@@ -31093,4 +31093,8 @@ a.text-muted:hover {
 [class*="accent-"] a.btn-dark {
   color: #ffffff;
 }
+#cs_pon {
+    cursor: pointer;
+    user-select: none;
+}
 /*# sourceMappingURL=adminlte.css.map */

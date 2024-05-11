@@ -28,6 +28,7 @@
 
     <script src="AdminTPL/plugins/jquery/jquery.min.js"></script>
     <script src="AdminTPL/plugins/jquery-ui/jquery-ui.min.js"></script>
+
     <script>
         $.widget.bridge('uibutton', $.ui.button)
     </script>
@@ -46,5 +47,136 @@
     <script src="AdminTPL/dist/js/pages/dashboard.js"></script>
     <script src="AdminTPL/dist/js/demo.js"></script>
     <script src="_framework/blazor.server.js"></script>
+
+    <script>
+        //code sắp xếp
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("myTable");
+            switching = true;
+            //Set the sorting direction to ascending:
+            dir = "asc";
+            /*Make a loop that will continue until
+            no switching has been done:*/
+            while (switching) {
+                //start by saying: no switching is done:
+                switching = false;
+                rows = table.rows;
+                /*Loop through all table rows (except the
+                first, which contains table headers):*/
+                for (i = 1; i < (rows.length - 1); i++) {
+                    //start by saying there should be no switching:
+                    shouldSwitch = false;
+                    /*Get the two elements you want to compare,
+                    one from current row and one from the next:*/
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    /*check if the two rows should switch place,
+                    based on the direction, asc or desc:*/
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            //if so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            //if so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    /*If a switch has been marked, make the switch
+                    and mark that a switch has been done:*/
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    //Each time a switch is done, increase this count by 1:
+                    switchcount++;
+                } else {
+                    /*If no switching has been done AND the direction is "asc",
+                    set the direction to "desc" and run the while loop again.*/
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+
+        }
+        //checkbox khi chọn tất cả
+        document.addEventListener("DOMContentLoaded", function () {
+            // Event listener for "Select All" checkbox
+            document.getElementById("select-all-checkbox").addEventListener("change", function () {
+                var checkboxes = document.querySelectorAll(".check-in-checkbox");
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = this.checked;
+                }, this);
+            });
+
+            // Event listener for table header clicks to trigger sorting
+            document.querySelectorAll("#grooming-table th").forEach(function (header, index) {
+                header.addEventListener("click", function () {
+                    sortTable(index);
+                });
+            });
+
+            // Event listener for checkbox changes
+            document.querySelectorAll(".check-in-checkbox").forEach(function (checkbox) {
+                checkbox.addEventListener("change", function () {
+                    // You can add logic here to handle checkbox state changes
+                    if (this.checked) {
+                        // Handle checkbox checked state
+                        console.log("Checked in");
+                    } else {
+                        // Handle checkbox unchecked state
+                        console.log("Checked out");
+                    }
+                });
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Event listener for checkbox changes
+            document.querySelectorAll(".check-in-checkbox").forEach(function (checkbox) {
+                checkbox.addEventListener("change", function () {
+                    var statusSelect = row.querySelector(".status-select");
+                    if (this.checked) {
+                        statusSelect.removeAttribute("disabled");
+                    } else {
+                        statusSelect.setAttribute("disabled", true);
+                    }
+                    enableUpdateStatusButton(); // Enable update status button if any checkbox is checked
+                });
+            });
+
+            // Function to enable update status button if any checkbox is checked
+            function enableUpdateStatusButton() {
+                var checkboxes = document.querySelectorAll(".check-in-checkbox");
+                var updateStatusBtn = document.getElementById("update-status-btn");
+                var isChecked = false;
+                checkboxes.forEach(function (checkbox) {
+                    if (checkbox.checked) {
+                        isChecked = true;
+                    }
+                });
+                if (isChecked) {
+                    updateStatusBtn.removeAttribute("disabled");
+                } else {
+                    updateStatusBtn.setAttribute("disabled", true);
+                }
+            }
+
+            // Event listener for update status button click
+            document.getElementById("update-status-btn").addEventListener("click", function () {
+                // You can add logic here to handle update status action
+                alert("Update status action triggered");
+            });
+        });
+
+
+    </script>
+
 </body>
 </html>
