@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DATN.ViewModels.Enum;
+
+namespace DATN.Data.Entities
+{
+	// Bảng Điểm danh nhân viên
+	[Table("EmployeeAttendances")]
+	public class EmployeeAttendance
+	{
+		[Key]
+		public int Id { get; set; } // Khóa chính
+
+		[ForeignKey("EmployeeSchedule")]
+		public int EmployeeScheduleId { get; set; } // Khóa ngoại đến ID lịch làm việc
+
+		[ForeignKey("User")]
+		public string UserId { get; set; } // Khóa ngoại đến ID nhân viên
+
+		public DateTime CheckInTime { get; set; } // Thời gian vào
+
+		public DateTime? CheckOutTime { get; set; } // Thời gian ra
+
+		public AttendanceStatus Status { get; set; } // Trạng thái
+
+		public string OtherNotes { get; set; } // Ghi chú khác
+
+		public virtual EmployeeSchedule EmployeeSchedule { get; set; } // Lịch làm việc
+
+		public virtual User User { get; set; } // Nhân viên
+	}
+}
