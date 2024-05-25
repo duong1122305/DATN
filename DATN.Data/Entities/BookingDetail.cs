@@ -14,14 +14,15 @@ namespace DATN.Data.Entities
 	[Table("BookingDetails")]
 	public class BookingDetail
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("Booking")]
 		public int BookingId { get; set; } // Khóa ngoại đến ID đặt lịch
+		
+		public Guid StaffId { get; set; } // Khóa ngoại đến ID đặt lịch
 
-		[ForeignKey("ServiceDetail")]
-		public int ServiceDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
+        public int? ComboId { get; set; }
+
+        public int? ServiceDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
 
 		public DateTime StartDateTime { get; set; } // Thời gian bắt đầu
 
@@ -32,6 +33,9 @@ namespace DATN.Data.Entities
 		public string Price { get; set; } // Giá tiền
 
 		public virtual Booking Booking { get; set; } // Đặt lịch
+		public virtual ComboService ComboService { get; set; } // Đặt lịch
+		public virtual User Staff { get; set; } // Đặt lịch
+		public virtual ICollection<Report> Reports { get; set; } 
 
 		public virtual ServiceDetail ServiceDetail { get; set; } // Chi tiết dịch vụ
 	}

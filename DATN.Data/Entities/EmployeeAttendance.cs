@@ -13,14 +13,11 @@ namespace DATN.Data.Entities
 	[Table("EmployeeAttendances")]
 	public class EmployeeAttendance
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("EmployeeSchedule")]
 		public int EmployeeScheduleId { get; set; } // Khóa ngoại đến ID lịch làm việc
 
-		[ForeignKey("User")]
-		public string UserId { get; set; } // Khóa ngoại đến ID nhân viên
+		public Guid UserId { get; set; } // Khóa ngoại đến ID nhân viên
 
 		public DateTime CheckInTime { get; set; } // Thời gian vào
 
@@ -28,9 +25,10 @@ namespace DATN.Data.Entities
 
 		public AttendanceStatus Status { get; set; } // Trạng thái
 
-		public string OtherNotes { get; set; } // Ghi chú khác
+		public string? OtherNotes { get; set; } // Ghi chú khác
 
 		public virtual EmployeeSchedule EmployeeSchedule { get; set; } // Lịch làm việc
+		public virtual ICollection<ShiftHandover> ShiftHandovers { get; set; } // Lịch làm việc
 
 		public virtual User User { get; set; } // Nhân viên
 	}

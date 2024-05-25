@@ -12,10 +12,8 @@ namespace DATN.Data.Entities
 	[Table("ComboServices")]
 	public class ComboService
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[Required]
 		public string Name { get; set; } // Tên gói dịch vụ
 
 		public DateTime CreateAt { get; set; } // Thời gian tạo
@@ -24,11 +22,11 @@ namespace DATN.Data.Entities
 
 		public double Price { get; set; } // Giá tiền
 
-		[ForeignKey("PetType")]
-		public int PetTypeId { get; set; } // Khóa ngoại đến ID loại thú cưng
-
 		public DateTime DeleteAt { get; set; } // Thời gian xóa
+		public bool IsDeleted { get; set; } // Thời gian xóa
 
 		public virtual PetType PetType { get; set; } // Loại thú cưng
+		public virtual ComboDetail ComboDetail { get; set; } // Loại thú cưng
+		public virtual ICollection<BookingDetail> BookingDetails { get; set; } // Loại thú cưng
 	}
 }

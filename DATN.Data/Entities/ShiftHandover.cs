@@ -12,11 +12,9 @@ namespace DATN.Data.Entities
 	[Table("ShiftHandovers")]
 	public class ShiftHandover
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("User")]
-		public string UserId { get; set; } // Khóa ngoại đến ID nhân viên
+		public int EmployeeAttendanceId { get; set; } // Khóa ngoại đến ID nhân viên
 
 		public DateTime CheckInTime { get; set; } // Thời gian vào
 
@@ -32,16 +30,16 @@ namespace DATN.Data.Entities
 
 		public double TotalEarnings { get; set; } // Tổng thu nhập
 
-		public double TotalOtherExpenses { get; set; } // Tổng chi phí khác
+		public double? TotalOtherExpenses { get; set; } // Tổng chi phí khác
 
-		public double TotalOtherIncomes { get; set; } // Tổng thu khác
+		public double? TotalOtherIncomes { get; set; } // Tổng thu khác
 
-		public string OtherExpenseReason { get; set; } // Lý do chi phí khác
+		public string? OtherExpenseReason { get; set; } // Lý do chi phí khác
 
-		public string OtherIncomeReason { get; set; } // Lý do thu nhập khác
+		public string? OtherIncomeReason { get; set; } // Lý do thu nhập khác
 
-		public string OtherNotes { get; set; } // Ghi chú khác
+		public string? OtherNotes { get; set; } // Ghi chú khác
 
-		public virtual User User { get; set; } // Nhân viên
+		public virtual EmployeeAttendance EmployeeAttendance { get; set; } // Nhân viên
 	}
 }

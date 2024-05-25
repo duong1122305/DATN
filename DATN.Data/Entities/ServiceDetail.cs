@@ -11,13 +11,10 @@ namespace DATN.Data.Entities
 	[Table("ServiceDetails")]
 	public class ServiceDetail
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("Service")]
 		public int ServiceId { get; set; } // Khóa ngoại đến ID dịch vụ
 
-		[Required]
 		public string Name { get; set; } // Tên chi tiết dịch vụ
 
 		public float Price { get; set; } // Giá tiền
@@ -28,10 +25,13 @@ namespace DATN.Data.Entities
 
 		public DateTime CreateAt { get; set; } // Thời gian tạo
 
-		public DateTime UpdateAt { get; set; } // Thời gian cập nhật
+		public DateTime? UpdateAt { get; set; } // Thời gian cập nhật
 
-		public DateTime DeleteAt { get; set; } // Thời gian xóa
+		public DateTime? DeleteAt { get; set; } // Thời gian xóa
+		public bool Deleted { get; set; } // Thời gian xóa
 
 		public virtual Service Service { get; set; } // Dịch vụ
+		public virtual ICollection<ComboDetail> ComboDetails { get; set; } // Dịch vụ
+		public virtual ICollection<BookingDetail> BookingDetails { get; set; } // Dịch vụ
 	}
 }

@@ -12,10 +12,10 @@ namespace DATN.Data.Entities
 	[Table("TypePayments")]
 	public class TypePayment
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[Required]
 		public string Name { get; set; } // Tên loại thanh toán
+		public virtual Booking Booking { get; set; }
+		public virtual ICollection<Payment> Payment { get; set; }
 	}
 }

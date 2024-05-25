@@ -11,12 +11,10 @@ namespace DATN.Data.Entities
 	[Table("WorkShifts")]
 	public class WorkShift
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
 		public DateTime WorkDate { get; set; } // Ngày làm việc
 
-		[ForeignKey("Shift")]
 		public int ShiftId { get; set; } // Khóa ngoại đến ID ca làm
 
 		public virtual Shift Shift { get; set; } // Ca làm

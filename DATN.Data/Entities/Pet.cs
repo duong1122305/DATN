@@ -12,18 +12,14 @@ namespace DATN.Data.Entities
 	[Table("Pets")]
 	public class Pet
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("Owner")]
-		public int OwnerId { get; set; } // Khóa ngoại đến ID chủ nhân
+		public Guid OwnerId { get; set; } // Khóa ngoại đến ID chủ nhân
 
-		[ForeignKey("Species")]
 		public int SpeciesId { get; set; } // Khóa ngoại đến ID giống thú cưng
 
 		public bool IsGuest { get; set; } // Thú cưng của khách hàng hay không
 
-		[Required]
 		public string Name { get; set; } // Tên thú cưng
 
 		public bool Gender { get; set; } // Giới tính
@@ -40,7 +36,6 @@ namespace DATN.Data.Entities
 
 		public string Note { get; set; } // Ghi chú
 
-		public virtual User? Owner { get; set; } // Chủ nhân
 		public virtual Guest? Guest { get; set; } // Chủ nhân
 
 		public virtual PetSpecies Species { get; set; } // Giống thú cưng

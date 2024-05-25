@@ -12,17 +12,15 @@ namespace DATN.Data.Entities
 	[Table("Reports")]
 	public class Report
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("ServiceDetail")]
-		public int ServiceDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
+		public int BookingDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
 
 		public string Comment { get; set; } // Bình luận
 
 		public DateTime CreateAt { get; set; } // Thời gian tạo
 
 		// Quan hệ một-nhiều: Mỗi báo cáo liên quan đến một chi tiết dịch vụ
-		public virtual ServiceDetail ServiceDetail { get; set; }
+		public virtual BookingDetail BookingDetail { get; set; }
 	}
 }

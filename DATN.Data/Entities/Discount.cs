@@ -12,7 +12,6 @@ namespace DATN.Data.Entities
 	[Table("Discounts")]
 	public class Discount
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
 		public int Quantity { get; set; } // Số lượng
@@ -34,5 +33,6 @@ namespace DATN.Data.Entities
 		public double MinMoneyApplicable { get; set; } // Giá trị tối thiểu áp dụng giảm giá
 
 		public DateTime? DeleteAt { get; set; } // Thời gian xóa
+		public virtual ICollection<Booking> Booking { get; set; }
 	}
 }

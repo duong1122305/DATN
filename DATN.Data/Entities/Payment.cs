@@ -12,16 +12,14 @@ namespace DATN.Data.Entities
 	[Table("Payments")]
 	public class Payment
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[ForeignKey("Booking")]
-		public int BookingId { get; set; } // Khóa ngoại đến ID đặt lịch
+		public int IdTypePayment { get; set; } // Khóa ngoại đến ID đặt lịch
 
 		public float Amount { get; set; } // Số tiền thanh toán
 
-		public DateTime PaymentTime { get; set; } // Thời gian thanh toán
+		public DateTime? PaymentTime { get; set; } // Thời gian thanh toán
 
-		public virtual Booking Booking { get; set; } // Đặt lịch
+		public virtual TypePayment TypePayment { get; set; } // Đặt lịch
 	}
 }

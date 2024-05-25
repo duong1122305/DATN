@@ -12,10 +12,8 @@ namespace DATN.Data.Entities
 	[Table("PetTypes")]
 	public class PetType
 	{
-		[Key]
 		public int Id { get; set; } // Khóa chính
 
-		[Required]
 		public string Name { get; set; } // Tên loại thú cưng
 
 		// Quan hệ một-nhiều: Mỗi loại thú cưng có thể có nhiều giống thú cưng
