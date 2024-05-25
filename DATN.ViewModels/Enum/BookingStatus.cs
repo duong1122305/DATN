@@ -8,14 +8,14 @@ namespace DATN.Data.Enum
 {
 	public enum BookingStatus
 	{
-		PENDING_CONFIRMATION, // Chờ xác nhận
-		CONFIRMED,            // Đã xác nhận
-		ARRIVED,              // Đã đến nơi
-		IN_PROGRESS,          // Đang thực hiện
-		COMPLETED,            // Đã hoàn thành
-		MISSED,              // Khách không đến
-		CUSTOMER_CANCELLED,   // Khách huỷ
-		STAFF_CANCELLED,      // Nhân viên huỷ
-		ADMIN_CANCELLED       // Admin huỷ
+		PendingConfirmation, // Chờ xác nhận
+		Confirmed,           // Đã xác nhận
+		Arrived,             // Đã đến nơi
+		InProgress,          // Đang thực hiện
+		Completed,           // Đã hoàn thành
+		NoShow,              // Khách không đến
+		CustomerCancelled,   // Khách huỷ
+		StaffCancelled,      // Nhân viên huỷ
+		AdminCancelled       // Admin huỷ
 	}
 }
