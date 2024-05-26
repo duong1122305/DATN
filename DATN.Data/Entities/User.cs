@@ -9,7 +9,8 @@ namespace DATN.Data.Entities
 {
 	public class User: IdentityUser<Guid>
 	{
-		public virtual ICollection<Booking> Bookings { get; set; }
+        public string? FullName { get; set; }
+        public virtual ICollection<Booking> Bookings { get; set; }
 		public virtual ICollection<BookingDetail> BookingDetails { get; set; }
 		public virtual ICollection<ShiftHandover> ShiftHandovers { get; set;}
 		public virtual ICollection<EmployeeSchedule> EmployeeSchedules { get; set;}

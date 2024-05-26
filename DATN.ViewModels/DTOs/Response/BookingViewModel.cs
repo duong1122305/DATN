@@ -1,33 +1,33 @@
-﻿using System;
-using System.Collections;
+﻿using DATN.Data.Enum;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DATN.Data.Enum;
 
-namespace DATN.Data.Entities
+namespace DATN.ViewModels.DTOs.Response
 {
-	// Bảng Đặt lịch
-	[Table("Bookings")]
-	public class Booking
-	{
+    public class BookingViewModel
+    {
 		public int Id { get; set; } // Khóa chính
 
 		public Guid? StaffAtCounterId { get; set; } // Khóa ngoại đến ID nhân viên thanh toán
+		public string? StaffCounterName {  get; set; }
 
 		public Guid? StaffConfirmId { get; set; } // Khóa ngoại đến ID nhân viên xác nhận đơn đặt hàng
+
+		public string? StaffConfirmName{ get; set; }//tên nhân viên xác nhận
 
 		public int? VoucherId { get; set; } // ID mã giảm giá (nếu có)
 		public double? ReducedAmount { get; set; } // số tiền giảm
 
 		public int PaymentTypeId { get; set; } // Khóa ngoại đến ID loại thanh toán
-
+		public string PaymentName { get; set; } // Tên loại thanh toán
+		
 		public Guid GuestId { get; set; } // Đặt lịch cho khách hàng chưa đăng ký
+        public string GuestName { get; set; }
 
-		public float TotalPrice { get; set; } // Tổng giá trị đơn đặt hàng
+        public float TotalPrice { get; set; } // Tổng giá trị đơn đặt hàng
 
 		public DateTime BookingTime { get; set; } // Thời gian đặt lịch
 
@@ -40,17 +40,8 @@ namespace DATN.Data.Entities
 		public DateTime? UpdatedAt { get; set; } // Thời gian cập nhật
 
 		public Guid? UpdatedBy { get; set; } // Người cập nhật
+        public  string UpdateByName { get; set; }
 
-		public BookingStatus Status { get; set; } // Trạng thái đơn hàng
-
-		public virtual ICollection<BookingDetail> BookingDetails { get; set; }
-
-		public virtual User StaffConfirm { get; set; }
-		public virtual User StaffAtCounter { get; set; }
-		public virtual User StaffUpdate{ get; set; }
-		public virtual Guest Guest { get; set; }
-		public virtual TypePayment TypePayment { get; set; }
-		public virtual Discount Discount { get; set; }
-
+        public BookingStatus Status { get; set; } // Trạng thái đơn hàng
 	}
 }

@@ -49,7 +49,6 @@ namespace DATN.Data.EF
         public DbSet<EmployeeSchedule> EmployeeSchedules { get; set; }
         public DbSet<EmployeeService> EmployeeServices { get; set; }
         public DbSet<Guest> Guests { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<Pet> Pets { get; set; }
         public DbSet<PetSpecies> PetSpecies { get; set; }
         public DbSet<PetType> PetTypes { get; set; }
