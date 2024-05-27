@@ -28,7 +28,6 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new EmployeeScheduleConfig());
             builder.ApplyConfiguration(new EmployeeServiceConfig());
             builder.ApplyConfiguration(new GuestConfig());
-            builder.ApplyConfiguration(new PaymentConfig());
             builder.ApplyConfiguration(new PetConfig());
             builder.ApplyConfiguration(new PetSeciesConfig());
             builder.ApplyConfiguration(new PetTypeConfig());

@@ -16,11 +16,11 @@ namespace DATN.Data.Config
             //
             builder.HasKey(c => c.Id);
             //
-            builder.HasOne(c=>c.Customer)
+            builder.HasOne(c=>c.StaffAtCounter)
                 .WithMany(c=>c.Bookings)
                 .HasForeignKey(c=>c.StaffAtCounterId);
             //
-            builder.HasOne(c=>c.Customer)
+            builder.HasOne(c=>c.StaffConfirm)
                 .WithMany(c=>c.Bookings)
                 .HasForeignKey(c=>c.StaffConfirmId);
             //

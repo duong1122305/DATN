@@ -16,6 +16,5 @@ namespace DATN.Data.Entities
 
 		public string Name { get; set; } // Tên loại thanh toán
 		public virtual Booking Booking { get; set; }
-		public virtual ICollection<Payment> Payment { get; set; }
 	}
 }
