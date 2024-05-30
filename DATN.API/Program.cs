@@ -1,5 +1,12 @@
+using DATN.Aplication.Extentions;
+using DATN.Aplication.Repositories;
 using DATN.Data.EF;
+using DATN.Data.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +23,38 @@ builder.Services.AddDbContext<DATNDbContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DATN"),
-        b=>b.MigrationsAssembly("DATN.API"));
+        b => b.MigrationsAssembly("DATN.API"));
 });
+
+builder.Services.AddIdentity<User, Role>(options =>
+{
+    options.Password.RequiredLength = 6;
+}).AddEntityFrameworkStores<DATNDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateActor = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        RequireExpirationTime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration.GetSection("JWT:Issuer").Value,
+        ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value))
+
+    };
+});
+
+builder.Services.AddScoped<MailExtention>();
+builder.Services.AddScoped<RandomCodeExtention>();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 var app = builder.Build();
 
@@ -30,6 +67,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
