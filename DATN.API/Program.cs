@@ -10,6 +10,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add auto mapper
+builder.Services.AddAutoMapper(typeof(Program));
 // Add services to the container.
 
 builder.Services.AddControllers();

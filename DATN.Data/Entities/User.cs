@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Data.Entities
 {
+
     public class User : IdentityUser<Guid>
     {
         public string FullName { get; set; }
@@ -20,4 +21,5 @@ namespace DATN.Data.Entities
         public virtual ICollection<EmployeeAttendance> EmployeeAttendances { get; set; }
         public virtual ICollection<EmployeeService> EmployeeServices { get; set; }
     }
+
 }
