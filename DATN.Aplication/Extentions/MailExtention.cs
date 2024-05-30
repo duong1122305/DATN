@@ -1,5 +1,6 @@
 ﻿using DATN.Data.Entities;
 using DATN.ViewModels;
+using DATN.ViewModels.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace DATN.Aplication.Extentions
                 return e.Message;
             }
         }
-        public async Task<string> SendMailCodeForgot(string userMail, string code)
+        public async Task<ResponseMail> SendMailCodeForgot(string userMail, string code)
         {
             try
             {
@@ -58,12 +59,12 @@ namespace DATN.Aplication.Extentions
                 client.UseDefaultCredentials = false;
                 client.Credentials = new NetworkCredential("shoppet79@gmail.com", "eolg vnvv dukb yhdm");
                 await client.SendMailAsync(message);
-                return $"Mã xác thực đã gửi tới email của bạn!!";
+                return new ResponseMail { IsSuccess = true, Notifications = "Mã xác nhận đã được gửi tới mail của bạn!!" };
             }
             catch (Exception e)
             {
 
-                return e.Message;
+                return new ResponseMail { IsSuccess = true, Notifications = "Mã xác nhận chưa được gửi đi!!", Error = e.Message };
             }
         }
     }

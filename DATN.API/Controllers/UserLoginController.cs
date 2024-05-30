@@ -7,6 +7,8 @@ using System.Net;
 using DATN.Aplication.Repositories;
 using DATN.ViewModels;
 using DATN.ViewModels.ViewModel;
+using Azure;
+using DATN.ViewModels.Common;
 
 namespace DATN.API.Controllers
 {
@@ -34,7 +36,7 @@ namespace DATN.API.Controllers
             return result;
         }
         [HttpPost("User-ForgotPass")]
-        public async Task<string> ForgotPassword(string mail)
+        public async Task<ResponseMail> ForgotPassword(string mail)
         {
             var result = await _userrepo.ForgotPassword(mail);
             return result;

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DATN.Aplication.Extentions;
 using DATN.ViewModels.ViewModel;
+using DATN.ViewModels.Common;
 
 namespace DATN.Aplication.Repositories
 {
@@ -32,45 +33,23 @@ namespace DATN.Aplication.Repositories
         }
         public async Task<string> Login(UserLoginView userView)
         {
-            var userName = await _userManager.FindByNameAsync(userView.UserName);
-            var userEmail = await _userManager.FindByEmailAsync(userView.UserName);
-            var UserPhone = await GetUserAtPhoneNumber(userView.UserName);
-            if (UserPhone == null && userName == null && userEmail == null) return null;
+            var userIdentity = await CheckUser(userView.UserName);
+            if (userIdentity == null) return null;
             else
             {
-                if (userName != null)
+                if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
                 {
-                    if (await _userManager.CheckPasswordAsync(userName, userView.Password))
-                    {
-                        _user = userName;
-                        return await GenerateTokenString(userView);
-                    }
-                    return null;
+                    _user=userIdentity;
+                    return await GenerateTokenString(userView);
                 }
-                else if (userEmail != null)
-                {
-                    if (await _userManager.CheckPasswordAsync(userEmail, userView.Password))
-                    {
-                        _user = userEmail;
-                        return await GenerateTokenString(userView);
-                    }
-                    return null;
-                }
-                else
-                {
-                    if (await _userManager.CheckPasswordAsync(UserPhone, userView.Password))
-                    {
-                        _user = UserPhone;
-                        return await GenerateTokenString(userView);
-                    }
-                    return null;
-                }
+                return null;
             }
 
         }
 
         public async Task<string> GenerateTokenString(UserLoginView userViewModel)
         {
+            var user = await CheckUser(userViewModel.UserName);
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, userViewModel.UserName),
@@ -93,6 +72,7 @@ namespace DATN.Aplication.Repositories
         {
             var userIdentity = new User()
             {
+                FullName= userRegisterView.FullName,
                 UserName = userRegisterView.UserName,
                 Email = userRegisterView.Email,
                 PhoneNumber = userRegisterView.PhoneNumber,
@@ -119,46 +99,46 @@ namespace DATN.Aplication.Repositories
             return "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!";
         }
 
-        public async Task<string> ForgotPassword(string username)
+        public async Task<ResponseMail> ForgotPassword(string username)
         {
-            var userName = await _userManager.FindByNameAsync(username);
-            var userEmail = await _userManager.FindByEmailAsync(username);
-            var UserPhone = await _userManager.Users.FirstOrDefaultAsync(c => c.PhoneNumber == username);
-            if (UserPhone == null && userName == null && userEmail == null) return "Tài khoản của bạn chưa được đăng kí";
+            var userIdentity = await CheckUser(username);
+            if (userIdentity == null) return new ResponseMail { IsSuccess = false, Notifications = "Tài khoản bạn nhập chưa được đăng ký!" };
             else
             {
                 string newcode = _random.RandomCode();
-                if (userName != null)
+                if (userIdentity != null)
                 {
-                    userName.Address = newcode;
-                    var updateUser = await _userManager.UpdateAsync(userName);
+                    userIdentity.CodeConfirm = newcode;
+                    var updateUser = await _userManager.UpdateAsync(userIdentity);
                     if (updateUser.Succeeded)
-                        return await _mail.SendMailCodeForgot(userName.Email, newcode);
+                        return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
                     else
                     {
-                        return "Lỏ rồi code chưa được đưa vào db đâu nhá";
+                        return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
                     }
                 }
-                else if (userEmail != null)
+                else if (userIdentity != null)
                 {
-                    userEmail.Address = newcode;
-                    var updateUser = await _userManager.UpdateAsync(userName);
+                    userIdentity.CodeConfirm = newcode;
+                    var updateUser = await _userManager.UpdateAsync(userIdentity);
                     if (updateUser.Succeeded)
-                        return await _mail.SendMailCodeForgot(userEmail.Email, newcode);
+                        return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
                     else
                     {
-                        return "Lỏ rồi code chưa được đưa vào db đâu nhá";
+                        return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
+
                     }
                 }
                 else
                 {
-                    UserPhone.Address = newcode;
-                    var updateUser = await _userManager.UpdateAsync(userName);
+                    userIdentity.CodeConfirm = newcode;
+                    var updateUser = await _userManager.UpdateAsync(userIdentity);
                     if (updateUser.Succeeded)
-                        return await _mail.SendMailCodeForgot(UserPhone.Email, newcode);
+                        return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
                     else
                     {
-                        return "Lỏ rồi code chưa được đưa vào db đâu nhá";
+                        return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
+
                     }
                 }
             }
@@ -167,7 +147,7 @@ namespace DATN.Aplication.Repositories
         public async Task<List<UserInfView>> GetUsers()
         {
             var listUserIdentity = await _userManager.Users.ToListAsync();
-            var listUser=new List<UserInfView>();
+            var listUser = new List<UserInfView>();
 
             foreach (var user in listUserIdentity)
             {
@@ -179,7 +159,7 @@ namespace DATN.Aplication.Repositories
                     userInfView.Address = user.Address;
                     userInfView.Email = user.Email;
                     userInfView.PhoneNumber = user.PhoneNumber;
-                    listUser.Add(userInfView); 
+                    listUser.Add(userInfView);
                 }
             }
             return listUser;
@@ -208,27 +188,13 @@ namespace DATN.Aplication.Repositories
 
         public async Task<string> ChangePassword(UserChangePasswordView user)
         {
-            var userName = await _userManager.FindByNameAsync(user.UserName);
-            var userEmail = await _userManager.FindByEmailAsync(user.UserName);
-            var UserPhone = await GetUserAtPhoneNumber(user.UserName);
-            if (UserPhone == null && userName == null && userEmail == null) return "Tài khoản chưa được đăng kí";
+            var userIdentity = await CheckUser(user.UserName);
+            if (userIdentity == null) return "Tài khoản chưa được đăng kí";
             else
             {
-                if (userName != null)
-                {
-                    _user = userName;
-                }
-                else if (userEmail != null)
-                {
-                    _user = userEmail;
-                }
-                else
-                {
-                    _user = UserPhone;
-                }
                 if (user.NewPassword == user.ConfirmPassword)
                 {
-                    var result = await _userManager.ChangePasswordAsync(_user, user.OldPassword, user.NewPassword);
+                    var result = await _userManager.ChangePasswordAsync(userIdentity, user.OldPassword, user.NewPassword);
                     if (result.Succeeded)
                     {
                         return "Đổi mật khẩu thành công!!";
@@ -236,6 +202,64 @@ namespace DATN.Aplication.Repositories
                     else return "Mật khẩu hiện tại đang sai hoặc mật khẩu mới chưa đúng định dạng";
                 }
                 else return "Mật khẩu mới và xác nhận lại mật khẩu mới không trùng khớp";
+            }
+        }
+
+        public async Task<string> GetConfirmCode(string username)
+        {
+            var user = await CheckUser(username);
+            if (user == null) return "Tài khoản nhập chưa được đăng kí";
+            else
+            {
+                if (user != null)
+                {
+                    return user.CodeConfirm;
+                }
+                else if (user != null)
+                {
+                    return user.CodeConfirm;
+                }
+                else
+                {
+                    return user.CodeConfirm;
+                }
+            }
+        }
+        public async Task<bool> CheckCodeConfirm(string username, string code)
+        {
+            var user = await CheckUser(username);
+            if (user != null)
+            {
+                if (code == user.CodeConfirm)
+                {
+                    user.CodeConfirm = null;
+                    await _userManager.UpdateAsync(user);
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        private async Task<User> CheckUser(string username)
+        {
+            var userName = await _userManager.FindByNameAsync(username);
+            var userEmail = await _userManager.FindByEmailAsync(username);
+            var userPhone = await GetUserAtPhoneNumber(username);
+            if (userPhone == null && userName == null && userEmail == null) return null;
+            else
+            {
+                if (userEmail != null)
+                {
+                    return userEmail;
+                }
+                else if (userName != null)
+                {
+                    return userName;
+                }
+                else
+                {
+                    return userPhone;
+                }
             }
         }
     }
