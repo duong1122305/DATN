@@ -11,6 +11,6 @@ namespace DATN.Aplication
 {
     public interface IUnitOfWork
     {
-        IGennericRepository<Service> CustomerRepository { get; }
+        IGennericRepository<Service> ServiceRepository { get; }
     }
 }

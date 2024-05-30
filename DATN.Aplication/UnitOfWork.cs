@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication
 {
-    public class UnitOfWork
+    public class UnitOfWork: IUnitOfWork
     {
         private readonly DATNDbContext _context;
 
