@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.Aplication.Repository
+namespace DATN.Aplication.Repository.IRepository
 {
-    public interface IServiceRepository: IGennericRepository<Service>
+    public interface IServiceRepository : IGennericRepository<Service>
     {
     }
 }

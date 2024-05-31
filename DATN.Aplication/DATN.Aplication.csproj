@@ -30,11 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Service\" />
-
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DATN.Data\DATN.Data.csproj" />
   </ItemGroup>
 

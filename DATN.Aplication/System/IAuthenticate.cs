@@ -3,9 +3,9 @@ using DATN.ViewModels;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.ViewModel;
 
-namespace DATN.Aplication.Repositories
+namespace DATN.Aplication.System
 {
-    public interface IUserRepo
+    public interface IAuthenticate
     {
         public Task<string> Login(UserLoginView userLoginView);
         public Task<string> Register(UserRegisterView userRegisterView);

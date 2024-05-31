@@ -26,7 +26,6 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new DiscountConfig());
             builder.ApplyConfiguration(new EmployeeAttendanceConfig());
             builder.ApplyConfiguration(new EmployeeScheduleConfig());
-            builder.ApplyConfiguration(new EmployeeServiceConfig());
             builder.ApplyConfiguration(new GuestConfig());
             builder.ApplyConfiguration(new PetConfig());
             builder.ApplyConfiguration(new PetSeciesConfig());
@@ -35,7 +34,6 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new ServiceConfig());
             builder.ApplyConfiguration(new ServiceDetailConfig());
             builder.ApplyConfiguration(new ShiftConfig());
-            builder.ApplyConfiguration(new ShiftHandoverConfig());
             builder.ApplyConfiguration(new TypePaymentConfig());
             builder.ApplyConfiguration(new WorkShiftConfig());
         }
@@ -46,7 +44,6 @@ namespace DATN.Data.EF
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendances { get; set; }
         public DbSet<EmployeeSchedule> EmployeeSchedules { get; set; }
-        public DbSet<EmployeeService> EmployeeServices { get; set; }
         public DbSet<Guest> Guests { get; set; }
         public DbSet<Pet> Pets { get; set; }
         public DbSet<PetSpecies> PetSpecies { get; set; }
@@ -55,7 +52,6 @@ namespace DATN.Data.EF
         public DbSet<Service> Services { get; set; }
         public DbSet<ServiceDetail> ServiceDetails { get; set; }
         public DbSet<Shift> Shifts { get; set; }
-        public DbSet<ShiftHandover> ShiftHandovers { get; set; }
         public DbSet<TypePayment> TypePayments { get; set; }
         public DbSet<WorkShift> WorkShifts { get; set; }
     }

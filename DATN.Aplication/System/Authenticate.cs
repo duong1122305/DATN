@@ -15,16 +15,16 @@ using DATN.Aplication.Extentions;
 using DATN.ViewModels.ViewModel;
 using DATN.ViewModels.Common;
 
-namespace DATN.Aplication.Repositories
+namespace DATN.Aplication.System
 {
-    public class UserRepo : IUserRepo
+    public class Authenticate : IAuthenticate
     {
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
         private User _user;
-        public UserRepo(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
         {
             _userManager = userManager;
             _config = configuration;

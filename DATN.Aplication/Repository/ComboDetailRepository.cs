@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ServiceRepository : GennericRepository<Service>, IServiceRepository
+    public class ComboDetailRepository : GennericRepository<ComboDetail>, IComboDetailRepository
     {
-        public ServiceRepository(DATNDbContext context) : base(context)
+        public ComboDetailRepository(DATNDbContext context) : base(context)
         {
         }
-
     }
 }

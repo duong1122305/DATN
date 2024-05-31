@@ -1,12 +1,13 @@
 using DATN.Aplication.Extentions;
-using DATN.Aplication.Repositories;
-using DATN.Data.EF;
+using DATN.Aplication.System;
 using DATN.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DATN.Aplication.System;
+using DATN.Data.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
-builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IAuthenticate, Authenticate>();
 
 var app = builder.Build();
 

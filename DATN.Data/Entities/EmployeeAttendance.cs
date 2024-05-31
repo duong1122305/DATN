@@ -28,7 +28,6 @@ namespace DATN.Data.Entities
 		public string? OtherNotes { get; set; } // Ghi chú khác
 
 		public virtual EmployeeSchedule EmployeeSchedule { get; set; } // Lịch làm việc
-		public virtual ICollection<ShiftHandover> ShiftHandovers { get; set; } // Lịch làm việc
 
 		public virtual User User { get; set; } // Nhân viên
 	}

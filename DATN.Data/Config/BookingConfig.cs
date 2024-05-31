@@ -20,10 +20,10 @@ namespace DATN.Data.Config
                 .WithMany(c=>c.Bookings)
                 .HasForeignKey(c=>c.StaffAtCounterId);
             //
-            builder.HasOne(c=>c.StaffConfirm)
-                .WithMany(c=>c.Bookings)
-                .HasForeignKey(c=>c.StaffConfirmId);
-            //
+            //builder.HasOne(c=>c.StaffConfirm)
+            //    .WithMany(c=>c.Bookings)
+            //    .HasForeignKey(c=>c.StaffConfirmId);
+            
             builder.HasOne(c => c.Discount)
                 .WithMany(c => c.Booking)
                 .HasForeignKey(c => c.VoucherId);

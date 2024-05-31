@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ServiceRepository : GennericRepository<Service>, IServiceRepository
+    public class ShiftRepository : GennericRepository<Shift>, IShiftRepository
     {
-        public ServiceRepository(DATNDbContext context) : base(context)
+        public ShiftRepository(DATNDbContext context) : base(context)
         {
         }
-
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 using System.Net;
-using DATN.Aplication.Repositories;
+using DATN.Aplication.System;
 using DATN.ViewModels;
 using DATN.ViewModels.ViewModel;
 using Azure;
@@ -16,9 +16,9 @@ namespace DATN.API.Controllers
     [ApiController]
     public class UserLoginController : ControllerBase
     {
-        private readonly IUserRepo _userrepo;
+        private readonly IAuthenticate _userrepo;
 
-        public UserLoginController(IUserRepo userRepo)
+        public UserLoginController(IAuthenticate userRepo)
         {
             _userrepo = userRepo;
         }

@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ServiceRepository : GennericRepository<Service>, IServiceRepository
+    public class TypePaymentRepository : GennericRepository<TypePayment>, ITypePaymentRepository
     {
-        public ServiceRepository(DATNDbContext context) : base(context)
+        public TypePaymentRepository(DATNDbContext context) : base(context)
         {
         }
-
     }
 }
