@@ -1,13 +1,12 @@
 ﻿using DATN.Data.Entities;
-using DATN.ViewModels;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.ViewModel;
+using DATN.ViewModels.DTOs.Request.Authenticate;
 
 namespace DATN.Aplication.System
 {
     public interface IAuthenticate
     {
-        public Task<string> Login(UserLoginView userLoginView);
+        public Task<ResponseData<string>> Login(UserLoginView userLoginView);
         public Task<string> Register(UserRegisterView userRegisterView);
         public Task<string> GenerateTokenString(UserLoginView userLoginView);
         public Task<ResponseMail> ForgotPassword(string username);

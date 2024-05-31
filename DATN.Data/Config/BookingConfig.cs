@@ -17,13 +17,15 @@ namespace DATN.Data.Config
             builder.HasKey(c => c.Id);
             //
             builder.HasOne(c=>c.StaffAtCounter)
-                .WithMany(c=>c.Bookings)
-                .HasForeignKey(c=>c.StaffAtCounterId);
+                .WithMany(c=>c.BookingsAsCounterStaff)
+                .HasForeignKey(c=>c.StaffAtCounterId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
             //
-            //builder.HasOne(c=>c.StaffConfirm)
-            //    .WithMany(c=>c.Bookings)
-            //    .HasForeignKey(c=>c.StaffConfirmId);
-            
+            builder.HasOne(c => c.StaffConfirm)
+                .WithMany(c => c.BookingsAsConfirmStaff)
+                .HasForeignKey(c => c.StaffConfirmId).OnDelete(DeleteBehavior.Restrict); 
+
             builder.HasOne(c => c.Discount)
                 .WithMany(c => c.Booking)
                 .HasForeignKey(c => c.VoucherId);

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.ViewModels
+namespace DATN.ViewModels.DTOs.Request.Authenticate
 {
     public class UserRegisterView
     {

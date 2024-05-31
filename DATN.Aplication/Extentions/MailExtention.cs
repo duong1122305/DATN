@@ -1,6 +1,6 @@
 ﻿using DATN.Data.Entities;
-using DATN.ViewModels;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Request.Authenticate;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -14,7 +14,8 @@ namespace DATN.Data.Entities
         public bool Gender { get; set; }
         public string? CodeConfirm { get; set; }
         public string Address { get; set; }
-        public virtual ICollection<Booking> Bookings { get; set; }
+        public ICollection<Booking> BookingsAsCounterStaff { get; set; }
+        public ICollection<Booking> BookingsAsConfirmStaff { get; set; }
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }
         public virtual ICollection<EmployeeSchedule> EmployeeSchedules { get; set; }
         public virtual ICollection<EmployeeAttendance> EmployeeAttendances { get; set; }

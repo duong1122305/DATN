@@ -19,6 +19,7 @@ namespace DATN.Data.Config
             builder.HasOne(c => c.Booking)
                 .WithMany(c => c.BookingDetails)
                 .HasForeignKey(c => c.BookingId)
+                .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
             //
             builder.HasOne(c=>c.ServiceDetail)

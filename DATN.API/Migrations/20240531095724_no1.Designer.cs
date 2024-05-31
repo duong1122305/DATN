@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    [Migration("20240530065612_ver1.1")]
-    partial class ver11
+    [Migration("20240531095724_no1")]
+    partial class no1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,10 +51,18 @@ namespace DATN.API.Migrations
                     b.Property<int>("PaymentTypeId")
                         .HasColumnType("int");
 
+                    b.Property<double?>("ReducedAmount")
+                        .HasColumnType("float");
+
                     b.Property<Guid?>("StaffAtCounterId")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("StaffConfirmId")
+                        .IsRequired()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffUpdateId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
@@ -66,8 +74,8 @@ namespace DATN.API.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("VoucherId")
                         .HasColumnType("int");
@@ -79,7 +87,11 @@ namespace DATN.API.Migrations
                     b.HasIndex("PaymentTypeId")
                         .IsUnique();
 
+                    b.HasIndex("StaffAtCounterId");
+
                     b.HasIndex("StaffConfirmId");
+
+                    b.HasIndex("StaffUpdateId");
 
                     b.HasIndex("VoucherId");
 
@@ -298,21 +310,6 @@ namespace DATN.API.Migrations
                     b.ToTable("EmployeeSchedules");
                 });
 
-            modelBuilder.Entity("DATN.Data.Entities.EmployeeService", b =>
-                {
-                    b.Property<Guid>("IdCustomer")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("IdService")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdCustomer", "IdService");
-
-                    b.HasIndex("IdService");
-
-                    b.ToTable("EmployeeServices");
-                });
-
             modelBuilder.Entity("DATN.Data.Entities.Guest", b =>
                 {
                     b.Property<Guid>("Id")
@@ -355,35 +352,6 @@ namespace DATN.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Guests");
-                });
-
-            modelBuilder.Entity("DATN.Data.Entities.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<float>("Amount")
-                        .HasColumnType("real");
-
-                    b.Property<int?>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdTypePayment")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PaymentTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("IdTypePayment");
-
-                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Pet", b =>
@@ -543,6 +511,9 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDetele")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -619,67 +590,6 @@ namespace DATN.API.Migrations
                     b.ToTable("Shift");
                 });
 
-            modelBuilder.Entity("DATN.Data.Entities.ShiftHandover", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CheckInTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CheckOutTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EmployeeAttendanceId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("FinalAccountBalance")
-                        .HasColumnType("float");
-
-                    b.Property<double>("FinalCash")
-                        .HasColumnType("float");
-
-                    b.Property<double>("InitialAccountBalance")
-                        .HasColumnType("float");
-
-                    b.Property<double>("InitialCash")
-                        .HasColumnType("float");
-
-                    b.Property<string>("OtherExpenseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OtherIncomeReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OtherNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("TotalEarnings")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("TotalOtherExpenses")
-                        .IsRequired()
-                        .HasColumnType("float");
-
-                    b.Property<double?>("TotalOtherIncomes")
-                        .IsRequired()
-                        .HasColumnType("float");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeAttendanceId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ShiftHandovers");
-                });
-
             modelBuilder.Entity("DATN.Data.Entities.TypePayment", b =>
                 {
                     b.Property<int>("Id")
@@ -709,9 +619,6 @@ namespace DATN.API.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("BookingId")
-                        .HasColumnType("int");
 
                     b.Property<string>("CodeConfirm")
                         .HasColumnType("nvarchar(max)");
@@ -768,8 +675,6 @@ namespace DATN.API.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -925,19 +830,37 @@ namespace DATN.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.User", "Customer")
-                        .WithMany("Bookings")
-                        .HasForeignKey("StaffConfirmId");
+                    b.HasOne("DATN.Data.Entities.User", "StaffAtCounter")
+                        .WithMany("BookingsAsCounterStaff")
+                        .HasForeignKey("StaffAtCounterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DATN.Data.Entities.User", "StaffConfirm")
+                        .WithMany("BookingsAsConfirmStaff")
+                        .HasForeignKey("StaffConfirmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DATN.Data.Entities.User", "StaffUpdate")
+                        .WithMany()
+                        .HasForeignKey("StaffUpdateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DATN.Data.Entities.Discount", "Discount")
                         .WithMany("Booking")
                         .HasForeignKey("VoucherId");
 
-                    b.Navigation("Customer");
-
                     b.Navigation("Discount");
 
                     b.Navigation("Guest");
+
+                    b.Navigation("StaffAtCounter");
+
+                    b.Navigation("StaffConfirm");
+
+                    b.Navigation("StaffUpdate");
 
                     b.Navigation("TypePayment");
                 });
@@ -947,7 +870,7 @@ namespace DATN.API.Migrations
                     b.HasOne("DATN.Data.Entities.Booking", "Booking")
                         .WithMany("BookingDetails")
                         .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DATN.Data.Entities.ComboService", "ComboService")
@@ -1047,40 +970,6 @@ namespace DATN.API.Migrations
                     b.Navigation("WorkShift");
                 });
 
-            modelBuilder.Entity("DATN.Data.Entities.EmployeeService", b =>
-                {
-                    b.HasOne("DATN.Data.Entities.User", "User")
-                        .WithMany("EmployeeServices")
-                        .HasForeignKey("IdCustomer")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DATN.Data.Entities.Service", "Service")
-                        .WithMany("EmployeeServices")
-                        .HasForeignKey("IdService")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Service");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DATN.Data.Entities.Payment", b =>
-                {
-                    b.HasOne("DATN.Data.Entities.Booking", null)
-                        .WithMany("Payments")
-                        .HasForeignKey("BookingId");
-
-                    b.HasOne("DATN.Data.Entities.TypePayment", "TypePayment")
-                        .WithMany("Payment")
-                        .HasForeignKey("IdTypePayment")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TypePayment");
-                });
-
             modelBuilder.Entity("DATN.Data.Entities.Pet", b =>
                 {
                     b.HasOne("DATN.Data.Entities.Guest", "Guest")
@@ -1131,28 +1020,6 @@ namespace DATN.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("DATN.Data.Entities.ShiftHandover", b =>
-                {
-                    b.HasOne("DATN.Data.Entities.EmployeeAttendance", "EmployeeAttendance")
-                        .WithMany("ShiftHandovers")
-                        .HasForeignKey("EmployeeAttendanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DATN.Data.Entities.User", null)
-                        .WithMany("ShiftHandovers")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("EmployeeAttendance");
-                });
-
-            modelBuilder.Entity("DATN.Data.Entities.User", b =>
-                {
-                    b.HasOne("DATN.Data.Entities.Booking", null)
-                        .WithMany("StaffAssigned")
-                        .HasForeignKey("BookingId");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.WorkShift", b =>
@@ -1224,10 +1091,6 @@ namespace DATN.API.Migrations
             modelBuilder.Entity("DATN.Data.Entities.Booking", b =>
                 {
                     b.Navigation("BookingDetails");
-
-                    b.Navigation("Payments");
-
-                    b.Navigation("StaffAssigned");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.BookingDetail", b =>
@@ -1246,11 +1109,6 @@ namespace DATN.API.Migrations
             modelBuilder.Entity("DATN.Data.Entities.Discount", b =>
                 {
                     b.Navigation("Booking");
-                });
-
-            modelBuilder.Entity("DATN.Data.Entities.EmployeeAttendance", b =>
-                {
-                    b.Navigation("ShiftHandovers");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeSchedule", b =>
@@ -1281,8 +1139,6 @@ namespace DATN.API.Migrations
                 {
                     b.Navigation("ComboDetails");
 
-                    b.Navigation("EmployeeServices");
-
                     b.Navigation("ServiceDetails");
                 });
 
@@ -1302,23 +1158,19 @@ namespace DATN.API.Migrations
                 {
                     b.Navigation("Booking")
                         .IsRequired();
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.User", b =>
                 {
                     b.Navigation("BookingDetails");
 
-                    b.Navigation("Bookings");
+                    b.Navigation("BookingsAsConfirmStaff");
+
+                    b.Navigation("BookingsAsCounterStaff");
 
                     b.Navigation("EmployeeAttendances");
 
                     b.Navigation("EmployeeSchedules");
-
-                    b.Navigation("EmployeeServices");
-
-                    b.Navigation("ShiftHandovers");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.WorkShift", b =>

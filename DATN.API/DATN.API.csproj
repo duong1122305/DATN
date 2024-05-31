@@ -32,4 +32,8 @@
     <ProjectReference Include="..\DATN.Data\DATN.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

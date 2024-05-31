@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 using System.Net;
 using DATN.Aplication.System;
-using DATN.ViewModels;
-using DATN.ViewModels.ViewModel;
 using Azure;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Request.Authenticate;
 
 namespace DATN.API.Controllers
 {
@@ -23,7 +22,7 @@ namespace DATN.API.Controllers
             _userrepo = userRepo;
         }
         [HttpPost("User-Login")]
-        public async Task<string> Login(UserLoginView user)
+        public async Task<ResponseData<string>> Login(UserLoginView user)
         {
             var result = await _userrepo.Login(user);
             return result;

@@ -1,5 +1,4 @@
-﻿using DATN.ViewModels;
-using DATN.Data.Entities;
+﻿using DATN.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +11,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using DATN.Aplication.Extentions;
-using DATN.ViewModels.ViewModel;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Request.Authenticate;
 
 namespace DATN.Aplication.System
 {
@@ -31,18 +30,45 @@ namespace DATN.Aplication.System
             _mail = mailExtention;
             _random = randomCodeExtention;
         }
-        public async Task<string> Login(UserLoginView userView)
+        public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
-            var userIdentity = await CheckUser(userView.UserName);
-            if (userIdentity == null) return null;
-            else
+            try
             {
-                if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
+
+                var userIdentity = await CheckUser(userView.UserName);
+                if (userIdentity == null)
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Error="Tài khoản hoặc mật khẩu không chính xác"
+                    };
+                else
                 {
-                    _user=userIdentity;
-                    return await GenerateTokenString(userView);
+                    if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
+                    {
+                       
+                        _user = userIdentity;
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Data = await GenerateTokenString(userView)
+                        };
+                    }
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Error = "Tài khoản hoặc mật khẩu không chính xác"
+                    };
                 }
-                return null;
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = ex.Message
+                };
+               
             }
 
         }
