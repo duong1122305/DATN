@@ -30,7 +30,7 @@ namespace DATN.Aplication.Extentions
                 client.EnableSsl = true;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("shoppet79@gmail.com", "eolg vnvv dukb yhdm");
+                client.Credentials = new NetworkCredential("shoppet79@gmail.com", "tznx twfq hclm ysok");
                 await client.SendMailAsync(message);
                 return $"Mã xác thực đã gửi tới email của bạn!!";
             }
