@@ -7,7 +7,7 @@ using System.Net;
 using DATN.Aplication.System;
 using Azure;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Request.Authenticate;
+using DATN.ViewModels.DTOs.Authenticate;
 
 namespace DATN.API.Controllers
 {

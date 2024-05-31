@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.ViewModels.DTOs.Request.Authenticate
+namespace DATN.ViewModels.DTOs.Authenticate
 {
     public class UserLoginView
     {
