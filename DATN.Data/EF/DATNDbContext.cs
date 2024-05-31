@@ -26,7 +26,6 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new DiscountConfig());
             builder.ApplyConfiguration(new EmployeeAttendanceConfig());
             builder.ApplyConfiguration(new EmployeeScheduleConfig());
-            builder.ApplyConfiguration(new EmployeeServiceConfig());
             builder.ApplyConfiguration(new GuestConfig());
             builder.ApplyConfiguration(new PetConfig());
             builder.ApplyConfiguration(new PetSeciesConfig());
@@ -46,7 +45,6 @@ namespace DATN.Data.EF
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendances { get; set; }
         public DbSet<EmployeeSchedule> EmployeeSchedules { get; set; }
-        public DbSet<EmployeeService> EmployeeServices { get; set; }
         public DbSet<Guest> Guests { get; set; }
         public DbSet<Pet> Pets { get; set; }
         public DbSet<PetSpecies> PetSpecies { get; set; }

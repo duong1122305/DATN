@@ -19,7 +19,6 @@ namespace DATN.Data.Entities
         public virtual ICollection<ShiftHandover> ShiftHandovers { get; set; }
         public virtual ICollection<EmployeeSchedule> EmployeeSchedules { get; set; }
         public virtual ICollection<EmployeeAttendance> EmployeeAttendances { get; set; }
-        public virtual ICollection<EmployeeService> EmployeeServices { get; set; }
     }
 
 }
