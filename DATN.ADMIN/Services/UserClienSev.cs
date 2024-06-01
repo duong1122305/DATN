@@ -11,13 +11,13 @@ namespace DATN.ADMIN.Services
     {
         private readonly HttpClient _client;
         public UserClienSev(HttpClient client)
-        {   
+        {
             _client = client;
 
         }
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
-             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+            var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
             return repon;
         }
 
@@ -39,3 +39,4 @@ namespace DATN.ADMIN.Services
         }
     }
 }
+
