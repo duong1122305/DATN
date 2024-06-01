@@ -1,4 +1,6 @@
 ﻿using DATN.Data.EF;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace DATN.Aplication.Common
 
         public GenericRepository(DATNDbContext context)
         {
-           _context = context;
+            _context = context;
         }
 
         public virtual T Add(T entity)
@@ -52,6 +54,18 @@ namespace DATN.Aplication.Common
         public void SaveChanges()
         {
             _context.SaveChanges();
+        }
+
+        public async Task<T> AddAsync(T entity)
+        {
+            var dbSet = _context.Set<T>();
+            var entry = await dbSet.AddAsync(entity);
+            return entry.Entity;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }
