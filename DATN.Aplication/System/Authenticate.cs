@@ -40,13 +40,13 @@ namespace DATN.Aplication.System
                     return new ResponseData<string>
                     {
                         IsSuccess = false,
-                        Error="Tài khoản hoặc mật khẩu không chính xác"
+                        Error = "Tài khoản hoặc mật khẩu không chính xác"
                     };
                 else
                 {
                     if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
                     {
-                       
+
                         _user = userIdentity;
                         return new ResponseData<string>
                         {
@@ -68,7 +68,7 @@ namespace DATN.Aplication.System
                     IsSuccess = false,
                     Error = ex.Message
                 };
-               
+
             }
 
         }
@@ -98,7 +98,7 @@ namespace DATN.Aplication.System
         {
             var userIdentity = new User()
             {
-                FullName= userRegisterView.FullName,
+                FullName = userRegisterView.FullName,
                 UserName = userRegisterView.UserName,
                 Email = userRegisterView.Email,
                 PhoneNumber = userRegisterView.PhoneNumber,
@@ -170,25 +170,32 @@ namespace DATN.Aplication.System
             }
         }
 
-        public async Task<List<UserInfView>> GetUsers()
+        public async Task<ResponseData<List<UserInfView>>> GetUsers()
         {
             var listUserIdentity = await _userManager.Users.ToListAsync();
-            var listUser = new List<UserInfView>();
-
-            foreach (var user in listUserIdentity)
+            if (listUserIdentity == null)
             {
-                var userInfView = new UserInfView();
-                userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
-                if (userInfView.Position != "Admin")
-                {
-                    userInfView.Name = user.FullName;
-                    userInfView.Address = user.Address;
-                    userInfView.Email = user.Email;
-                    userInfView.PhoneNumber = user.PhoneNumber;
-                    listUser.Add(userInfView);
-                }
+                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
             }
-            return listUser;
+            else
+            {
+                var listUser = new List<UserInfView>();
+
+                foreach (var user in listUserIdentity)
+                {
+                    var userInfView = new UserInfView();
+                    userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
+                    if (userInfView.Position != "Admin")
+                    {
+                        userInfView.Name = user.FullName;
+                        userInfView.Address = user.Address;
+                        userInfView.Email = user.Email;
+                        userInfView.PhoneNumber = user.PhoneNumber;
+                        listUser.Add(userInfView);
+                    }
+                }
+                return new ResponseData<List<UserInfView>> { Data = listUser, IsSuccess = true };
+            }
         }
 
         public async Task<User> GetUserAtPhoneNumber(string phonenumber)

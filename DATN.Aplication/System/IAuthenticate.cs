@@ -10,7 +10,7 @@ namespace DATN.Aplication.System
         public Task<string> Register(UserRegisterView userRegisterView);
         public Task<string> GenerateTokenString(UserLoginView userLoginView);
         public Task<ResponseMail> ForgotPassword(string username);
-        public Task<List<UserInfView>> GetUsers();
+        public Task<ResponseData<List<UserInfView>>> GetUsers();
         public Task<User> GetUserAtPhoneNumber(string phonenumber);
         public Task<bool> UpdateInformationUser(UserRegisterView userRegisterView);
         public Task<string> ChangePassword(UserChangePasswordView user);

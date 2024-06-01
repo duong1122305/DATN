@@ -41,4 +41,8 @@
     <None Include="wwwroot\css\Component.css" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DATN.ViewModels\DATN.ViewModels.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,49 +1,44 @@
 ﻿@page "/quanlynhanvien"
 @using DATN.ADMIN.Data
-@inject WeatherForecastService ForecastService
 
 <PageTitle>Quản lý nhân viên</PageTitle>
 
 
 <div class="content-wrapper px-4">
-    <h1>Weather forecast</h1>
-    <p>This component demonstrates fetching data from a service.</p>
+    <h3>Danh sách nhân viên</h3>
 
-    @if (forecasts == null)
+    @if (response.Data == null || response.Data.Count == 0 )
     {
-        <p><em>Loading...</em></p>
+        <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
     }
     else
     {
         <table class="table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
+                    <th>Tên</th>
+                    <th>SĐT. (C)</th>
+                    <th>Email. (F)</th>
+                    <th>Địa chỉ</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var forecast in forecasts)
+                @foreach (var i in response.Data)
                 {
                     <tr>
-                        <td>@forecast.Date.ToShortDateString()</td>
-                        <td>@forecast.TemperatureC</td>
-                        <td>@forecast.TemperatureF</td>
-                        <td>@forecast.Summary</td>
+                        <td>@i.Name</td>
+                        <td>@i.PhoneNumber</td>
+                        <td>@i.Email</td>
+                        <td>@i.Address</td>
+                        <td>
+                            <a href="@($"/editfootballplayer/{FootballPlayer.FootballPlayerId}")" class="btn btn-primary">Edit</a>
+                        </td>
                     </tr>
+
                 }
             </tbody>
         </table>
     }
+
 </div>
 
-@code {
-    private WeatherForecast[]? forecasts;
-
-    protected override async Task OnInitializedAsync()
-    {
-        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
-    }
-}

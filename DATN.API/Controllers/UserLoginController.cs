@@ -42,7 +42,7 @@ namespace DATN.API.Controllers
         }
 
         [HttpGet("List-User")]
-        public async Task<List<UserInfView>> GetUsers()
+        public async Task<ResponseData<List<UserInfView>>> GetUsers()
         {
             var result = await _userrepo.GetUsers();
             return result;
