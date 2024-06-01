@@ -18,7 +18,7 @@ namespace DATN.ADMIN.Pages
 
             if(response.IsSuccessStatusCode)
             {
-                navigationManager.NavigateTo("/");
+                navigationManager.NavigateTo("/trangchu");
             }
             else
             {
