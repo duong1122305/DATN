@@ -12,7 +12,6 @@ builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<UserLoginView>();
 
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
