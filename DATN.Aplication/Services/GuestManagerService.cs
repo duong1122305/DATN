@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class GuestManagerService: IGuestManagerService
+    public class GuestManagerService : IGuestManagerService
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -26,14 +26,14 @@ namespace DATN.Aplication.Services
 
         public async Task<ResponseData<GuestViewModel>> FindGuestByID(Guid id)
         {
-          
+
             try
             {
                 var result = _unitOfWork.GuestRepository.GetAsync(id);
 
-                if (result !=null)
+                if (result != null)
                 {
-                    var guestVM= _mapper.Map<GuestViewModel>(result);
+                    var guestVM = _mapper.Map<GuestViewModel>(result);
                     return new ResponseData<GuestViewModel>
                     {
                         IsSuccess = true,
@@ -62,22 +62,44 @@ namespace DATN.Aplication.Services
             try
             {
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
-
-                if (result != null)
+                if (request.keyWord != null)
                 {
-                    var guestVM = _mapper.Map<GuestViewModel>(result);
+                    result = result.Where(p => p.PhoneNumber.Contains(request.keyWord)).OrderByDescending(p => p.Name);
+                }
+                int totalCount = result.Count();
+                if (totalCount > 0)
+                {
+                    result = result.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize);
+
+                    var lstGuestVM = result.Select(p => new GuestViewModel()
+                    {
+                        Address = p.Address,
+                        Email = p.Email,
+                        Gender = p.Gender,
+                        CodeConfirm = p.CodeConfirm,
+                        Name = p.Name,
+                        PhoneNumber = p.PhoneNumber,
+                        UserName = p.UserName,
+                        Id = p.Id,
+                    });
+                    GetGuestResponse response = new GetGuestResponse()
+                    {
+                        lstGuest = lstGuestVM.ToList(),
+                        PagingData = new PagingResponseData(request.pageIndex, request.pageSize, totalCount)
+                    };
                     return new ResponseData<GetGuestResponse>
                     {
                         IsSuccess = true,
-                        Data = null,
+                        Data = response,
                     };
                 }
                 return new ResponseData<GetGuestResponse>
                 {
-                    IsSuccess = false,
-                    Error = "Không tìm thấy khách hàng"
+                    IsSuccess = true,
+                    Data = new GetGuestResponse()
                 };
             }
+
             catch (Exception ex)
             {
 
@@ -149,13 +171,13 @@ namespace DATN.Aplication.Services
                     PasswordHash = _passwordExtensitons.HashPassword(request.Password),
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
-                var result=  await _unitOfWork.SaveChangeAsync();
-                if (result>0)
+                var result = await _unitOfWork.SaveChangeAsync();
+                if (result > 0)
                 {
                     return new ResponseData<string>
                     {
                         IsSuccess = true,
-                        Data=" Thêm thành công"
+                        Data = " Thêm thành công"
                     };
                 }
                 return new ResponseData<string>
