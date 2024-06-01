@@ -256,9 +256,9 @@ namespace DATN.Aplication
             }
         }
 
-        public void SaveChangeAsync()
+        public async Task<int> SaveChangeAsync()
         {
-            _context.SaveChangesAsync();
+           return await  _context.SaveChangesAsync();
         }
     }
 }

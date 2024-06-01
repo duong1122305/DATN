@@ -10,4 +10,8 @@
     <PackageReference Include="FluentValidation" Version="11.9.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DATN.Utilites\DATN.Utilites.csproj" />
+  </ItemGroup>
+
 </Project>

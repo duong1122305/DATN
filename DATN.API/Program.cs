@@ -8,14 +8,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DATN.Aplication.System;
 using DATN.Data.EF;
+using DATN.Aplication.Services;
+using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
 using DATN.Aplication.Services;
 using DATN.Aplication;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add auto mapper
-builder.Services.AddAutoMapper(typeof(Program));
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -59,6 +60,14 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
+
+
+
+
+// Add auto mapper
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
 builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
