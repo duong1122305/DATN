@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ComboDetailRepository : GennericRepository<ComboDetail>, IComboDetailRepository
+    public class ComboDetailRepository : GenericRepository<ComboDetail>, IComboDetailRepository
     {
         public ComboDetailRepository(DATNDbContext context) : base(context)
         {

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Common
 {
-    public abstract class GennericRepository<T> : IGennericRepository<T> where T : class
+    public abstract class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected DATNDbContext _context;
 
-        public GennericRepository(DATNDbContext context)
+        public GenericRepository(DATNDbContext context)
         {
            _context = context;
         }

@@ -29,7 +29,7 @@ namespace DATN.API.Controllers
         }
 
         [HttpPost("User-Register")]
-        public async Task<string> Register(UserRegisterView user)
+        public async Task<ResponseData<string>> Register(UserRegisterView user)
         {
             var result = await _userrepo.Register(user);
             return result;
@@ -42,14 +42,14 @@ namespace DATN.API.Controllers
         }
 
         [HttpGet("List-User")]
-        public async Task<List<UserInfView>> GetUsers()
+        public async Task<ResponseData<List<UserInfView>>> GetUsers()
         {
             var result = await _userrepo.GetUsers();
             return result;
         }
 
         [HttpGet("User-Phone")]
-        public async Task<User> GetUserByPhoneNumber(string phonenumber)
+        public async Task<ResponseData<UserInfView>> GetUserByPhoneNumber(string phonenumber)
         {
             var result = await _userrepo.GetUserAtPhoneNumber(phonenumber);
             return result;

@@ -1,6 +1,9 @@
-﻿namespace DATN.Aplication.Repository.IRepository
+﻿using DATN.Aplication.Common;
+using DATN.Data.Entities;
+
+namespace DATN.Aplication.Repository.IRepository
 {
-    internal interface IPetTypeRepository
+    internal interface IPetTypeRepository : IGenericRepository<PetType>
     {
     }
 }

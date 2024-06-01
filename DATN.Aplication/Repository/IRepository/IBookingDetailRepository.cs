@@ -3,7 +3,7 @@ using DATN.Data.Entities;
 
 namespace DATN.Aplication.Repository.IRepository
 {
-    internal interface IComboDetailRepository : IGenericRepository<ComboDetail>
+    public interface IBookingDetailRepository : IGenericRepository<BookingDetail>
     {
     }
 }

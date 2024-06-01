@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class PetSeciesRepository : GennericRepository<PetSpecies>, IPetSceciesRepository
+    public class PetSeciesRepository : GenericRepository<PetSpecies>, IPetSceciesRepository
     {
         public PetSeciesRepository(DATNDbContext context) : base(context)
         {

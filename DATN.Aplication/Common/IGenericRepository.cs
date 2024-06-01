@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Common
 {
-    public interface IGennericRepository<T>
+    public interface IGenericRepository<T>
     {
         T Add(T entity);
         T Update(T entity);
