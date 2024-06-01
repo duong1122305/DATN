@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace DATN.Data.Entities
 
     public class User : IdentityUser<Guid>
     {
+        [Required]
         public string FullName { get; set; }
         public bool Gender { get; set; }
         public string? CodeConfirm { get; set; }

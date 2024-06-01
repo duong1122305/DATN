@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using DATN.Aplication.Services;
+using DATN.Data.Entities;
+using DATN.ViewModels.DTOs.Guest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +12,11 @@ namespace DATN.Aplication.Mapping
 {
     public class MappingProfile:Profile
     {
+       
         public MappingProfile()
         {
-            //CreateMap<Product, ProductViewModel>().ForMember(x => x.CategoryName, y => y.MapFrom(z => z.Category.Name));
+            CreateMap<GuestRegisterNoUserRequest, Guest>().ReverseMap();
+            CreateMap<Guest, GuestViewModel>().ReverseMap();
         }
     }
 }
