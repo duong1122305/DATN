@@ -28,5 +28,6 @@ namespace DATN.Aplication
         IGenericRepository<Shift> ShiftRepository { get; }
         IGenericRepository<TypePayment> TypePaymentRepository { get; }
         IGenericRepository<WorkShift> WorkShiftRepository { get; }
+        Task<int> SaveChangeAsync();
     }
 }
