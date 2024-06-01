@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class EmployceeScheduleRepository : GennericRepository<EmployeeSchedule>, IEmployeeScheduleRepository
+    public class EmployceeScheduleRepository : GenericRepository<EmployeeSchedule>, IEmployeeScheduleRepository
     {
         public EmployceeScheduleRepository(DATNDbContext context) : base(context)
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository.IRepository
 {
-    public interface IServiceRepository : IGennericRepository<Service>
+    public interface IServiceRepository : IGenericRepository<Service>
     {
     }
 }

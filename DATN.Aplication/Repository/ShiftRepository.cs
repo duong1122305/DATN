@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ShiftRepository : GennericRepository<Shift>, IShiftRepository
+    public class ShiftRepository : GenericRepository<Shift>, IShiftRepository
     {
         public ShiftRepository(DATNDbContext context) : base(context)
         {

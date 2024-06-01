@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class GuestRepository : GennericRepository<Guest>, IGuestRepository
+    public class GuestRepository : GenericRepository<Guest>, IGuestRepository
     {
         public GuestRepository(DATNDbContext context) : base(context)
         {
