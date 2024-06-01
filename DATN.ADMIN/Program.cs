@@ -1,4 +1,6 @@
 using DATN.ADMIN.Data;
+using DATN.ADMIN.IServices;
+using DATN.ADMIN.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -8,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/") });
+builder.Services.AddScoped<IUserClientSev, UserClienSev>();
+
+
 
 var app = builder.Build();
 
