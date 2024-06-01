@@ -16,7 +16,7 @@ namespace DATN.ADMIN.Pages
         {
             var response = await client.PostAsJsonAsync("api/UserLogin/User-Login", user);
 
-            if(response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 navigationManager.NavigateTo("/trangchu");
             }
