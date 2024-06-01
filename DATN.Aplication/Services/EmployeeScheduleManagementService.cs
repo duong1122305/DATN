@@ -8,6 +8,7 @@ using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DATN.Aplication.Services
 {
@@ -24,12 +25,12 @@ namespace DATN.Aplication.Services
 
         public async Task<ResponseData<List<ScheduleView>>> GetAll(int month, int year)
         {
-            var query = from shift in _unitOfWork.ShiftRepository.All()
-                        join workshift in _unitOfWork.WorkShiftRepository.All()
+            var query = from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                        join workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                         on shift.Id equals workshift.ShiftId
-                        join schedule in _unitOfWork.EmployeeScheduleRepository.All()
+                        join schedule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
                         on workshift.Id equals schedule.WorkShiftId
-                        join user in _usermanager.Users.ToList()
+                        join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
                         where workshift.WorkDate.Year == year &&
                         workshift.WorkDate.Month == month
@@ -56,7 +57,7 @@ namespace DATN.Aplication.Services
                 int nextMonth = currentDay.Month == 12 ? 1 : currentDay.Month + 1;
                 int nextYear = nextMonth == 12 ? currentDay.Year + 1 : currentDay.Year;
 
-                var query = from workshift in _unitOfWork.WorkShiftRepository.All()
+                var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                             where workshift.WorkDate.Year == nextYear &&
                             workshift.WorkDate.Month == nextMonth
                             select workshift;

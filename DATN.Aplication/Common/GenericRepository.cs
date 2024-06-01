@@ -55,17 +55,5 @@ namespace DATN.Aplication.Common
         {
             return await _context.SaveChangesAsync();           // Lưu thay đổi vào cơ sở dữ liệu
         }
-
-        public async Task<T> AddAsync(T entity)
-        {
-            var dbSet = _context.Set<T>();
-            var entry = await dbSet.AddAsync(entity);
-            return entry.Entity;
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
     }
 }

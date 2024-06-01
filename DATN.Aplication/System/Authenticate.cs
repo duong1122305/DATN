@@ -122,6 +122,7 @@ namespace DATN.Aplication.System
                 }
                 return new ResponseData<string> { IsSuccess = false, Error = "Tạo tài khoản không thành công" };
             }
+            else
             return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
         }
 

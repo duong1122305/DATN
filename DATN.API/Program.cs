@@ -62,15 +62,14 @@ builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
-
+builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
+builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
 
 
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
-builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
+
 
 var app = builder.Build();
 

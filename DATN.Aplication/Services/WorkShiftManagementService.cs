@@ -23,7 +23,7 @@ namespace DATN.Aplication.Services
             var currentDay = DateTime.Now;
             int nextMonth = currentDay.Month == 12 ? 1 : currentDay.Month + 1;
             int nextYear = nextMonth == 12 ? currentDay.Year + 1 : currentDay.Year;
-            var query = from workshift in _unitOfWork.WorkShiftRepository.All()
+            var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                         where workshift.WorkDate.Year == nextYear &&
                         workshift.WorkDate.Month == nextMonth
                         select workshift;
@@ -36,7 +36,7 @@ namespace DATN.Aplication.Services
                         var dayInMonth = DateTime.DaysInMonth(currentDay.Year + 1, 1);
                         for (var i = 1; i <= dayInMonth; i++)
                         {
-                            foreach (var day in _unitOfWork.ShiftRepository.All())
+                            foreach (var day in await _unitOfWork.ShiftRepository.GetAllAsync())
                             {
                                 var workshift = new WorkShift()
                                 {
@@ -53,7 +53,7 @@ namespace DATN.Aplication.Services
                         var dayInMonth = DateTime.DaysInMonth(currentDay.Year, currentDay.Month + 1);
                         for (var i = 1; i <= dayInMonth; i++)
                         {
-                            foreach (var day in _unitOfWork.ShiftRepository.All())
+                            foreach (var day in await _unitOfWork.ShiftRepository.GetAllAsync())
                             {
                                 var workshift = new WorkShift()
                                 {
