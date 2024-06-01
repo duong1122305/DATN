@@ -79,5 +79,14 @@ namespace DATN.API.Controllers
             var result = await _employeeSchedule.GetAll(month, year);
             return result;
         }
+        
+        //nếu bị sai hãy xoá dòng này
+
+        [HttpPost("get-all-ca-lam")]
+        public async Task<ResponseData<List<ScheduleView>>> GetAllCa()
+        {
+            var result = await _employeeSchedule.GetAllCa();
+            return result;
+        }
     }
 }

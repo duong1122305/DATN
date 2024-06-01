@@ -12,6 +12,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/") });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
+builder.Services.AddScoped<IEmployeeScheduleSer, EmployeeScheduleSer>();
 
 
 

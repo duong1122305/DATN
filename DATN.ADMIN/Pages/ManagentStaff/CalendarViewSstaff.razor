@@ -1,8 +1,8 @@
-﻿@page "/quanlynhanvien"
+﻿@page "/calendarNV"
 @using DATN.ADMIN.Data
+<PageTitle>Lịch làm việc của nhân viên</PageTitle>
 
-<PageTitle>Quản lý nhân viên</PageTitle>
-<div class="align-content-center">
+<div class="content-wrapper">
     @if (response.Data == null || response.Data.Count == 0)
     {
         <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
@@ -13,10 +13,11 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" /></th>
-                    <th>Tên</th>
-                    <th>Số điện thoại</th>
-                    <th>Email</th>
-                    <th>Địa chỉ</th>
+                    <th>Họ Tên</th>
+                    <th>Ca làm</th>
+                    <th>Ngày làm</th>
+                    <th>Từ</th>
+                    <th>Đến</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,16 +26,13 @@
                     <tr>
                         <td><input type="checkbox" /></td>
                         <td>@i.Name</td>
-                        <td>@i.PhoneNumber</td>
-                        <td>@i.Email</td>
-                        <td>@i.Address</td>
+                        <td>@i.Shift</td>
+                        <td>@i.WorkDate</td>
+                        <td>@i.To</td>
+                        <td>@i.From</td>
                     </tr>
                 }
             </tbody>
         </table>
-        <button class="btn btn-primary">Thêm nhân viên</button>
-
     }
 </div>
-
-
