@@ -49,6 +49,12 @@ namespace DATN.Aplication.Services
             }
             return new ResponseData<List<ScheduleView>> { IsSuccess = true, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year}" };
         }
+
+        public async Task<ResponseData<List<ScheduleView>>> GetAllCa()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<ResponseData<string>> InsertEmployeeNextMonthCompareCurrentMonth(List<string> listUser, int shift)
         {
             try
@@ -59,8 +65,8 @@ namespace DATN.Aplication.Services
 
                 var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                             where workshift.WorkDate.Year == nextYear &&
-                            workshift.WorkDate.Month == nextMonth && 
-                            workshift.ShiftId==shift
+                            workshift.WorkDate.Month == nextMonth &&
+                            workshift.ShiftId == shift
                             select workshift;
 
                 foreach (var workShift in query)
@@ -72,18 +78,18 @@ namespace DATN.Aplication.Services
                             UserId = Guid.Parse(user),
                             WorkShiftId = workShift.Id
                         };
-                        var querycheck= from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                        where scheduletable.UserId == schedule.UserId && 
-                                        scheduletable.WorkShiftId == schedule.WorkShiftId
-                                        select scheduletable;
-                        if (querycheck.ToList().Count==0)
+                        var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                         where scheduletable.UserId == schedule.UserId &&
+                                         scheduletable.WorkShiftId == schedule.WorkShiftId
+                                         select scheduletable;
+                        if (querycheck.ToList().Count == 0)
                         {
                             await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
                         }
                     }
                 }
-                return new ResponseData<string> { IsSuccess = true, Data = $"Thêm lịch làm việc ca" };
+                return new ResponseData<string> { IsSuccess = true, Data = $"Thêm lịch làm việc thành công!" };
             }
             catch (Exception e)
             {
