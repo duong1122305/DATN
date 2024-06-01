@@ -1,17 +1,15 @@
-using DATN.ADMIN.Data;
 using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using DATN.ViewModels.DTOs.Authenticate;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/") });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
+builder.Services.AddScoped<UserLoginView>();
 
 
 

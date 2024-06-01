@@ -1,7 +1,8 @@
 ﻿@page "/login"
 @using Microsoft.AspNetCore.Components.Web
 @namespace DATN.ADMIN.Pages
-<PageTitle>Đăng nhập</PageTitle>
+@inherits LayoutComponentBase
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,17 +22,17 @@
                             <a href="/"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="width: 150px; height: 150px;"></a>
                         </div>
                         <div>
-                            <form>
+                            <EditForm OnValidSubmit="@Submit" Model="user">
                                 <input type="hidden">
                                 <!-- Email Address -->
                                 <div>
-                                    <label class="form-label" for="email">Email</label>
-                                    <input class="form-control" id="email" type="email" name="email" value="" required="required" autofocus="autofocus" placeholder="admin201@gmail.com">
+                                    <label class="form-label">Tên đăng nhập</label>
+                                    <InputText class="form-control" @bind-Value="@user.UserName"/>
                                 </div>
                                 <!-- Password -->
                                 <div class="mt-4">
                                     <label class="form-label" for="password">Mật khẩu</label>
-                                    <input class="form-control" id="password" type="password" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
+                                    <InputText class="form-control" @bind-Value="@user.Password" id="password" type="password" name="password" required="required" autocomplete="current-password" placeholder="abc@123" />
                                 </div>
 
                                 <!-- Remember Me -->
@@ -43,7 +44,7 @@
                                 <div class="d-flex align-items-center justify-content-center mt-4">
                                     <button type="submit" class="btn btn-info fw-normal text-white fw-bold">Đăng nhập</button>
                                 </div>
-                            </form>
+                            </EditForm>
                             <div>
                             </div>
                         </div>
