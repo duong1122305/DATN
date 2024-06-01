@@ -7,9 +7,6 @@
 }
 
 
-<div class="content-wrapper px-4 p-4">
-    <h3>Danh sách nhân viên</h3>
-    <div class=""></div>
     @if (response.Data == null || response.Data.Count == 0)
     {
         <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
@@ -35,6 +32,9 @@
                         <td>@i.PhoneNumber</td>
                         <td>@i.Email</td>
                         <td>@i.Address</td>
+                        <td>
+                            <a href="@($"/editfootballplayer/{FootballPlayer.FootballPlayerId}")" class="btn btn-primary">Edit</a>
+                        </td>
                     </tr>
                 }
             </tbody>

@@ -73,7 +73,7 @@ namespace DATN.Aplication.System
 
         }
 
-        public async Task<string> GenerateTokenString(UserLoginView userViewModel)
+        private async Task<string> GenerateTokenString(UserLoginView userViewModel)
         {
             var user = await CheckUser(userViewModel.UserName);
             var claims = new List<Claim>()
@@ -94,7 +94,7 @@ namespace DATN.Aplication.System
             return token;
         }
 
-        public async Task<string> Register(UserRegisterView userRegisterView)
+        public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
             var userIdentity = new User()
             {
@@ -118,11 +118,11 @@ namespace DATN.Aplication.System
                         UserName = userRegisterView.UserName,
                         Password = userRegisterView.Password
                     };
-                    return await _mail.SendMailAccountStaffAsync(userRegisterView.Email, userInf);
+                    return new ResponseData<string> { IsSuccess = true, Data = await _mail.SendMailAccountStaffAsync(userRegisterView.Email, userInf) };
                 }
-                return "Tạo tài khoản không thành công";
+                return new ResponseData<string> { IsSuccess = false, Error = "Tạo tài khoản không thành công" };
             }
-            return "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!";
+            return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
         }
 
         public async Task<ResponseMail> ForgotPassword(string username)
@@ -132,55 +132,26 @@ namespace DATN.Aplication.System
             else
             {
                 string newcode = _random.RandomCode();
-                if (userIdentity != null)
-                {
-                    userIdentity.CodeConfirm = newcode;
-                    var updateUser = await _userManager.UpdateAsync(userIdentity);
-                    if (updateUser.Succeeded)
-                        return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
-                    else
-                    {
-                        return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
-                    }
-                }
-                else if (userIdentity != null)
-                {
-                    userIdentity.CodeConfirm = newcode;
-                    var updateUser = await _userManager.UpdateAsync(userIdentity);
-                    if (updateUser.Succeeded)
-                        return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
-                    else
-                    {
-                        return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
 
-                    }
-                }
+                userIdentity.CodeConfirm = newcode;
+                var updateUser = await _userManager.UpdateAsync(userIdentity);
+                if (updateUser.Succeeded)
+                    return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
                 else
                 {
-                    userIdentity.CodeConfirm = newcode;
-                    var updateUser = await _userManager.UpdateAsync(userIdentity);
-                    if (updateUser.Succeeded)
-                        return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
-                    else
-                    {
-                        return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
-
-                    }
+                    return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };
                 }
+
             }
         }
 
         public async Task<ResponseData<List<UserInfView>>> GetUsers()
         {
             var listUserIdentity = await _userManager.Users.ToListAsync();
-            if (listUserIdentity == null)
-            {
-                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
-            }
-            else
-            {
-                var listUser = new List<UserInfView>();
+            var listUser = new List<UserInfView>();
 
+            if (listUserIdentity.Count > 0)
+            {
                 foreach (var user in listUserIdentity)
                 {
                     var userInfView = new UserInfView();
@@ -194,20 +165,34 @@ namespace DATN.Aplication.System
                         listUser.Add(userInfView);
                     }
                 }
-                return new ResponseData<List<UserInfView>> { Data = listUser, IsSuccess = true };
+                return new ResponseData<List<UserInfView>> { IsSuccess = true, Data = listUser };
             }
+            else
+                return new ResponseData<List<UserInfView>> { IsSuccess = true, Error = "Ko có nhân viên nào trong danh sách" };
+
         }
 
-        public async Task<User> GetUserAtPhoneNumber(string phonenumber)
+        public async Task<ResponseData<UserInfView>> GetUserAtPhoneNumber(string phonenumber)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(c => c.PhoneNumber == phonenumber);
-            return user;
+            if (user != null)
+            {
+                var userInfView = new UserInfView();
+                userInfView.Name = user.FullName;
+                userInfView.Email = user.Email;
+                userInfView.PhoneNumber = user.PhoneNumber;
+                userInfView.Address = user.Address;
+                userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
+                return new ResponseData<UserInfView> { IsSuccess = true, Data = userInfView };
+            }
+            else
+                return new ResponseData<UserInfView> { IsSuccess = true, Error = "Chưa có khách hàng nào đăng kí trên số điện thoại này" };
         }
 
-        public async Task<bool> UpdateInformationUser(UserRegisterView userRegisterView)
+        public async Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView)
         {
             var userIdentity = await _userManager.FindByNameAsync(userRegisterView.UserName);
-            if (userIdentity == null) return false;
+            if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
             else
             {
                 userIdentity.PhoneNumber = userRegisterView.PhoneNumber;
@@ -215,14 +200,17 @@ namespace DATN.Aplication.System
                 userIdentity.Email = userRegisterView.Email;
 
                 var result = _userManager.UpdateAsync(userIdentity);
-                return result.IsCompleted;
+                if (result.IsCompleted)
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                else
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
             }
         }
 
-        public async Task<string> ChangePassword(UserChangePasswordView user)
+        public async Task<ResponseData<string>> ChangePassword(UserChangePasswordView user)
         {
             var userIdentity = await CheckUser(user.UserName);
-            if (userIdentity == null) return "Tài khoản chưa được đăng kí";
+            if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản chưa có" };
             else
             {
                 if (user.NewPassword == user.ConfirmPassword)
@@ -230,35 +218,24 @@ namespace DATN.Aplication.System
                     var result = await _userManager.ChangePasswordAsync(userIdentity, user.OldPassword, user.NewPassword);
                     if (result.Succeeded)
                     {
-                        return "Đổi mật khẩu thành công!!";
+                        return new ResponseData<string> { IsSuccess = true, Data = "Đổi mật khẩu thành công!!" };
                     }
-                    else return "Mật khẩu hiện tại đang sai hoặc mật khẩu mới chưa đúng định dạng";
+                    else return new ResponseData<string> { IsSuccess = false, Error = "Mật khẩu hiện tại đang sai hoặc mật khẩu mới chưa đúng định dạng" };
                 }
-                else return "Mật khẩu mới và xác nhận lại mật khẩu mới không trùng khớp";
+                else return new ResponseData<string> { IsSuccess = false, Error = "Mật khẩu mới và xác nhận lại mật khẩu mới không trùng khớp" };
             }
         }
 
-        public async Task<string> GetConfirmCode(string username)
+        public async Task<ResponseData<string>> GetConfirmCode(string username)
         {
             var user = await CheckUser(username);
-            if (user == null) return "Tài khoản nhập chưa được đăng kí";
+            if (user == null) return new ResponseData<string> { IsSuccess = true, Error = "Tài khoản nhập chưa được đăng kí" };
             else
             {
-                if (user != null)
-                {
-                    return user.CodeConfirm;
-                }
-                else if (user != null)
-                {
-                    return user.CodeConfirm;
-                }
-                else
-                {
-                    return user.CodeConfirm;
-                }
+                return new ResponseData<string> { IsSuccess = true, Data = user.CodeConfirm };
             }
         }
-        public async Task<bool> CheckCodeConfirm(string username, string code)
+        public async Task<ResponseData<bool>> CheckCodeConfirm(string username, string code)
         {
             var user = await CheckUser(username);
             if (user != null)
@@ -267,17 +244,17 @@ namespace DATN.Aplication.System
                 {
                     user.CodeConfirm = null;
                     await _userManager.UpdateAsync(user);
-                    return true;
+                    return new ResponseData<bool> { IsSuccess = true };
                 }
-                return false;
+                return new ResponseData<bool> { IsSuccess = false, Error = "Code chưa đúng" };
             }
-            return false;
+            return new ResponseData<bool> { IsSuccess = false, Error = "Tài khoản hoặc mật khẩu chưa đúng!" };
         }
         private async Task<User> CheckUser(string username)
         {
             var userName = await _userManager.FindByNameAsync(username);
             var userEmail = await _userManager.FindByEmailAsync(username);
-            var userPhone = await GetUserAtPhoneNumber(username);
+            var userPhone = await _userManager.Users.FirstOrDefaultAsync(c => c.PhoneNumber == username);
             if (userPhone == null && userName == null && userEmail == null) return null;
             else
             {

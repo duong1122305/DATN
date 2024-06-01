@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class DiscountRepository : GennericRepository<Discount>, IDiscountRepository
+    public class DiscountRepository : GenericRepository<Discount>, IDiscountRepository
     {
         public DiscountRepository(DATNDbContext context) : base(context)
         {

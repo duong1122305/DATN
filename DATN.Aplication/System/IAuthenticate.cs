@@ -7,14 +7,13 @@ namespace DATN.Aplication.System
     public interface IAuthenticate
     {
         public Task<ResponseData<string>> Login(UserLoginView userLoginView);
-        public Task<string> Register(UserRegisterView userRegisterView);
-        public Task<string> GenerateTokenString(UserLoginView userLoginView);
+        public Task<ResponseData<string>> Register(UserRegisterView userRegisterView);
         public Task<ResponseMail> ForgotPassword(string username);
         public Task<ResponseData<List<UserInfView>>> GetUsers();
-        public Task<User> GetUserAtPhoneNumber(string phonenumber);
-        public Task<bool> UpdateInformationUser(UserRegisterView userRegisterView);
-        public Task<string> ChangePassword(UserChangePasswordView user);
-        public Task<string> GetConfirmCode(string username);
-        public Task<bool> CheckCodeConfirm(string username, string code);
+        public Task<ResponseData<UserInfView>> GetUserAtPhoneNumber(string phonenumber);
+        public Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView);
+        public Task<ResponseData<string>> ChangePassword(UserChangePasswordView user);
+        public Task<ResponseData<string>> GetConfirmCode(string username);
+        public Task<ResponseData<bool>> CheckCodeConfirm(string username, string code);
     }
 }

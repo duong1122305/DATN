@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ComboServiceRepository : GennericRepository<ComboService>, IComboServiceRepository
+    public class ComboServiceRepository : GenericRepository<ComboService>, IComboServiceRepository
     {
         public ComboServiceRepository(DATNDbContext context) : base(context)
         {

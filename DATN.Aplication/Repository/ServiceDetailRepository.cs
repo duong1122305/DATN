@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class ServiceDetailRepository : GennericRepository<ServiceDetail>, IServiceDetailsRepository
+    public class ServiceDetailRepository : GenericRepository<ServiceDetail>, IServiceDetailsRepository
     {
         public ServiceDetailRepository(DATNDbContext context) : base(context)
         {
