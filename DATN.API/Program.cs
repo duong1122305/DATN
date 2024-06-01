@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DATN.Aplication.System;
 using DATN.Data.EF;
 using DATN.Aplication.Services;
 using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
-using DATN.Aplication.Services;
-using DATN.Aplication;
 
 var builder = WebApplication.CreateBuilder(args);
 

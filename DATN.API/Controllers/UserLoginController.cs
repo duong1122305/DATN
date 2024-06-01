@@ -76,7 +76,7 @@ namespace DATN.API.Controllers
         [HttpPost("tim_ca_theo_thang_nam")]
         public async Task<ResponseData<List<ScheduleView>>> Test2(int month, int year)
         {
-            var result = await _employeeSchedule.GetAll(month, year);
+            var result = await _employeeSchedule.GetUserInOneMonth(month, year);
             return result;
         }
     }

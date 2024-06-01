@@ -1,4 +1,4 @@
-﻿namespace DATN.Aplication.Services
+﻿namespace DATN.Aplication.Services.IServices
 {
     public interface IServiceManagerService
     {

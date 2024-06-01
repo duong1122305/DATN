@@ -23,7 +23,7 @@ namespace DATN.Aplication.Services
             _usermanager = userManager;
         }
 
-        public async Task<ResponseData<List<ScheduleView>>> GetAll(int month, int year)
+        public async Task<ResponseData<List<ScheduleView>>> GetUserInOneMonth(int month, int year)
         {
             var query = from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                         join workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
@@ -33,10 +33,10 @@ namespace DATN.Aplication.Services
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
                         where workshift.WorkDate.Year == year &&
-                        workshift.WorkDate.Month == month
+                        workshift.WorkDate.Month == month && 
+                        user.IsDeleted == true
                         select new ScheduleView
                         {
-
                             Name = user.FullName,
                             WorkDate = workshift.WorkDate,
                             Shift = shift.Name,
@@ -59,7 +59,8 @@ namespace DATN.Aplication.Services
 
                 var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                             where workshift.WorkDate.Year == nextYear &&
-                            workshift.WorkDate.Month == nextMonth
+                            workshift.WorkDate.Month == nextMonth && 
+                            workshift.ShiftId==shift
                             select workshift;
 
                 foreach (var workShift in query)
@@ -71,8 +72,15 @@ namespace DATN.Aplication.Services
                             UserId = Guid.Parse(user),
                             WorkShiftId = workShift.Id
                         };
-                        await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
-                        await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
+                        var querycheck= from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                        where scheduletable.UserId == schedule.UserId && 
+                                        scheduletable.WorkShiftId == schedule.WorkShiftId
+                                        select scheduletable;
+                        if (querycheck.ToList().Count==0)
+                        {
+                            await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
+                            await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
+                        }
                     }
                 }
                 return new ResponseData<string> { IsSuccess = true, Data = $"Thêm lịch làm việc ca" };
