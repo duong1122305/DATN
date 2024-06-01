@@ -148,13 +148,7 @@ namespace DATN.Aplication.System
         public async Task<ResponseData<List<UserInfView>>> GetUsers()
         {
             var listUserIdentity = await _userManager.Users.ToListAsync();
-            if (listUserIdentity == null)
-            {
-                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
-            }
-            else
-            {
-                var listUser = new List<UserInfView>();
+            var listUser = new List<UserInfView>();
 
             if (listUserIdentity.Count > 0)
             {
