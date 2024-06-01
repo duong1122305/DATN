@@ -69,7 +69,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<GetGuestResponse>
                     {
                         IsSuccess = true,
-                        Data = guestVM
+                        Data = null,
                     };
                 }
                 return new ResponseData<GetGuestResponse>
