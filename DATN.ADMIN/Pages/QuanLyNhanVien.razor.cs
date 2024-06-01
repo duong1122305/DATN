@@ -4,6 +4,7 @@ using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Reflection.Metadata;
 
 namespace DATN.ADMIN.Pages
 {
@@ -21,6 +22,5 @@ namespace DATN.ADMIN.Pages
                 NavigationManager.NavigateTo("/NotFound");
             }
         }
-
     }
 }

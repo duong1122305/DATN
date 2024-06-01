@@ -2,12 +2,15 @@
 @using DATN.ADMIN.Data
 
 <PageTitle>Quản lý nhân viên</PageTitle>
+@code {
+
+}
 
 
-<div class="content-wrapper px-4">
+<div class="content-wrapper px-4 p-4">
     <h3>Danh sách nhân viên</h3>
-
-    @if (response.Data == null || response.Data.Count == 0 )
+    <div class=""></div>
+    @if (response.Data == null || response.Data.Count == 0)
     {
         <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
     }
@@ -16,9 +19,10 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th><input type="checkbox" /></th>
                     <th>Tên</th>
-                    <th>SĐT. (C)</th>
-                    <th>Email. (F)</th>
+                    <th>Số điện thoại</th>
+                    <th>Email</th>
                     <th>Địa chỉ</th>
                 </tr>
             </thead>
@@ -26,19 +30,18 @@
                 @foreach (var i in response.Data)
                 {
                     <tr>
+                        <td><input type="checkbox" /></td>
                         <td>@i.Name</td>
                         <td>@i.PhoneNumber</td>
                         <td>@i.Email</td>
                         <td>@i.Address</td>
-                        <td>
-                            <a href="@($"/editfootballplayer/{FootballPlayer.FootballPlayerId}")" class="btn btn-primary">Edit</a>
-                        </td>
                     </tr>
-
                 }
             </tbody>
         </table>
-    }
+        <button class="btn btn-primary">Thêm nhân viên</button>
 
+    }
 </div>
+
 
