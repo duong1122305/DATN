@@ -46,7 +46,6 @@ namespace DATN.Aplication.System
                 {
                     if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
                     {
-
                         _user = userIdentity;
                         return new ResponseData<string>
                         {

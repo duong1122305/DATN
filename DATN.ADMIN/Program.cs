@@ -4,8 +4,6 @@ using DATN.ADMIN.Services;
 using DATN.Data.EF;
 using DATN.Data.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
