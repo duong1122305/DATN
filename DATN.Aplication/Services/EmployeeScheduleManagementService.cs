@@ -96,5 +96,10 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = true, Error = e.Message };
             }
         }
+
+        public Task<ResponseData<List<ScheduleView>>> GetAll(int month, int year)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

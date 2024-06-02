@@ -22,13 +22,15 @@ namespace DATN.Aplication.System
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
+        private readonly SignInManager<User> _signInManager;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
+            _signInManager = signInManager;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -48,6 +50,7 @@ namespace DATN.Aplication.System
                     {
 
                         _user = userIdentity;
+                        var result = _signInManager.PasswordSignInAsync(userIdentity, userView.Password, false, false);
                         return new ResponseData<string>
                         {
                             IsSuccess = true,
@@ -123,7 +126,7 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = false, Error = "Tạo tài khoản không thành công" };
             }
             else
-            return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
         }
 
         public async Task<ResponseMail> ForgotPassword(string username)

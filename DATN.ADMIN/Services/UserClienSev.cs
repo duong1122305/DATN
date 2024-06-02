@@ -6,6 +6,7 @@ using DATN.ViewModels.DTOs.Authenticate;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 
 namespace DATN.ADMIN.Services
@@ -31,10 +32,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> Login(UserLoginView user)
         {
-            var jsonContent = JsonConvert.SerializeObject(user);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            var request = await _client.PostAsync("api/User-Login", content);
+            var request = await _client.PostAsJsonAsync("api/UserLogin/User-Login", user);
             var result = request.StatusCode.ToString();
             return new ResponseData<string> { IsSuccess = request.IsSuccessStatusCode, Data = result };
         }

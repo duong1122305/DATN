@@ -30,15 +30,29 @@ namespace DATN.ADMIN.Pages
             _userClienSev = userClientSev;
         }
 
-        public async Task HandleLogin()
+        public async Task<IActionResult> HandleLogin()
         {
-            userLoginView = new UserLoginView()
+            try
             {
-                UserName = email,
-                Password = password
-            };
-            var user = await _userClienSev.GetAll();
-            var test = "ok";
+                userLoginView = new UserLoginView()
+                {
+                    UserName = email,
+                    Password = password
+                };
+                var user = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
+                if (user.IsSuccess)
+                {
+                    return RedirectToPage("/trangchu");
+                }
+                else
+                    return RedirectToPage("/dang-nhap");
+
+            }
+            catch (Exception)
+            {
+                return RedirectToPage("/dang-nhap");
+
+            }
         }
     }
 }
