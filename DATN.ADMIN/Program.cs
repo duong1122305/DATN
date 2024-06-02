@@ -1,7 +1,7 @@
 using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.ViewModels.DTOs.Authenticate;
-
+using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,7 +10,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/") });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<UserLoginView>();
-
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
