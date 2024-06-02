@@ -9,6 +9,5 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<List<ScheduleView>>> GetUserInOneMonth(int month, int year);
         // nếu sai hay xoá dòng này
         public Task<ResponseData<List<ScheduleView>>> GetAllCa();
-        public Task<ResponseData<List<ScheduleView>>> GetUserInOneMonth(int month, int year);
     }
 }
