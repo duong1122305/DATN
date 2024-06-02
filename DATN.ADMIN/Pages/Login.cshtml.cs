@@ -32,13 +32,17 @@ namespace DATN.ADMIN.Pages
 
         public async Task HandleLogin()
         {
-            userLoginView = new UserLoginView()
+
+            var response = await _userClienSev.Login(new UserLoginView { UserName = email, Password = password });
+            if (response.IsSuccess)
             {
-                UserName = email,
-                Password = password
-            };
-            var user = await _userClienSev.GetAll();
-            var test = "ok";
+                Navigation.NavigateTo("/trangchu");
+            }
+            else
+            {
+                Navigation.NavigateTo("/login");
+            }
+            
         }
     }
 }

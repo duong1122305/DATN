@@ -20,7 +20,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.LoginPath = "/dang-nhap";
+                options.LoginPath = "/login";
             });
 
 builder.Services.AddDbContext<DATNDbContext>(options =>

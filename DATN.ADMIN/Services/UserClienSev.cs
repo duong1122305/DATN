@@ -34,10 +34,13 @@ namespace DATN.ADMIN.Services
             var jsonContent = JsonConvert.SerializeObject(user);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var request = await _client.PostAsync("api/User-Login", content);
+            var request = await _client.PostAsJsonAsync("api/UserLogin/User-Login", content);
             var result = request.StatusCode.ToString();
+ 
             return new ResponseData<string> { IsSuccess = request.IsSuccessStatusCode, Data = result };
+
         }
+
 
         public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         {
@@ -50,5 +53,6 @@ namespace DATN.ADMIN.Services
             var response = await _client.PutAsJsonAsync("api/UserLogin", userInfView);
             return await response.Content.ReadFromJsonAsync<UserInfView>();
         }
+
     }
 }
