@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using DATN.Aplication.Extentions;
+using DATN.Aplication.Repository;
+using DATN.Aplication.Repository.IRepository;
+using DATN.Data.EF;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
@@ -17,11 +20,13 @@ namespace DATN.Aplication.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private PasswordExtensitons _passwordExtensitons;
-        public GuestManagerService(IMapper mapper, IUnitOfWork unitOfWork)
+        private MailExtention _mailExtension;
+        public GuestManagerService(IMapper mapper, IUnitOfWork unitOfWork, MailExtention mailExtension)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _passwordExtensitons = new PasswordExtensitons();
+            _mailExtension = mailExtension;
         }
 
         public async Task<ResponseData<GuestViewModel>> FindGuestByID(Guid id)
@@ -29,7 +34,7 @@ namespace DATN.Aplication.Services
 
             try
             {
-                var result = _unitOfWork.GuestRepository.GetAsync(id);
+                var result = await _unitOfWork.GuestRepository.GetAsync(id);
 
                 if (result != null)
                 {
@@ -64,7 +69,9 @@ namespace DATN.Aplication.Services
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
                 if (request.keyWord != null)
                 {
-                    result = result.Where(p => p.PhoneNumber.Contains(request.keyWord)).OrderByDescending(p => p.Name);
+                    result = result.Where(p => p.PhoneNumber.Contains(request.keyWord)
+                                            || p.Name.ToLower().Contains(request.keyWord.ToLower()))
+                                           .OrderByDescending(p => p.Name);
                 }
                 int totalCount = result.Count();
                 if (totalCount > 0)
@@ -76,11 +83,11 @@ namespace DATN.Aplication.Services
                         Address = p.Address,
                         Email = p.Email,
                         Gender = p.Gender,
-                        CodeConfirm = p.CodeConfirm,
                         Name = p.Name,
                         PhoneNumber = p.PhoneNumber,
                         UserName = p.UserName,
                         Id = p.Id,
+                        IsDelete=p.IsDeleted,
                     });
                     GetGuestResponse response = new GetGuestResponse()
                     {
@@ -111,9 +118,48 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public Task<ResponseData<string>> RegisterByCustomer(GuestRegisterUserRequest request)
+        public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterUserRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var guest = new Guest()
+                {
+                    Address = request.Address,
+                    Email = request.Email,
+                    Gender = request.Gender,
+                    Name = request.Name,
+                    IsDeleted = false,
+                    PhoneNumber = request.PhoneNumber,
+                    RegisteredAt = DateTime.Now,
+                    UserName = request.UserName,
+                    PasswordHash = _passwordExtensitons.HashPassword(request.Password),
+                    IsComfirm = false,
+                };
+                await _unitOfWork.GuestRepository.AddAsync(guest);
+                var result = await _unitOfWork.SaveChangeAsync();
+                await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, request.Password, guest.Id.ToString());
+                if (result > 0)
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Data = " Thêm thành công"
+                    };
+                }
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Thêm thất bại"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = ex.Message
+                };
+            }
         }
 
         public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request)
@@ -127,6 +173,7 @@ namespace DATN.Aplication.Services
                     PhoneNumber = request.PhoneNumber,
                     Gender = request.Gender,
                 };
+                await _unitOfWork.GuestRepository.AddAsync(guest);
                 var result = await _unitOfWork.SaveChangeAsync();
                 if (result > 0)
                 {
@@ -158,6 +205,28 @@ namespace DATN.Aplication.Services
 
             try
             {
+                string erorrMessage = "";
+                bool checkUser=true;
+                if ( await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
+                {
+                    checkUser=false;
+                    erorrMessage = "Email đã được đăng ký ở tài khoản khác";
+                }              
+                if ( await _unitOfWork.GuestRepository.CheckUserExist(request.UserName))
+                {
+                    checkUser = false;
+                    erorrMessage = "Tên đăng nhập đã tồn tại";
+                }
+                if (!checkUser)
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Error= erorrMessage,
+                    };
+                }
+
+
                 var guest = new Guest()
                 {
                     Address = request.Address,
@@ -169,9 +238,13 @@ namespace DATN.Aplication.Services
                     RegisteredAt = DateTime.Now,
                     UserName = request.UserName,
                     PasswordHash = _passwordExtensitons.HashPassword(request.Password),
+                    IsComfirm = false,
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
                 var result = await _unitOfWork.SaveChangeAsync();
+
+
+                await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, request.Password, guest.Id.ToString());
                 if (result > 0)
                 {
                     return new ResponseData<string>
@@ -200,5 +273,44 @@ namespace DATN.Aplication.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<ResponseData<string>> VerififyUser(string verifyToken, string mail)
+        {
+            try
+            {
+               
+                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(verifyToken));
+                if (guest != null && guest.Email == mail)
+                {
+                    guest.IsComfirm = true;
+                    var result = await _unitOfWork.SaveChangeAsync();
+
+                    if (result > 0)
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Data = " Xác minh thành công"
+                        };
+                    }
+                }
+
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Xác minh thất bại thất bại"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = ex.Message
+                };
+            }
+        }
+
+
     }
 }

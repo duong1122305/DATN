@@ -11,6 +11,6 @@ namespace DATN.Aplication.Services
         Task<ResponseData<string>>UpdateGuest(GuestViewModel request);
         Task<ResponseData<GetGuestResponse>>GetGuest(GetGuestRequest request);
         Task<ResponseData<GuestViewModel>>FindGuestByID(Guid id);
-        
+        Task<ResponseData<string>> VerififyUser(string verifyToken, string mail);
     }
 }

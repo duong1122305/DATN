@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ namespace DATN.ViewModels.Common
 {
 	public class PagingResponseData
 	{
+		[Range(1,100)]
 		public int PageIndex { get; set; }// page hiện tại
-		public int PageSize { get; set; }// kích thước page
+        [Range(1, 100)]
+        public int PageSize { get; set; }// kích thước page
 		public int TotalCount { get; set; }// Tổng số bản ghi
-		public int TotalPage => (int)Math.Ceiling((decimal)TotalCount / PageSize);// Tổng số trang
+		public int TotalPage { get; set; }// Tổng số trang
         public bool? HasNext => TotalPage > PageIndex;// có next đc ko
 		public bool? HasPrev => PageIndex > 0;// có lùi đc ko
         public PagingResponseData( int pageIndex, int pageSize, int tolalCount)
@@ -19,6 +22,7 @@ namespace DATN.ViewModels.Common
             PageIndex = pageIndex;
 			PageSize = pageSize;
 			TotalCount = tolalCount;
+            TotalPage=pageSize>0?(int)Math.Ceiling((decimal)TotalCount / PageSize):0;
         }
     }
 }
