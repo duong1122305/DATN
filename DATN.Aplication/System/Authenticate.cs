@@ -22,15 +22,13 @@ namespace DATN.Aplication.System
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
-        private readonly SignInManager<User> _signInManager;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, SignInManager<User> signInManager)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
-            _signInManager = signInManager;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -50,7 +48,6 @@ namespace DATN.Aplication.System
                     {
 
                         _user = userIdentity;
-                        var result = _signInManager.PasswordSignInAsync(userIdentity, userView.Password, false, false);
                         return new ResponseData<string>
                         {
                             IsSuccess = true,
