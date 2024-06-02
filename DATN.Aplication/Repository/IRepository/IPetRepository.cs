@@ -3,7 +3,7 @@ using DATN.Data.Entities;
 
 namespace DATN.Aplication.Repository.IRepository
 {
-    internal interface IPetRepository : IGenericRepository<Pet>
+    public interface IPetRepository : IGenericRepository<Pet>
     {
     }
 }
