@@ -42,6 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DATN.Data\DATN.Data.csproj" />
     <ProjectReference Include="..\DATN.ViewModels\DATN.ViewModels.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,7 @@
-﻿@page "/dang-nhap"
+﻿@page "/login"
 @using Microsoft.AspNetCore.Components.Web
 @namespace DATN.ADMIN.Pages
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inherits LayoutComponentBase
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,36 +22,36 @@
                             <a href="/"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="width: 150px; height: 150px;"></a>
                         </div>
                         <div>
-                            <form>
+                            <EditForm OnValidSubmit="@Submit" Model="user">
                                 <input type="hidden">
                                 <!-- Email Address -->
                                 <div>
-                                    <label class="form-label" for="email">Email</label>
-                                    <input class="form-control" id="email" type="email" name="email" value="" required="required" autofocus="autofocus" placeholder="admin201@gmail.com">
+                                    <label class="form-label">Tên đăng nhập</label>
+                                    <InputText class="form-control" @bind-Value="@user.UserName"/>
                                 </div>
                                 <!-- Password -->
                                 <div class="mt-4">
                                     <label class="form-label" for="password">Mật khẩu</label>
-                                    <input class="form-control" id="password" type="password" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
+                                    <InputText class="form-control" @bind-Value="@user.Password" id="password" type="password" name="password" required="required" autocomplete="current-password" placeholder="abc@123" />
                                 </div>
 
                                 <!-- Remember Me -->
                                 <div class="mt-4">
-                                    <div class="d-flex align-items-center justify-content-between mt-4">
-                                        <label for="remember_me" class="d-inline-flex">
-                                            <input type="checkbox" name="remember" class="form-check-input">
-                                            <span class="ms-2">Nhớ thông tin</span>
-                                        </label>
-                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" asp-page="ForGotPassword">Quên mật khẩu?</a>
+                                    <div class="d-flex align-items-center justify-content-end mt-4">
+                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" href="/quen-mat-khau">Quên mật khẩu?</a>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-center mt-4">
                                     <button type="submit" class="btn btn-info fw-normal text-white fw-bold">Đăng nhập</button>
                                 </div>
-                            </form>
+                            </EditForm>
                             <div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

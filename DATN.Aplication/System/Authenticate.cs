@@ -122,7 +122,12 @@ namespace DATN.Aplication.System
                 }
                 return new ResponseData<string> { IsSuccess = false, Error = "Tạo tài khoản không thành công" };
             }
-            return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
+
+            }
+           
         }
 
         public async Task<ResponseMail> ForgotPassword(string username)
