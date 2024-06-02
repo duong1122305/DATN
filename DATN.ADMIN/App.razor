@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using DATN.ADMIN.Pages
+@using System.Security.Claims
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -18,7 +19,6 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
-
 @code {
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
@@ -28,18 +28,14 @@
     AuthenticationStateProvider authenticationStateProvider { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (!user.Identity.IsAuthenticated)
+        var key = httpContextAccessor.HttpContext.Session.GetString("key");
+        var identity = new ClaimsIdentity(key);
+        httpContextAccessor.HttpContext.User = new ClaimsPrincipal(identity);
+        var authState = httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+        if (!authState)
         {
             // Chuyển hướng đến trang đăng nhập
             navigationManager.NavigateTo("/dangnhap");
         }
-        else
-        {
-            navigationManager.NavigateTo("/trangchu");
-        }
     }
-   
 }

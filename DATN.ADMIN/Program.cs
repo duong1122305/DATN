@@ -1,13 +1,16 @@
-using DATN.ADMIN.Data;
+﻿using DATN.ADMIN.Data;
 using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.Data.EF;
 using DATN.Data.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +22,20 @@ builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("http
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-                options.LoginPath = "/login";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value,
+                    ValidIssuer = builder.Configuration.GetSection("JWT:Issuer").Value,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value))
+                };
             });
 
 builder.Services.AddDbContext<DATNDbContext>(options =>
@@ -45,6 +58,14 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser());
 });
 
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(1); // Thời gian timeout của session
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Chỉ định cookie này là cần thiết
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -59,6 +80,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

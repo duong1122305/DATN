@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Claims;
 
 namespace DATN.ADMIN.Pages
 {
@@ -23,7 +24,7 @@ namespace DATN.ADMIN.Pages
         private readonly UserManager<User> _userManager;
         HttpContextAccessor _contextAccessor;
 
-        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager, IUserClientSev userClientSev,HttpContextAccessor contextAccessor)
+        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager, IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -41,10 +42,11 @@ namespace DATN.ADMIN.Pages
                     Password = password
                 };
                 var user = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
-                if (user.IsSuccess)
-                {
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
 
+                if (user.IsSuccess && user.Data != null)
+                {
+                    _contextAccessor.HttpContext.Session.SetString("key",user.Data);
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
                 }
 
             }

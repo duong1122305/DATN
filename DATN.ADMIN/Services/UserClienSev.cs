@@ -32,10 +32,10 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> Login(UserLoginView user)
         {
-            var request = await _client.PostAsJsonAsync("api/UserLogin/User-Login", user);
-            var result = request.StatusCode.ToString();
- 
-            return new ResponseData<string> { IsSuccess = request.IsSuccessStatusCode, Data = result };
+            var response = await _client.PostAsJsonAsync("api/UserLogin/User-Login", user);
+            var result = await response.Content.ReadFromJsonAsync<ResponseData<string>>();
+
+            return result;
 
         }
 
