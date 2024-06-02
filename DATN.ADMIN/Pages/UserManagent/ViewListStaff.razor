@@ -1,0 +1,90 @@
+﻿@page "/ListStaffView"
+@using DATN.ADMIN.Data
+@using DATN.ADMIN.IServices;
+@using DATN.ViewModels.Common;
+@using DATN.ViewModels.DTOs.Authenticate;
+<PageTitle>Quản lý nhân viên</PageTitle>
+<MudCard Class="my-2" Style="position:relative;">
+@if (response.Data == null || response.Data.Count == 0)
+    {
+    @*    <MudProgressCircular Color="Color.Default" Indeterminate="true" /> *@
+     <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" EndIcon="@Icons.Material.Filled.Refresh"/>
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudOverlay Visible="isVisible" DarkBackground="true" Absolute="true">
+            <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+        </MudOverlay>
+    }
+    else
+    {
+        <MudSimpleTable style="overflow-x:auto;">
+            <thead class="text-center">
+                <tr class="text-center">
+                    <th scope="col">#</th>
+                    <th scope="col">Tên</th>
+                    <th scope="col">Số điện thoại</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Địa chỉ</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in response.Data)
+                {
+                    <tr class="text-center">
+                        <th scope="row"><input type="checkbox"/></th>
+                        <td>@i.Name</td>
+                        <td>@i.PhoneNumber</td>
+                        <td>@i.Email</td>
+                        <td>@i.Address</td>
+                        <td>
+                            <MudSwitch Color="Color.Primary" @bind-Checked=@(disabled)/>
+                        </td>
+                        <td>
+                            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary">Gửi email</MudButton>
+                           <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="OnButtonClicked" >Xoá</MudButton>
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Custom.Uncategorized.Radioactive" Color="Color.Warning">Sửa</MudButton>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+    }
+    </MudCard>
+
+@code {
+    [Inject] IUserClientSev userClientSev { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    [Parameter] public ResponseData<List<UserInfView>> response { get; set; } = new ResponseData<List<UserInfView>>();
+    protected override async Task OnInitializedAsync()
+    {
+        response = await userClientSev.GetAll();
+        if (!response.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/NotFound");
+        }
+    }
+    bool disabled = false;
+    //thông báo khi xoá
+    [Inject]
+    private IDialogService DialogService { get; set; }
+    private async void OnButtonClicked()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Thông báo",
+            "Bạn có muốn xoá không?!",
+            yesText: "Xoá!", cancelText: "Cancel");
+        StateHasChanged();
+    }
+    private bool isVisible;
+
+}
