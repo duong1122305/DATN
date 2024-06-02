@@ -19,18 +19,19 @@ namespace DATN.ADMIN.Pages
         public string email { get; set; }
         [BindProperty]
         public string password { get; set; }
-        NavigationManager Navigation { get; set; }
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        HttpContextAccessor _contextAccessor;
 
-        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager, IUserClientSev userClientSev)
+        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager, IUserClientSev userClientSev,HttpContextAccessor contextAccessor)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _userClienSev = userClientSev;
+            _contextAccessor = contextAccessor;
         }
 
-        public async Task<IActionResult> HandleLogin()
+        public async Task HandleLogin()
         {
             try
             {
@@ -42,16 +43,14 @@ namespace DATN.ADMIN.Pages
                 var user = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
                 if (user.IsSuccess)
                 {
-                    return RedirectToPage("/trangchu");
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+
                 }
-                else
-                    return RedirectToPage("/dang-nhap");
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return RedirectToPage("/dang-nhap");
-
+                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
             }
         }
     }
