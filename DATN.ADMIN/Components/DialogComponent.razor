@@ -1,19 +1,23 @@
-﻿<div>
-    <p>Output: @message</p>
-    <button onclick="document.getElementById('my-dialog').showModal">
-        Hiển thị popup
-    </button>
+﻿<MudDialog Style="width:600px; height:650px" CloseOnEscape="false">
+    <DialogContent>
+        <MudForm @bind-IsValid="@success">
+            <MudTextField T="string" Label="Họ tên" Required="true" RequiredError="Vui lòng không để trống!" style="padding-bottom:20px"></MudTextField>
+            <MudTextField T="string" Label="Email" Required="true" RequiredError="Vui lòng không để trống!" style="padding-bottom:20px"></MudTextField>
+            <MudTextField T="string" Label="User" Required="true" RequiredError="Vui lòng không để trống!" style="padding-bottom:20px"></MudTextField>
+            <MudTextField T="string" Label="Địa chỉ" Required="true" RequiredError="Vui lòng không để trống!" style="padding-bottom:20px"></MudTextField>
+            <MudTextField T="string" Label="Số điện thoại" Required="true" RequiredError="Vui lòng không để trống!" style="padding-bottom:20px"></MudTextField>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Huỷ</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" >Xác nhận</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    <dialog id="my-dialog" @onclose="OnClose" @oncanel="OnCanel">
-        <p>hi</p>
-        <form method="dialog">
-            <button>close</button>
-        </form>
-    </dialog>
-</div>
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel(); 
 
-@code{
-string message;
-void OnClose(EventArgs e) =>message+="onclose";
-void OnCanel(EventArgs e) =>message+="oncanel";
+    bool success = false;
 }

@@ -1,31 +1,33 @@
-﻿@page "/ListStaff"
+﻿@* @page "/ListSales"
 @using System.Net.Http.Json
-@using DATN.ADMIN.Components
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
-<PageTitle>Danh sách nhân viên</PageTitle>
+<PageTitle>Danh sách mã giảm giá</PageTitle>
 
 <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+        <MudText Typo="Typo.h6">Danh sách mã giảm giá</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" @onclick="OpenDialog">Thêm</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh Style="text-align:center;" >ID</MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Name)">Tên nhân viên</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;">ID</MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Name)">Số lượng</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Voucher Code</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Mô tả</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Có hiệu lực từ</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Có hiệu lực đến</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">% giảm</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Số tiền giảm tối đa</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Số tiền hoá đơn tối thiểu</MudTableSortLabel></MudTh>
         <MudTh Style="text-align:center;">Trạng thái</MudTh>
-        <MudTh Style="text-align:center;">Xác thực</MudTh>
         <MudTh Style="text-align:center;">Hành động</MudTh>
     </HeaderContent>
-    <RowTemplate >
+    <RowTemplate>
         <MudTd DataLabel="STT" Style="text-align:center;">
             @(lstUser.IndexOf(context) + 1)
         </MudTd>
@@ -38,7 +40,7 @@
             <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
         </MudTd>
         <MudTd Style="text-align:center;">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="OnButtonClicked">Xoá</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
         </MudTd>
@@ -48,11 +50,6 @@
     </PagerContent>
 </MudTable>
 <MudOverlay @bind-Visible="isVisible" DarkBackground="true" ZIndex="9999" AutoClose="true" />
-<style>
-    .my-custom-class {
-        backdrop-filter: blur(10px);
-    }
-</style>
 @code {
     //button trạng thái
     private bool _disableElevation = false;
@@ -88,24 +85,5 @@
         StateHasChanged();
     }
 
-    //tạo sự kiện để mở xem detail
 
-    private void OpenDialog()
-    {
-        var options = new DialogOptions { ClassBackground = "my-custom-class" };
-        _dialogservice.Show<DialogComponent>("Thêm nhân viên", options);
-    }
-
-
-    //Thông báo hỏi khi xoá
-    private async void OnButtonClicked()
-    {
-        bool? result = await _dialogservice.ShowMessageBox(
-            "Thông báo",
-            "Bạn có muốn xoá nhân viên?",
-            yesText: "Xoá", cancelText: "Huỷ");
-        StateHasChanged();
-    }
-
- 
-}
+} *@

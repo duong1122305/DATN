@@ -9,7 +9,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
         <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
-            <MudMenuItem>Hồ sơ</MudMenuItem>
+            <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
             <MudMenuItem>Đăng xuất</MudMenuItem>
         </MudMenu>
     </MudAppBar>
@@ -18,7 +18,7 @@
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-        <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+        <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
         @Body
         </MudContainer>
 
