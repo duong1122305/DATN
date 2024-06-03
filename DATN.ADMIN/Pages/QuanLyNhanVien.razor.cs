@@ -22,5 +22,19 @@ namespace DATN.ADMIN.Pages
                 NavigationManager.NavigateTo("/NotFound");
             }
         }
+        // Biến kiểm soát hiển thị popup
+        private bool showPopup = false;
+
+        // Phương thức mở popup
+        private void OpenPopup()
+        {
+            showPopup = true;
+        }
+
+        // Phương thức đóng popup
+        private void ClosePopup()
+        {
+            showPopup = false;
+        }
     }
 }

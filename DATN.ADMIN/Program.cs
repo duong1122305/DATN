@@ -1,5 +1,4 @@
-﻿using DATN.ADMIN.Data;
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.Data.EF;
 using DATN.Data.Entities;
