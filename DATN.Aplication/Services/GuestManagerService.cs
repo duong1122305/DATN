@@ -77,7 +77,6 @@ namespace DATN.Aplication.Services
                 if (totalCount > 0)
                 {
                     result = result.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize);
-
                     var lstGuestVM = result.Select(p => new GuestViewModel()
                     {
                         Address = p.Address,
@@ -87,8 +86,9 @@ namespace DATN.Aplication.Services
                         PhoneNumber = p.PhoneNumber,
                         UserName = p.UserName,
                         Id = p.Id,
-                        IsDelete=p.IsDeleted,
-                    });
+                        IsDelete = p.IsDeleted,
+                        Password =p.PasswordHash !=null? _passwordExtensitons.Decrypt(p.PasswordHash):null,
+                    }); ;
                     GetGuestResponse response = new GetGuestResponse()
                     {
                         lstGuest = lstGuestVM.ToList(),
