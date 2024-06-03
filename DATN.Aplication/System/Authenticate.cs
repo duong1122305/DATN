@@ -23,7 +23,6 @@ namespace DATN.Aplication.System
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
-        private readonly RoleManager<Role> _roleManager;
         private User _user;
         public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager)
         {
