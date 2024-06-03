@@ -1,0 +1,90 @@
+﻿@page "/ViewShudule"
+@using System.Net.Http.Json
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Danh sách ca làm</PageTitle>
+
+@if (lstUser != null)
+{
+    <MudTable Items="@lstUser" Hover="@hover" Filter="new Func<ScheduleView,bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Danh sách ca làm</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;">Ca làm</MudTh>
+            <MudTh Style="text-align:center;">Từ</MudTh>
+            <MudTh Style="text-align:center;">Đến</MudTh>
+            <MudTh Style="text-align:center;">Thời gian</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="STT" Style="text-align:center;">
+                @(lstUser.IndexOf(context) + 1)
+            </MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Shift</MudTd>
+            <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
+            <MudTd DataLabel="To" Style="text-align:center;">@context.To</MudTd>
+            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate</MudTd>
+            <MudTd Style="text-align:center;">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+    <MudOverlay @bind-Visible="isVisible" DarkBackground="true" ZIndex="9999" AutoClose="true" />
+}
+else
+{
+<DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
+}
+@code {
+    //button trạng thái
+    private bool _disableElevation = false;
+    //hiệu ứng hover
+    private bool hover = true;
+    private string searchString1 = "";
+    private List<ScheduleView> lstUser = new List<ScheduleView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam");
+        lstUser = user.Data;
+    }
+
+    private bool FilterFunc1(ScheduleView element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(ScheduleView element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
+            return true;
+        return false;
+    }
+    //overlay màn
+    private bool isVisible;
+
+    public void OpenOverlay()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+
+ 
+}
