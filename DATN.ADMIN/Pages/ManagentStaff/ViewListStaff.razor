@@ -17,7 +17,7 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh Style="text-align:center;" >ID</MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Name)">Tên nhân viên</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
         <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
         <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
         <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
@@ -29,7 +29,7 @@
         <MudTd DataLabel="STT" Style="text-align:center;">
             @(lstUser.IndexOf(context) + 1)
         </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
         <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
         <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
         <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
@@ -73,7 +73,7 @@
             return true;
         if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if ($"{element.Email} {element.Position} {element.PhoneNumber}".Contains(searchString))
             return true;
