@@ -302,11 +302,11 @@ namespace DATN.Aplication.System
         public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
         {
             var queryRole = await _roleManager.FindByIdAsync(addRoleForUserView.RoleId);
-            var user = await _userManager.FindByEmailAsync(addRoleForUserView.EmployeeId);
+            var user = await _userManager.FindByIdAsync(addRoleForUserView.UserId);
             if (queryRole != null)
             {
-                var queryUser = _userManager.AddToRoleAsync(user, queryRole.Name);
-                if (queryUser.IsCompleted)
+                var queryUser = await _userManager.AddToRoleAsync(user, queryRole.Name);
+                if (queryUser.Succeeded)
                 {
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ cho người dùng thành công" };
                 }
