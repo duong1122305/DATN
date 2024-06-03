@@ -16,7 +16,8 @@ namespace DATN.Data.Entities
         public bool Gender { get; set; }
         public string? CodeConfirm { get; set; }
         public string Address { get; set; }
-       
+        public bool IsDeleted { get; set; }
+
         public ICollection<Booking> BookingsAsCounterStaff { get; set; }
         public ICollection<Booking> BookingsAsConfirmStaff { get; set; }
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }

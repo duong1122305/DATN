@@ -22,13 +22,15 @@ namespace DATN.Aplication.System
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
+        private readonly RoleManager<Role> _roleManager;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
+            _roleManager = roleManager;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -123,7 +125,7 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = false, Error = "Tạo tài khoản không thành công" };
             }
             else
-            return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
         }
 
         public async Task<ResponseMail> ForgotPassword(string username)
@@ -298,7 +300,7 @@ namespace DATN.Aplication.System
         public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
         {
             var queryRole = await _roleManager.FindByIdAsync(addRoleForUserView.RoleId);
-            var user = await _userManager.FindByIdAsync(addRoleForUserView.EmployeeId);
+            var user = await _userManager.FindByIdAsync(addRoleForUserView.UserId);
             if (queryRole != null)
             {
                 var queryUser = await _userManager.AddToRoleAsync(user, queryRole.Name);
@@ -354,7 +356,6 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ mới thành công" };
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Lỗi đéo biêts" };
-            }
         }
     }
 }
