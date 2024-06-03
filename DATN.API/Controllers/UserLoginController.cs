@@ -73,7 +73,7 @@ namespace DATN.API.Controllers
             var result = await _employeeSchedule.InsertEmployeeNextMonthCompareCurrentMonth(listUser, shift);
             return result;
         }
-        [HttpPost("tim_ca_theo_thang_nam")]
+        [HttpGet("tim_ca_theo_thang_nam")]
         public async Task<ResponseData<List<ScheduleView>>> Test2(int month, int year)
         {
             var result = await _employeeSchedule.GetUserInOneMonth(month, year);
@@ -82,10 +82,22 @@ namespace DATN.API.Controllers
         
         //nếu bị sai hãy xoá dòng này
 
-        [HttpPost("get-all-ca-lam")]
-        public async Task<ResponseData<List<ScheduleView>>> GetAllCa()
+        [HttpGet("get-all-1-ca")]
+        public async Task<ResponseData<List<ScheduleView>>> GetAllCa(int ca)
         {
-            var result = await _employeeSchedule.GetAllCa();
+            var result = await _employeeSchedule.GetScheduleForShift(ca);
+            return result;
+        }
+        [HttpGet("get-all")]
+        public async Task<ResponseData<List<ScheduleView>>> GetAll()
+        {
+            var result = await _employeeSchedule.GetAll();
+            return result;
+        }
+        [HttpPost("get-month-to-month")]
+        public async Task<ResponseData<List<ScheduleView>>> GetMonthToMonth(ScheduleMonthToMonthView view)
+        {
+            var result = await _employeeSchedule.GetScheduleFromMonthToMonth(view);
             return result;
         }
     }

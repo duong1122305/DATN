@@ -1,8 +1,11 @@
 using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
+using DATN.Aplication.CustomProvider;
 using DATN.Data.Entities;
 using DATN.ViewModels.DTOs.Authenticate;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,39 +23,40 @@ namespace DATN.ADMIN.Pages
         public string email { get; set; }
         [BindProperty]
         public string password { get; set; }
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
         HttpContextAccessor _contextAccessor;
-
-        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager, IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
+        public LoginModel(IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _userClienSev = userClientSev;
             _contextAccessor = contextAccessor;
         }
-
         public async Task HandleLogin()
         {
-            try
+            if (_contextAccessor.HttpContext.Session.GetString("Key") != null)
             {
-                userLoginView = new UserLoginView()
-                {
-                    UserName = email,
-                    Password = password
-                };
-                var user = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
-
-                if (user.IsSuccess && user.Data != null)
-                {
-                    _contextAccessor.HttpContext.Session.SetString("key",user.Data);
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
-                }
-
+                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
             }
-            catch (Exception e)
+            else
             {
-                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                try
+                {
+                    userLoginView = new UserLoginView()
+                    {
+                        UserName = email,
+                        Password = password
+                    };
+                    var checkLogin = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
+
+                    if (checkLogin.IsSuccess && checkLogin.Data != null)
+                    {
+                        _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
+                        _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                }
             }
         }
     }

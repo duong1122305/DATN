@@ -77,8 +77,9 @@ namespace DATN.Aplication.System
             var user = await CheckUser(userViewModel.UserName);
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, userViewModel.UserName),
-                new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user)))
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user))),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
             SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);

@@ -1,14 +1,12 @@
-﻿using DATN.ADMIN.Data;
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
+using DATN.Aplication.CustomProvider;
 using DATN.Data.EF;
 using DATN.Data.Entities;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -54,17 +52,21 @@ builder.Services.AddIdentity<User, Role>(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Authenticated", policy =>
-        policy.RequireAuthenticatedUser());
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+    // Thêm các policy khác nếu cần
 });
 
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(1); // Thời gian timeout của session
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true; // Chỉ định cookie này là cần thiết
 });
+
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 
 var app = builder.Build();
 
