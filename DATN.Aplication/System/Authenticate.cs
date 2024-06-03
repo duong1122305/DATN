@@ -183,7 +183,7 @@ namespace DATN.Aplication.System
             if (user != null)
             {
                 var userInfView = new UserInfView();
-                userInfView.Name = user.FullName;
+                userInfView.FullName = user.FullName;
                 userInfView.Email = user.Email;
                 userInfView.PhoneNumber = user.PhoneNumber;
                 userInfView.Address = user.Address;
