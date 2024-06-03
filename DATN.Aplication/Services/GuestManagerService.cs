@@ -7,6 +7,8 @@ using DATN.Data.EF;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -269,9 +271,77 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public Task<ResponseData<string>> UpdateGuest(GuestViewModel request)
+        public async Task<ResponseData<string>> SoftDelete(DeleteRequest<Guid> request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _unitOfWork.GuestRepository.SoftDelete(request);
+                var result =      await _unitOfWork.GuestRepository.SaveChangesAsync() > 0; 
+                if (result)
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Data = "Thay đôi trạng thái thành công"
+                    };
+                }
+                return new ResponseData<string>
+                {
+                    IsSuccess = true,
+                    Data = "Thay đôi trạng thái không thành công"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResponseData<string>> UpdateGuest(GuestUpdateRequest request)
+        {
+            try
+            {
+
+                var guest = new Guest()
+                {
+                    Address = request.Address,
+                    Gender = request.Gender,
+                    Name = request.Name,
+                    IsDeleted = false,
+                    PhoneNumber = request.PhoneNumber,
+                    RegisteredAt = DateTime.Now,
+                    PasswordHash = _passwordExtensitons.HashPassword(request.Password),
+                   
+                };
+                await _unitOfWork.GuestRepository.UpdateAsync(guest);
+                var result = await _unitOfWork.SaveChangeAsync();
+
+                if (result > 0)
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Data = " Thêm thành công"
+                    };
+                }
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Thêm thất bại"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = ex.Message
+                };
+            }
         }
 
         public async Task<ResponseData<string>> VerififyUser(string verifyToken, string mail)

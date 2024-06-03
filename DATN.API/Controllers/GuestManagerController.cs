@@ -43,5 +43,15 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.VerififyUser(verifyToken, mail);
         }
+        [HttpPost("update-guest")]
+        public async Task<ResponseData<string>> UpdateGuest(GuestUpdateRequest request)
+        {
+            return await _guestManagerService.UpdateGuest(request);
+        }
+        [HttpPost("change-status")]
+        public async Task<ResponseData<string>> ChangStatus(DeleteRequest<Guid> request)
+        {
+             return await _guestManagerService.SoftDelete(request);
+        }
     }
 }
