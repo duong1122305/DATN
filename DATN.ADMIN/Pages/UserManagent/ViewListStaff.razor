@@ -1,90 +1,109 @@
-﻿@page "/ListStaffView"
-@using DATN.ADMIN.Data
-@using DATN.ADMIN.IServices;
-@using DATN.ViewModels.Common;
-@using DATN.ViewModels.DTOs.Authenticate;
-<PageTitle>Quản lý nhân viên</PageTitle>
-<MudCard Class="my-2" Style="position:relative;">
-@if (response.Data == null || response.Data.Count == 0)
-    {
-    @*    <MudProgressCircular Color="Color.Default" Indeterminate="true" /> *@
-     <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" EndIcon="@Icons.Material.Filled.Refresh"/>
-        <MudCardContent>
-            <MudSkeleton Width="30%" Height="42px;" />
-            <MudSkeleton Width="80%" />
-            <MudSkeleton Width="100%" />
-        </MudCardContent>
-        <MudCardActions>
-            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
-            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
-        </MudCardActions>
-        <MudOverlay Visible="isVisible" DarkBackground="true" Absolute="true">
-            <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
-        </MudOverlay>
-    }
-    else
-    {
-        <MudSimpleTable style="overflow-x:auto;">
-            <thead class="text-center">
-                <tr class="text-center">
-                    <th scope="col">#</th>
-                    <th scope="col">Tên</th>
-                    <th scope="col">Số điện thoại</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Địa chỉ</th>
-                    <th scope="col">Trạng thái</th>
-                    <th scope="col">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var i in response.Data)
-                {
-                    <tr class="text-center">
-                        <th scope="row"><input type="checkbox"/></th>
-                        <td>@i.Name</td>
-                        <td>@i.PhoneNumber</td>
-                        <td>@i.Email</td>
-                        <td>@i.Address</td>
-                        <td>
-                            <MudSwitch Color="Color.Primary" @bind-Checked=@(disabled)/>
-                        </td>
-                        <td>
-                            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary">Gửi email</MudButton>
-                           <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="OnButtonClicked" >Xoá</MudButton>
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Custom.Uncategorized.Radioactive" Color="Color.Warning">Sửa</MudButton>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </MudSimpleTable>
-    }
-    </MudCard>
+﻿@page "/ListStaff"
+@using System.Net.Http.Json
+@inject HttpClient httpClient
+<PageTitle>Danh sách nhân viên</PageTitle>
+
+<MudTable Items="@Elements" Hover="@hover" Filter="new Func<Element,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh Style="text-align:center;">ID</MudTh>
+        <MudTh Style="text-align:center;">Tên nhân viên</MudTh>
+        <MudTh Style="text-align:center;">Số điện thoại</MudTh>
+        <MudTh Style="text-align:center;">Địa chỉ</MudTh>
+        <MudTh Style="text-align:center;">Trạng thái</MudTh>
+        <MudTh Style="text-align:center;">Xác thực</MudTh>
+        <MudTh Style="text-align:center;">Hành động</MudTh>
+    </HeaderContent>
+    <RowTemplate >
+        <MudTd DataLabel="Nr" Style="text-align:center;">
+        </MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+        <MudTd DataLabel="Sign" Style="text-align:center;">@context.Sign</MudTd>
+        <MudTd DataLabel="Position" Style="text-align:center;">@context.Position</MudTd>
+        <MudTd DataLabel="Status" Style="text-align:center;">
+            @if (context.Status== 1)
+            {
+                <p>Hoạt động</p>
+            }
+            else
+            {
+               <p>Ngừng hoạt động</p>
+
+            }
+        </MudTd>
+        <MudTd DataLabel="Verify" Style="text-align:center;">
+            @if (context.Verify == 1)
+            {
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info">Đã xác thực</MudChip>
+            }
+            else
+            {
+                <MudChip Icon="@Icons.Material.Filled.Dangerous" Color="Color.Error">Chưa xác thực</MudChip>
+            }
+        </MudTd>
+        <MudTd Style="text-align:center;">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
-    [Inject] IUserClientSev userClientSev { get; set; }
-    [Inject] NavigationManager NavigationManager { get; set; }
+    private int cout= 0;
+    //button trạng thái
+    private bool _disableElevation = false;
+    //hiệu ứng hover
+    private bool hover = true;
+    private string searchString1 = "";
+    private HashSet<Element> selectedItems = new HashSet<Element>();
 
-    [Parameter] public ResponseData<List<UserInfView>> response { get; set; } = new ResponseData<List<UserInfView>>();
+    private IEnumerable<Element> Elements = new List<Element>();
+
     protected override async Task OnInitializedAsync()
     {
-        response = await userClientSev.GetAll();
-        if (!response.IsSuccess)
+        // Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
+
+        Elements = new List<Element>()
         {
-            NavigationManager.NavigateTo("/NotFound");
-        }
+            new Element() {Molar = "Test",Sign = "0989123123", Position= "Phú thọ", Name="Hưng",Number="10", Status=1, Verify=1},
+            new Element() {Molar = "Test",Sign = "0989123124", Position= "Hà Nội", Name="Việt",Number="10", Status=2, Verify=2},
+            new Element() {Molar = "Test",Sign = "0989123126", Position= "Bắc Giang", Name="Hà",Number="10", Status=1, Verify=1},
+            new Element() {Molar = "Test",Sign = "0989123127", Position= "Tuyên Quang", Name="Dương",Number="0,3",Status=2, Verify=2}
+        };
     }
-    bool disabled = false;
-    //thông báo khi xoá
-    [Inject]
-    private IDialogService DialogService { get; set; }
-    private async void OnButtonClicked()
+
+    private bool FilterFunc1(Element element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(Element element, string searchString)
     {
-        bool? result = await DialogService.ShowMessageBox(
-            "Thông báo",
-            "Bạn có muốn xoá không?!",
-            yesText: "Xoá!", cancelText: "Cancel");
-        StateHasChanged();
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Sign.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Number} {element.Position} {element.Molar}".Contains(searchString))
+            return true;
+        return false;
     }
-    private bool isVisible;
+
+    public class Element
+    {
+        public string Sign { get; set; } = string.Empty;
+        public string Number { get; set; } = string.Empty;
+        public int Verify { get; set; } 
+        public string Position { get; set; } = string.Empty;
+        public int Status { get; set; } 
+        public string Molar { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
 
 }

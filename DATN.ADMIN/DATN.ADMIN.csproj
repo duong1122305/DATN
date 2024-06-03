@@ -39,7 +39,6 @@
 
   <ItemGroup>
     <None Include="Components\LoadingIndicator.razor" />
-    <None Include="wwwroot\css\Component.css" />
   </ItemGroup>
 
   <ItemGroup>
