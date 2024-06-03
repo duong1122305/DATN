@@ -73,20 +73,67 @@ namespace DATN.API.Controllers
             var result = await _employeeSchedule.InsertEmployeeNextMonthCompareCurrentMonth(listUser, shift);
             return result;
         }
-        [HttpPost("tim_ca_theo_thang_nam")]
+        [HttpGet("tim_ca_theo_thang_nam")]
         public async Task<ResponseData<List<ScheduleView>>> Test2(int month, int year)
         {
             var result = await _employeeSchedule.GetUserInOneMonth(month, year);
             return result;
         }
-        
-        //nếu bị sai hãy xoá dòng này
-
-        [HttpPost("get-all-ca-lam")]
-        public async Task<ResponseData<List<ScheduleView>>> GetAllCa()
+        [HttpGet("get-all-1-ca")]
+        public async Task<ResponseData<List<ScheduleView>>> GetAllCa(int ca)
         {
-            var result = await _employeeSchedule.GetAllCa();
+            var result = await _employeeSchedule.GetScheduleForShift(ca);
             return result;
         }
+        [HttpGet("get-all")]
+        public async Task<ResponseData<List<ScheduleView>>> GetAll()
+        {
+            var result = await _employeeSchedule.GetAll();
+            return result;
+        }
+        [HttpPost("get-month-to-month")]
+        public async Task<ResponseData<List<ScheduleView>>> GetMonthToMonth(ScheduleMonthToMonthView view)
+        {
+            var result = await _employeeSchedule.GetScheduleFromMonthToMonth(view);
+            return result;
+        }
+        [HttpPut("remove")]
+        public async Task<ResponseData<string>> RemoveEmployee(string id)
+        {
+            var result = await _userrepo.RemoveUser(id);
+            return result;
+        }
+        [HttpGet("Get-id-user")]
+        public Task<ResponseData<string>> GetId(string username)
+        {
+            var id = _userrepo.GetIdUser(username);
+            return id;
+        }
+        [HttpGet("Get-role-user")]
+        public async Task<ResponseData<string>> GetRoleUser(string id)
+        {
+            return await _userrepo.GetRoleUser(id);
+        }
+        [HttpPost("Add-role-user")]
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            return await _userrepo.AddRoleForUser(addRoleForUserView);
+        }
+        [HttpGet("List-Position")]
+        public async Task<ResponseData<List<string>>> ListPosition()
+        {
+            return await _userrepo.ListPosition();
+        }
+        [HttpPost("create-role")]
+        public async Task<ResponseData<string>> AddRole(string roleName)
+        {
+            return await _userrepo.AddRole(roleName);
+        }
+        [HttpPut("Update-inf")]
+        public Task<ResponseData<string>> UpdateInfUser(UserRegisterView user )
+        {
+            return _userrepo.UpdateInformationUser(user);
+        }
+
     }
 }

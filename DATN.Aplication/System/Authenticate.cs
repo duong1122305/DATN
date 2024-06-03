@@ -19,16 +19,18 @@ namespace DATN.Aplication.System
     public class Authenticate : IAuthenticate
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
+            _roleManager = roleManager;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -77,8 +79,9 @@ namespace DATN.Aplication.System
             var user = await CheckUser(userViewModel.UserName);
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, userViewModel.UserName),
-                new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user)))
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user))),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
             SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -104,6 +107,7 @@ namespace DATN.Aplication.System
                 Address = userRegisterView.Address,
                 NormalizedEmail = userRegisterView.Email.ToUpper(),
                 NormalizedUserName = userRegisterView.UserName.ToUpper(),
+                IsDeleted = false,
             };
             var checkEmail = await _userManager.FindByEmailAsync(userRegisterView.Email);
             var checkPhone = await GetUserAtPhoneNumber(userIdentity.PhoneNumber);
@@ -158,7 +162,8 @@ namespace DATN.Aplication.System
                     userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
                     if (userInfView.Position != "Admin")
                     {
-                        userInfView.Name = user.FullName;
+                        userInfView.FullName=user.FullName;
+                        userInfView.UserName = user.UserName;
                         userInfView.Address = user.Address;
                         userInfView.Email = user.Email;
                         userInfView.PhoneNumber = user.PhoneNumber;
@@ -178,7 +183,7 @@ namespace DATN.Aplication.System
             if (user != null)
             {
                 var userInfView = new UserInfView();
-                userInfView.Name = user.FullName;
+                userInfView.FullName = user.FullName;
                 userInfView.Email = user.Email;
                 userInfView.PhoneNumber = user.PhoneNumber;
                 userInfView.Address = user.Address;
@@ -201,9 +206,9 @@ namespace DATN.Aplication.System
 
                 var result = _userManager.UpdateAsync(userIdentity);
                 if (result.IsCompleted)
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Data = "Cập nhật thông tin tài khoản thành công!!" };
                 else
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Error = "Thông tin chưa được thay đổi" };
             }
         }
 
@@ -271,6 +276,88 @@ namespace DATN.Aplication.System
                     return userPhone;
                 }
             }
+        }
+
+        public async Task<ResponseData<string>> RemoveUser(string id)
+        {
+            var userIdentity = await _userManager.FindByIdAsync(id);
+            if (userIdentity != null)
+            {
+                userIdentity.IsDeleted = true;
+                await _userManager.UpdateAsync(userIdentity);
+                return new ResponseData<string> { IsSuccess = true, Data = "Xóa user thành công!" };
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Xóa lỗi" };
+        }
+
+        public async Task<ResponseData<string>> GetIdUser(string username)
+        {
+            var user = await CheckUser(username);
+            if (user != null)
+                return new ResponseData<string> { IsSuccess = true, Data = user.Id.ToString() };
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Không có user này" };
+        }
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            var queryRole = await _roleManager.FindByIdAsync(addRoleForUserView.RoleId);
+            var user = await _userManager.FindByEmailAsync(addRoleForUserView.EmployeeId);
+            if (queryRole != null)
+            {
+                var queryUser = _userManager.AddToRoleAsync(user, queryRole.Name);
+                if (queryUser.IsCompleted)
+                {
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ cho người dùng thành công" };
+                }
+                return new ResponseData<string> { IsSuccess = false, Error = "User không có" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Chức vụ không có" };
+        }
+
+        public async Task<ResponseData<List<string>>> ListPosition()
+        {
+            var listRole = await _roleManager.Roles.ToListAsync();
+            if (listRole.Count > 0)
+            {
+                var list = new List<string>();
+                foreach (var role in listRole)
+                {
+                    list.Add(role.Name);
+                }
+                return new ResponseData<List<string>> { IsSuccess = true, Data = list };
+            }
+            else
+                return new ResponseData<List<string>> { IsSuccess = false, Error = "Chưa có chức vụ nào" };
+        }
+
+        public async Task<ResponseData<string>> GetRoleUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                var role = await _userManager.GetRolesAsync(user);
+                if (role == null)
+                    return new ResponseData<string> { IsSuccess = false, Error = "Người dùng chưa có chức vụ" };
+                else
+                    return new ResponseData<string> { IsSuccess = true, Data = string.Join(" ", role) };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Không có người dùng này" };
+        }
+
+        public async Task<ResponseData<string>> AddRole(string roleName)
+        {
+            var roleIdentity = new Role()
+            {
+                Name = roleName,
+                NormalizedName = roleName.ToUpper()
+            };
+            var createRole = await _roleManager.CreateAsync(roleIdentity);
+            if (createRole.Succeeded)
+            {
+                return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ mới thành công" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Lỗi đéo biêts" };
         }
     }
 }
