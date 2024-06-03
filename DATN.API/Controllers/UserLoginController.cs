@@ -97,7 +97,7 @@ namespace DATN.API.Controllers
             var result = await _employeeSchedule.GetScheduleFromMonthToMonth(view);
             return result;
         }
-        [HttpPut("remove")]
+        [HttpPost("remove")]
         public async Task<ResponseData<string>> RemoveEmployee(string id)
         {
             var result = await _userrepo.RemoveUser(id);
