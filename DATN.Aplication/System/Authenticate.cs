@@ -19,16 +19,18 @@ namespace DATN.Aplication.System
     public class Authenticate : IAuthenticate
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
+            _roleManager = roleManager;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -295,6 +297,66 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = true, Data = user.Id.ToString() };
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không có user này" };
+        }
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            var queryRole = await _roleManager.FindByIdAsync(addRoleForUserView.RoleId);
+            var user = await _userManager.FindByEmailAsync(addRoleForUserView.EmployeeId);
+            if (queryRole != null)
+            {
+                var queryUser = _userManager.AddToRoleAsync(user, queryRole.Name);
+                if (queryUser.IsCompleted)
+                {
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ cho người dùng thành công" };
+                }
+                return new ResponseData<string> { IsSuccess = false, Error = "User không có" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Chức vụ không có" };
+        }
+
+        public async Task<ResponseData<List<string>>> ListPosition()
+        {
+            var listRole = await _roleManager.Roles.ToListAsync();
+            if (listRole.Count > 0)
+            {
+                var list = new List<string>();
+                foreach (var role in listRole)
+                {
+                    list.Add(role.Name);
+                }
+                return new ResponseData<List<string>> { IsSuccess = true, Data = list };
+            }
+            else
+                return new ResponseData<List<string>> { IsSuccess = false, Error = "Chưa có chức vụ nào" };
+        }
+
+        public async Task<ResponseData<string>> GetRoleUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                var role = await _userManager.GetRolesAsync(user);
+                if (role == null)
+                    return new ResponseData<string> { IsSuccess = false, Error = "Người dùng chưa có chức vụ" };
+                else
+                    return new ResponseData<string> { IsSuccess = true, Data = string.Join(" ", role) };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Không có người dùng này" };
+        }
+
+        public async Task<ResponseData<string>> AddRole(string roleName)
+        {
+            var roleIdentity = new Role()
+            {
+                Name = roleName,
+                NormalizedName = roleName.ToUpper()
+            };
+            var createRole = await _roleManager.CreateAsync(roleIdentity);
+            if (createRole.Succeeded)
+            {
+                return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ mới thành công" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Lỗi đéo biêts" };
         }
     }
 }

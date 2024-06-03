@@ -100,8 +100,35 @@ namespace DATN.API.Controllers
         [HttpPut("remove")]
         public async Task<ResponseData<string>> RemoveEmployee(string id)
         {
-            var result =await _userrepo.RemoveUser(id);
+            var result = await _userrepo.RemoveUser(id);
             return result;
         }
+        [HttpGet("Get-id-user")]
+        public Task<ResponseData<string>> GetId(string username)
+        {
+            var id = _userrepo.GetIdUser(username);
+            return id;
+        }
+        [HttpGet("Get-role-user")]
+        public async Task<ResponseData<string>> GetRoleUser(string id)
+        {
+            return await _userrepo.GetRoleUser(id);
+        }
+        [HttpPost("Add-role-user")]
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            return await _userrepo.AddRoleForUser(addRoleForUserView);
+        }
+        [HttpGet("List-Position")]
+        public async Task<ResponseData<List<string>>> ListPosition()
+        {
+            return await _userrepo.ListPosition();
+        }
+        [HttpPost("create-role")]
+        public async Task<ResponseData<string>> AddRole(string roleName)
+        {
+            return await _userrepo.AddRole(roleName);
+        }
+
     }
 }
