@@ -1,5 +1,6 @@
 ﻿using DATN.Aplication.Common;
 using DATN.Aplication.Repository;
+using DATN.Aplication.Repository.IRepository;
 using DATN.Data.EF;
 using DATN.Data.Entities;
 using System;
@@ -13,252 +14,241 @@ namespace DATN.Aplication
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DATNDbContext _context;
+        private IServiceRepository _serviceRepository;
+        private IBookingRepository _bookingRepository;
+        private IBookingDetailRepository _bookingDetailRepository;
+        private IComboDetailRepository _comboDetailRepository;
+        private IComboServiceRepository _comboServiceRepository;
+        private IDiscountRepository _discountRepository;
+        private IEmployeeScheduleRepository _employeeScheduleRepository;
+        private IEmployAttendanceRepository _employeeAttendanceRepository;
+        private IGuestRepository _guestRepository;
+        private IPetRepository _petRepository;
+        private IPetSceciesRepository _petSpeciesRepository;
+        private IPetTypeRepository _petTypeRepository;
+        private IReportRepository _reportRepository;
+        private IServiceDetailsRepository _serviceDetailRepository;
+        private IShiftRepository _shiftRepository;
+        private ITypePaymentRepository _typePaymentRepository;
+        private IWorkShiftRepository _workShiftRepository;
 
         public UnitOfWork(DATNDbContext context)
         {
             _context = context;
         }
 
-        private IGenericRepository<Service> _ServiceRepository;
-
-        private IGenericRepository<Booking> _BookingRepository;
-
-        private IGenericRepository<BookingDetail> _BookingDetailRepository;
-
-        private IGenericRepository<ComboDetail> _ComboDetailRepository;
-
-        private IGenericRepository<ComboService> _ComboServiceRepository;
-
-        private IGenericRepository<Discount> _DiscountRepository;
-
-        private IGenericRepository<EmployeeSchedule> _EmployeeScheduleRepository;
-
-        private IGenericRepository<EmployeeAttendance> _EmployeeAttendanceRepository;
-
-        private IGenericRepository<Guest> _GuestRepository;
-
-        private IGenericRepository<Pet> _PetRepository;
-
-        private IGenericRepository<PetSpecies> _PetSpeciesRepository;
-
-        private IGenericRepository<PetType> _PetTypeRepository;
-
-        private IGenericRepository<Report> _ReportRepository;
-
-        private IGenericRepository<ServiceDetail> _ServiceDetailRepository;
-
-        private IGenericRepository<Shift> _ShiftRepository;
-
-        private IGenericRepository<TypePayment> _TypePaymentRepository;
-
-        private IGenericRepository<WorkShift> _WorkShiftRepository;
-        public IGenericRepository<Service> ServiceRepository
+        public IServiceRepository ServiceRepository
         {
             get
             {
-                if (_ServiceRepository == null)
+                if (_serviceRepository == null)
                 {
-                    _ServiceRepository = new ServiceRepository(_context);
+                    _serviceRepository = new ServiceRepository(_context);
                 }
-
-                return _ServiceRepository;
-            }
-        }
-        public IGenericRepository<Booking> BookingRepository
-        {
-            get
-            {
-                if (_BookingRepository == null)
-                {
-                    _BookingRepository = new BookingRepository(_context);
-                }
-                return _BookingRepository;
+                return _serviceRepository;
             }
         }
 
-        public IGenericRepository<BookingDetail> BookingDetailRepository
+        public IBookingRepository BookingRepository
         {
             get
             {
-                if (_BookingDetailRepository == null)
+                if (_bookingRepository == null)
                 {
-                    _BookingDetailRepository = new BookingDetailRepository(_context);
+                    _bookingRepository = new BookingRepository(_context);
                 }
-                return _BookingDetailRepository;
+                return _bookingRepository;
             }
         }
 
-        public IGenericRepository<ComboDetail> ComboDetailRepository
+        public IBookingDetailRepository BookingDetailRepository
         {
             get
             {
-                if (_ComboDetailRepository == null)
+                if (_bookingDetailRepository == null)
                 {
-                    _ComboDetailRepository = new ComboDetailRepository(_context);
+                    _bookingDetailRepository = new BookingDetailRepository(_context);
                 }
-                return _ComboDetailRepository;
+                return _bookingDetailRepository;
             }
         }
 
-        public IGenericRepository<ComboService> ComboServiceRepository
+        public IComboDetailRepository ComboDetailRepository
         {
             get
             {
-                if (_ComboServiceRepository == null)
+                if (_comboDetailRepository == null)
                 {
-                    _ComboServiceRepository = new ComboServiceRepository(_context);
+                    _comboDetailRepository = new ComboDetailRepository(_context);
                 }
-                return _ComboServiceRepository;
+                return _comboDetailRepository;
             }
         }
 
-        public IGenericRepository<Discount> DiscountRepository
+        public IComboServiceRepository ComboServiceRepository
         {
             get
             {
-                if (_DiscountRepository == null)
+                if (_comboServiceRepository == null)
                 {
-                    _DiscountRepository = new DiscountRepository(_context);
+                    _comboServiceRepository = new ComboServiceRepository(_context);
                 }
-                return _DiscountRepository;
+                return _comboServiceRepository;
             }
         }
 
-        public IGenericRepository<EmployeeSchedule> EmployeeScheduleRepository
+        public IDiscountRepository DiscountRepository
         {
             get
             {
-                if (_EmployeeScheduleRepository == null)
+                if (_discountRepository == null)
                 {
-                    _EmployeeScheduleRepository = new EmployceeScheduleRepository(_context);
+                    _discountRepository = new DiscountRepository(_context);
                 }
-                return _EmployeeScheduleRepository;
+                return _discountRepository;
             }
         }
 
-        public IGenericRepository<EmployeeAttendance> EmployeeAttendanceRepository
+        public IEmployeeScheduleRepository EmployeeScheduleRepository
         {
             get
             {
-                if (_EmployeeAttendanceRepository == null)
+                if (_employeeScheduleRepository == null)
                 {
-                    _EmployeeAttendanceRepository = new EmployeAttendanceRepository(_context);
+                    _employeeScheduleRepository = new EmployceeScheduleRepository(_context);
                 }
-                return _EmployeeAttendanceRepository;
+                return _employeeScheduleRepository;
             }
         }
 
-        public IGenericRepository<Guest> GuestRepository
+        public IEmployAttendanceRepository EmployeeAttendanceRepository
         {
             get
             {
-                if (_GuestRepository == null)
+                if (_employeeAttendanceRepository == null)
                 {
-                    _GuestRepository = new GuestRepository(_context);
+                    _employeeAttendanceRepository = new EmployeAttendanceRepository(_context);
                 }
-                return _GuestRepository;
+                return _employeeAttendanceRepository;
             }
         }
 
-        public IGenericRepository<Pet> PetRepository
+        public IGuestRepository GuestRepository
         {
             get
             {
-                if (_PetRepository == null)
+                if (_guestRepository == null)
                 {
-                    _PetRepository = new PetRepository(_context);
+                    _guestRepository = new GuestRepository(_context);
                 }
-                return _PetRepository;
+                return _guestRepository;
             }
         }
 
-        public IGenericRepository<PetSpecies> PetSpeciesRepository
+        public IPetRepository PetRepository
         {
             get
             {
-                if (_PetSpeciesRepository == null)
+                if (_petRepository == null)
                 {
-                    _PetSpeciesRepository = new PetSeciesRepository(_context);
+                    _petRepository = new PetRepository(_context);
                 }
-                return _PetSpeciesRepository;
+                return _petRepository;
             }
         }
 
-        public IGenericRepository<Report> ReportRepository
+        public IPetSceciesRepository PetSpeciesRepository
         {
             get
             {
-                if (_ReportRepository == null)
+                if (_petSpeciesRepository == null)
                 {
-                    _ReportRepository = new ReportRepository(_context);
+                    _petSpeciesRepository = new PetSeciesRepository(_context);
                 }
-                return _ReportRepository;
+                return _petSpeciesRepository;
             }
         }
 
-        public IGenericRepository<PetType> PetTypeRepository
+        public IPetTypeRepository PetTypeRepository
         {
             get
             {
-                if (_PetTypeRepository == null)
+                if (_petTypeRepository == null)
                 {
-                    _PetTypeRepository = new PetTypeRepository(_context);
+                    _petTypeRepository = new PetTypeRepository(_context);
                 }
-                return _PetTypeRepository;
+                return _petTypeRepository;
             }
         }
 
-        public IGenericRepository<ServiceDetail> ServiceDetailRepository
+        public IReportRepository ReportRepository
         {
             get
             {
-                if (_ServiceDetailRepository == null)
+                if (_reportRepository == null)
                 {
-                    _ServiceDetailRepository = new ServiceDetailRepository(_context);
+                    _reportRepository = new ReportRepository(_context);
                 }
-                return _ServiceDetailRepository;
+                return _reportRepository;
             }
         }
 
-        public IGenericRepository<Shift> ShiftRepository
+        public IServiceDetailsRepository ServiceDetailRepository
         {
             get
             {
-                if (_ShiftRepository == null)
+                if (_serviceDetailRepository == null)
                 {
-                    _ShiftRepository = new ShiftRepository(_context);
+                    _serviceDetailRepository = new ServiceDetailRepository(_context);
                 }
-                return _ShiftRepository;
+                return _serviceDetailRepository;
             }
         }
 
-        public IGenericRepository<TypePayment> TypePaymentRepository
+        public IShiftRepository ShiftRepository
         {
             get
             {
-                if (_TypePaymentRepository == null)
+                if (_shiftRepository == null)
                 {
-                    _TypePaymentRepository = new TypePaymentRepository(_context);
+                    _shiftRepository = new ShiftRepository(_context);
                 }
-                return _TypePaymentRepository;
+                return _shiftRepository;
             }
         }
 
-        public IGenericRepository<WorkShift> WorkShiftRepository
+        public ITypePaymentRepository TypePaymentRepository
         {
             get
             {
-                if (_WorkShiftRepository == null)
+                if (_typePaymentRepository == null)
                 {
-                    _WorkShiftRepository = new WorkShiftRepository(_context);
+                    _typePaymentRepository = new TypePaymentRepository(_context);
                 }
-                return _WorkShiftRepository;
+                return _typePaymentRepository;
             }
         }
+
+        public IWorkShiftRepository WorkShiftRepository
+        {
+            get
+            {
+                if (_workShiftRepository == null)
+                {
+                    _workShiftRepository = new WorkShiftRepository(_context);
+                }
+                return _workShiftRepository;
+            }
+        }
+
+
 
         public async Task<int> SaveChangeAsync()
         {
-           return await  _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
+
+    
     }
+
 }

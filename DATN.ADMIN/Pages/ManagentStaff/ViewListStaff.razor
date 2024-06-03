@@ -1,0 +1,174 @@
+﻿@page "/ListStaff"
+@using System.Net.Http.Json
+@using DATN.ADMIN.Components
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Danh sách nhân viên</PageTitle>
+
+@if (lstUser !=null)
+{
+    <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" @onclick="OpenDialog">Thêm</MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;">Trạng thái</MudTh>
+            <MudTh Style="text-align:center;">Xác thực</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="STT" Style="text-align:center;">
+                @(lstUser.IndexOf(context) + 1)
+            </MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
+            <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
+            <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
+            <MudTd DataLabel="Email" Style="text-align:center;">Chưa có</MudTd>
+            <MudTd DataLabel="Email" Style="text-align:center;">
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
+            </MudTd>
+            <MudTd Style="text-align:center;">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" @onclick="() => OnButtonClicked(context)">Xoá</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+else
+{
+    <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+}
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+@code {
+    //button trạng thái
+    private bool _disableElevation = false;
+    private string searchString1 = "";
+    private List<UserInfView> lstUser = new List<UserInfView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+        lstUser = user.Data;
+    }
+
+    private bool FilterFunc1(UserInfView element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(UserInfView element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Email} {element.Position} {element.PhoneNumber}".Contains(searchString))
+            return true;
+        return false;
+    }
+    //overlay màn
+    private bool isVisible;
+
+    public void OpenOverlay()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    //tạo sự kiện để mở xem detail
+
+    private async void OpenDialog()
+    {
+        var options = new DialogOptions { ClassBackground = "my-custom-class", CloseButton = true};
+        _dialogservice.Show<CreateUpdate>("Thêm nhân viên", options);
+        await OnInitializedAsync();
+    }
+
+
+    //Thông báo hỏi khi xoá
+    private async void OnButtonClicked(UserInfView user)
+    {
+    //     bool result = await _dialogservice.ShowMessageBox(
+    //         "Thông báo",
+    //         "Bạn có muốn xoá nhân viên?",
+    //         yesText: "Xoá", cancelText: "Huỷ", noText: null, new DialogOptions{ ClassBackground = "my-custom-class", CloseButton = true});
+    // StateHasChanged();
+    //     if (result)
+    //     {
+    //         await DeleteServer(user.UserName);
+    //     }
+
+        var options = new MessageBoxOptions()
+            {
+                Title = "Xác nhận xoá",
+                Message = $"Bạn có chắc muốn xoá nhân viên '{user.FullName}'?",
+                YesText = "Xoá",
+                CancelText = "Huỷ"
+            };
+
+        var result = await _dialogservice.ShowMessageBox(options);
+
+        if (result == true)
+        {
+            await DeleteServer(user.UserName);
+        }
+    }
+
+    private async Task DeleteServer(string username)
+    {
+        var user = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={username}");
+        if (user.IsSuccess)
+        {
+            var response = await httpClient.PostAsJsonAsync<ResponseData<string>>($"api/UserLogin/remove",user);
+            if (response.IsSuccessStatusCode)
+            {
+                Message($"Đã xoá nhân viên '{username}'", Severity.Success);
+                await RefreshData(); // Refresh danh sách sau khi xoá
+            }
+            else
+            {
+                Message("TỪ TỪ", Severity.Error);
+            }
+        }
+        else
+        {
+            Message(user.Error, Severity.Error);
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        var userList = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+        lstUser = userList.Data;
+    }
+
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
+
+
+ 
+}

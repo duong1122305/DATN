@@ -1,164 +1,77 @@
-﻿@page "/"
+﻿@page "/trangchu"
+<PageTitle>Trang chủ</PageTitle>
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
+                        <CustomGraphics>
+                            <style>
+                                .heavy {
+                                    font: bold 30px Helvetica;
+                                }
 
-<PageTitle>Trang chu</PageTitle>
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">Bảng điều khiển</h1>
-                </div><!-- /.col -->
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-                        <li class="breadcrumb-item active">Bảng điều khiển</li>
-                    </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
-            <!-- Small boxes (Stat box) -->
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-white">
-                        <div class="inner">
-                            <h3>20</h3>
-                            <p>Đơn đặt hàng</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-shopping-bag" aria-hidden="true" style="color:burlywood"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-white">
-                        <div class="icon">
-                            <i class="fa fa-check" aria-hidden="true" style="color: green; border-radius:10px"></i>
-                        </div>
-                        <div class="inner">
-                            <h3>20<sup style="font-size: 20px"></sup></h3>
-                            <p>Dịch Vụ Đã Hoàn Thành</p>
-                        </div>
+                                .Rrrrr {
+                                    font: italic 40px Helvetica;
+                                    fill: rgb(62,44,221);
+                                }
+                            </style>
+                        </CustomGraphics>
+                    </MudChart>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
+                    <MudChart ChartType="ChartType.Donut" Width="100%" Height="350px" InputData="@data" InputLabels="@labels">
+                        <CustomGraphics>
+                            <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Doanh thu</text>
+                            <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
+                        </CustomGraphics>
+                    </MudChart>
 
-                    </div>
-                </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-white">
-                        <div class="inner">
-                            <h3>10</h3>
+                    @code {
+        public double[] data = { 25, 77, 28 };
+        public string[] labels = { "Tỉa lông", "Cắt móng", "Nhuộm lông" };
+                    }
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Bạn không có quyền truy cập trang này !!!!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "cắt tóc", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 16,23,30 } },
+        new ChartSeries() { Name = "Nhuộm", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
+        new ChartSeries() { Name = "Cắt móng", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
+    };
+    public string[] XAxisLabels = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
 
-                            <p>Dịch Vụ Chưa Hoàn Thành</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-times" aria-hidden="true" style="color: red"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-white">
-                        <div class="inner">
-                            <h3>100,000,000</h3>
-                            <p>Doanh Thu Từ Dịch Vụ</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-usd" style="color: limegreen"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- ./col -->
-            </div>
-            <!-- /.row -->
-            <!-- Main row -->
-            <div class="row">
-                <!-- Left col -->
-                <section class="col-lg-7 connectedSortable">
-                    <div class="card card-block card-stretch card-height">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-                                <h5 class="card-title mb-0">Doanh thu hàng tháng</h5>
-
-                            </div>
-
-                            <div id="loader" style="display: none;">
-                                processing.....
-                            </div>
-                            <div id="chart-01" style="min-height: 298px;"><div id="apexchartsp82tyy5nh" class="apexcharts-canvas apexchartsp82tyy5nh apexcharts-theme-light" style="width: 1029px; height: 283px;"><svg id="SvgjsSvg1473" width="1029" height="283" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev" class="apexcharts-svg apexcharts-zoomable" xmlns:data="ApexChartsNS" transform="translate(0, 0)" style="background: transparent;"><foreignObject x="0" y="0" width="1029" height="283"><div class="apexcharts-legend" xmlns="http://www.w3.org/1999/xhtml" style="max-height: 141.5px;"></div></foreignObject><rect id="SvgjsRect1478" width="0" height="0" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fefefe"></rect><g id="SvgjsG1544" class="apexcharts-yaxis" rel="0" transform="translate(5, 0)"><g id="SvgjsG1545" class="apexcharts-yaxis-texts-g"><text id="SvgjsText1547" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="20" y="31.5" text-anchor="end" dominant-baseline="auto" font-size="11px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-yaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1548">đ</tspan><title>đ</title></text><text id="SvgjsText1550" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="20" y="76.7" text-anchor="end" dominant-baseline="auto" font-size="11px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-yaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1551">đ</tspan><title>đ</title></text><text id="SvgjsText1553" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="20" y="121.9" text-anchor="end" dominant-baseline="auto" font-size="11px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-yaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1554">đ</tspan><title>đ</title></text><text id="SvgjsText1556" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="20" y="167.10000000000002" text-anchor="end" dominant-baseline="auto" font-size="11px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-yaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1557">đ</tspan><title>đ</title></text><text id="SvgjsText1559" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="20" y="212.3" text-anchor="end" dominant-baseline="auto" font-size="11px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-yaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1560">đ</tspan><title>đ</title></text><text id="SvgjsText1562" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="20" y="257.5" text-anchor="end" dominant-baseline="auto" font-size="11px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-yaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1563">đ</tspan><title>đ</title></text></g></g><g id="SvgjsG1475" class="apexcharts-inner apexcharts-graphical" transform="translate(35, 30)"><defs id="SvgjsDefs1474"><clipPath id="gridRectMaskp82tyy5nh"><rect id="SvgjsRect1480" width="978.6931838989258" height="229" x="-3.5" y="-1.5" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="forecastMaskp82tyy5nh"></clipPath><clipPath id="nonForecastMaskp82tyy5nh"></clipPath><clipPath id="gridRectMarkerMaskp82tyy5nh"><rect id="SvgjsRect1481" width="975.6931838989258" height="230" x="-2" y="-2" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><linearGradient id="SvgjsLinearGradient1486" x1="0" y1="0" x2="0" y2="1"><stop id="SvgjsStop1487" stop-opacity="0.4" stop-color="rgba(151,93,238,0.4)" offset="0"></stop><stop id="SvgjsStop1488" stop-opacity="0.1" stop-color="rgba(151,93,238,0.1)" offset="1"></stop><stop id="SvgjsStop1489" stop-opacity="0.1" stop-color="rgba(151,93,238,0.1)" offset="1"></stop></linearGradient></defs><line id="SvgjsLine1479" x1="0" y1="0" x2="0" y2="226" stroke="#b6b6b6" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-xcrosshairs" x="0" y="0" width="1" height="226" fill="#b1b9c4" filter="none" fill-opacity="0.9" stroke-width="1"></line><g id="SvgjsG1492" class="apexcharts-grid"><g id="SvgjsG1493" class="apexcharts-gridlines-horizontal"><line id="SvgjsLine1497" x1="0" y1="45.2" x2="971.6931838989258" y2="45.2" stroke="#e0e0e0" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-gridline"></line><line id="SvgjsLine1498" x1="0" y1="90.4" x2="971.6931838989258" y2="90.4" stroke="#e0e0e0" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-gridline"></line><line id="SvgjsLine1499" x1="0" y1="135.60000000000002" x2="971.6931838989258" y2="135.60000000000002" stroke="#e0e0e0" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-gridline"></line><line id="SvgjsLine1500" x1="0" y1="180.8" x2="971.6931838989258" y2="180.8" stroke="#e0e0e0" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-gridline"></line></g><g id="SvgjsG1494" class="apexcharts-gridlines-vertical"></g><line id="SvgjsLine1503" x1="0" y1="226" x2="971.6931838989258" y2="226" stroke="transparent" stroke-dasharray="0" stroke-linecap="butt"></line><line id="SvgjsLine1502" x1="0" y1="1" x2="0" y2="226" stroke="transparent" stroke-dasharray="0" stroke-linecap="butt"></line></g><g id="SvgjsG1482" class="apexcharts-area-series apexcharts-plot-series"><g id="SvgjsG1483" class="apexcharts-series" seriesName="total" data:longestSeries="true" rel="1" data:realIndex="0"><path id="SvgjsPath1490" d="M 0 226 L 0 225.99160571428573C 30.917510396784 225.99160571428573 57.41823359402744 226 88.33574399081144 226C 119.25325438759543 226 145.75397758483888 225.74817142857142 176.67148798162287 225.74817142857142C 207.58899837840687 225.74817142857142 234.08972157565034 225.91605714285714 265.00723197243434 225.91605714285714C 295.92474236921834 225.91605714285714 322.42546556646175 226 353.34297596324575 226C 384.26048636002974 226 410.7612095572732 226 441.6787199540572 226C 472.5962303508412 226 499.0969535480847 226 530.0144639448687 226C 560.9319743416527 226 587.432697538896 147.314936 618.35020793568 147.314936C 649.267718332464 147.314936 675.7684415297075 226 706.6859519264915 226C 737.6034623232755 226 764.104185520519 226 795.021695917303 226C 825.939206314087 226 852.4399295113304 226 883.3574399081144 226C 914.2749503048984 226 940.7756735021418 42.76953142857144 971.6931838989258 42.76953142857144C 971.6931838989258 42.76953142857144 971.6931838989258 42.76953142857144 971.6931838989258 226M 971.6931838989258 42.76953142857144z" fill="url(#SvgjsLinearGradient1486)" fill-opacity="1" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-area" index="0" clip-path="url(#gridRectMaskp82tyy5nh)" pathTo="M 0 226 L 0 225.99160571428573C 30.917510396784 225.99160571428573 57.41823359402744 226 88.33574399081144 226C 119.25325438759543 226 145.75397758483888 225.74817142857142 176.67148798162287 225.74817142857142C 207.58899837840687 225.74817142857142 234.08972157565034 225.91605714285714 265.00723197243434 225.91605714285714C 295.92474236921834 225.91605714285714 322.42546556646175 226 353.34297596324575 226C 384.26048636002974 226 410.7612095572732 226 441.6787199540572 226C 472.5962303508412 226 499.0969535480847 226 530.0144639448687 226C 560.9319743416527 226 587.432697538896 147.314936 618.35020793568 147.314936C 649.267718332464 147.314936 675.7684415297075 226 706.6859519264915 226C 737.6034623232755 226 764.104185520519 226 795.021695917303 226C 825.939206314087 226 852.4399295113304 226 883.3574399081144 226C 914.2749503048984 226 940.7756735021418 42.76953142857144 971.6931838989258 42.76953142857144C 971.6931838989258 42.76953142857144 971.6931838989258 42.76953142857144 971.6931838989258 226M 971.6931838989258 42.76953142857144z" pathFrom="M -1 226 L -1 226 L 88.33574399081144 226 L 176.67148798162287 226 L 265.00723197243434 226 L 353.34297596324575 226 L 441.6787199540572 226 L 530.0144639448687 226 L 618.35020793568 226 L 706.6859519264915 226 L 795.021695917303 226 L 883.3574399081144 226 L 971.6931838989258 226"></path><path id="SvgjsPath1491" d="M 0 225.99160571428573C 30.917510396784 225.99160571428573 57.41823359402744 226 88.33574399081144 226C 119.25325438759543 226 145.75397758483888 225.74817142857142 176.67148798162287 225.74817142857142C 207.58899837840687 225.74817142857142 234.08972157565034 225.91605714285714 265.00723197243434 225.91605714285714C 295.92474236921834 225.91605714285714 322.42546556646175 226 353.34297596324575 226C 384.26048636002974 226 410.7612095572732 226 441.6787199540572 226C 472.5962303508412 226 499.0969535480847 226 530.0144639448687 226C 560.9319743416527 226 587.432697538896 147.314936 618.35020793568 147.314936C 649.267718332464 147.314936 675.7684415297075 226 706.6859519264915 226C 737.6034623232755 226 764.104185520519 226 795.021695917303 226C 825.939206314087 226 852.4399295113304 226 883.3574399081144 226C 914.2749503048984 226 940.7756735021418 42.76953142857144 971.6931838989258 42.76953142857144" fill="none" fill-opacity="1" stroke="#975dee" stroke-opacity="1" stroke-linecap="butt" stroke-width="3" stroke-dasharray="0" class="apexcharts-area" index="0" clip-path="url(#gridRectMaskp82tyy5nh)" pathTo="M 0 225.99160571428573C 30.917510396784 225.99160571428573 57.41823359402744 226 88.33574399081144 226C 119.25325438759543 226 145.75397758483888 225.74817142857142 176.67148798162287 225.74817142857142C 207.58899837840687 225.74817142857142 234.08972157565034 225.91605714285714 265.00723197243434 225.91605714285714C 295.92474236921834 225.91605714285714 322.42546556646175 226 353.34297596324575 226C 384.26048636002974 226 410.7612095572732 226 441.6787199540572 226C 472.5962303508412 226 499.0969535480847 226 530.0144639448687 226C 560.9319743416527 226 587.432697538896 147.314936 618.35020793568 147.314936C 649.267718332464 147.314936 675.7684415297075 226 706.6859519264915 226C 737.6034623232755 226 764.104185520519 226 795.021695917303 226C 825.939206314087 226 852.4399295113304 226 883.3574399081144 226C 914.2749503048984 226 940.7756735021418 42.76953142857144 971.6931838989258 42.76953142857144" pathFrom="M -1 226 L -1 226 L 88.33574399081144 226 L 176.67148798162287 226 L 265.00723197243434 226 L 353.34297596324575 226 L 441.6787199540572 226 L 530.0144639448687 226 L 618.35020793568 226 L 706.6859519264915 226 L 795.021695917303 226 L 883.3574399081144 226 L 971.6931838989258 226" fill-rule="evenodd"></path><g id="SvgjsG1484" class="apexcharts-series-markers-wrap" data:realIndex="0"></g></g><g id="SvgjsG1485" class="apexcharts-datalabels" data:realIndex="0"></g></g><g id="SvgjsG1495" class="apexcharts-grid-borders"><line id="SvgjsLine1496" x1="0" y1="0" x2="971.6931838989258" y2="0" stroke="#e0e0e0" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-gridline"></line><line id="SvgjsLine1501" x1="0" y1="226" x2="971.6931838989258" y2="226" stroke="#e0e0e0" stroke-dasharray="3" stroke-linecap="butt" class="apexcharts-gridline"></line></g><line id="SvgjsLine1504" x1="0" y1="0" x2="971.6931838989258" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="1" stroke-linecap="butt" class="apexcharts-ycrosshairs"></line><line id="SvgjsLine1505" x1="0" y1="0" x2="971.6931838989258" y2="0" stroke-dasharray="0" stroke-width="0" stroke-linecap="butt" class="apexcharts-ycrosshairs-hidden"></line><g id="SvgjsG1506" class="apexcharts-xaxis" transform="translate(0, 0)"><g id="SvgjsG1507" class="apexcharts-xaxis-texts-g" transform="translate(0, -4)"><text id="SvgjsText1509" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="0" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1510">Jan</tspan><title>Jan</title></text><text id="SvgjsText1512" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="88.33574399081142" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1513">Feb</tspan><title>Feb</title></text><text id="SvgjsText1515" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="176.67148798162287" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1516">Mar</tspan><title>Mar</title></text><text id="SvgjsText1518" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="265.0072319724343" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1519">Apr</tspan><title>Apr</title></text><text id="SvgjsText1521" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="353.3429759632457" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1522">May</tspan><title>May</title></text><text id="SvgjsText1524" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="441.67871995405716" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1525">Jun</tspan><title>Jun</title></text><text id="SvgjsText1527" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="530.0144639448687" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1528">Jul</tspan><title>Jul</title></text><text id="SvgjsText1530" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="618.3502079356801" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1531">Aug</tspan><title>Aug</title></text><text id="SvgjsText1533" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="706.6859519264916" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1534">Sep</tspan><title>Sep</title></text><text id="SvgjsText1536" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="795.0216959173031" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1537">Oct</tspan><title>Oct</title></text><text id="SvgjsText1539" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="883.3574399081145" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1540">Nov</tspan><title>Nov</title></text><text id="SvgjsText1542" font-family="&quot;Inter&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;" x="971.693183898926" y="255" text-anchor="middle" dominant-baseline="auto" font-size="12px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-xaxis-label " style="font-family: Inter, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;"><tspan id="SvgjsTspan1543">Dec</tspan><title>Dec</title></text></g></g><g id="SvgjsG1564" class="apexcharts-yaxis-annotations"></g><g id="SvgjsG1565" class="apexcharts-xaxis-annotations"></g><g id="SvgjsG1566" class="apexcharts-point-annotations"></g><rect id="SvgjsRect1567" width="0" height="0" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fefefe" class="apexcharts-zoom-rect"></rect><rect id="SvgjsRect1568" width="0" height="0" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fefefe" class="apexcharts-selection-rect"></rect></g></svg></div></div>
-
-                        </div>
-                    </div>
-                </section>
-                <!-- /.Left col -->
-                <!-- right col (We are only adding the ID to make the widgets sortable)-->
-                <section class="col-lg-5">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="ion ion-clipboard mr-1"></i>
-                                Đặt Lịch Gần Đây
-                            </h3>
-                            <div class="card-tools">
-                                <a href="#" style="text-decoration:none" class="p-2">Xem tất cả</a>
-                            </div>
-
-                        </div>
-                        <!-- /.card-header -->
-                        <ul class="list-unstyled mb-0">
-                            <li class="d-flex align-items-center py-3 border-bottom">
-                                <img src="~/AdminTPL/dist/img/user.jpg" class="rounded-pill m-2" style="height:50px; width:50px">
-                                <div class="ms-3 w-100">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-2">
-                                            <a href="#" style="text-decoration:none">#1</a>
-                                        </h6>
-                                        <small class="text-warning pr-3">Đang chờ</small>
-                                    </div>
-                                    <small> May 10, 2024 | 07:15 AM </small>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center py-3 border-bottom">
-                                <img src="~/AdminTPL/dist/img/user.jpg" class="rounded-pill m-2" style="height:50px; width:50px">
-                                <div class="ms-3 w-100">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-2">
-                                            <a href="#" style="text-decoration:none">#2</a>
-                                        </h6>
-                                        <small class="text-danger pr-3">Từ Chối</small>
-                                    </div>
-                                    <small> 10 05, 2024 | 07:15 AM </small>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center py-3 border-bottom">
-                                <img src="~/AdminTPL/dist/img/user.jpg" class="rounded-pill m-2" style="height:50px; width:50px">
-                                <div class="ms-3 w-100">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-2">
-                                            <a href="#" style="text-decoration:none">#3</a>
-                                        </h6>
-                                        <small class="text-primary pr-3">Đã Chấp Nhận</small>
-                                    </div>
-                                    <small> 10 05, 2024 | 07:15 AM </small>
-                                </div>
-                            </li>
-                        </ul>
-
-                    </div>
-                </section>
-                <!-- right col -->
-            </div>
-            <!-- /.row (main row) -->
-        </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-</div>
+    // code biểu đồ chứng khoán như sóng
+}

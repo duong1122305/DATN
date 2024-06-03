@@ -9,6 +9,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<UserInfView>>> GetAll();
 
         Task<ResponseData<UserInfView>> GetById(Guid id);
+        Task<ResponseData<string>> Login(UserLoginView user);
         Task<UserInfView> UpdateUser(UserInfView userInfView);
         Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest);
     }

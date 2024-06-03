@@ -92,7 +92,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.BookingDetail", b =>
@@ -139,7 +139,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("BookingDetails", (string)null);
+                    b.ToTable("BookingDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ComboDetail", b =>
@@ -160,7 +160,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ComboDetails", (string)null);
+                    b.ToTable("ComboDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ComboService", b =>
@@ -198,7 +198,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("PetTypeId");
 
-                    b.ToTable("ComboServices", (string)null);
+                    b.ToTable("ComboServices");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Discount", b =>
@@ -246,7 +246,7 @@ namespace DATN.API.Migrations
                     b.HasIndex("VoucherCode")
                         .IsUnique();
 
-                    b.ToTable("Discounts", (string)null);
+                    b.ToTable("Discounts");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeAttendance", b =>
@@ -281,7 +281,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EmployeeAttendances", (string)null);
+                    b.ToTable("EmployeeAttendances");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeSchedule", b =>
@@ -304,7 +304,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("WorkShiftId");
 
-                    b.ToTable("EmployeeSchedules", (string)null);
+                    b.ToTable("EmployeeSchedules");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Guest", b =>
@@ -324,6 +324,9 @@ namespace DATN.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Gender")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsComfirm")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsDeleted")
@@ -348,7 +351,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guests", (string)null);
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Pet", b =>
@@ -401,7 +404,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("SpeciesId");
 
-                    b.ToTable("Pets", (string)null);
+                    b.ToTable("Pets");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.PetSpecies", b =>
@@ -427,7 +430,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("PetTypeId");
 
-                    b.ToTable("PetSpecies", (string)null);
+                    b.ToTable("PetSpecies");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.PetType", b =>
@@ -444,7 +447,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PetTypes", (string)null);
+                    b.ToTable("PetTypes");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Report", b =>
@@ -469,7 +472,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("BookingDetailId");
 
-                    b.ToTable("Reports", (string)null);
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Role", b =>
@@ -517,7 +520,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ServiceDetail", b =>
@@ -561,7 +564,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ServiceDetails", (string)null);
+                    b.ToTable("ServiceDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Shift", b =>
@@ -584,7 +587,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shift", (string)null);
+                    b.ToTable("Shift");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.TypePayment", b =>
@@ -601,7 +604,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TypePayments", (string)null);
+                    b.ToTable("TypePayments");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.User", b =>
@@ -636,6 +639,9 @@ namespace DATN.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Gender")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -707,7 +713,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("WorkShifts", (string)null);
+                    b.ToTable("WorkShifts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

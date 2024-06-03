@@ -15,7 +15,7 @@ namespace DATN.ViewModels.DTOs.Guest
         public string? Password { get; set; }
         public string? UserName { get; set; }
         public string? Email { get; set; }
-        public string? CodeConfirm { get; set; }
         public string? Address { get; set; }
+        public bool? IsDelete { get; set; }
     }
 }

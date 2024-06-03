@@ -14,5 +14,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
         public string Address { get; set; }
         public string Email { get; set; }
         public string Position { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsConfirm { get; set; }
     }
 }

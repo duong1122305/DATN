@@ -27,7 +27,7 @@ namespace DATN.Aplication.Services
                         where workshift.WorkDate.Year == nextYear &&
                         workshift.WorkDate.Month == nextMonth
                         select workshift;
-            if (query == null)
+            if (query.ToList().Count == 0)
             {
                 try
                 {

@@ -19,6 +19,7 @@ namespace DATN.Aplication.System
     public class Authenticate : IAuthenticate
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
@@ -48,7 +49,6 @@ namespace DATN.Aplication.System
                 {
                     if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
                     {
-
                         _user = userIdentity;
                         return new ResponseData<string>
                         {
@@ -80,8 +80,9 @@ namespace DATN.Aplication.System
             var user = await CheckUser(userViewModel.UserName);
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, userViewModel.UserName),
-                new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user)))
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user))),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
             SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -107,6 +108,7 @@ namespace DATN.Aplication.System
                 Address = userRegisterView.Address,
                 NormalizedEmail = userRegisterView.Email.ToUpper(),
                 NormalizedUserName = userRegisterView.UserName.ToUpper(),
+                IsDeleted = false,
             };
             var checkEmail = await _userManager.FindByEmailAsync(userRegisterView.Email);
             var checkPhone = await GetUserAtPhoneNumber(userIdentity.PhoneNumber);
@@ -161,7 +163,8 @@ namespace DATN.Aplication.System
                     userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
                     if (userInfView.Position != "Admin")
                     {
-                        userInfView.Name = user.FullName;
+                        userInfView.FullName=user.FullName;
+                        userInfView.UserName = user.UserName;
                         userInfView.Address = user.Address;
                         userInfView.Email = user.Email;
                         userInfView.PhoneNumber = user.PhoneNumber;
@@ -204,9 +207,9 @@ namespace DATN.Aplication.System
 
                 var result = _userManager.UpdateAsync(userIdentity);
                 if (result.IsCompleted)
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Data = "Cập nhật thông tin tài khoản thành công!!" };
                 else
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Error = "Thông tin chưa được thay đổi" };
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using DATN.Aplication.Services;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +26,22 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request)
         {
             return await _guestManagerService.RegisterNoUser(request);
+        }
+  
+        [HttpPost("GetGuest")]
+        public async Task<ResponseData<GetGuestResponse>> GetGuestPaging(GetGuestRequest request)
+        {
+            return await _guestManagerService.GetGuest(request);
+        } 
+        [HttpGet("find-by-id")]
+        public async Task<ResponseData<GuestViewModel>> FindByID(Guid id)
+        {
+            return await _guestManagerService.FindGuestByID(id);
+        }  
+        [HttpGet("verify-user")]
+        public async Task<ResponseData<string>> FindByID(string verifyToken, string mail)
+        {
+            return await _guestManagerService.VerififyUser(verifyToken, mail);
         }
     }
 }

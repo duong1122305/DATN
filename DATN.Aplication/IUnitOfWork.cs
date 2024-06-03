@@ -1,5 +1,6 @@
 ﻿using DATN.Aplication.Common;
 using DATN.Aplication.Repository;
+using DATN.Aplication.Repository.IRepository;
 using DATN.Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,23 +12,23 @@ namespace DATN.Aplication
 {
     public interface IUnitOfWork
     {
-        IGenericRepository<Service> ServiceRepository { get; }
-        IGenericRepository<Booking> BookingRepository { get; }
-        IGenericRepository<BookingDetail> BookingDetailRepository { get; }
-        IGenericRepository<ComboDetail> ComboDetailRepository { get; }
-        IGenericRepository<ComboService> ComboServiceRepository { get; }
-        IGenericRepository<Discount> DiscountRepository { get; }
-        IGenericRepository<EmployeeSchedule> EmployeeScheduleRepository { get; }
-        IGenericRepository<EmployeeAttendance> EmployeeAttendanceRepository { get; }
-        IGenericRepository<Guest> GuestRepository { get; }
-        IGenericRepository<Pet> PetRepository { get; }
-        IGenericRepository<PetSpecies> PetSpeciesRepository { get; }
-        IGenericRepository<PetType> PetTypeRepository { get; }
-        IGenericRepository<Report> ReportRepository { get; }
-        IGenericRepository<ServiceDetail> ServiceDetailRepository { get; }
-        IGenericRepository<Shift> ShiftRepository { get; }
-        IGenericRepository<TypePayment> TypePaymentRepository { get; }
-        IGenericRepository<WorkShift> WorkShiftRepository { get; }
+        IServiceRepository ServiceRepository { get; }
+        IBookingRepository BookingRepository { get; }
+        IBookingDetailRepository BookingDetailRepository { get; }
+        IComboDetailRepository ComboDetailRepository { get; }
+        IComboServiceRepository ComboServiceRepository { get; }
+        IDiscountRepository DiscountRepository { get; }
+        IEmployeeScheduleRepository EmployeeScheduleRepository { get; }
+        IEmployAttendanceRepository EmployeeAttendanceRepository { get; }
+        IGuestRepository GuestRepository { get; }
+        IPetRepository PetRepository { get; }
+        IPetSceciesRepository PetSpeciesRepository { get; }
+        IPetTypeRepository PetTypeRepository { get; }
+        IReportRepository ReportRepository { get; }
+        IServiceDetailsRepository ServiceDetailRepository { get; }
+        IShiftRepository ShiftRepository { get; }
+        ITypePaymentRepository TypePaymentRepository { get; }
+        IWorkShiftRepository WorkShiftRepository { get; }
         Task<int> SaveChangeAsync();
     }
 }

@@ -3,7 +3,7 @@ using DATN.Data.Entities;
 
 namespace DATN.Aplication.Repository.IRepository
 {
-    internal interface IEmployeeScheduleRepository : IGenericRepository<EmployeeSchedule>
+    public interface IEmployeeScheduleRepository : IGenericRepository<EmployeeSchedule>
     {
     }
 }
