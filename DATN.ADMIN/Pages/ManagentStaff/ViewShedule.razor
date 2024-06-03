@@ -22,18 +22,16 @@
             <MudTh Style="text-align:center;">Từ</MudTh>
             <MudTh Style="text-align:center;">Đến</MudTh>
             <MudTh Style="text-align:center;">Thời gian</MudTh>
-            <MudTh Style="text-align:center;">Tên</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="STT" Style="text-align:center;">
                 @(lstUser.IndexOf(context) + 1)
             </MudTd>
-            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Shift</MudTd>
-            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
-            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
-            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Shift</MudTd>
+            <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
+            <MudTd DataLabel="To" Style="text-align:center;">@context.To</MudTd>
+            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate</MudTd>
             <MudTd Style="text-align:center;">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
@@ -60,7 +58,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all");
+        var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam");
         lstUser = user.Data;
     }
 
