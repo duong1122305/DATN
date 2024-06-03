@@ -105,6 +105,7 @@ namespace DATN.Aplication.System
                 Address = userRegisterView.Address,
                 NormalizedEmail = userRegisterView.Email.ToUpper(),
                 NormalizedUserName = userRegisterView.UserName.ToUpper(),
+                IsDeleted = false,
             };
             var checkEmail = await _userManager.FindByEmailAsync(userRegisterView.Email);
             var checkPhone = await GetUserAtPhoneNumber(userIdentity.PhoneNumber);
@@ -202,9 +203,9 @@ namespace DATN.Aplication.System
 
                 var result = _userManager.UpdateAsync(userIdentity);
                 if (result.IsCompleted)
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Data = "Cập nhật thông tin tài khoản thành công!!" };
                 else
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted };
+                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Error = "Thông tin chưa được thay đổi" };
             }
         }
 
@@ -272,6 +273,28 @@ namespace DATN.Aplication.System
                     return userPhone;
                 }
             }
+        }
+
+        public async Task<ResponseData<string>> RemoveUser(string id)
+        {
+            var userIdentity = await _userManager.FindByIdAsync(id);
+            if (userIdentity != null)
+            {
+                userIdentity.IsDeleted = true;
+                await _userManager.UpdateAsync(userIdentity);
+                return new ResponseData<string> { IsSuccess = true, Data = "Xóa user thành công!" };
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Xóa lỗi" };
+        }
+
+        public async Task<ResponseData<string>> GetIdUser(string username)
+        {
+            var user = await CheckUser(username);
+            if (user != null)
+                return new ResponseData<string> { IsSuccess = true, Data = user.Id.ToString() };
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Không có user này" };
         }
     }
 }

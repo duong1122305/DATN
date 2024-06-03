@@ -79,9 +79,6 @@ namespace DATN.API.Controllers
             var result = await _employeeSchedule.GetUserInOneMonth(month, year);
             return result;
         }
-        
-        //nếu bị sai hãy xoá dòng này
-
         [HttpGet("get-all-1-ca")]
         public async Task<ResponseData<List<ScheduleView>>> GetAllCa(int ca)
         {
@@ -98,6 +95,12 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<List<ScheduleView>>> GetMonthToMonth(ScheduleMonthToMonthView view)
         {
             var result = await _employeeSchedule.GetScheduleFromMonthToMonth(view);
+            return result;
+        }
+        [HttpPut("remove")]
+        public async Task<ResponseData<string>> RemoveEmployee(string id)
+        {
+            var result =await _userrepo.RemoveUser(id);
             return result;
         }
     }
