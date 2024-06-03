@@ -162,7 +162,8 @@ namespace DATN.Aplication.System
                     userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
                     if (userInfView.Position != "Admin")
                     {
-                        userInfView.Name = user.FullName;
+                        userInfView.FullName=user.FullName;
+                        userInfView.UserName = user.UserName;
                         userInfView.Address = user.Address;
                         userInfView.Email = user.Email;
                         userInfView.PhoneNumber = user.PhoneNumber;

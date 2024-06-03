@@ -129,6 +129,11 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.AddRole(roleName);
         }
+        [HttpPut("Update-inf")]
+        public Task<ResponseData<string>> UpdateInfUser(UserRegisterView user )
+        {
+            return _userrepo.UpdateInformationUser(user);
+        }
 
     }
 }
