@@ -46,7 +46,7 @@ namespace DATN.ADMIN.Pages
                 if (user.IsSuccess && user.Data != null)
                 {
                     _contextAccessor.HttpContext.Session.SetString("key",user.Data);
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/"));
                 }
 
             }

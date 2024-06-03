@@ -1,0 +1,88 @@
+﻿@page "/ListStaff"
+@using System.Net.Http.Json
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Danh sách nhân viên</PageTitle>
+
+<MudTable Items="@lstUser" Hover="@hover" Filter="new Func<UserInfView,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh Style="text-align:center;">ID</MudTh>
+        <MudTh Style="text-align:center;">Tên nhân viên</MudTh>
+        <MudTh Style="text-align:center;">Số điện thoại</MudTh>
+        <MudTh Style="text-align:center;">Địa chỉ</MudTh>
+        <MudTh Style="text-align:center;">Email</MudTh>
+        <MudTh Style="text-align:center;">Trạng thái</MudTh>
+        <MudTh Style="text-align:center;">Xác thực</MudTh>
+        <MudTh Style="text-align:center;">Hành động</MudTh>
+    </HeaderContent>
+    <RowTemplate >
+        <MudTd DataLabel="STT" Style="text-align:center;">
+            @(lstUser.IndexOf(context) + 1)
+        </MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+        <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
+        <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">Chưa có</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">
+            <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info">Đã xác thực</MudChip>
+        </MudTd>
+        <MudTd Style="text-align:center;">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" >Sửa</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+<MudOverlay @bind-Visible="isVisible" DarkBackground="true" ZIndex="9999" AutoClose="true" />
+@code {
+    //button trạng thái
+    private bool _disableElevation = false;
+    //hiệu ứng hover
+    private bool hover = true;
+    private string searchString1 = "";
+    private List<UserInfView> lstUser = new List<UserInfView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+        lstUser = user.Data;
+    }
+
+    private bool FilterFunc1(UserInfView element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(UserInfView element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Email} {element.Position} {element.PhoneNumber}".Contains(searchString))
+            return true;
+        return false;
+    }
+    //overlay màn
+    private bool isVisible;
+
+    public void OpenOverlay()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+ 
+}

@@ -1,0 +1,19 @@
+﻿<div>
+    <p>Output: @message</p>
+    <button onclick="document.getElementById('my-dialog').showModal">
+        Hiển thị popup
+    </button>
+
+    <dialog id="my-dialog" @onclose="OnClose" @oncanel="OnCanel">
+        <p>hi</p>
+        <form method="dialog">
+            <button>close</button>
+        </form>
+    </dialog>
+</div>
+
+@code{
+string message;
+void OnClose(EventArgs e) =>message+="onclose";
+void OnCanel(EventArgs e) =>message+="oncanel";
+}

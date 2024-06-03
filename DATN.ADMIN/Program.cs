@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
+using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,6 +21,7 @@ builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("http
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMudServices();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -60,7 +61,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(1); // Thời gian timeout của session
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true; // Chỉ định cookie này là cần thiết
 });
