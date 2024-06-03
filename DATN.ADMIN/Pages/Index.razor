@@ -1,63 +1,69 @@
 ﻿@page "/trangchu"
 <PageTitle>Trang chủ</PageTitle>
-    <MudGrid>
-        <MudItem xs="12" sm="6" md="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
-                <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
-                    <CustomGraphics>
-                        <style>
-                            .heavy {
-                                font: bold 30px Helvetica;
-                            }
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
+                        <CustomGraphics>
+                            <style>
+                                .heavy {
+                                    font: bold 30px Helvetica;
+                                }
 
-                            .Rrrrr {
-                                font: italic 40px Helvetica;
-                                fill: rgb(62,44,221);
-                            }
-                        </style>
-                    </CustomGraphics>
-                </MudChart>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
-                <MudChart ChartType="ChartType.Donut" Width="100%" Height="350px" InputData="@data" InputLabels="@labels">
-                    <CustomGraphics>
-                        <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Doanh thu</text>
-                        <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
-                    </CustomGraphics>
-                </MudChart>
+                                .Rrrrr {
+                                    font: italic 40px Helvetica;
+                                    fill: rgb(62,44,221);
+                                }
+                            </style>
+                        </CustomGraphics>
+                    </MudChart>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
+                    <MudChart ChartType="ChartType.Donut" Width="100%" Height="350px" InputData="@data" InputLabels="@labels">
+                        <CustomGraphics>
+                            <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Doanh thu</text>
+                            <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
+                        </CustomGraphics>
+                    </MudChart>
 
-                @code {
-                    public double[] data = { 25, 77, 28};
-                    public string[] labels = { "Tỉa lông", "Cắt móng", "Nhuộm lông"};
-                }
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudGrid>
-                <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-    </MudGrid>
-
+                    @code {
+        public double[] data = { 25, 77, 28 };
+        public string[] labels = { "Tỉa lông", "Cắt móng", "Nhuộm lông" };
+                    }
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Bạn không có quyền truy cập trang này !!!!</h1>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
     public List<ChartSeries> Series = new List<ChartSeries>()
     {
