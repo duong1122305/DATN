@@ -179,7 +179,7 @@ namespace DATN.Aplication.System
             if (user != null)
             {
                 var userInfView = new UserInfView();
-                userInfView.Name = user.FullName;
+                userInfView.FullName = user.FullName;
                 userInfView.Email = user.Email;
                 userInfView.PhoneNumber = user.PhoneNumber;
                 userInfView.Address = user.Address;
@@ -271,6 +271,89 @@ namespace DATN.Aplication.System
                 {
                     return userPhone;
                 }
+            }
+        }
+
+        public async Task<ResponseData<string>> RemoveUser(string id)
+        {
+            var userIdentity = await _userManager.FindByIdAsync(id);
+            if (userIdentity != null)
+            {
+                userIdentity.IsDeleted = true;
+                await _userManager.UpdateAsync(userIdentity);
+                return new ResponseData<string> { IsSuccess = true, Data = "Xóa user thành công!" };
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Xóa lỗi" };
+        }
+
+        public async Task<ResponseData<string>> GetIdUser(string username)
+        {
+            var user = await CheckUser(username);
+            if (user != null)
+                return new ResponseData<string> { IsSuccess = true, Data = user.Id.ToString() };
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Không có user này" };
+        }
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            var queryRole = await _roleManager.FindByIdAsync(addRoleForUserView.RoleId);
+            var user = await _userManager.FindByIdAsync(addRoleForUserView.EmployeeId);
+            if (queryRole != null)
+            {
+                var queryUser = await _userManager.AddToRoleAsync(user, queryRole.Name);
+                if (queryUser.Succeeded)
+                {
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ cho người dùng thành công" };
+                }
+                return new ResponseData<string> { IsSuccess = false, Error = "User không có" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Chức vụ không có" };
+        }
+
+        public async Task<ResponseData<List<string>>> ListPosition()
+        {
+            var listRole = await _roleManager.Roles.ToListAsync();
+            if (listRole.Count > 0)
+            {
+                var list = new List<string>();
+                foreach (var role in listRole)
+                {
+                    list.Add(role.Name);
+                }
+                return new ResponseData<List<string>> { IsSuccess = true, Data = list };
+            }
+            else
+                return new ResponseData<List<string>> { IsSuccess = false, Error = "Chưa có chức vụ nào" };
+        }
+
+        public async Task<ResponseData<string>> GetRoleUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                var role = await _userManager.GetRolesAsync(user);
+                if (role == null)
+                    return new ResponseData<string> { IsSuccess = false, Error = "Người dùng chưa có chức vụ" };
+                else
+                    return new ResponseData<string> { IsSuccess = true, Data = string.Join(" ", role) };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Không có người dùng này" };
+        }
+
+        public async Task<ResponseData<string>> AddRole(string roleName)
+        {
+            var roleIdentity = new Role()
+            {
+                Name = roleName,
+                NormalizedName = roleName.ToUpper()
+            };
+            var createRole = await _roleManager.CreateAsync(roleIdentity);
+            if (createRole.Succeeded)
+            {
+                return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ mới thành công" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Lỗi đéo biêts" };
             }
         }
     }

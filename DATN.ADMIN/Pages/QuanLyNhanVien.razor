@@ -1,42 +1,38 @@
-﻿@page "/quanlynhanvien"
-@using DATN.ADMIN.Data
-
-<PageTitle>Quản lý nhân viên</PageTitle>
-@code {
-
-}
-
-<div class="align-content-center">
-    @if (response.Data == null || response.Data.Count == 0)
-    {
-        <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" /></th>
-                    <th>Tên</th>
-                    <th>Số điện thoại</th>
-                    <th>Email</th>
-                    <th>Địa chỉ</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var i in response.Data)
-                {
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>@i.Name</td>
-                        <td>@i.PhoneNumber</td>
-                        <td>@i.Email</td>
-                        <td>@i.Address</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <button class="btn btn-primary">Thêm nhân viên</button>
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @page "/quanlynhanvien"
+        <PageTitle>Quản lý nhân viên</PageTitle>
+        <div class="align-content-center">
+            @if (response.Data == null || response.Data.Count == 0)
+            {
+                <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" /></th>
+                            <th>Tên</th>
+                            <th>Số điện thoại</th>
+                            <th>Email</th>
+                            <th>Địa chỉ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in response.Data)
+                        {
+                            <tr>
+                                <td><input type="checkbox" /></td>
+                                @* <td>@i.Name</td> *@
+                                <td>@i.PhoneNumber</td>
+                                <td>@i.Email</td>
+                                <td>@i.Address</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <button class="btn btn-primary">Thêm nhân viên</button>
 
     }
 </div>
