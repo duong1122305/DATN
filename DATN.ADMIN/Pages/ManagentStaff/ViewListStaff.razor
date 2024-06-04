@@ -36,12 +36,16 @@
             <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
             <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
             @if (!context.IsDeleted)
-        {
-                <MudTd DataLabel="Email" Style="text-align:center;">Còn hoạt động</MudTd>
+            {
+                <MudTd DataLabel="Email" Style="text-align:center;">
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info">Hoạt động</MudChip>
+                </MudTd>
             }
             else
             {
-                <MudTd DataLabel="Email" Style="text-align:center;">Không còn hoạt động</MudTd>
+                <MudTd DataLabel="Email" Style="text-align:center;">
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error">Ngưng hoạt động</MudChip>
+                </MudTd>
             }
             <MudTd DataLabel="Email" Style="text-align:center;">
                 <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
@@ -102,68 +106,6 @@ else
         return false;
     }
 
-    //tạo sự kiện để mở xem detail
-
-    private async Task OpenDialog(string userName)
-    {
-        var options = new DialogOptions { ClassBackground = "my-custom-class", CloseButton = true };
-        _dialogservice.Show<CreateUpdate>("Thêm nhân viên", options);
-        await OnInitializedAsync();
-    }
-
-
-    //Thông báo hỏi khi xoá
-    private async void OnButtonClicked(UserInfView user)
-    {
-        //     bool result = await _dialogservice.ShowMessageBox(
-        //         "Thông báo",
-        //         "Bạn có muốn xoá nhân viên?",
-        //         yesText: "Xoá", cancelText: "Huỷ", noText: null, new DialogOptions{ ClassBackground = "my-custom-class", CloseButton = true});
-        // StateHasChanged();
-        //     if (result)
-        //     {
-        //         await DeleteServer(user.UserName);
-        //     }
-
-        var options = new MessageBoxOptions()
-            {
-                Title = "Xác nhận xoá",
-                Message = $"Bạn có chắc muốn xoá nhân viên '{user.FullName}'?",
-                YesText = "Xoá",
-                CancelText = "Huỷ"
-            };
-        var updateCreate = await _dialogservice.ShowAsync<DialogComponent>(nameDialog, parameters, options);
-        var result = await updateCreate.Result;
-        if (!result.Canceled)
-        {
-            updateCreate.Close();
-            await LoadData();
-        }
-    }
-
-
-    //Thông báo hỏi khi xoá
-    private async Task deleteStaff(string userName)
-    {
-        if (await Confirm()==true)
-        {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={user.Data}");
-            if (response.IsSuccess)
-            {
-                var respone = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={result.Data}");
-                if (respone.IsSuccess)
-                {
-                    Message($"Đã xoá nhân viên{userName}", Severity.Success);
-                    await LoadData();
-                }
-                Message("Xoá thất bại", Severity.Error);
-            }
-        }else
-        {
-            Message("Xoá không thành công", Severity.Error);
-        }
-    }
-
     //hoi truoc khi xoa
     private async Task<bool?> Confirm()
     {
@@ -171,9 +113,62 @@ else
                     "Xác nhận xóa nhân viên?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-            StateHasChanged();
-            return confirm;
-   }
+        StateHasChanged();
+        return confirm;
+    }
+
+    //Thông báo hỏi khi xoá
+    private async Task deleteStaff(string userName)
+    {
+        if (await Confirm()==true)
+        {
+            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
+            if (response.IsSuccess)
+            {
+                var respone = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={response.Data}");
+                if (respone.IsSuccess)
+                {
+                    Message($"Đã xoá nhân viên{userName}", Severity.Success);
+                    await LoadData();
+                }
+                else
+                {
+                    Message("Xoá thất bại", Severity.Error);
+
+                }
+            }
+        }else
+        {
+            Message("Xoá không thành công", Severity.Error);
+        }
+    }
+
+    //thêm sửa !
+    private async Task OpenDialog(string username)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới nhân viên";
+        if (username != null)
+        {
+            parameters.Add("userName", username);
+            nameDialog = "Cập nhật nhân viên";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
 
    //messenge
     private void Message(string message, Severity severity)
