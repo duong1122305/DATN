@@ -8,46 +8,52 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-<MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+@if (lstUser!=null)
+{
+    <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh Style="text-align:center;" >ID</MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:center;">Trạng thái</MudTh>
-        <MudTh Style="text-align:center;">Xác thực</MudTh>
-        <MudTh Style="text-align:center;">Hành động</MudTh>
-    </HeaderContent>
-    <RowTemplate >
-        <MudTd DataLabel="STT" Style="text-align:center;">
-            @(lstUser.IndexOf(context) + 1)
-        </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
-        <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
-        <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">Chưa có</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">
-            <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
-        </MudTd>
-        <MudTd Style="text-align:center;">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="OnButtonClicked">Xoá</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
-        </MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
-<MudOverlay @bind-Visible="isVisible" DarkBackground="true" ZIndex="9999" AutoClose="true" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;">Trạng thái</MudTh>
+            <MudTh Style="text-align:center;">Xác thực</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="STT" Style="text-align:center;">
+                @(lstUser.IndexOf(context) + 1)
+            </MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
+            <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
+            <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
+            <MudTd DataLabel="Email" Style="text-align:center;">@context.IsDeleted</MudTd>
+            <MudTd DataLabel="Email" Style="text-align:center;">
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
+            </MudTd>
+            <MudTd Style="text-align:center;">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))">Xoá</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))">Sửa</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+else
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
 <style>
     .my-custom-class {
         backdrop-filter: blur(10px);
@@ -57,9 +63,18 @@
     //button trạng thái
     private bool _disableElevation = false;
     private string searchString1 = "";
+    private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
 
+
+    // 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    // load lai du lieu
+    protected async Task LoadData()
     {
         var user = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
         lstUser = user.Data;
@@ -79,32 +94,75 @@
             return true;
         return false;
     }
-    //overlay màn
-    private bool isVisible;
-
-    public void OpenOverlay()
-    {
-        isVisible = true;
-        StateHasChanged();
-    }
 
     //tạo sự kiện để mở xem detail
 
-    private void OpenDialog()
+    private async Task OpenDialog(string userName)
     {
-        var options = new DialogOptions { ClassBackground = "my-custom-class" };
-        _dialogservice.Show<DialogComponent>("Thêm nhân viên", options);
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới nhân viên";
+        if (userName != _userView.UserName)
+        {
+            parameters.Add("UserName", userName);
+            nameDialog = "Cập nhật nhân viên";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var updateCreate = await _dialogservice.ShowAsync<DialogComponent>(nameDialog, parameters, options);
+        var result = await updateCreate.Result;
+        if (!result.Canceled)
+        {
+            updateCreate.Close();
+            await LoadData();
+        }
     }
 
 
     //Thông báo hỏi khi xoá
-    private async void OnButtonClicked()
+    private async Task deleteStaff(string userName)
     {
-        bool? result = await _dialogservice.ShowMessageBox(
-            "Thông báo",
-            "Bạn có muốn xoá nhân viên?",
-            yesText: "Xoá", cancelText: "Huỷ");
-        StateHasChanged();
+        if (await Confirm()==true)
+        {
+            var result = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username{userName}");
+            if (result.IsSuccess)
+            {
+                var respone = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={result.Data}");
+                if (respone.IsSuccess)
+                {
+                    Message($"Đã xoá nhân viên{userName}", Severity.Success);
+                    await LoadData();
+                }
+                Message("Xoá thất bại", Severity.Error);
+            }
+        }else
+        {
+            Message("Xoá không thành công", Severity.Error);
+        }
+    }
+
+    //hoi truoc khi xoa
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa nhân viên?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+            StateHasChanged();
+            return confirm;
+   }
+
+   //messenge
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
     }
 
  

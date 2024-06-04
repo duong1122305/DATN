@@ -1,58 +1,48 @@
-﻿@page "/create"
-@using System.Net.Http.Json
-@using DATN.ViewModels.Common
+﻿@using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @inject HttpClient httpClient
-@inherits 
 @if (_users != null)
 {
-    <MudGrid>
-        <MudItem xs="6" sm="12">
-            <MudPaper Class="pa-4">
-                <MudForm @bind-IsValid="@success" @ref="form">
-                    <MudTextField T="string" Label="Tên người dùng" Required="true" RequiredError="Vui lòng không để trống!" />
-                    <MudTextField T="string" Label="Họ và tên" Required="true" RequiredError="Vui lòng không để trống" />
-                    <MudTextField T="string" Label="Mật khẩu" Required="true" RequiredError="Vui lòng không để trống" />
-                    <MudTextField T="string" Label="Số điện thoại" Required="true" RequiredError="Vui lòng không để trống" />
-                    <MudTextField T="string" Label="Email" Required="true" RequiredError="Vui lòng không để trống" />
-                    <MudTextField T="string" Label="Địa chỉ" Required="true" RequiredError="Vui lòng không để trống" />
-                    <div class="d-flex align-center justify-space-between">
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" >Đăng ký</MudButton>
-                    </div>
-                </MudForm>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+    <EditForm Model="@user">
+        <MudItem xs="12" sm="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField T="string" @bind-Value="user.FullName" Label="Họ tên" For="@(() => user.FullName)" />
+                    <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
+                    <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
+                    <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+                    <hr class="hr" />
+                    <div class="mt-5" style="text-align: end;">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </EditForm>
 }
 else
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+ <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
 }
-
 @code {
-    bool success;
-    MudForm form;
-    [Parameter]
-    public Guid? Id { get; set; }
-    [CascadingParameter] MudDialogInstance CreateUpdateDialog { get; set; }
-
+    [Parameter] 
+    public UserInfView? userName { get; set; }
+    [CascadingParameter]
+    MudDialog _dialogBox{ get; set; }
     private string _nameButton = "Thêm mới";
-    private List<UserInfView> _userView;
 
-    private void Message(string message, Severity severity)
+    private List<UserInfView> _users;
+    private UserRegisterView user = new UserRegisterView();
+
+    protected async override Task OnInitializedAsync()
     {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
+        var usrr = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+
+        if (userName!= null)
+        {
+            _nameButton = "Cập nhật";
+        }
     }
-    private async Task<bool?> Confirm()
-    {
-        var confirm = await _dialogservice.ShowMessageBox(
-            "Thông báo",
-                    "Xác nhận cập nhật nhân viên",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-        StateHasChanged();
-        return confirm;
-    }
+
+    bool success = false;
 }
