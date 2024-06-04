@@ -8,7 +8,7 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-@if (lstUser !=null)
+@if (lstUser != null)
 {
     <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
         <ToolBarContent>
@@ -35,7 +35,14 @@
             <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
             <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
             <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
-            <MudTd DataLabel="Email" Style="text-align:center;">Chưa có</MudTd>
+            @if (!context.IsDeleted)
+        {
+                <MudTd DataLabel="Email" Style="text-align:center;">Còn hoạt động</MudTd>
+            }
+            else
+            {
+                <MudTd DataLabel="Email" Style="text-align:center;">Không còn hoạt động</MudTd>
+            }
             <MudTd DataLabel="Email" Style="text-align:center;">
                 <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
             </MudTd>
@@ -98,7 +105,7 @@ else
 
     private async void OpenDialog()
     {
-        var options = new DialogOptions { ClassBackground = "my-custom-class", CloseButton = true};
+        var options = new DialogOptions { ClassBackground = "my-custom-class", CloseButton = true };
         _dialogservice.Show<CreateUpdate>("Thêm nhân viên", options);
         await OnInitializedAsync();
     }
@@ -107,15 +114,15 @@ else
     //Thông báo hỏi khi xoá
     private async void OnButtonClicked(UserInfView user)
     {
-    //     bool result = await _dialogservice.ShowMessageBox(
-    //         "Thông báo",
-    //         "Bạn có muốn xoá nhân viên?",
-    //         yesText: "Xoá", cancelText: "Huỷ", noText: null, new DialogOptions{ ClassBackground = "my-custom-class", CloseButton = true});
-    // StateHasChanged();
-    //     if (result)
-    //     {
-    //         await DeleteServer(user.UserName);
-    //     }
+        //     bool result = await _dialogservice.ShowMessageBox(
+        //         "Thông báo",
+        //         "Bạn có muốn xoá nhân viên?",
+        //         yesText: "Xoá", cancelText: "Huỷ", noText: null, new DialogOptions{ ClassBackground = "my-custom-class", CloseButton = true});
+        // StateHasChanged();
+        //     if (result)
+        //     {
+        //         await DeleteServer(user.UserName);
+        //     }
 
         var options = new MessageBoxOptions()
             {
@@ -138,8 +145,8 @@ else
         var user = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={username}");
         if (user.IsSuccess)
         {
-            var response = await httpClient.PostAsJsonAsync<ResponseData<string>>($"api/UserLogin/remove",user);
-            if (response.IsSuccessStatusCode)
+            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={user.Data}");
+            if (response.IsSuccess)
             {
                 Message($"Đã xoá nhân viên '{username}'", Severity.Success);
                 await RefreshData(); // Refresh danh sách sau khi xoá
@@ -170,5 +177,5 @@ else
 
 
 
- 
+
 }
