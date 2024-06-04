@@ -3,10 +3,8 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @inject HttpClient httpClient
-@inject ISnackbar Snackbar
-@inject IDialogService _dialogservice;
-
-@if (_userView == null)
+@inherits 
+@if (_users != null)
 {
     <MudGrid>
         <MudItem xs="6" sm="12">
