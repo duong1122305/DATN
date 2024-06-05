@@ -7,7 +7,7 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách ca làm</PageTitle>
 
-@if (lstUser != null)
+@if (lstUser.Count > 0)
 {
     <MudTable Items="@lstUser" Hover="@hover" Filter="new Func<ScheduleView,bool>(FilterFunc1)">
         <ToolBarContent>
@@ -42,11 +42,10 @@
             <MudTablePager />
         </PagerContent>
     </MudTable>
-    <MudOverlay @bind-Visible="isVisible" DarkBackground="true" ZIndex="9999" AutoClose="true" />
 }
 else
 {
-<DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
 }
 @code {
     //button trạng thái
@@ -59,7 +58,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam");
-        lstUser = user.Data;
+        if (user.IsSuccess)
+        {
+            lstUser = user.Data;
+        }
+        else
+        {
+            
+        }
     }
 
     private bool FilterFunc1(ScheduleView element) => FilterFunc(element, searchString1);
@@ -85,6 +91,11 @@ else
         StateHasChanged();
     }
 
-
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
  
 }

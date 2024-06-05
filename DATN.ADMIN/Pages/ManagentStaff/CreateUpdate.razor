@@ -3,28 +3,31 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
-<EditForm Model="@user">
-    <MudItem xs="12" sm="12">
-        <MudCard>
-            <MudCardContent>
-                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ tên" For="@(() => user.FullName)" />
-                <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
-                <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
-                <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
-                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
-                @if (userName == null)
-                {
+@if (_lstView !=null)
+{
+    <EditForm Model="@user" onsubmit="@(async()=>await Submid())">
+        <MudItem xs="12" sm="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField T="string" @bind-Value="user.FullName" Label="Họ tên" For="@(() => user.FullName)" />
+                    <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
+                    <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
+                    <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
+                    <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
                     <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" />
-                }
-                <hr class="hr" />
-                <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</EditForm>
-
+                    <hr class="hr" />
+                    <div class="mt-5" style="text-align: end;">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </EditForm>
+}
+else
+{
+    <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
+}
 @code {
     [Parameter]
     public string userName { get; set; }
@@ -36,9 +39,13 @@
     //nó đây
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
+    private List<UserInfView> _lstView;
+
 
     protected async override Task OnInitializedAsync()
     {
+        var user2 = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+        _lstView = user2.Data;
         if (!string.IsNullOrEmpty(userName))
         {
             _nameButton = "Cập nhật";
@@ -87,7 +94,7 @@
             if (result.IsSuccessStatusCode)
             {
                 Message("Cập nhật thành công", Severity.Success);
-                // _dialogBox.Close(DialogResult.Ok(true));
+                _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
