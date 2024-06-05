@@ -50,7 +50,7 @@
                 httpContextAccessor.HttpContext.Session.Clear();
                 // Chuyển hướng đến màn login
                 // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
-                navigationManager.NavigateTo("/dangnhap", true);
+                await OnInitializedAsync();
             }
             }
         }

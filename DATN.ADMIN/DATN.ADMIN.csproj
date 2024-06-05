@@ -7,11 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="View\**" />
+    <Content Remove="View\**" />
+    <EmbeddedResource Remove="View\**" />
+    <None Remove="View\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\LoadingIndicator.razor" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="View\Account\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
