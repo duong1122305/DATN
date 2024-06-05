@@ -7,14 +7,12 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách ca làm</PageTitle>
 
-@if (lstUser != null)
-{
     <MudTable Items="@lstUser" Hover="@hover" Filter="new Func<ScheduleView,bool>(FilterFunc1)">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Danh sách ca làm</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">ID</MudTh>
@@ -39,15 +37,10 @@
             </MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager />
+        <MudTablePager TransformOrigin="Origin.TopCenter"/>
         </PagerContent>
     </MudTable>
-    <MudOverlay @bind-Visible="isVisible" DarkBackground="true" ZIndex="9999" AutoClose="true" />
-}
-else
-{
-<DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
-}
+
 @code {
     //button trạng thái
     private bool _disableElevation = false;
@@ -56,10 +49,15 @@ else
     private string searchString1 = "";
     private List<ScheduleView> lstUser = new List<ScheduleView>();
 
+    protected async Task LoadData()
+    {
+        var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam"); ;
+        lstUser = user.Data;
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam");
-        lstUser = user.Data;
+        // await LoadData();
     }
 
     private bool FilterFunc1(ScheduleView element) => FilterFunc(element, searchString1);
@@ -76,15 +74,59 @@ else
             return true;
         return false;
     }
-    //overlay màn
-    private bool isVisible;
 
-    public void OpenOverlay()
+    private void Message(string message, Severity severity)
     {
-        isVisible = true;
-        StateHasChanged();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
     }
 
+    // thông báo
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa ca làm?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
 
+    private async Task OpenDialog(string username)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới ca làm";
+        if (username != null)
+        {
+            // _userView = lstUser.FirstOrDefault(c => c.UserName == username);
+            // var updateView = new UserRegisterView()
+            //     {
+            //         UserName = username,
+            //         FullName = _userView.FullName,
+            //         Address = _userView.Address,
+            //         PhoneNumber = _userView.PhoneNumber,
+            //         Email = _userView.Email,
+            //     };
+            parameters.Add("username", username);
+            // parameters.Add("user", updateView);
+            nameDialog = "Cập nhật ca làm";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpSchdule>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
  
 }

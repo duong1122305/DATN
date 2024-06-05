@@ -1,8 +1,8 @@
-﻿@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.Authenticate
-@inject ISnackbar Snackbar
+﻿@inject ISnackbar Snackbar
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
 <EditForm Model="@user">
     <MudItem xs="12" sm="12">
         <MudCard>
@@ -28,8 +28,7 @@
 @code {
     [Parameter]
     public string userName { get; set; }
-    [CascadingParameter]
-    MudDialog _dialogBox { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
 
     private bool display = false;
@@ -56,11 +55,11 @@
     {
         //gọi api thêm
         var result = await httpClient.PostAsJsonAsync<UserRegisterView>("api/UserLogin/User-Register", user);
-        if (result.IsSuccessStatusCode)
+        bool val = result.IsSuccessStatusCode;
+        if (val)
         {
             Message("Thêm mới thành công", Severity.Success);
-            StateHasChanged();
-            // _dialogBox.Close(DialogResult.Ok(true));
+            _dialogBox.Close(DialogResult.Ok(true));
         }
         else
         {
@@ -71,7 +70,7 @@
     private async Task<bool?> Confirm()
     {
         var confirm = await _diagService.ShowMessageBox("Thông báo",
-                    "Xác nhận cập nhật nhân viên?",
+    "Xác nhận cập nhật nhân viên?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
@@ -87,7 +86,7 @@
             if (result.IsSuccessStatusCode)
             {
                 Message("Cập nhật thành công", Severity.Success);
-                // _dialogBox.Close(DialogResult.Ok(true));
+                _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {

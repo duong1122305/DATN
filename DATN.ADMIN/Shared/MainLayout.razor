@@ -1,54 +1,78 @@
-﻿@using Microsoft.AspNetCore.Http.Extensions
-@using Microsoft.AspNetCore.Mvc
-@inherits LayoutComponentBase
-
-<MudThemeProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
-<MudLayout>
-    <MudAppBar Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
-        <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
-            <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
-            <MudMenuItem>
-                <p id="logout" @onclick="LogOut">Đăng xuất</p>
-            </MudMenuItem>
-            <MudLink></MudLink>
-        </MudMenu>
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-        <img src="./img/logo_name.png" alt="Website Logo" style="padding-left:45px;width: 200px; height: 120px;" />
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent>
-        <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
-            @Body
-        </MudContainer>
-
-    </MudMainContent>
-</MudLayout>
+﻿    @using System.Security.Policy
+    @using DATN.Aplication.CustomProvider   
+    @inject IDialogService _dialogservice;
+    @inject AuthenticationStateProvider AuthenticationStateProvider
+    @inherits LayoutComponentBase
+    <MudThemeProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+    <MudLayout>
+        <MudAppBar Elevation="0">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
+            <MudSpacer />
+            <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
+                <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
+                <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
+            </MudMenu>
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+            <img src="./img/logo_name.png" alt="Website Logo" style="padding-left:45px;width: 200px; height: 120px;" />
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent>
+            <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
 @code {
     [Inject]
-    HttpContextAccessor httpContextAccessor { get; set; }
+    protected NavigationManager navigationManager { get; set; }
     [Inject]
-    NavigationManager navigationManager { get; set; }
+    protected IHttpContextAccessor httpContextAccessor { get; set; }
+
     bool _drawerOpen = true;
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
-    async void LogOut()
+    private async Task logOut()
     {
-        httpContextAccessor.HttpContext.Session.Remove("Key");
-        navigationManager.NavigateTo("/dangnhap");
-        await this.OnInitializedAsync();
-    }
-    protected async override Task OnInitializedAsync()
-    {
-        if (httpContextAccessor.HttpContext.Session.GetString("Key") == null)
+        var confirm = await Confirm();
+        if (confirm == true)
         {
-            navigationManager.NavigateTo("/dangnhap");
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user.Identity.IsAuthenticated)
+            {
+                // Xoá session (nếu có)
+                httpContextAccessor.HttpContext.Session.Remove("Key");
+                httpContextAccessor.HttpContext.Session.Clear();
+                // Chuyển hướng đến màn login
+                // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
+                navigationManager.NavigateTo("/dangnhap", true);
+            }
+            }
         }
+        protected async override Task OnInitializedAsync()
+        {
+        var session = httpContextAccessor.HttpContext.Session.GetString("Key");
+        if (string.IsNullOrEmpty(session))
+        {
+            // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
+            navigationManager.NavigateTo("/dangnhap", true);
+        }
+
+        }
+        private async Task<bool?> Confirm()
+        {
+            var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                        "Bạn có muốn đăng xuất không?",
+               yesText: "Xác nhận",
+                        cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+            StateHasChanged();
+            return confirm;
+        }
+
     }
-}
+

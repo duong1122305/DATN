@@ -8,7 +8,7 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-@if (lstUser != null)
+@if (lstUser.Count > 0 )
 {
     <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
         <ToolBarContent>
@@ -63,6 +63,8 @@
 }
 else
 {
+
+
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 <style>
