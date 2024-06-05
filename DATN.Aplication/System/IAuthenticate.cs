@@ -11,7 +11,7 @@ namespace DATN.Aplication.System
         public Task<ResponseMail> ForgotPassword(string username);
         public Task<ResponseData<List<UserInfView>>> GetUsers();
         public Task<ResponseData<UserInfView>> GetUserAtPhoneNumber(string phonenumber);
-        public Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView);
+        public Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView, string id);
         public Task<ResponseData<string>> RemoveUser(string id);
         public Task<ResponseData<string>> ChangePassword(UserChangePasswordView user);
         public Task<ResponseData<string>> GetConfirmCode(string username);

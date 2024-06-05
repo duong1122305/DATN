@@ -195,12 +195,14 @@ namespace DATN.Aplication.System
                 return new ResponseData<UserInfView> { IsSuccess = false, Error = "Chưa có khách hàng nào đăng kí trên số điện thoại này" };
         }
 
-        public async Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView)
+        public async Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView, string id)
         {
-            var userIdentity = await _userManager.FindByNameAsync(userRegisterView.UserName);
+            var userIdentity = await _userManager.FindByIdAsync(id);
             if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
             else
             {
+                userIdentity.UserName = userRegisterView.UserName;
+                userIdentity.FullName = userRegisterView.FullName;
                 userIdentity.PhoneNumber = userRegisterView.PhoneNumber;
                 userIdentity.Address = userRegisterView.Address;
                 userIdentity.Email = userRegisterView.Email;
