@@ -64,55 +64,44 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<GetGuestResponse>> GetGuest(GetGuestRequest request)
+        public async Task<ResponseData<List<GuestViewModel>>> GetGuest()
         {
             try
             {
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
-                if (request.keyWord != null)
+                var response = result.Select(p => new GuestViewModel()
                 {
-                    result = result.Where(p => p.PhoneNumber.Contains(request.keyWord)
-                                            || p.Name.ToLower().Contains(request.keyWord.ToLower()))
-                                           .OrderByDescending(p => p.Name);
-                }
+                    Address = p.Address,
+                    Email = p.Email,
+                    Gender = p.Gender,
+                    Id = p.Id,
+                    Name = p.Name,
+                    IsDelete = p.IsDeleted,
+                    Password = _passwordExtensitons.Decrypt(p.PasswordHash),
+                    PhoneNumber = p.PhoneNumber,
+                    UserName = p.UserName,
+                }).ToList();
                 int totalCount = result.Count();
-                if (totalCount > 0)
+                if (totalCount != 0)
                 {
-                    result = result.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize);
-                    var lstGuestVM = result.Select(p => new GuestViewModel()
-                    {
-                        Address = p.Address,
-                        Email = p.Email,
-                        Gender = p.Gender,
-                        Name = p.Name,
-                        PhoneNumber = p.PhoneNumber,
-                        UserName = p.UserName,
-                        Id = p.Id,
-                        IsDelete = p.IsDeleted,
-                        Password =p.PasswordHash !=null? _passwordExtensitons.Decrypt(p.PasswordHash):null,
-                    }); ;
-                    GetGuestResponse response = new GetGuestResponse()
-                    {
-                        lstGuest = lstGuestVM.ToList(),
-                        PagingData = new PagingResponseData(request.pageIndex, request.pageSize, totalCount)
-                    };
-                    return new ResponseData<GetGuestResponse>
+
+                    return new ResponseData<List<GuestViewModel>>
                     {
                         IsSuccess = true,
                         Data = response,
                     };
                 }
-                return new ResponseData<GetGuestResponse>
+                return new ResponseData<List<GuestViewModel>>
                 {
                     IsSuccess = true,
-                    Data = new GetGuestResponse()
+                    Data = new List<GuestViewModel>()
                 };
             }
 
             catch (Exception ex)
             {
 
-                return new ResponseData<GetGuestResponse>
+                return new ResponseData<List<GuestViewModel>>
                 {
                     IsSuccess = false,
                     Error = ex.Message
@@ -208,13 +197,13 @@ namespace DATN.Aplication.Services
             try
             {
                 string erorrMessage = "";
-                bool checkUser=true;
-                if ( await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
+                bool checkUser = true;
+                if (await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
                 {
-                    checkUser=false;
+                    checkUser = false;
                     erorrMessage = "Email đã được đăng ký ở tài khoản khác";
-                }              
-                if ( await _unitOfWork.GuestRepository.CheckUserExist(request.UserName))
+                }
+                if (await _unitOfWork.GuestRepository.CheckUserExist(request.UserName))
                 {
                     checkUser = false;
                     erorrMessage = "Tên đăng nhập đã tồn tại";
@@ -224,7 +213,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string>
                     {
                         IsSuccess = false,
-                        Error= erorrMessage,
+                        Error = erorrMessage,
                     };
                 }
 
@@ -276,7 +265,7 @@ namespace DATN.Aplication.Services
             try
             {
                 await _unitOfWork.GuestRepository.SoftDelete(request);
-                var result =      await _unitOfWork.GuestRepository.SaveChangesAsync() > 0; 
+                var result = await _unitOfWork.GuestRepository.SaveChangesAsync() > 0;
                 if (result)
                 {
                     return new ResponseData<string>
@@ -315,7 +304,7 @@ namespace DATN.Aplication.Services
                     PhoneNumber = request.PhoneNumber,
                     RegisteredAt = DateTime.Now,
                     PasswordHash = _passwordExtensitons.HashPassword(request.Password),
-                   
+
                 };
                 await _unitOfWork.GuestRepository.UpdateAsync(guest);
                 var result = await _unitOfWork.SaveChangeAsync();
@@ -344,12 +333,12 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<string>> VerififyUser(string verifyToken, string mail)
+        public async Task<ResponseData<string>> VerififyUser(string verifyConstring, string mail)
         {
             try
             {
-               
-                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(verifyToken));
+
+                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(verifyConstring));
                 if (guest != null && guest.Email == mail)
                 {
                     guest.IsComfirm = true;
