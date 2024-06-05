@@ -3,44 +3,39 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
-@if (user != null)
-{
-    <EditForm Model="@user" >
-        <MudItem xs="12" sm="12">
-            <MudCard>
-                <MudCardContent>
-                    <MudTextField T="string" @bind-Value="user.FullName" Label="Họ tên" For="@(() => user.FullName)" />
-                    <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
-                    <MudTextField T="string" @bind-Value="user.Address"Label="Địa chỉ" For="@(() => user.Address)" />
-                    <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
-                    <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+<EditForm Model="@user">
+    <MudItem xs="12" sm="12">
+        <MudCard>
+            <MudCardContent>
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ tên" For="@(() => user.FullName)" />
+                <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
+                <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
+                <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
+                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+                @if (userName == null)
+                {
                     <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" />
-                    <hr class="hr" />
-                    <div class="mt-5" style="text-align: end;">
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
-                        </div>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-        </EditForm>
-}
-else
-{
- <DATN.ADMIN.Components.LoadingIndicator></DATN.ADMIN.Components.LoadingIndicator>
-}
+                }
+                <hr class="hr" />
+                <div class="mt-5" style="text-align: end;">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</EditForm>
+
 @code {
-    [Parameter] 
+    [Parameter]
     public string userName { get; set; }
     [CascadingParameter]
-    MudDialog _dialogBox{ get; set; }
+    MudDialog _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
-    [Parameter]
-    public UserUpdateView userUpdateView { get; set; }
 
     private bool display = false;
     //nó đây
-    private UserRegisterView user = new UserRegisterView();
-    private List<UserInfView> _user;
+    [Parameter]
+    public UserRegisterView user { get; set; } = new UserRegisterView();
 
     protected async override Task OnInitializedAsync()
     {
@@ -52,8 +47,6 @@ else
             {
                 display = true;
                 var upDa = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={userUp}", user);
-
-                
             }
         }
     }
@@ -62,7 +55,7 @@ else
     protected async Task Create()
     {
         //gọi api thêm
-        var result = await httpClient.PostAsJsonAsync<UserRegisterView>("api/UserLogin/User-Register",user);
+        var result = await httpClient.PostAsJsonAsync<UserRegisterView>("api/UserLogin/User-Register", user);
         if (result.IsSuccessStatusCode)
         {
             Message("Thêm mới thành công", Severity.Success);
@@ -89,11 +82,12 @@ else
     {
         if (await Confirm() == true)
         {
-            var result = await httpClient.PutAsJsonAsync<UserRegisterView>("api/UserLogin/Update-inf", user);
+            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
+            var result = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={response.Data}", user);
             if (result.IsSuccessStatusCode)
             {
                 Message("Cập nhật thành công", Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
+                // _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
