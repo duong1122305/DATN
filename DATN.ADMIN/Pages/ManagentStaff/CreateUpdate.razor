@@ -67,7 +67,7 @@ else
         {
             Message("Thêm mới thành công", Severity.Success);
             StateHasChanged();
-            _dialogBox.Close(DialogResult.Ok(true));
+            // _dialogBox.Close(DialogResult.Ok(true));
         }
         else
         {
@@ -104,21 +104,29 @@ else
     }
     private async Task Submid()
     {
-        var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
-        if (response.IsSuccess)
+        if (user.Password != null)
         {
-            if (userName != null)
+            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={user.UserName}");
+            if (response.Data == null)
+            {
+                await Create();
+            }
+            else
+            {
+                Message("UserName bị trùng", Severity.Warning);
+            }
+        }
+        else
+        {
+            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
+            if (response.IsSuccess)
             {
                 await Update();
             }
             else
             {
-                await Create();
+                Message("chưa biết", Severity.Warning);
             }
-        }
-        else
-        {
-            Message("Tên nhân viên đã tồn tại", Severity.Warning);
         }
         StateHasChanged();
     }
