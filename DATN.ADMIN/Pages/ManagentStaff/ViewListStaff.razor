@@ -15,7 +15,7 @@
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" @onclick="OpenDialog">Thêm</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">ID</MudTh>
@@ -36,19 +36,23 @@
             <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
             <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
             @if (!context.IsDeleted)
-        {
-                <MudTd DataLabel="Email" Style="text-align:center;">Còn hoạt động</MudTd>
+            {
+                <MudTd DataLabel="Email" Style="text-align:center;">
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info">Hoạt động</MudChip>
+                </MudTd>
             }
             else
             {
-                <MudTd DataLabel="Email" Style="text-align:center;">Không còn hoạt động</MudTd>
+                <MudTd DataLabel="Email" Style="text-align:center;">
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error">Ngưng hoạt động</MudChip>
+                </MudTd>
             }
             <MudTd DataLabel="Email" Style="text-align:center;">
                 <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
             </MudTd>
             <MudTd Style="text-align:center;">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" @onclick="() => OnButtonClicked(context)">Xoá</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))">Xoá</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))">Sửa</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
             </MudTd>
         </RowTemplate>
@@ -59,7 +63,7 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 <style>
     .my-custom-class {
@@ -70,9 +74,18 @@ else
     //button trạng thái
     private bool _disableElevation = false;
     private string searchString1 = "";
+    private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
 
+
+    // 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    // load lai du lieu
+    protected async Task LoadData()
     {
         var user = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
         lstUser = user.Data;
@@ -92,82 +105,72 @@ else
             return true;
         return false;
     }
-    //overlay màn
-    private bool isVisible;
 
-    public void OpenOverlay()
+    //hoi truoc khi xoa
+    private async Task<bool?> Confirm()
     {
-        isVisible = true;
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa nhân viên?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
+        return confirm;
     }
-
-    //tạo sự kiện để mở xem detail
-
-    private async void OpenDialog()
-    {
-        var options = new DialogOptions { ClassBackground = "my-custom-class", CloseButton = true };
-        _dialogservice.Show<CreateUpdate>("Thêm nhân viên", options);
-        await OnInitializedAsync();
-    }
-
 
     //Thông báo hỏi khi xoá
-    private async void OnButtonClicked(UserInfView user)
+    private async Task deleteStaff(string userName)
     {
-        //     bool result = await _dialogservice.ShowMessageBox(
-        //         "Thông báo",
-        //         "Bạn có muốn xoá nhân viên?",
-        //         yesText: "Xoá", cancelText: "Huỷ", noText: null, new DialogOptions{ ClassBackground = "my-custom-class", CloseButton = true});
-        // StateHasChanged();
-        //     if (result)
-        //     {
-        //         await DeleteServer(user.UserName);
-        //     }
-
-        var options = new MessageBoxOptions()
-            {
-                Title = "Xác nhận xoá",
-                Message = $"Bạn có chắc muốn xoá nhân viên '{user.FullName}'?",
-                YesText = "Xoá",
-                CancelText = "Huỷ"
-            };
-
-        var result = await _dialogservice.ShowMessageBox(options);
-
-        if (result == true)
+        if (await Confirm()==true)
         {
-            await DeleteServer(user.UserName);
-        }
-    }
-
-    private async Task DeleteServer(string username)
-    {
-        var user = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={username}");
-        if (user.IsSuccess)
-        {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={user.Data}");
+            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
             if (response.IsSuccess)
             {
-                Message($"Đã xoá nhân viên '{username}'", Severity.Success);
-                await RefreshData(); // Refresh danh sách sau khi xoá
+                var respone = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={response.Data}");
+                if (respone.IsSuccess)
+                {
+                    Message($"Đã xoá nhân viên{userName}", Severity.Success);
+                    await LoadData();
+                }
+                else
+                {
+                    Message("Xoá thất bại", Severity.Error);
+
+                }
             }
-            else
-            {
-                Message("TỪ TỪ", Severity.Error);
-            }
-        }
-        else
+        }else
         {
-            Message(user.Error, Severity.Error);
+            Message("Xoá không thành công", Severity.Error);
         }
     }
 
-    private async Task RefreshData()
+    //thêm sửa !
+    private async Task OpenDialog(string username)
     {
-        var userList = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
-        lstUser = userList.Data;
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới nhân viên";
+        if (username != null)
+        {
+            parameters.Add("userName", username);
+            nameDialog = "Cập nhật nhân viên";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
     }
 
+   //messenge
     private void Message(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
