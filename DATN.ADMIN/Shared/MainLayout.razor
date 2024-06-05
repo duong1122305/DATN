@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inherits LayoutComponentBase
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -9,7 +11,10 @@
         <MudSpacer />
         <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
             <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
-            <MudMenuItem>Đăng xuất</MudMenuItem>
+            <MudMenuItem>
+                <p id="logout" @onclick="LogOut">Đăng xuất</p>
+            </MudMenuItem>
+            <MudLink></MudLink>
         </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
@@ -24,9 +29,26 @@
     </MudMainContent>
 </MudLayout>
 @code {
+    [Inject]
+    HttpContextAccessor httpContextAccessor { get; set; }
+    [Inject]
+    NavigationManager navigationManager { get; set; }
     bool _drawerOpen = true;
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    async void LogOut()
+    {
+        httpContextAccessor.HttpContext.Session.Remove("Key");
+        navigationManager.NavigateTo("/dangnhap");
+        await this.OnInitializedAsync();
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        if (httpContextAccessor.HttpContext.Session.GetString("Key") == null)
+        {
+            navigationManager.NavigateTo("/dangnhap");
+        }
     }
 }
