@@ -46,20 +46,27 @@ namespace DATN.Aplication.System
                     };
                 else
                 {
-                    if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
+                    if (userIdentity.IsDeleted)
                     {
-                        _user = userIdentity;
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản của bạn đã bị khóa vui lòng liên hệ admin để đc mở lại" };
+                    }
+                    else
+                    {
+                        if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
+                        {
+                            _user = userIdentity;
+                            return new ResponseData<string>
+                            {
+                                IsSuccess = true,
+                                Data = await GenerateTokenString(userView)
+                            };
+                        }
                         return new ResponseData<string>
                         {
-                            IsSuccess = true,
-                            Data = await GenerateTokenString(userView)
+                            IsSuccess = false,
+                            Error = "Tài khoản hoặc mật khẩu không chính xác"
                         };
                     }
-                    return new ResponseData<string>
-                    {
-                        IsSuccess = false,
-                        Error = "Tài khoản hoặc mật khẩu không chính xác"
-                    };
                 }
             }
             catch (Exception ex)
@@ -360,6 +367,17 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ mới thành công" };
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Lỗi đéo biêts" };
+        }
+
+        public async Task<ResponseData<string>> ActiveAccount(string id)
+        {
+            var query = await _userManager.FindByIdAsync(id);
+            query.IsDeleted = false;
+            var result = await _userManager.UpdateAsync(query);
+            if (result.Succeeded)
+                return new ResponseData<string> { IsSuccess = true, Data = "Đã kích hoạt lại tài khoản thành công" };
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa kích hoạt được" };
         }
     }
 }

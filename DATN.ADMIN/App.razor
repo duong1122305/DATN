@@ -24,7 +24,7 @@
 @code {
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
-    
+
     [Inject]
     CustomAuthenticationStateProvider authenticationStateProvider { get; set; }
 
@@ -44,7 +44,6 @@
         }
         else
         {
-            // Chuyển hướng đến trang đăng nhập
             navigationManager.NavigateTo("/dangnhap");
         }
     }

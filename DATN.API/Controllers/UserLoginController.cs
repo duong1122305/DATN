@@ -20,12 +20,14 @@ namespace DATN.API.Controllers
         private readonly IAuthenticate _userrepo;
         private readonly IWorkShiftManagementService _worshiftmanagement;
         private readonly IEmployeeScheduleManagementService _employeeSchedule;
+        private readonly IShiftManagementService _shiftManagement;
 
-        public UserLoginController(IAuthenticate userRepo, IWorkShiftManagementService workShiftManagementService, IEmployeeScheduleManagementService employeeScheduleManagementService)
+        public UserLoginController(IAuthenticate userRepo, IWorkShiftManagementService workShiftManagementService, IEmployeeScheduleManagementService employeeScheduleManagementService, IShiftManagementService shiftManagementService)
         {
             _userrepo = userRepo;
             _worshiftmanagement = workShiftManagementService;
             _employeeSchedule = employeeScheduleManagementService;
+            _shiftManagement = shiftManagementService;
         }
         //api đăng nhập tài khoản
         [HttpPost("User-Login")]
@@ -161,6 +163,25 @@ namespace DATN.API.Controllers
         {
             return _userrepo.UpdateInformationUser(userUpdateView, id);
         }
-
+        [HttpPost("Create-shift")]
+        public async Task<ResponseData<string>> CreateShift(ShiftView shift)
+        {
+            return await _shiftManagement.CreateShift(shift);
+        }
+        [HttpPut("Update-shift")]
+        public async Task<ResponseData<string>> UpdateShift(ShiftView shift, int id)
+        {
+            return await _shiftManagement.UpdateShift(shift, id);
+        }
+        [HttpGet("Get-List-Shift")]
+        public async Task<ResponseData<List<Shift>>> GetListShift()
+        {
+            return await _shiftManagement.GetListShift();
+        }
+        [HttpGet("Active-user")]
+        public async Task<ResponseData<string>> ActiveUser(string id)
+        {
+            return await _userrepo.ActiveAccount(id);
+        }
     }
 }

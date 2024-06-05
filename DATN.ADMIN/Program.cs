@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MudBlazor.Services;
+using Microsoft.JSInterop;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -51,12 +52,7 @@ builder.Services.AddIdentity<User, Role>(options =>
     .AddDefaultTokenProviders();
 
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
-    // Thêm các policy khác nếu cần
-});
+builder.Services.AddAuthorization();
 
 
 builder.Services.AddSession(options =>
@@ -68,6 +64,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 var app = builder.Build();
 
@@ -79,6 +76,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+// ... (in the Configure method)
+app.UseResponseCaching();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
