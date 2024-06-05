@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="View\Account\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 

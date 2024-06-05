@@ -55,7 +55,7 @@ namespace DATN.ADMIN.Pages
                 }
                 catch (Exception e)
                 {
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/Account/dangnhap"));
                 }
             }
         }
