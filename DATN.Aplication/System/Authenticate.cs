@@ -195,23 +195,22 @@ namespace DATN.Aplication.System
                 return new ResponseData<UserInfView> { IsSuccess = false, Error = "Chưa có khách hàng nào đăng kí trên số điện thoại này" };
         }
 
-        public async Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView, string id)
+        public async Task<ResponseData<string>> UpdateInformationUser(UserUpdateView userUpdateView, string id)
         {
             var userIdentity = await _userManager.FindByIdAsync(id);
             if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
             else
             {
-                userIdentity.UserName = userRegisterView.UserName;
-                userIdentity.FullName = userRegisterView.FullName;
-                userIdentity.PhoneNumber = userRegisterView.PhoneNumber;
-                userIdentity.Address = userRegisterView.Address;
-                userIdentity.Email = userRegisterView.Email;
+                userIdentity.FullName = userUpdateView.FullName;
+                userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
+                userIdentity.Address = userUpdateView.Address;
+                userIdentity.Email = userUpdateView.Email;
 
-                var result = _userManager.UpdateAsync(userIdentity);
-                if (result.IsCompleted)
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Data = "Cập nhật thông tin tài khoản thành công!!" };
+                var result = await _userManager.UpdateAsync(userIdentity);
+                if (result.Succeeded)
+                    return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
                 else
-                    return new ResponseData<string> { IsSuccess = result.IsCompleted, Error = "Thông tin chưa được thay đổi" };
+                    return new ResponseData<string> { IsSuccess = result.Succeeded, Error = "Thông tin chưa được thay đổi" };
             }
         }
 

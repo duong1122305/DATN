@@ -11,7 +11,7 @@
                 <MudCardContent>
                     <MudTextField T="string" @bind-Value="user.FullName" Label="Họ tên" For="@(() => user.FullName)" />
                     <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
-                    <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
+                    <MudTextField T="string" @bind-Value="user.Address"Label="Địa chỉ" For="@(() => user.Address)" />
                     <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                     <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
                     <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" />
@@ -34,7 +34,8 @@ else
     [CascadingParameter]
     MudDialog _dialogBox{ get; set; }
     private string _nameButton = "Thêm mới";
-
+    [Parameter]
+    public UserUpdateView userUpdateView { get; set; }
 
     private bool display = false;
     //nó đây
@@ -50,6 +51,9 @@ else
             if (userUp.Data != null)
             {
                 display = true;
+                var upDa = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={userUp}", user);
+
+                
             }
         }
     }

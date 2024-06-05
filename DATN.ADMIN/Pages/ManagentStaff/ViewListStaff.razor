@@ -15,7 +15,7 @@
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null,null))">Thêm</MudButton>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">ID</MudTh>
@@ -52,7 +52,7 @@
             </MudTd>
             <MudTd Style="text-align:center;">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))">Xoá</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))">Sửa</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName,updateUserView))">Sửa</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
             </MudTd>
         </RowTemplate>
@@ -77,7 +77,7 @@ else
     private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
 
-
+    private UserUpdateView updateUserView = new UserUpdateView();
     // 
     protected override async Task OnInitializedAsync()
     {
@@ -144,14 +144,20 @@ else
     }
 
     //thêm sửa !
-    private async Task OpenDialog(string username)
+    private async Task OpenDialog(string username,UserUpdateView userUpdateView)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới nhân viên";
         if (username != null)
         {
+            _userView = lstUser.FirstOrDefault(x => x.UserName == username);
+            userUpdateView.Address = _userView.Address;
+            userUpdateView.FullName = _userView.FullName;
+            userUpdateView.PhoneNumber = _userView.PhoneNumber;
+            userUpdateView.Email = _userView.Email;
             parameters.Add("username", username);
             nameDialog = "Cập nhật nhân viên";
+            parameters.Add("updateUserView", updateUserView);
         }
         DialogOptions options = new DialogOptions()
             {
