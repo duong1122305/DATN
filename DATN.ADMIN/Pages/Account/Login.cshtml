@@ -1,11 +1,13 @@
 ﻿@page "/dangnhap"
 @model LoginModel
+@using DATN.ADMIN.Pages
+@using DATN.ADMIN.Pages.Account
 @using DATN.Aplication.CustomProvider
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using DATN.Data.Entities
-@namespace DATN.ADMIN.Pages
+
 @inject HttpContextAccessor _contextAccessor
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
@@ -44,10 +46,8 @@
                                 <div class="mt-4">
                                     <div class="d-flex align-items-center justify-content-between mt-4">
                                         <label for="remember_me" class="d-inline-flex">
-                                            <input type="checkbox" name="remember" class="form-check-input">
-                                            <span class="ms-2">Nhớ thông tin</span>
                                         </label>
-                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" asp-page="ForGotPassword">Quên mật khẩu?</a>
+                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" style="text-decoration:none" href="/quenMatKhau">Quên mật khẩu?</a>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-center mt-4">

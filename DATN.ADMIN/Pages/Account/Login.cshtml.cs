@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Security.Claims;
 
-namespace DATN.ADMIN.Pages
+namespace DATN.ADMIN.Pages.Account
 {
     public class LoginModel : PageModel
     {
@@ -55,7 +55,7 @@ namespace DATN.ADMIN.Pages
                 }
                 catch (Exception e)
                 {
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/Account/dangnhap"));
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
                 }
             }
         }

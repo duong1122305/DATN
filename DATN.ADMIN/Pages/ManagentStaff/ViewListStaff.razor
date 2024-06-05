@@ -8,14 +8,16 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-@if (lstUser.Count > 0 )
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
+
+@if (lstUser.Count > 0 && lstUser != null )
 {
     <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
         <ToolBarContent>
+            
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">ID</MudTh>
@@ -38,22 +40,30 @@
             @if (!context.IsDeleted)
             {
                 <MudTd DataLabel="Email" Style="text-align:center;">
-                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info">Hoạt động</MudChip>
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info" title="Hoạt động">Hoạt động</MudChip>
                 </MudTd>
             }
             else
             {
                 <MudTd DataLabel="Email" Style="text-align:center;">
-                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error">Ngưng hoạt động</MudChip>
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Ngưng hoạt động">Ngưng hoạt động</MudChip>
                 </MudTd>
             }
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Đã xác thực">Đã xác thực</MudChip>
             </MudTd>
             <MudTd Style="text-align:center;">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))">Xoá</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))">Sửa</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+                @if (context.IsDeleted)
+                {
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt">Kích hoạt</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá">Xoá</MudButton>
+                }
+             
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa">Sửa</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem">Xem</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -63,9 +73,7 @@
 }
 else
 {
-
-
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
 <style>
     .my-custom-class {
@@ -80,7 +88,6 @@ else
     private List<UserInfView> lstUser = new List<UserInfView>();
 
     private UserUpdateView updateUserView = new UserUpdateView();
-    //
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -165,6 +172,41 @@ else
             parameters.Add("username", username);
             parameters.Add("user", updateView);
             nameDialog = "Cập nhật nhân viên";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+    //xem chi tiết
+    private async Task OpenDialogDetails(string username)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết nhân viên";
+        if (username != null)
+        {
+            _userView = lstUser.FirstOrDefault(c => c.UserName == username);
+            var updateView = new UserRegisterView()
+                {
+                    UserName = username,
+                    FullName = _userView.FullName,
+                    Address = _userView.Address,
+                    PhoneNumber = _userView.PhoneNumber,
+                    Email = _userView.Email,
+                };
+            parameters.Add("username", username);
+            parameters.Add("user", updateView);
         }
         DialogOptions options = new DialogOptions()
             {
