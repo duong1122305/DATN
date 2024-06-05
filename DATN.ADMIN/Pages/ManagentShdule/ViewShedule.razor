@@ -133,13 +133,13 @@ else
                 CloseButton = true,
                 FullWidth = true
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpSchdule>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-        }
+        // var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog, parameters, options);
+        // var result = await createUpdateDialog.Result;
+        // if (!result.Canceled)
+        // {
+        //     createUpdateDialog.Close();
+        //     await LoadData();
+        // }
     }
   
 } *@

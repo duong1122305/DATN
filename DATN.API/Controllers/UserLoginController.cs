@@ -163,21 +163,29 @@ namespace DATN.API.Controllers
         {
             return _userrepo.UpdateInformationUser(userUpdateView, id);
         }
+
+        //api tạo mới ca làm
         [HttpPost("Create-shift")]
         public async Task<ResponseData<string>> CreateShift(ShiftView shift)
         {
             return await _shiftManagement.CreateShift(shift);
         }
+
+        //api cập nhật ca làm
         [HttpPut("Update-shift")]
         public async Task<ResponseData<string>> UpdateShift(ShiftView shift, int id)
         {
             return await _shiftManagement.UpdateShift(shift, id);
         }
+
+        //api lấy ca làm
         [HttpGet("Get-List-Shift")]
         public async Task<ResponseData<List<Shift>>> GetListShift()
         {
             return await _shiftManagement.GetListShift();
         }
+
+        //api acitve lại trạng thái tài khoản từ xoá sang hoạt dộng
         [HttpGet("Active-user")]
         public async Task<ResponseData<string>> ActiveUser(string id)
         {
