@@ -46,7 +46,6 @@ namespace DATN.Aplication.System
                 {
                     if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
                     {
-
                         _user = userIdentity;
                         return new ResponseData<string>
                         {
@@ -108,7 +107,7 @@ namespace DATN.Aplication.System
             };
             var checkEmail = await _userManager.FindByEmailAsync(userRegisterView.Email);
             var checkPhone = await GetUserAtPhoneNumber(userIdentity.PhoneNumber);
-            if (checkEmail == null && checkPhone == null)
+            if (checkEmail == null && checkPhone.Data == null)
             {
                 var result = await _userManager.CreateAsync(userIdentity, userRegisterView.Password);
                 if (result.Succeeded)
@@ -123,11 +122,7 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = false, Error = "Tạo tài khoản không thành công" };
             }
             else
-            {
                 return new ResponseData<string> { IsSuccess = false, Error = "Thông tin tài khoản bị trùng với thông tin tài khoản đã có( Email or PhoneNumber )!!" };
-
-            }
-           
         }
 
         public async Task<ResponseMail> ForgotPassword(string username)
@@ -191,7 +186,7 @@ namespace DATN.Aplication.System
                 return new ResponseData<UserInfView> { IsSuccess = true, Data = userInfView };
             }
             else
-                return new ResponseData<UserInfView> { IsSuccess = true, Error = "Chưa có khách hàng nào đăng kí trên số điện thoại này" };
+                return new ResponseData<UserInfView> { IsSuccess = false, Error = "Chưa có khách hàng nào đăng kí trên số điện thoại này" };
         }
 
         public async Task<ResponseData<string>> UpdateInformationUser(UserRegisterView userRegisterView)

@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DATN.Aplication.System;
 using DATN.Data.EF;
 using DATN.Aplication.Services;
 using DATN.Aplication;
+using DATN.Aplication.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,12 +59,14 @@ builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
-
+builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
+builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
 
 
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(Program));
+
 
 var app = builder.Build();
 

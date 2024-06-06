@@ -1,13 +1,41 @@
-﻿@using DATN.ADMIN.Pages
-<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Login)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(Login)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using DATN.ADMIN.Pages
+@using System.Security.Claims
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
+                <Authorizing>
+                    <h3>Authorizing...</h3>
+                </Authorizing>
+                <NotAuthorized>
+                    <h3>Not authorized</h3>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <h3>Sorry, there's nothing at this address.</h3>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+@code {
+    [Inject]
+    protected IHttpContextAccessor httpContextAccessor { get; set; }
+    [Inject]
+    protected NavigationManager navigationManager { get; set; }
+    [Inject]
+    AuthenticationStateProvider authenticationStateProvider { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var key = httpContextAccessor.HttpContext.Session.GetString("key");
+        var identity = new ClaimsIdentity(key);
+        httpContextAccessor.HttpContext.User = new ClaimsPrincipal(identity);
+        var authState = httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+        if (!authState)
+        {
+            // Chuyển hướng đến trang đăng nhập
+            navigationManager.NavigateTo("/dangnhap");
+        }
+    }
+}
