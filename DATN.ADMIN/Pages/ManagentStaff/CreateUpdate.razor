@@ -29,7 +29,6 @@
     public string userName { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
-
     private bool display = false;
     [Inject]
     private IUserClientSev _client {get; set;}
@@ -46,9 +45,8 @@
     protected async Task Create()
     {
         //gọi api thêm
-        var result = await httpClient.PostAsJsonAsync<UserRegisterView>("api/UserLogin/User-Register", user);
-        bool val = result.IsSuccessStatusCode;
-        if (val)
+        var result = await _client.Register(user);
+        if (result.IsSuccess)
         {
             Message("Thêm mới thành công", Severity.Success);
             _dialogBox.Close(DialogResult.Ok(true));

@@ -12,5 +12,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> Login(UserLoginView user);
         Task<UserInfView> UpdateUser(UserInfView userInfView);
         Task<ResponseData<string>> activeUser(string id);
+        Task<ResponseData<string>> Register(UserRegisterView userRegisterView);
+
     }
 }

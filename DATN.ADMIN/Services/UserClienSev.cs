@@ -47,6 +47,12 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
+        public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
+        {
+            var respone= await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
+            var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
+            return result;
+        }
 
         public async Task<UserInfView> UpdateUser(UserInfView userInfView)
         {
