@@ -2,6 +2,7 @@
 using DATN.Aplication.Repository.IRepository;
 using DATN.Data.EF;
 using DATN.Data.Entities;
+using DATN.ViewModels.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,17 @@ namespace DATN.Aplication.Repository
               
             }
            
+        }
+
+        public async Task<bool> SoftDelete(DeleteRequest<Guid> request)
+        {
+            var result = await _context.Guests.FirstOrDefaultAsync(x => x.Id == request.ID);
+            if (result != null)
+            {
+                result.IsDeleted = result.IsDeleted;
+             
+            }
+            return false;
         }
     }
 }

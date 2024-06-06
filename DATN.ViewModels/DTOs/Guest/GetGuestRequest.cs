@@ -8,8 +8,5 @@ namespace DATN.ViewModels.DTOs.Guest
 {
     public class GetGuestRequest
     {
-        public int pageIndex { get; set; } = 1;
-        public int pageSize { get; set; } = 10;
-        public string? keyWord {  get; set; }
     }
 }
