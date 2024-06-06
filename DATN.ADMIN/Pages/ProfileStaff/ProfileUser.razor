@@ -1,5 +1,6 @@
 ﻿@page "/profileUser"
 @inherits LayoutComponentBase
+@using System.IdentityModel.Tokens.Jwt
 
 <PageTitle>Hồ Sơ Người Dùng</PageTitle>
 
@@ -22,5 +23,19 @@
     </MudItem>
 </MudGrid>
 @code{
+    [Inject]
+    HttpClient httpClient { get; set; }
     bool success=false;
+    HttpContextAccessor _contextAccessor;
+
+    private async Task DecodeToken(){
+        var token = _contextAccessor.HttpContext.Session.GetString("Key");
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+        var userIdClaims = jwtSecurityToken.Claims.FirstOrDefault(c => c.Type == "Name");
+
+        var response = await httpClient.GetAsync("api/Get-id-user");
+    }
 }

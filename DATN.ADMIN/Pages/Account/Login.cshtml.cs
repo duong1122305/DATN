@@ -53,7 +53,7 @@ namespace DATN.ADMIN.Pages.Account
                     }
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
                 }
