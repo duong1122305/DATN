@@ -1,16 +1,16 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
+using DATN.Aplication.CustomProvider;
 using DATN.Data.EF;
 using DATN.Data.Entities;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MudBlazor.Services;
+using Microsoft.JSInterop;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -52,11 +52,7 @@ builder.Services.AddIdentity<User, Role>(options =>
     .AddDefaultTokenProviders();
 
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Authenticated", policy =>
-        policy.RequireAuthenticatedUser());
-});
+builder.Services.AddAuthorization();
 
 
 builder.Services.AddSession(options =>
@@ -65,6 +61,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true; // Chỉ định cookie này là cần thiết
 });
+
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 var app = builder.Build();
 
@@ -76,6 +76,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+// ... (in the Configure method)
+app.UseResponseCaching();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

@@ -1,0 +1,26 @@
+﻿@page "/profileUser"
+@inherits LayoutComponentBase
+
+<PageTitle>Hồ Sơ Người Dùng</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="6">
+        <MudText Typo="Typo.h6" Class="p-4">Hồ sơ người dùng</MudText>
+        <MudPaper Class="pa-4">
+            <MudForm @bind-IsValid="@success">
+                <MudTextField T="string" Label="Tên người dùng" Required="true" RequiredError="Vui lòng không để trống!" />
+                <MudTextField T="string" Label="Họ và tên" Required="true" RequiredError="Vui lòng không để trống" />
+                <MudTextField T="string" Label="Mật khẩu" Required="true" RequiredError="Vui lòng không để trống" />
+                <MudTextField T="string" Label="Số điện thoại" Required="true" RequiredError="Vui lòng không để trống" />
+                <MudTextField T="string" Label="Email" Required="true" RequiredError="Vui lòng không để trống" />
+                <MudTextField T="string" Label="Địa chỉ" Required="true" RequiredError="Vui lòng không để trống" />
+                <div class="d-flex align-center justify-space-between pt-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Xác nhận</MudButton>
+                </div>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+@code{
+    bool success=false;
+}

@@ -61,6 +61,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
 builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
 builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
+builder.Services.AddScoped<IShiftManagementService, ShiftManagementService>();
 
 
 

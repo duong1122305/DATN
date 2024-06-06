@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="View\**" />
+    <Content Remove="View\**" />
+    <EmbeddedResource Remove="View\**" />
+    <None Remove="View\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\LoadingIndicator.razor" />
   </ItemGroup>
 
@@ -16,6 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.19">
       <PrivateAssets>all</PrivateAssets>
@@ -43,6 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DATN.Aplication\DATN.Aplication.csproj" />
     <ProjectReference Include="..\DATN.Data\DATN.Data.csproj" />
     <ProjectReference Include="..\DATN.ViewModels\DATN.ViewModels.csproj" />
   </ItemGroup>

@@ -1,10 +1,13 @@
 ﻿@page "/dangnhap"
-@model DATN.ADMIN.Pages.LoginModel
+@model LoginModel
+@using DATN.ADMIN.Pages
+@using DATN.ADMIN.Pages.Account
+@using DATN.Aplication.CustomProvider
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using DATN.Data.Entities
-@namespace DATN.ADMIN.Pages
+
 @inject HttpContextAccessor _contextAccessor
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
@@ -23,7 +26,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="text-center">
-                            <a href="/"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="width: 150px; height: 150px;"></a>
+                            <a href="/trangchu"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="width: 150px; height: 150px;"></a>
                         </div>
                         <div>
                             <form method="post">
@@ -31,22 +34,20 @@
                                 <!-- Email Address -->
                                 <div>
                                     <label class="form-label" for="email">Email</label>
-                                    <input class="form-control" id="email" name="email" value="binh" required="required" autofocus="autofocus">
+                                    <input class="form-control" id="email" name="email" value="binh123" required="required" autofocus="autofocus">
                                 </div>
                                 <!-- Password -->
                                 <div class="mt-4">
                                     <label class="form-label" for="password">Mật khẩu</label>
-                                    <input class="form-control" id="password" type="password" value="Binhkudo2003@@" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
+                                    <input class="form-control" id="password" type="password" value="Binh123@@" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
                                 </div>
 
                                 <!-- Remember Me -->
                                 <div class="mt-4">
                                     <div class="d-flex align-items-center justify-content-between mt-4">
                                         <label for="remember_me" class="d-inline-flex">
-                                            <input type="checkbox" name="remember" class="form-check-input">
-                                            <span class="ms-2">Nhớ thông tin</span>
                                         </label>
-                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" asp-page="ForGotPassword">Quên mật khẩu?</a>
+                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" style="text-decoration:none" href="/quenMatKhau">Quên mật khẩu?</a>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-center mt-4">

@@ -1,7 +1,8 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using DATN.Aplication.CustomProvider
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
-@using DATN.ADMIN.Pages
 @using System.Security.Claims
+@using System.IdentityModel.Tokens.Jwt
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -15,26 +16,34 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <h3>Sorry, there's nothing at this address.</h3>
+           <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
 @code {
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
+
+    [Inject]
+    CustomAuthenticationStateProvider authenticationStateProvider { get; set; }
+
     [Inject]
     protected NavigationManager navigationManager { get; set; }
-    [Inject]
-    AuthenticationStateProvider authenticationStateProvider { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        var key = httpContextAccessor.HttpContext.Session.GetString("key");
-        var identity = new ClaimsIdentity(key);
-        httpContextAccessor.HttpContext.User = new ClaimsPrincipal(identity);
-        var authState = httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
-        if (!authState)
+        var key = httpContextAccessor.HttpContext.Session.GetString("Key");
+        if (key != null)
         {
-            // Chuyển hướng đến trang đăng nhập
+            var authenState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (!authenState.User.Identity.IsAuthenticated)
+            {
+                navigationManager.NavigateTo("/dangnhap");
+            }
+        }
+        else
+        {
             navigationManager.NavigateTo("/dangnhap");
         }
     }
