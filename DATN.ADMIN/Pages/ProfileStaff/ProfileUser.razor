@@ -5,6 +5,7 @@
 @using DATN.ADMIN.Services
 @using DATN.ViewModels.DTOs.Authenticate
 @using System.Security.Claims
+@inject IDialogService _dialogservice;
 
 <PageTitle>Hồ Sơ Người Dùng</PageTitle>
 
@@ -15,12 +16,12 @@
             <MudForm @bind-IsValid="@success">
                 <MudTextField T="string" Label="Tên người dùng" @bind-Value="@user.UserName" Required="true" RequiredError="Vui lòng không để trống!" />
                 <MudTextField T="string" Label="Họ và tên" @bind-Value="@user.FullName" Required="true" RequiredError="Vui lòng không để trống" />
-                <MudTextField T="string" Label="Mật khẩu" @bind-Value="@user.Password" InputType="InputType.Password" Required="true" RequiredError="Vui lòng không để trống" />
                 <MudTextField T="string" Label="Số điện thoại" @bind-Value="@user.PhoneNumber" Required="true" RequiredError="Vui lòng không để trống" />
                 <MudTextField T="string" Label="Email" @bind-Value="@user.Email" Required="true" RequiredError="Vui lòng không để trống" />
                 <MudTextField T="string" Label="Địa chỉ" @bind-Value="@user.Address" Required="true" RequiredError="Vui lòng không để trống" />
                 <div class="d-flex align-center justify-space-between pt-2">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Xác nhận</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Class="ml-auto">Đổi mật khẩu</MudButton>
                 </div>
             </MudForm>
         </MudPaper>
@@ -39,6 +40,7 @@
     HttpContextAccessor _contextAccessor { get; set; }
 
     UserInfView user { get; set; } = new UserInfView();
+    List<UserInfView> lstUser { get; set; } = new List<UserInfView>();
 
     bool success = false;
     private string id = "";
@@ -62,5 +64,31 @@
         if (result != null) user = result.Data;
 
         if (result == null) navi.NavigateTo("/NotFound");
+    }
+    // mở popup
+    private async Task OpenDialog(string username)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Thay đổi mật khẩu";
+            // user = lstUser.FirstOrDefault(c => c.UserName == username);
+            // var updateView = new UserRegisterView()
+            //     {
+            //         UserName = username,
+            //         Password = user.Password,
+            //     };
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<UpdatePassword>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+        }
     }
 }
