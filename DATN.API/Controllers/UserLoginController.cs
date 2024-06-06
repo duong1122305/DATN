@@ -70,7 +70,7 @@ namespace DATN.API.Controllers
         }
 
         //api thêm ca cho nhân viên
-        [HttpPost("test_them_ca_cho_1_thang")]
+        [HttpGet("test_them_ca_cho_1_thang")]
         public async Task<ResponseData<string>> Test()
         {
             var result = await _worshiftmanagement.InsertWorkShiftNextMonthCompareCurrentMonth();

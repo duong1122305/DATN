@@ -6,6 +6,7 @@
 @using DATN.ViewModels.DTOs.Authenticate
 @using Newtonsoft.Json
 <EditForm Model="@shiftView">
+   <DataAnnotationsValidator/>
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
@@ -23,7 +24,7 @@
 
 @code {
     [Parameter]
-    public int idShift { get; set; }
+    public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
 
@@ -31,10 +32,9 @@
     //đây là thêm mới
     [Parameter]
     public ShiftView shiftView { get; set; } = new ShiftView();
-
     protected async override Task OnInitializedAsync()
     {
-        if (idShift != 0)
+        if (id != 0)
         {
             _nameButton = "Cập nhật";
         }
@@ -87,7 +87,7 @@
     }
     private async Task Submid()
     {
-        if (idShift != 0)
+        if (id != 0)
         {
             await Update();
         }
