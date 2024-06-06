@@ -25,20 +25,18 @@ namespace DATN.ADMIN.Services
             return repon;
         }
 
-        public async Task<ResponseData<UserInfView>> GetById(Guid id)
+        public async Task<ResponseData<string>> GetById(string id)
         {
-            return await _client.GetFromJsonAsync<ResponseData<UserInfView>>($"api/UserLogin/{id}");
+          var id2 =  await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+          return id2;
         }
 
         public async Task<ResponseData<string>> Login(UserLoginView user)
         {
             var response = await _client.PostAsJsonAsync("api/UserLogin/User-Login", user);
             var result = await response.Content.ReadFromJsonAsync<ResponseData<string>>();
-
             return result;
-
         }
-
 
         public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         {

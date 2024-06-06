@@ -1,24 +1,20 @@
-﻿@* @inject ISnackbar Snackbar
+﻿@inject ISnackbar Snackbar
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
+@using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-<EditForm>
+<EditForm Model="@user">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" Label="Họ tên" z />
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
                 <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
                 <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
-                <MudSelect T="Pizza" Label="Pizza" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@(new Pizza("Cardinale"))" />
-                    <MudSelectItem Value="@(new Pizza("Diavolo"))" />
-                    <MudSelectItem Value="@(new Pizza("Margarita"))" />
-                    <MudSelectItem Value="@(new Pizza("Spinaci"))" />
-                </MudSelect>
+                <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" InputType="InputType.Password"/>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -35,9 +31,11 @@
     private string _nameButton = "Thêm mới";
 
     private bool display = false;
+    [Inject]
+    private IUserClientSev _client {get; set;}
     //nó đây
     [Parameter]
-    public List<Shift> lstShift { get; set; } = new List<Shift>();
+    public UserRegisterView user { get; set; } = new UserRegisterView();
 
     protected async override Task OnInitializedAsync()
     {
@@ -125,4 +123,4 @@
         Snackbar.Add(message, severity);
     }
     bool success = false;
-} *@
+} 
