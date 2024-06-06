@@ -26,7 +26,7 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="STT" Style="text-align:center;">
-                @(lstShift.IndexOf(context) + 1)
+               @context.Id
             </MudTd>
             <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
             <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
@@ -104,16 +104,6 @@ else
         Snackbar.Add(message, severity);
     }
 
-    // thông báo
-    private async Task<bool?> Confirm()
-    {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận xóa ca làm?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-        StateHasChanged();
-        return confirm;
-    }
 
     private async Task OpenDialog(int? id)
     {
@@ -121,17 +111,17 @@ else
         string nameDialog = "Thêm mới ca làm";
         if (id != null)
         {
-          var view = lstShift.FirstOrDefault(c => c.Id == id);
+            var view = lstShift.FirstOrDefault(c => c.Id == id);
             var updateView = new ShiftView()
                 {
                     Name = view.Name,
                     From = view.From.Hours,
                     To = view.To.Hours,
                 };
-            // parameters.Add("Id", id);
-            parameters.Add("Id", id);
+            parameters.Add("shiftview", updateView);
             nameDialog = "Cập nhật ca làm";
         }
+        parameters.Add("id", id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -140,7 +130,7 @@ else
                 CloseButton = true,
                 FullWidth = true
             };
-       try
+        try
         {
             var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
@@ -148,6 +138,7 @@ else
             {
                 createUpdateDialog.Close();
                 await LoadData();
+                await OnInitializedAsync();
             }
         }
         catch (Exception)
