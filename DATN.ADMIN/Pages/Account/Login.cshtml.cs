@@ -1,4 +1,4 @@
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.Aplication.CustomProvider;
 using DATN.Data.Entities;
@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Reflection.Metadata;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.ADMIN.Pages.Account
 {
@@ -24,6 +26,8 @@ namespace DATN.ADMIN.Pages.Account
         [BindProperty]
         public string password { get; set; }
         HttpContextAccessor _contextAccessor;
+        public string ErrorMessage { get; set; }
+
         public LoginModel(IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
         {
             _userClienSev = userClientSev;
@@ -59,5 +63,6 @@ namespace DATN.ADMIN.Pages.Account
                 }
             }
         }
+
     }
 }

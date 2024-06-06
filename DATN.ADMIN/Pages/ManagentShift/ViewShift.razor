@@ -32,8 +32,8 @@
             <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
             <MudTd DataLabel="To" Style="text-align:center;">@context.To</MudTd>
             <MudTd Style="text-align:center;">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))">Sửa</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary" OnClick="@(async()=> await OpenDialog(context.Id))">Xem</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Edit" IconSize="Size.Large" IconColor="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))"></MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconSize="Size.Large" IconColor="Color.Info" OnClick="@(async()=> await OpenDialog(context.Id))"></MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>

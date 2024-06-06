@@ -35,9 +35,14 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> GetById(string id)
         {
-          var respone =  await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+          return await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+        }
+
+        public async Task<ResponseData<string>> GetByIdRemove(string id)
+        {
+            var respone = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
             var result = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={respone.Data}");
-          return result;
+            return result;
         }
 
         public async Task<ResponseData<string>> Login(UserLoginView user)
