@@ -185,7 +185,7 @@ namespace DATN.API.Controllers
             return await _shiftManagement.GetListShift();
         }
 
-        //api acitve lại trạng thái tài khoản từ xoá sang hoạt dộng
+        //api acitve lại trạng thái tài khoản từ ngừng hoạt động sang hoạt dộng
         [HttpGet("Active-user")]
         public async Task<ResponseData<string>> ActiveUser(string id)
         {

@@ -52,15 +52,16 @@
             <MudTd Style="text-align:center;">
                 @if (context.IsDeleted)
                 {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt">Active</MudButton>
+                    <MudButton IconSize="Size.Large" IconColor="Color.Success" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.UserName))" Style="margin-right: 5px"></MudButton>
                 }
                 else
                 {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá">Xoá</MudButton>
+                    <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá" Style="margin-right: 5px"></MudButton>
                 }
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa">Sửa</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa" Style="margin-right: 5px"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết" Style="margin-right: 5px"></MudButton>
             </MudTd>
+
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -128,27 +129,30 @@ else
     {
         if (await Confirm() == true)
         {
-            // var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
             var response2 = await _client.GetById(userName);
             if (response2.IsSuccess)
             {
-                // var id = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={response2.Data}");
-                // var respone = await _client.statusUser(id);
-                if (response2.IsSuccess)
-                {
-                    Message($"Đã xoá nhân viên{userName}", Severity.Success);
-                    await LoadData();
-                }
-                else
-                {
-                    Message("Xoá thất bại", Severity.Error);
-
-                }
+                Message($"Đã xoá nhân viên{userName}", Severity.Success);
+                await LoadData();
             }
             else
             {
-                Message("Bạn đã huỷ thao tác xoá", Severity.Error);
+                Message("Không tìm thấy nhân viên", Severity.Error);
             }
+        }
+    }
+
+    private async Task activeAc(string username)
+    {
+        var repon = await _client.activeUser(username);
+        if (repon.IsSuccess)
+        {
+            Message("Đã kích hoạt trạng thái", Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            Message("Chưa kích hoạt", Severity.Success);
         }
     }
 
