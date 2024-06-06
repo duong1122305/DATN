@@ -26,7 +26,6 @@ namespace DATN.ADMIN.Pages.Account
         [BindProperty]
         public string password { get; set; }
         HttpContextAccessor _contextAccessor;
-        public string ErrorMessage { get; set; }
 
         public LoginModel(IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
         {
@@ -55,11 +54,17 @@ namespace DATN.ADMIN.Pages.Account
                         _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
                         _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
                     }
-
+                    else if(checkLogin.Error != null)
+                    {
+                        TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
+                        Page();
+                    }
                 }
                 catch (Exception e)
                 {
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                    TempData["Error"] = "Đã xảy ra lỗi khi đăng nhập.";
+                    Redirect("~/dangnhap");
+                    //_contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
                 }
             }
         }
