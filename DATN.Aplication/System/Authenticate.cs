@@ -382,16 +382,16 @@ namespace DATN.Aplication.System
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Chưa kích hoạt được" };
         }
-        public async Task<ResponseData<UserInfView>> GetInfByToken()
+        public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
             try
             {
-                var key = _httpContextAccessor.HttpContext.Session.GetString("Key");
-                JwtSecurityTokenHandler jwtSecurityToken = new JwtSecurityTokenHandler();
-                var token = jwtSecurityToken.ReadJwtToken(key);
-                var claims = token.Claims;
-                var claimsIdentity = new ClaimsIdentity(claims, "JwtBearer");
-                var user = await _userManager.FindByIdAsync(claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                //var key = _httpContextAccessor.HttpContext.Session.GetString("Key");
+                //JwtSecurityTokenHandler jwtSecurityToken = new JwtSecurityTokenHandler();
+                //var token = jwtSecurityToken.ReadJwtToken(key);
+                //var claims = token.Claims;
+                //var claimsIdentity = new ClaimsIdentity(claims, "JwtBearer");
+                var user = await _userManager.FindByIdAsync(id);
                 var userinf = new UserInfView()
                 {
                     UserName = user.UserName,

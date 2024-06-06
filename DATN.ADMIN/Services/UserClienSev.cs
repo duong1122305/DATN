@@ -39,6 +39,11 @@ namespace DATN.ADMIN.Services
 
         }
 
+        public async Task<ResponseData<UserInfView>> GetInfoUser(string id)
+        {
+            var response = await _client.GetFromJsonAsync<ResponseData<UserInfView>>($"api/UserLogin/Get-user-inf-by-token/{id}");
+            return response;
+        }
 
         public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         {

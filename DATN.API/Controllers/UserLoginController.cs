@@ -191,10 +191,10 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ActiveAccount(id);
         }
-        [HttpGet("Get-user-inf-by-token")]
-        public async Task<ResponseData<UserInfView>> GetInfByToken()
+        [HttpGet("Get-user-inf-by-token/{id}")]
+        public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
-            return await _userrepo.GetInfByToken();
+            return await _userrepo.GetInfByToken(id);
         }
     }
 }
