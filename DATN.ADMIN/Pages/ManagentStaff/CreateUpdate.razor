@@ -3,6 +3,7 @@
 @inject HttpClient httpClient
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using Newtonsoft.Json
 <EditForm Model="@user">
     <MudItem xs="12" sm="12">
         <MudCard>
@@ -55,15 +56,15 @@
     {
         //gọi api thêm
         var result = await httpClient.PostAsJsonAsync<UserRegisterView>("api/UserLogin/User-Register", user);
-        bool val = result.IsSuccessStatusCode;
-        if (val)
+        var val = JsonConvert.DeserializeObject<ResponseData<string>>(await result.Content.ReadAsStringAsync());
+        if (val.IsSuccess)
         {
-            Message("Thêm mới thành công", Severity.Success);
+            Message(val.Data, Severity.Success);
             _dialogBox.Close(DialogResult.Ok(true));
         }
         else
         {
-            Message("Thêm mới thất bại", Severity.Error);
+            Message(val.Error, Severity.Error);
         }
     }
     //thông báo xác nhận
@@ -82,16 +83,22 @@
         if (await Confirm() == true)
         {
             var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
-            var result = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={response.Data}", user);
-            if (result.IsSuccessStatusCode)
+            if (response.IsSuccess)
             {
-                Message("Cập nhật thành công", Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
+                var result = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={response.Data}", user);
+                var val = JsonConvert.DeserializeObject<ResponseData<string>>(await result.Content.ReadAsStringAsync());
+
+                if (val.IsSuccess)
+                {
+                    Message(val.Data, Severity.Success);
+                    _dialogBox.Close(DialogResult.Ok(true));
+                }
+                else
+                {
+                    Message(val.Error, Severity.Error);
+                }
             }
-            else
-            {
-                Message("Cập nhật thất bại", Severity.Error);
-            }
+
         }
     }
     private async Task Submid()

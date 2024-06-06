@@ -114,7 +114,7 @@ namespace DATN.API.Controllers
             var result = await _employeeSchedule.GetScheduleFromMonthToMonth(view);
             return result;
         }
-        
+
         //api xoá chuyển trạng thái của nhân viên
         [HttpGet("remove")]
         public async Task<ResponseData<string>> RemoveEmployee(string id)
@@ -191,5 +191,11 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ActiveAccount(id);
         }
+        [HttpGet("Get-user-inf-by-token")]
+        public async Task<ResponseData<UserInfView>> GetInfByToken()
+        {
+            return await _userrepo.GetInfByToken();
+        }
+
     }
 }

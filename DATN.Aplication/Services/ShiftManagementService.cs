@@ -23,16 +23,23 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var shiftIden = new Shift()
+                if (shift.From > shift.To)
                 {
-                    Id = 0,
-                    Name = shift.Name,
-                    From = new TimeSpan(shift.From, 0, 0),
-                    To = new TimeSpan(shift.To, 0, 0),
-                };
-                await _unitOfWork.ShiftRepository.AddAsync(shiftIden);
-                await _unitOfWork.SaveChangeAsync();
-                return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giờ bắt đầu phải nhỏ hơn giờ kết thúc!" };
+                }
+                else
+                {
+                    var shiftIden = new Shift()
+                    {
+                        Id = 0,
+                        Name = shift.Name,
+                        From = new TimeSpan(shift.From, 0, 0),
+                        To = new TimeSpan(shift.To, 0, 0),
+                    };
+                    await _unitOfWork.ShiftRepository.AddAsync(shiftIden);
+                    await _unitOfWork.SaveChangeAsync();
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công" };
+                }
             }
             catch (Exception e)
             {
@@ -55,20 +62,27 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
-                            where shifttable.Id == id
-                            select shifttable;
-                var shifts = query.FirstOrDefault();
-                if (query.Count() > 0)
+                if (shift.From > shift.To)
                 {
-                    shifts.From = new TimeSpan(shift.From, 0, 0);
-                    shifts.To = new TimeSpan(shift.To, 0, 0);
-                    shifts.Name = shift.Name;
-                    await _unitOfWork.ShiftRepository.UpdateAsync(shifts);
-                    await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giờ bắt đầu phải nhỏ hơn giờ kết thúc!" };
                 }
-                return new ResponseData<string> { IsSuccess = false, Error = "Không có id ca làm này" };
+                else
+                {
+                    var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                where shifttable.Id == id
+                                select shifttable;
+                    var shifts = query.FirstOrDefault();
+                    if (query.Count() > 0)
+                    {
+                        shifts.From = new TimeSpan(shift.From, 0, 0);
+                        shifts.To = new TimeSpan(shift.To, 0, 0);
+                        shifts.Name = shift.Name;
+                        await _unitOfWork.ShiftRepository.UpdateAsync(shifts);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công" };
+                    }
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có id ca làm này" };
+                }
             }
             catch (Exception e)
             {
