@@ -10,11 +10,17 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
-                <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
+                    @if (userName == null)
+                {
+                    <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" />
+                }
                 <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
-                <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" InputType="InputType.Password"/>
+                    @if (userName == null)
+                {
+                    <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" />
+                }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -29,16 +35,20 @@
     public string userName { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
-    private bool display = false;
     [Inject]
     private IUserClientSev _client {get; set;}
     //nó đây
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
 
+    UserUpdateView view = new UserUpdateView();
+
     protected async override Task OnInitializedAsync()
     {
-
+        if (userName!= null)
+        {
+            _nameButton = "Cập nhật";
+        }
     }
 
     //thêm
@@ -48,12 +58,12 @@
         var result = await _client.Register(user);
         if (result.IsSuccess)
         {
-            Message("Thêm mới thành công", Severity.Success);
+            Message(result.Data, Severity.Success);
             _dialogBox.Close(DialogResult.Ok(true));
         }
         else
         {
-            Message("Thêm mới thất bại", Severity.Error);
+            Message(result.Error, Severity.Error);
         }
     }
     //thông báo xác nhận
@@ -71,16 +81,19 @@
     {
         if (await Confirm() == true)
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
-            var result = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={response.Data}", user);
-            if (result.IsSuccessStatusCode)
+            view.FullName = user.FullName;
+            view.Address = user.Address;
+            view.PhoneNumber = user.PhoneNumber;
+            view.Email = user.Email;
+            var result = await _client.UpdateUser(view,userName);
+            if (result.IsSuccess)
             {
-                Message("Cập nhật thành công", Severity.Success);
+                Message(result.Data, Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message("Cập nhật thất bại", Severity.Error);
+                Message(result.Error, Severity.Error);
             }
         }
     }
@@ -88,26 +101,26 @@
     {
         if (user.Password != null)
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={user.UserName}");
+            var response = await _client.GetById(userName);
             if (response.Data == null)
             {
                 await Create();
             }
             else
             {
-                Message("UserName bị trùng", Severity.Warning);
+                Message("Tài khoản đã đăng ký!", Severity.Warning);
             }
         }
         else
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
+            var response = await _client.GetById(userName);
             if (response.IsSuccess)
             {
                 await Update();
             }
             else
             {
-                Message("chưa biết", Severity.Warning);
+                Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
             }
         }
         StateHasChanged();

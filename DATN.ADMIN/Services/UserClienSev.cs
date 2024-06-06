@@ -54,11 +54,12 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
-        public async Task<UserInfView> UpdateUser(UserInfView userInfView)
+        public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id)
         {
-            var response = await _client.PutAsJsonAsync("api/UserLogin", userInfView);
-            return await response.Content.ReadFromJsonAsync<UserInfView>();
+            var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+            var respone =  await _client.PutAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
+            var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
+            return result;
         }
-
     }
 }
