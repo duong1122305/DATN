@@ -11,11 +11,11 @@
 <PageTitle>Danh sách nhân viên</PageTitle>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
-<MudSelect T="string" Label="Ca làm" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
+<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
     @foreach (var item in lstShift)
     {
-        <MudSelectItem Value="item">@item.Name</MudSelectItem>
+        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
     }
 </MudSelect>
 @if (lstUser.Count > 0 && lstUser != null)
@@ -102,10 +102,12 @@ else
 
     private bool IsAnyUserSelected => selectedUsers.Any(selected => selected);
     private List<Shift> lstShift = new List<Shift>();
-    private Shift shift = new Shift();
+    private Shift shift { get; set; }
 
     //lưu trạng thái của từng nhân viên khi ấn checkbox
     private List<bool> selectedUsers = new List<bool>();
+    private int selectedShiftId;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,6 +122,7 @@ else
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
+
     }
 
 
@@ -248,24 +251,54 @@ else
             await LoadData();
         }
     }
+    private void HandleShiftChange(ChangeEventArgs e)
+    {
+        // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
+        selectedShiftId = Convert.ToInt32(e.Value);
+    }
     //thêm nhân viên vào ca làm
     private async Task AddToShift()
     {
         var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
         var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
-        var selectedShiftId = shift.Id;
+        var selectedShiftId = this.selectedShiftId;
         // Xử lý logic để thêm selectedUsers vào một ca làm
         var listIdUser = new List<string>();
-        if (selectedUser1s.Count > 0 && selectedUser1s != null)
+        if (await Confirm2()== true)
         {
-            foreach (var user2 in selectedUser1s)
+            // nứng à
+            if (selectedUser1s.Count > 0 && selectedUser1s != null)
             {
-                var idUser = await _client.GetById(user2.UserName);
-                listIdUser.Add(idUser.Data);
+                foreach (var user2 in selectedUser1s)
+                {
+                    var idUser = await _client.GetById(user2.UserName);
+                    listIdUser.Add(idUser.Data);
+                }
+                var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
+                Message(repo.Data, Severity.Success);
+                await LoadData();
             }
-            var repo = _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
+            else
+            {
+                Message("Thêm hông thành công", Severity.Error);
+            }
+        }
+        else
+        {
+            Message("Lỗi không xác định!!", Severity.Warning);
+
         }
 
+    }
+    //hỏi trước khi thêm
+    private async Task<bool?> Confirm2()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận thêm ca cho nhân viên?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
     }
 
     //messenge
@@ -275,8 +308,4 @@ else
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
-
-
-
-
 }
