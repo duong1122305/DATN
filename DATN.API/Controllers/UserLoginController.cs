@@ -70,7 +70,7 @@ namespace DATN.API.Controllers
         }
 
         //api thêm ca cho nhân viên
-        [HttpGet("test_them_ca_cho_1_thang")]
+        [HttpGet("them-ca-for-all-staff")]
         public async Task<ResponseData<string>> Test()
         {
             var result = await _worshiftmanagement.InsertWorkShiftNextMonthCompareCurrentMonth();
@@ -78,7 +78,7 @@ namespace DATN.API.Controllers
         }
 
         //api thêm ca cho nhân vêin
-        [HttpPost("test_them_ca_cho_nhanvien_1thang")]
+        [HttpPost("them-ca-one-staff")]
         public async Task<ResponseData<string>> Test1(List<string> listUser, int shift)
         {
             var result = await _employeeSchedule.InsertEmployeeNextMonthCompareCurrentMonth(listUser, shift);
@@ -93,7 +93,7 @@ namespace DATN.API.Controllers
             return result;
         }
         //api lấy ca theo id
-        [HttpGet("get-all-1-ca")]
+        [HttpGet("find-ca-by-id")]
         public async Task<ResponseData<List<ScheduleView>>> GetAllCa(int ca)
         {
             var result = await _employeeSchedule.GetScheduleForShift(ca);
@@ -101,7 +101,7 @@ namespace DATN.API.Controllers
         }
 
         //api lấy tất cả danh sách lịch làm việc của nhân viên
-        [HttpGet("get-all")]
+        [HttpGet("get-all-ca-lam")]
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var result = await _employeeSchedule.GetAll();
@@ -185,7 +185,7 @@ namespace DATN.API.Controllers
             return await _shiftManagement.GetListShift();
         }
 
-        //api acitve lại trạng thái tài khoản từ xoá sang hoạt dộng
+        //api acitve lại trạng thái tài khoản từ ngừng hoạt động sang hoạt dộng
         [HttpGet("Active-user")]
         public async Task<ResponseData<string>> ActiveUser(string id)
         {

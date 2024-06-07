@@ -9,6 +9,7 @@
 @using DATN.Data.Entities
 
 @inject HttpContextAccessor _contextAccessor
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
 <html lang="en">
@@ -31,16 +32,22 @@
                         <div>
                             <form method="post">
                                 <input type="hidden">
-                                <!-- Email Address -->
+                               <!-- Email Address -->
                                 <div>
                                     <label class="form-label" for="email">Email</label>
-                                    <input class="form-control" id="email" name="email" value="binh123" required="required" autofocus="autofocus">
+                                    <input class="form-control"  id="email" value="binh1234" name="email" required="required" autofocus="autofocus">
                                 </div>
                                 <!-- Password -->
                                 <div class="mt-4">
                                     <label class="form-label" for="password">Mật khẩu</label>
                                     <input class="form-control" id="password" type="password" value="Binh123@@" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
-                                </div>
+                                    <div style="padding-top: 10px">
+                                        @if (TempData["Error"] != null)
+                                        {
+                                            <div class="alert alert-danger" style="margin-top=5px">@TempData["Error"]</div>
+                                        }
+                                    </div>
+                                </div> 
 
                                 <!-- Remember Me -->
                                 <div class="mt-4">

@@ -1,25 +1,23 @@
-﻿@* @inject ISnackbar Snackbar
+﻿@inject ISnackbar Snackbar
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
+@using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-@using Newtonsoft.Json
 <EditForm Model="@user">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" Label="Họ tên" z />
-                <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" Disabled="display" />
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
+                    <MudTextField T="string" @bind-Value="user.UserName" Label="Tên đăng nhập" For="@(() => user.UserName)" />
                 <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
-                <MudSelect T="Pizza" Label="Pizza" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@(new Pizza("Cardinale"))" />
-                    <MudSelectItem Value="@(new Pizza("Diavolo"))" />
-                    <MudSelectItem Value="@(new Pizza("Margarita"))" />
-                    <MudSelectItem Value="@(new Pizza("Spinaci"))" />
-                </MudSelect>
+                    @if (userName == null)
+                {
+                    <MudTextField T="string" @bind-Value="user.Password" Label="Mật khẩu" For="@(() => user.Password)" />
+                }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -34,31 +32,35 @@
     public string userName { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
-
-    private bool display = false;
+    [Inject]
+    private IUserClientSev _client {get; set;}
     //nó đây
     [Parameter]
-    public List<Shift> lstShift { get; set; } = new List<Shift>();
+    public UserRegisterView user { get; set; } = new UserRegisterView();
+
+    UserUpdateView view = new UserUpdateView();
 
     protected async override Task OnInitializedAsync()
     {
-
+        if (userName!= null)
+        {
+            _nameButton = "Cập nhật";
+        }
     }
 
     //thêm
     protected async Task Create()
     {
         //gọi api thêm
-        var result = await httpClient.PostAsJsonAsync<UserRegisterView>("api/UserLogin/User-Register", user);
-        var val = JsonConvert.DeserializeObject<ResponseData<string>>(await result.Content.ReadAsStringAsync());
-        if (val.IsSuccess)
+        var result = await _client.Register(user);
+        if (result.IsSuccess)
         {
-            Message(val.Data, Severity.Success);
+            Message(result.Data, Severity.Success);
             _dialogBox.Close(DialogResult.Ok(true));
         }
         else
         {
-            Message(val.Error, Severity.Error);
+            Message(result.Error, Severity.Error);
         }
     }
     //thông báo xác nhận
@@ -76,21 +78,19 @@
     {
         if (await Confirm() == true)
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
-            if (response.IsSuccess)
+            view.FullName = user.FullName;
+            view.Address = user.Address;
+            view.PhoneNumber = user.PhoneNumber;
+            view.Email = user.Email;
+            var result = await _client.UpdateUser(view,userName);
+            if (result.IsSuccess)
             {
-                var result = await httpClient.PutAsJsonAsync<UserRegisterView>($"api/UserLogin/Update-inf?id={response.Data}", user);
-                var val = JsonConvert.DeserializeObject<ResponseData<string>>(await result.Content.ReadAsStringAsync());
-
-                if (val.IsSuccess)
-                {
-                    Message(val.Data, Severity.Success);
-                    _dialogBox.Close(DialogResult.Ok(true));
-                }
-                else
-                {
-                    Message(val.Error, Severity.Error);
-                }
+                Message(result.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
             }
 
         }
@@ -99,26 +99,26 @@
     {
         if (user.Password != null)
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={user.UserName}");
+            var response = await _client.GetById(userName);
             if (response.Data == null)
             {
                 await Create();
             }
             else
             {
-                Message("UserName bị trùng", Severity.Warning);
+                Message("Tài khoản đã đăng ký!", Severity.Warning);
             }
         }
         else
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
+            var response = await _client.GetById(userName);
             if (response.IsSuccess)
             {
                 await Update();
             }
             else
             {
-                Message("chưa biết", Severity.Warning);
+                Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
             }
         }
         StateHasChanged();
@@ -132,4 +132,4 @@
         Snackbar.Add(message, severity);
     }
     bool success = false;
-} *@
+} 

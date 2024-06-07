@@ -1,4 +1,4 @@
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.Aplication.CustomProvider;
 using DATN.Data.Entities;
@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Reflection.Metadata;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.ADMIN.Pages.Account
 {
@@ -24,6 +26,7 @@ namespace DATN.ADMIN.Pages.Account
         [BindProperty]
         public string password { get; set; }
         HttpContextAccessor _contextAccessor;
+
         public LoginModel(IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
         {
             _userClienSev = userClientSev;
@@ -51,13 +54,20 @@ namespace DATN.ADMIN.Pages.Account
                         _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
                         _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
                     }
-
+                    else if (checkLogin.Error != null)
+                    {
+                        TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
+                        Page();
+                    }
                 }
                 catch (Exception e)
                 {
-                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                    TempData["Error"] = "Đã xảy ra lỗi khi đăng nhập.";
+                    Redirect("~/dangnhap");
+                    //_contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
                 }
             }
         }
+
     }
 }
