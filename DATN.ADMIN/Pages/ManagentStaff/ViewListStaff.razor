@@ -28,13 +28,13 @@
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;">Chọn</MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;">Trạng thái</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh> 
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Checkbox" Style="text-align:center;">

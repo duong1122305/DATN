@@ -18,7 +18,7 @@
             <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;">STT</MudTh>
             <MudTh Style="text-align:center;">Ca làm</MudTh>
             <MudTh Style="text-align:center;">Từ</MudTh>
             <MudTh Style="text-align:center;">Đến</MudTh>
@@ -26,7 +26,7 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="STT" Style="text-align:center;">
-               @context.Id
+                @(lstShift.IndexOf(context) + 1)
             </MudTd>
             <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
             <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
@@ -43,8 +43,9 @@
 }
 else
 {
-    <div style="justify-content:center; justify-items:center">
+        <div style="justify-content:center; justify-items:center">
         <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        
     </div>
 }
 
@@ -81,7 +82,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+            await LoadData();
     }
 
     private bool FilterFunc1(Shift element) => FilterFunc(element, searchString1);
@@ -118,8 +119,7 @@ else
                     From = view.From.Hours,
                     To = view.To.Hours,
                 };
-            // parameters.Add("Id", id);
-            parameters.Add("idShift", id);
+            parameters.Add("id", id);
             parameters.Add("shiftView", updateView);
             nameDialog = "Cập nhật ca làm";
         }
