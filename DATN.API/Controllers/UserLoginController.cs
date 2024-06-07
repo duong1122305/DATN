@@ -53,6 +53,14 @@ namespace DATN.API.Controllers
             return result;
         }
 
+        //change password
+        [HttpPut("changePassword")]
+        public async Task<ResponseData<string>> ChangePassword(UserChangePasswordView changePasswordView)
+        {
+            var result = await _userrepo.ChangePassword(changePasswordView);
+            return result;
+        }
+
         //api lấy danh sách tài khoản nhân viên
         [HttpGet("List-User")]
         public async Task<ResponseData<List<UserInfView>>> GetUsers()
