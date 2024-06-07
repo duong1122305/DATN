@@ -27,6 +27,12 @@ namespace DATN.ADMIN.Services
             return repon;
         }
 
+        public async Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift)
+        {
+            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/them-ca-one-staff?shift={idShift}", lstStaff);
+            return await lst.Content.ReadFromJsonAsync<ResponseData<string>>();
+        }
+
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
