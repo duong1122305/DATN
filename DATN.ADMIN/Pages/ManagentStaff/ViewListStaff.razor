@@ -13,17 +13,17 @@
 
 @if (lstUser.Count > 0 && lstUser != null )
 {
-    <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc1)">
+    <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc)">
         <ToolBarContent>
             
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">ID</MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
-            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;">Trạng thái</MudTh>
@@ -61,7 +61,6 @@
                 <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa" Style="margin-right: 5px"></MudButton>
                 <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết" Style="margin-right: 5px"></MudButton>
             </MudTd>
-
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -80,7 +79,7 @@ else
 @code {
     //button trạng thái
     private bool _disableElevation = false;
-    private string searchString1 = "";
+    private string searchString = "";
     private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
     [Inject]
@@ -98,17 +97,14 @@ else
         lstUser = user.Data;
     }
 
-    private bool FilterFunc1(UserInfView element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(UserInfView element, string searchString)
+    private bool FilterFunc(UserInfView element)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.Email} {element.Position} {element.PhoneNumber}".Contains(searchString))
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString,StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase) )
             return true;
         return false;
     }
