@@ -2,6 +2,7 @@
 @using System.Net.Http.Json
 @using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
+@using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @inject HttpClient httpClient
@@ -10,14 +11,18 @@
 <PageTitle>Danh sách nhân viên</PageTitle>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
-<div class="m-2">
-
-</div>
-@if (lstUser.Count > 0 && lstUser != null )
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
+<MudSelect T="string" Label="Ca làm" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
+    @foreach (var item in lstShift)
+    {
+        <MudSelectItem Value="@item.Name" style="width:100px; margin-bottom: 10px;">@item.Name</MudSelectItem>
+    }
+</MudSelect>
+@if (lstUser.Count > 0 && lstUser != null)
 {
     <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc)">
         <ToolBarContent>
-            
+
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
@@ -32,8 +37,15 @@
             <MudTh Style="text-align:center;">Hành động</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="STT" Style="text-align:center;">
-                @(lstUser.IndexOf(context) + 1)
+            <MudTd DataLabel="Checkbox" Style="text-align:center;">
+                @if (!context.IsDeleted)
+                {
+                    <MudCheckBox @bind-Checked="selectedUsers[lstUser.IndexOf(context)]" />
+                }
+                else
+                {
+                    <MudCheckBox Disabled="@true" Checked="@false" />
+                }
             </MudTd>
             <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
             <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
@@ -71,7 +83,7 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 <style>
     .my-custom-class {
@@ -87,6 +99,14 @@ else
     [Inject]
     private IUserClientSev _client { get; set; }
     private UserUpdateView updateUserView = new UserUpdateView();
+
+    private bool IsAnyUserSelected => selectedUsers.Any(selected => selected);
+    private List<Shift> lstShift = new List<Shift>();
+    private Shift shift = new Shift();
+
+    //lưu trạng thái của từng nhân viên khi ấn checkbox
+    private List<bool> selectedUsers = new List<bool>();
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -97,6 +117,9 @@ else
     {
         var user = await _client.GetAll();
         lstUser = user.Data;
+        selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
+        var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
+        lstShift = shift.Data;
     }
 
 
@@ -106,7 +129,7 @@ else
             return true;
         if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString,StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase) )
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
@@ -224,6 +247,18 @@ else
             createUpdateDialog.Close();
             await LoadData();
         }
+    }
+    //thêm nhân viên vào ca làm
+    private async Task AddToShift()
+    {
+        var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
+        var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
+        // Xử lý logic để thêm selectedUsers vào một ca làm
+        if (selectedUser1s.Count > 0 && selectedUser1s != null)
+        {
+
+        }
+
     }
 
     //messenge

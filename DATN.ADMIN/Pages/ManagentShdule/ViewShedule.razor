@@ -118,7 +118,7 @@ else
                 CloseButton = true,
                 FullWidth = true
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CuShedule>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateShudule>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
