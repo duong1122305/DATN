@@ -12,10 +12,10 @@
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
-<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
+<MudSelect T="string" Label="Ca làm" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
     @foreach (var item in lstShift)
     {
-        <MudSelectItem Value="@item.Name">@item.Name</MudSelectItem>
+        <MudSelectItem Value="item">@item.Name</MudSelectItem>
     }
 </MudSelect>
 @if (lstUser.Count > 0 && lstUser != null)
