@@ -4,6 +4,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using Newtonsoft.Json
 <EditForm Model="@shiftView">
    <DataAnnotationsValidator/>
     <MudItem xs="12" sm="12">
@@ -44,15 +45,15 @@
     {
         //gọi api thêm
         var result = await httpClient.PostAsJsonAsync<ShiftView>("api/UserLogin/Create-shift", shiftView);
-        bool val = result.IsSuccessStatusCode;
-        if (val)
+        var val = JsonConvert.DeserializeObject<ResponseData<string>>(await result.Content.ReadAsStringAsync());
+        if (val.IsSuccess)
         {
-            Message("Thêm mới thành công", Severity.Success);
+            Message(val.Data, Severity.Success);
             _dialogBox.Close(DialogResult.Ok(true));
         }
         else
         {
-            Message("Thêm mới thất bại", Severity.Error);
+            Message(val.Error, Severity.Error);
         }
     }
     //thông báo xác nhận
@@ -71,14 +72,16 @@
         if (await Confirm() == true)
         {
             var viewShift = await httpClient.PutAsJsonAsync<ShiftView>($"api/UserLogin/Update-shift?id={id}", shiftView);
-            if (viewShift.IsSuccessStatusCode)
+            var val = JsonConvert.DeserializeObject<ResponseData<string>>(await viewShift.Content.ReadAsStringAsync());
+
+            if (val.IsSuccess)
             {
-                Message("Cập nhật thành công", Severity.Success);
+                Message(val.Data, Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message("Cập nhật thất bại", Severity.Error);
+                Message(val.Error, Severity.Error);
             }
         }
     }

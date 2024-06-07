@@ -118,7 +118,9 @@ else
                     From = view.From.Hours,
                     To = view.To.Hours,
                 };
-            parameters.Add("shiftview", updateView);
+            // parameters.Add("Id", id);
+            parameters.Add("idShift", id);
+            parameters.Add("shiftView", updateView);
             nameDialog = "Cập nhật ca làm";
         }
         parameters.Add("id", id);
@@ -132,7 +134,7 @@ else
             };
         try
         {
-            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog, parameters, options);
+            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog,parameters,options);
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {
