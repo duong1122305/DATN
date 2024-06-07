@@ -257,6 +257,12 @@ else
         // Xử lý logic để thêm selectedUsers vào một ca làm
         if (selectedUser1s.Count > 0 && selectedUser1s != null)
         {
+            foreach (var user2 in selectedUser1s)
+            {
+                var listid = user2.UserName;
+                var a = await _client.GetById(listid);
+                // var repo = await _client.AddShuduleStaffMany(a.Data, selectedShiftId);
+            }
             // lỗi moẹ r ồi bạn ôi anh ơi hơi khó, lỗi rồi bạn ơi
             // var repo = _client.AddShuduleStaffMany(selectedUser1s, selectedShiftId);
         }
