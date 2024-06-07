@@ -23,22 +23,27 @@
         <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
             @Body
         </MudContainer>
-        <MudCardHeader Class="collapse" >
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-6">2024 © MewShop.</div>
-                    <div class="col-sm-6 text-end">Design &amp; Development Department</div>
+        <MudCardHeader Style="@($"color:{Theme.Palette.White}; background:{Theme.Palette.PrimaryLighten};")">
+            <div style="margin-left:450px;text-align:center; display:flex; flex-direction:column;">
+                <div>
+                    <div style="flex: 1;">2024 © MewShop.</div>
+                    <div style="flex: 1; text-align: right;">Design &amp; Development</div>
                 </div>
             </div>
         </MudCardHeader>
     </MudMainContent>
+  
 </MudLayout>
+
 @code {
     [Inject]
     protected NavigationManager navigationManager { get; set; }
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
 
+
+    //màu
+    private MudTheme Theme = new MudTheme();
     bool _drawerOpen = true;
     void DrawerToggle()
     {

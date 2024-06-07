@@ -10,7 +10,9 @@
 <PageTitle>Danh sách nhân viên</PageTitle>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
+<div class="m-2">
 
+</div>
 @if (lstUser.Count > 0 && lstUser != null )
 {
     <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc)">
@@ -128,7 +130,7 @@ else
             var response2 = await _client.GetByIdRemove(userName);
             if (response2.IsSuccess)
             {
-                Message($"Đã xoá nhân viên{userName}", Severity.Success);
+                Message($"Đã xoá nhân viên {userName}", Severity.Success);
                 await LoadData();
             }
             else
