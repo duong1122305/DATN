@@ -38,9 +38,9 @@ namespace DATN.ADMIN.Services
             try
             {
                 var response = await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/2/{provinceCode}.htm");
-                var provinceDetails = JsonConvert.DeserializeObject<dynamic>(response);
-                var districts = JsonConvert.DeserializeObject<List<DataAdress>>(provinceDetails.districts.ToString());
-               
+                var dataAll = JsonConvert.DeserializeObject<AddressAPIResponse>(response);
+                var districts = dataAll.data;
+
                 if (districts == null)
                 {
                     return new List<DataAdress>();
@@ -58,8 +58,8 @@ namespace DATN.ADMIN.Services
             try
             {
                 var response = await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/3/{districtCode}.htm");
-                var districtDetails = JsonConvert.DeserializeObject<dynamic>(response);
-                var wards = JsonConvert.DeserializeObject<List<DataAdress>>(districtDetails.wards.ToString());
+                var dataAll = JsonConvert.DeserializeObject<AddressAPIResponse>(response);
+                var wards = dataAll.data;
 
                 if (wards == null)
                 {
