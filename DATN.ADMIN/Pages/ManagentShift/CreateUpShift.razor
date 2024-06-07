@@ -71,7 +71,7 @@
     {
         if (await Confirm() == true)
         {
-            var viewShift = await httpClient.PutAsJsonAsync<ShiftView>($"api/UserLogin/Update-shift?id={idShift}", shiftView);
+            var viewShift = await httpClient.PutAsJsonAsync<ShiftView>($"api/UserLogin/Update-shift?id={id}", shiftView);
             var val = JsonConvert.DeserializeObject<ResponseData<string>>(await viewShift.Content.ReadAsStringAsync());
 
             if (val.IsSuccess)
