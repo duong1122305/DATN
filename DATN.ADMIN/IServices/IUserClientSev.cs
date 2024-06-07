@@ -16,6 +16,8 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> Register(UserRegisterView userRegisterView);
 
         Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift);
+        Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien();
+        Task<ResponseData<string>> UpdateCaNhanVien(List<string> lstStaff, int idShift);
 
     }
 }

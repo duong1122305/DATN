@@ -7,35 +7,38 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách ca làm</PageTitle>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())">Thêm ca 1 tháng tiếp theo</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCaNhanVien())">Thêm ca làm cho nhân viên</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())" title="Thêm ca 1 tháng tiếp theo">Thêm ca 1 tháng tiếp theo</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Href="/ListStaff" title="Danh sách nhân viên">Danh sách nhân viên</MudButton>
 @if (lstUser.Count > 0 && lstUser != null)
 {
   <MudTable Items="@lstUser" Hover="@hover" Filter="new Func<ScheduleView,bool>(FilterFunc)">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Danh sách ca làm</MudText>
+            <MudText Typo="Typo.h3">Danh sách ca làm</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">ID</MudTh>
             <MudTh Style="text-align:center;">Ca làm</MudTh>
-            <MudTh Style="text-align:center;">Từ</MudTh>
-            <MudTh Style="text-align:center;">Đến</MudTh>
-            <MudTh Style="text-align:center;">Thời gian</MudTh>
+            <MudTh Style="text-align:center;">Tên nhân viên</MudTh>
+            <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
+            <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
+            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh>
+
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="STT" Style="text-align:center;">
                 @(lstUser.IndexOf(context) + 1)
             </MudTd>
-            <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
-            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Shift</MudTd>
-            <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
-            <MudTd DataLabel="To" Style="text-align:center;">@context.To</MudTd>
-            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate</MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
+            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
             <MudTd Style="text-align:center;">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" >Sửa</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary" >Xem</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" IconSize="Size.Large" title="Sửa"></MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" IconSize="Size.Large" title="Xem chi tiết"></MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -66,7 +69,7 @@ else
     {
         try
         {
-            var user = await httpClient.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all");
+            var user = await _client.GetAllCaNhanVien();
             if (!user.IsSuccess)
             {
                 lstUser = null;
@@ -84,7 +87,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-
+        await LoadData();
     }
 
 
@@ -142,11 +145,10 @@ else
     {
         if (await Confirm()==true)
         {
-            var result = await httpClient.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/test_them_ca_cho_1_thang");
+            var result = await httpClient.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/them-ca-for-all-staff");
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
-                await OnInitializedAsync();
             }
             else
             {

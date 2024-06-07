@@ -1,4 +1,4 @@
-﻿    @page "/ListStaff"
+﻿@page "/ListStaff"
 @using System.Net.Http.Json
 @using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
@@ -10,12 +10,13 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
-<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm">Thêm vào ca làm</MudButton>
+<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;" title="Chọn ca làm">
+    <MudSelectItem Value="Convert.ToInt32(null)">Chọn ca làm</MudSelectItem>
     @foreach (var item in lstShift)
     {
-        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+        <MudSelectItem Value="@item.Id" title="@item.Name">@item.Name</MudSelectItem>
     }
 </MudSelect>
 @if (lstUser.Count > 0 && lstUser != null)
@@ -262,6 +263,7 @@ else
         var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
         var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
         var selectedShiftId = this.selectedShiftId;
+
         // Xử lý logic để thêm selectedUsers vào một ca làm
         var listIdUser = new List<string>();
         if (await Confirm2()== true)
@@ -274,9 +276,16 @@ else
                     var idUser = await _client.GetById(user2.UserName);
                     listIdUser.Add(idUser.Data);
                 }
-                var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
-                Message(repo.Data, Severity.Success);
-                await LoadData();
+                if (selectedShiftId>0)
+                {
+                    var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
+                    Message(repo.Data, Severity.Success);
+                    await LoadData();
+                }
+                else
+                {
+                    Message("Chưa chọn ca làm", Severity.Error);
+                }
             }
             else
             {

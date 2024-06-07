@@ -39,6 +39,11 @@ namespace DATN.ADMIN.Services
             return repon;
         }
 
+        public async Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien()
+        {
+            return await _client.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam");
+        }
+
         public async Task<ResponseData<string>> GetById(string id)
         {
           return await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
@@ -63,6 +68,11 @@ namespace DATN.ADMIN.Services
             var respone= await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
+        }
+
+        public Task<ResponseData<string>> UpdateCaNhanVien(List<string> lstStaff, int idShift)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id)
