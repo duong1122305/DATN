@@ -1,0 +1,65 @@
+﻿@page "/address"
+@using DATN.ViewModels.Common.Location;
+@using DATN.ADMIN.IServices;
+
+<div class="d-flex m-3">
+    @if (provinces.Count > 0)
+    {
+        <MudSelect Class="mud-mb-2" T="string" Label="Tỉnh" ValueChanged="ChooseProvinces" Width="200px">
+            @foreach (var item in provinces)
+            {
+                <MudSelectItem T="string" Value="@item.id">@item.name</MudSelectItem>
+            }
+        </MudSelect>
+    }
+
+
+    @if (districs.Count > 0)
+    {
+        <MudSelect Class="mud-mb-2" T="string" Label="Huyện" ValueChanged="ChooseDistricts" Width="200px">
+            @foreach (var item in districs)
+            {
+                <MudSelectItem T="string" Value="@item.id">@item.name</MudSelectItem>
+            }
+        </MudSelect>
+    }
+
+
+    @if (wards.Count > 0)
+    {
+        <MudSelect Class="mud-mb-2" T="string" Label="Xã" @bind-Value="selectedWards" Width="200px">
+            @foreach (var item in wards)
+            {
+                <MudSelectItem T="string" Value="@item.id">@item.name</MudSelectItem>
+            }
+        </MudSelect>
+    }
+
+</div>
+
+@code {
+    [Inject] public IAddressService addressService { get; set; }
+    private List<DataAdress> provinces = new List<DataAdress>();
+    private List<DataAdress> districs = new List<DataAdress>();
+    private List<DataAdress> wards = new List<DataAdress>();
+    protected string selectedProvinces;
+    protected string selectedDistrict;
+    protected string selectedWards;
+
+    protected override async Task OnInitializedAsync()
+    {
+        provinces = await addressService.GetProvinces();
+    }
+
+    public async Task ChooseProvinces(string value)
+    {
+        selectedProvinces = value;
+        districs = await addressService.GetDistricts(selectedProvinces);
+    }
+
+    public async Task ChooseDistricts(string value)
+    {
+        selectedDistrict = value;
+        wards = await addressService.GetWards(selectedDistrict);
+    }
+}

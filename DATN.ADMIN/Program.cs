@@ -64,6 +64,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<IAddressService,AddressService>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 var app = builder.Build();
