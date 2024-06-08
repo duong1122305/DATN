@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\ManagerGuest\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using DATN.ADMIN.IServices;
+﻿using Azure;
+using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common.Location;
 using Newtonsoft.Json;
 
@@ -72,6 +73,38 @@ namespace DATN.ADMIN.Services
                 return new List<DataAdress>();
 
             }
+        }
+        public async Task<string>GetFullNameByWard(string addressCode)
+        {
+            try
+            {
+                var arrData= addressCode.Split('|');
+                var response= await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/5/{addressCode}.htm");
+				var dataAll = JsonConvert.DeserializeObject<AddressAPIResponse>(response);
+                return dataAll.data.First().full_name;
+			}
+            catch (Exception)
+            {
+                return null;
+                
+            }
+                 
+        }   
+        public async Task<DataAdress> GetFullCodeByWard(string addressCode)
+        {
+            try
+            {
+                var arrData= addressCode.Split('|');
+                var response= await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/5/{addressCode}.htm");
+				var dataAll = JsonConvert.DeserializeObject<AddressAPIResponse>(response);
+                return dataAll.data.First();
+			}
+            catch (Exception)
+            {
+                return null;
+                
+            }
+                 
         }
     }
 }
