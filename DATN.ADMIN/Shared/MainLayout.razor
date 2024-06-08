@@ -10,7 +10,10 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
+        <MudAvatar>
+            <MudImage Src="img/logo_bc.png"></MudImage>
+        </MudAvatar>
+        <MudMenu Label="Admin" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3 text-white">
             <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
             <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
         </MudMenu>
