@@ -235,7 +235,7 @@ namespace DATN.Aplication.System
                     var result = await _userManager.ChangePasswordAsync(userIdentity, user.OldPassword, user.NewPassword);
                     if (result.Succeeded)
                     {
-                        return new ResponseData<string> { IsSuccess = true, Data = "Đổi mật khẩu thành công!!" };
+                        return new ResponseData<string> { IsSuccess = true, Error = "Đổi mật khẩu thành công!!" };
                     }
                     else return new ResponseData<string> { IsSuccess = false, Error = "Mật khẩu hiện tại đang sai hoặc mật khẩu mới chưa đúng định dạng" };
                 }

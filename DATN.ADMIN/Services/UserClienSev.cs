@@ -57,5 +57,10 @@ namespace DATN.ADMIN.Services
             return await response.Content.ReadFromJsonAsync<UserInfView>();
         }
 
+        public async Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView)
+        {
+            var response = await _client.PutAsJsonAsync("api/UserLogin/changePassword", userChangePasswordView);
+            return await response.Content.ReadFromJsonAsync<ResponseData<UserChangePasswordView>>();
+        }
     }
 }
