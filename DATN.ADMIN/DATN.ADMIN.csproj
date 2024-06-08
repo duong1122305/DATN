@@ -20,6 +20,7 @@
   <ItemGroup>
     <Folder Include="Pages\ManagerGuest\" />
     <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
   <ItemGroup>

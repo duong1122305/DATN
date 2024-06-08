@@ -1,36 +1,50 @@
 ﻿    @using System.Security.Policy
-    @using DATN.Aplication.CustomProvider   
+    @using DATN.Aplication.CustomProvider
     @inject IDialogService _dialogservice;
     @inject AuthenticationStateProvider AuthenticationStateProvider
     @inherits LayoutComponentBase
-    <MudThemeProvider />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
-    <MudLayout>
-        <MudAppBar Elevation="0">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
-            <MudSpacer />
-            <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
+        <MudSpacer />
+        <MudAvatar><MudImage Src="img/images.jpg"></MudImage></MudAvatar>
+        <MudMenu Label="Admin" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3 text-white">
                 <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
                 <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
             </MudMenu>
-        </MudAppBar>
-        <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-            <img src="./img/logo_name.png" alt="Website Logo" style="padding-left:45px;width: 200px; height: 120px;" />
-            <NavMenu />
-        </MudDrawer>
-        <MudMainContent>
-            <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
-                @Body
-            </MudContainer>
-        </MudMainContent>
-    </MudLayout>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+        <img src="./img/logo_name.png" alt="Website Logo" style="padding-left:45px;width: 200px; height: 120px;" />
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
+            @Body
+        </MudContainer>
+        <MudCardHeader Style="@($"color:{Theme.Palette.White}; background:{Theme.Palette.PrimaryLighten};")">
+            <div style="margin-left:450px;text-align:center; display:flex; flex-direction:column;">
+                <div>
+                    <div style="flex: 1;">2024 © MewShop.</div>
+                    <div style="flex: 1; text-align: right;">Design &amp; Development</div>
+                </div>
+            </div>
+        </MudCardHeader>
+    </MudMainContent>
+
+</MudLayout>
+
 @code {
     [Inject]
     protected NavigationManager navigationManager { get; set; }
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
 
+
+    //màu
+    private MudTheme Theme = new MudTheme();
     bool _drawerOpen = true;
     void DrawerToggle()
     {
@@ -50,10 +64,10 @@
                 httpContextAccessor.HttpContext.Session.Clear();
                 await OnInitializedAsync();
             }
-            }
         }
-        protected async override Task OnInitializedAsync()
-        {
+    }
+    protected async override Task OnInitializedAsync()
+    {
         var session = httpContextAccessor.HttpContext.Session.GetString("Key");
         if (string.IsNullOrEmpty(session))
         {
@@ -61,16 +75,15 @@
             navigationManager.NavigateTo("/dangnhap", true);
         }
 
-        }
-        private async Task<bool?> Confirm()
-        {
-            var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                        "Bạn có muốn đăng xuất không?",
-               yesText: "Xác nhận",
-                        cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-            StateHasChanged();
-            return confirm;
-        }
-
     }
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Bạn có muốn đăng xuất không?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
+}
 

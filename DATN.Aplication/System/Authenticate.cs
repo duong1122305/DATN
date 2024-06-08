@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using DATN.Aplication.Extentions;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
+using Microsoft.AspNetCore.Http;
 
 namespace DATN.Aplication.System
 {
@@ -23,14 +24,16 @@ namespace DATN.Aplication.System
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
+        private readonly IHttpContextAccessor _contextAccessor;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
             _roleManager = roleManager;
+            _contextAccessor = httpContextAccessor;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -378,6 +381,35 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = true, Data = "Đã kích hoạt lại tài khoản thành công" };
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Chưa kích hoạt được" };
+        }
+
+        public async Task<ResponseData<UserInfView>> GetInfByToken()
+        {
+            try
+            {
+                var key = _contextAccessor.HttpContext.Session.GetString("Key");
+                JwtSecurityTokenHandler jwtSecurityToken = new JwtSecurityTokenHandler();
+                var token = jwtSecurityToken.ReadJwtToken(key);
+                var claims = token.Claims;
+                var claimsIdentity = new ClaimsIdentity(claims, "JwtBearer");
+                var user = await _userManager.FindByIdAsync(claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var userinf = new UserInfView()
+                {
+                    UserName = user.UserName,
+                    Address = user.Address,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Password = user.PasswordHash,
+                    FullName = user.FullName,
+                    IsDeleted = user.IsDeleted,
+                    IsConfirm = user.EmailConfirmed
+                };
+                return new ResponseData<UserInfView> { IsSuccess = true, Data = userinf };
+            }
+            catch (Exception e)
+            {
+                return new ResponseData<UserInfView> { IsSuccess = true, Error = e.Message };
+            }
         }
     }
 }
