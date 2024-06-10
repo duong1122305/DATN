@@ -11,26 +11,7 @@ namespace DATN.Aplication.Extentions
 {
     public class PasswordExtensitons
     {
-        //public string HashPassword(string password)
-        //{
-        //    // Generate a random salt
-        //    byte[] salt = new byte[128 / 8];
-        //    using (var rng = RandomNumberGenerator.Create())
-        //    {
-        //        rng.GetBytes(salt);
-        //    }
-
-        //    // Hash the password with PBKDF2
-        //    string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-        //        password: password,
-        //        salt: salt,
-        //        prf: KeyDerivationPrf.HMACSHA256,
-        //        iterationCount: 10000,
-        //        numBytesRequested: 256 / 8));
-
-        //    // Combine the salt and hashed password
-        //    return $"{Convert.ToBase64String(salt)}:{hashedPassword}";
-        //}
+        
         private static readonly byte[] Key = Encoding.UTF8.GetBytes("A3F256789B4E9D8F6C7B1E3C5A6D9E7F"); // 32 bytes for AES-256
         private static readonly byte[] IV = Encoding.UTF8.GetBytes("A1B2C3D4E5F60718"); // 16 bytes for AES
 
