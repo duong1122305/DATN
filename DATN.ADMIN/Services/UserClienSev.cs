@@ -63,6 +63,13 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
+        public async Task<ResponseData<UserInfView>> GetInfoUser(string id)
+        {
+            var response = await _client.GetFromJsonAsync<ResponseData<UserInfView>>($"api/UserLogin/Get-user-inf-by-token/{id}");
+            return response;
+        }
+
+        //public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
             var respone= await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
@@ -81,6 +88,12 @@ namespace DATN.ADMIN.Services
             var respone =  await _client.PutAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
+        }
+
+        public async Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView)
+        {
+            var response = await _client.PutAsJsonAsync("api/UserLogin/changePassword", userChangePasswordView);
+            return await response.Content.ReadFromJsonAsync<ResponseData<UserChangePasswordView>>();
         }
     }
 }
