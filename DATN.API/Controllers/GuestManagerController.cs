@@ -29,7 +29,7 @@ namespace DATN.API.Controllers
         }
   
         [HttpPost("GetGuest")]
-        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging( )
+        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging()
         {
             return await _guestManagerService.GetGuest();
         } 

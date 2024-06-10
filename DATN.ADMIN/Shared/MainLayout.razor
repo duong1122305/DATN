@@ -7,7 +7,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    <MudAppBar Elevation="0">
+    <MudAppBar Elevation="5">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
         <MudAvatar><MudImage Src="img/images.jpg"></MudImage></MudAvatar>
@@ -24,16 +24,7 @@
         <MudContainer Class="mt-16 px-8 " MaxWidth="MaxWidth.False">
             @Body
         </MudContainer>
-        <MudCardHeader Style="@($"color:{Theme.Palette.White}; background:{Theme.Palette.PrimaryLighten};")">
-            <div style="margin-left:450px;text-align:center; display:flex; flex-direction:column;">
-                <div>
-                    <div style="flex: 1;">2024 © MewShop.</div>
-                    <div style="flex: 1; text-align: right;">Design &amp; Development</div>
-                </div>
-            </div>
-        </MudCardHeader>
     </MudMainContent>
-
 </MudLayout>
 
 @code {
