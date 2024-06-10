@@ -17,6 +17,7 @@ namespace DATN.ADMIN.IServices
 
         Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift);
 
+        Task<UserInfView> UpdateUser(UserInfView userInfView);
         Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest);
         Task<ResponseData<UserInfView>> GetInfoUser(string id);
         Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView);

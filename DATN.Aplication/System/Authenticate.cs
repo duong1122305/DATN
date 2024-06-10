@@ -383,7 +383,7 @@ namespace DATN.Aplication.System
                 return new ResponseData<string> { IsSuccess = false, Error = "Chưa kích hoạt được" };
         }
 
-        public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
+        public async Task<ResponseData<UserInfView>> GetInfByToken()
         {
             try
             {
