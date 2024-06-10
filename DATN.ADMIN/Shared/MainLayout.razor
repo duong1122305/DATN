@@ -1,6 +1,8 @@
 ﻿    @using System.Security.Policy
     @using DATN.Aplication.CustomProvider
-    @inject IDialogService _dialogservice;
+    @using System.IdentityModel.Tokens.Jwt
+    @using System.Security.Claims
+    @inject IDialogService _dialogservice
     @inject AuthenticationStateProvider AuthenticationStateProvider
     @inherits LayoutComponentBase
 <MudThemeProvider />
@@ -10,7 +12,10 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
+        <MudAvatar>
+            <MudImage Src="img/logo_bc.png"></MudImage>
+        </MudAvatar>
+        <MudMenu Label="@name" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
             <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
             <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
         </MudMenu>
@@ -32,6 +37,7 @@
     protected IHttpContextAccessor httpContextAccessor { get; set; }
 
     bool _drawerOpen = true;
+    private string name = "";
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -55,10 +61,18 @@
     protected async override Task OnInitializedAsync()
     {
         var session = httpContextAccessor.HttpContext.Session.GetString("Key");
+
         if (string.IsNullOrEmpty(session))
         {
             // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
             navigationManager.NavigateTo("/dangnhap", true);
+        }
+        else
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
+            // var listClaims = jwtSecurityToken.Claims.ToArray();
+            name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
         }
 
     }

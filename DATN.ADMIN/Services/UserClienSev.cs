@@ -64,7 +64,7 @@ namespace DATN.ADMIN.Services
             return response;
         }
 
-        public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
+        //public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
             var respone= await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
