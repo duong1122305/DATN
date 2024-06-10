@@ -180,7 +180,7 @@ else
 			return true;
 		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
 			return true;
-		if (element.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+		if (element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
 			return true;
 		return false;
 	}
