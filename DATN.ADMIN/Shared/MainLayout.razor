@@ -1,8 +1,6 @@
 ﻿@using System.Security.Policy
 @using DATN.Aplication.CustomProvider
-@using System.Security.Claims
-@using System.IdentityModel.Tokens.Jwt
-@inject IDialogService _dialogservice
+@inject IDialogService _dialogservice;
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inherits LayoutComponentBase
 <MudThemeProvider />
@@ -15,7 +13,7 @@
         <MudAvatar>
             <MudImage Src="img/logo_bc.png"></MudImage>
         </MudAvatar>
-        <MudMenu Label="@name" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3 text-white">
+        <MudMenu Label="Admin" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3 text-white">
             <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
             <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
         </MudMenu>
@@ -35,8 +33,6 @@
     protected NavigationManager navigationManager { get; set; }
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
-
-    private string name = "";
 
     bool _drawerOpen = true;
     void DrawerToggle()
@@ -62,9 +58,6 @@
     protected async override Task OnInitializedAsync()
     {
         var session = httpContextAccessor.HttpContext.Session.GetString("Key");
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
-        name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
         if (string.IsNullOrEmpty(session))
         {
             // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
