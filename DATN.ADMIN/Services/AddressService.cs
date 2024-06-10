@@ -79,7 +79,7 @@ namespace DATN.ADMIN.Services
             try
             {
                 var arrData= addressCode.Split('|');
-                var response= await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/5/{addressCode}.htm");
+                var response= await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/5/{arrData[0]}.htm");
 				var dataAll = JsonConvert.DeserializeObject<AddressAPIResponse>(response);
                 return dataAll.data.First().full_name;
 			}
@@ -95,9 +95,10 @@ namespace DATN.ADMIN.Services
             try
             {
                 var arrData= addressCode.Split('|');
-                var response= await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/5/{addressCode}.htm");
+                var response= await _client.GetStringAsync($"https://esgoo.net/api-tinhthanh/5/{arrData[0]}.htm");
 				var dataAll = JsonConvert.DeserializeObject<AddressAPIResponse>(response);
                 return dataAll.data.First();
+                // id tinh quan 
 			}
             catch (Exception)
             {

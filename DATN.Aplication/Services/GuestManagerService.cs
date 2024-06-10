@@ -69,7 +69,7 @@ namespace DATN.Aplication.Services
             try
             {
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
-                var response = result.Select(p => new GuestViewModel()
+                var response = result.Where(p=>p.IsComfirm==true).Select(p => new GuestViewModel()
                 {
                     Address = p.Address,
                     Email = p.Email,
@@ -77,10 +77,11 @@ namespace DATN.Aplication.Services
                     Id = p.Id,
                     Name = p.Name,
                     IsDelete = p.IsDeleted,
-                    Password = _passwordExtensitons.Decrypt(p.PasswordHash),
+                    Password =p.PasswordHash!=null?_passwordExtensitons.Decrypt(p.PasswordHash):"",
                     PhoneNumber = p.PhoneNumber,
                     UserName = p.UserName,
                 }).ToList();
+                
                 int totalCount = result.Count();
                 if (totalCount != 0)
                 {
@@ -163,6 +164,8 @@ namespace DATN.Aplication.Services
                     Name = request.Name,
                     PhoneNumber = request.PhoneNumber,
                     Gender = request.Gender,
+                    IsComfirm=true,
+                    IsDeleted = false,
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
                 var result = await _unitOfWork.SaveChangeAsync();
@@ -264,8 +267,7 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                await _unitOfWork.GuestRepository.SoftDelete(request);
-                var result = await _unitOfWork.GuestRepository.SaveChangesAsync() > 0;
+                 var result =await _unitOfWork.GuestRepository.SoftDelete(request);
                 if (result)
                 {
                     return new ResponseData<string>

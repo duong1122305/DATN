@@ -8,7 +8,7 @@
         <MudSelect Class="mud-mb-2" T="string" Label="Tỉnh" ValueChanged="ChooseProvinces" Width="200px">
             @foreach (var item in provinces)
             {
-                <MudSelectItem T="string" Value="@item.id">@item.name</MudSelectItem>
+                <MudSelectItem T="string" Value="@item.id">@item.full_name</MudSelectItem>
             }
         </MudSelect>
     }
@@ -19,7 +19,7 @@
         <MudSelect Class="mud-mb-2" T="string" Label="Huyện" ValueChanged="ChooseDistricts" Width="200px">
             @foreach (var item in districs)
             {
-                <MudSelectItem T="string" Value="@item.id">@item.name</MudSelectItem>
+                <MudSelectItem T="string" Value="@item.id">@item.full_name</MudSelectItem>
             }
         </MudSelect>
     }
@@ -30,7 +30,7 @@
         <MudSelect Class="mud-mb-2" T="string" Label="Xã" @bind-Value="selectedWards" Width="200px">
             @foreach (var item in wards)
             {
-                <MudSelectItem T="string" Value="@item.id">@item.name</MudSelectItem>
+                <MudSelectItem T="string" Value="@item.id">@item.full_name</MudSelectItem>
             }
         </MudSelect>
     }
