@@ -8,8 +8,15 @@ namespace DATN.ADMIN.IServices
     {
         Task<ResponseData<List<UserInfView>>> GetAll();
 
-        Task<ResponseData<UserInfView>> GetById(Guid id);
+        Task<ResponseData<string>> GetById(string id);
+        Task<ResponseData<string>> GetByIdRemove(string id);
         Task<ResponseData<string>> Login(UserLoginView user);
+        Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id);
+        Task<ResponseData<string>> activeUser(string id);
+        Task<ResponseData<string>> Register(UserRegisterView userRegisterView);
+
+        Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift);
+
         Task<UserInfView> UpdateUser(UserInfView userInfView);
         Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest);
         Task<ResponseData<UserInfView>> GetInfoUser(string id);

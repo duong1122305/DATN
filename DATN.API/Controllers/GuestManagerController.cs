@@ -29,9 +29,9 @@ namespace DATN.API.Controllers
         }
   
         [HttpPost("GetGuest")]
-        public async Task<ResponseData<GetGuestResponse>> GetGuestPaging(GetGuestRequest request)
+        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging( )
         {
-            return await _guestManagerService.GetGuest(request);
+            return await _guestManagerService.GetGuest();
         } 
         [HttpGet("find-by-id")]
         public async Task<ResponseData<GuestViewModel>> FindByID(Guid id)
@@ -39,9 +39,19 @@ namespace DATN.API.Controllers
             return await _guestManagerService.FindGuestByID(id);
         }  
         [HttpGet("verify-user")]
-        public async Task<ResponseData<string>> FindByID(string verifyToken, string mail)
+        public async Task<ResponseData<string>> FindByID(string verifyConstring, string mail)
         {
-            return await _guestManagerService.VerififyUser(verifyToken, mail);
+            return await _guestManagerService.VerififyUser(verifyConstring, mail);
+        }
+        [HttpPost("update-guest")]
+        public async Task<ResponseData<string>> UpdateGuest(GuestUpdateRequest request)
+        {
+            return await _guestManagerService.UpdateGuest(request);
+        }
+        [HttpPost("change-status")]
+        public async Task<ResponseData<string>> ChangStatus(DeleteRequest<Guid> request)
+        {
+             return await _guestManagerService.SoftDelete(request);
         }
     }
 }

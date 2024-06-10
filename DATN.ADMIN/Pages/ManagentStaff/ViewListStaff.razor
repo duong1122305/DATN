@@ -1,6 +1,7 @@
-﻿@page "/ListStaff"
+﻿    @page "/ListStaff"
 @using System.Net.Http.Json
 @using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
@@ -10,30 +11,30 @@
 <PageTitle>Danh sách nhân viên</PageTitle>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px">Thêm</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
-<MudSelect T="string" Label="Ca làm" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
-       @foreach (var item in lstShift)
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px">Thêm vào ca làm</MudButton>
+<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;">
+    @foreach (var item in lstShift)
     {
-        <MudSelectItem Value="@item.Name" style="width:100px; margin-bottom: 10px;">@item.Name</MudSelectItem>
+        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
     }
 </MudSelect>
-@if (lstUser.Count > 0 && lstUser != null )
+@if (lstUser.Count > 0 && lstUser != null)
 {
     <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc)">
         <ToolBarContent>
-            
+
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;">Chọn</MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
-            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;">Trạng thái</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh> 
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Checkbox" Style="text-align:center;">
@@ -53,27 +54,26 @@
             @if (!context.IsDeleted)
             {
                 <MudTd DataLabel="Email" Style="text-align:center;">
-                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Info" title="Hoạt động">Hoạt động</MudChip>
+                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
                 </MudTd>
             }
             else
             {
                 <MudTd DataLabel="Email" Style="text-align:center;">
-                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Ngưng hoạt động">Ngưng hoạt động</MudChip>
+                    <MudChip Icon="@Icons.Material.Filled.Close" Color="Color.Error" title="Ngưng hoạt động">Ngưng hoạt động</MudChip>
                 </MudTd>
             }
             <MudTd Style="text-align:center;">
                 @if (context.IsDeleted)
                 {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt">Kích hoạt</MudButton>
+                    <MudButton IconSize="Size.Large" IconColor="Color.Success" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.UserName))" Style="margin-right: 5px"></MudButton>
                 }
                 else
                 {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá">Xoá</MudButton>
+                    <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá" Style="margin-right: 5px"></MudButton>
                 }
-             
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa">Sửa</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem">Xem</MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa" Style="margin-right: 5px"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết" Style="margin-right: 5px"></MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -83,7 +83,7 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 <style>
     .my-custom-class {
@@ -96,15 +96,18 @@ else
     private string searchString = "";
     private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
-
-    private bool IsAnyUserSelected => selectedUsers.Any(selected => selected);
+    [Inject]
+    private IUserClientSev _client { get; set; }
     private UserUpdateView updateUserView = new UserUpdateView();
 
+    private bool IsAnyUserSelected => selectedUsers.Any(selected => selected);
     private List<Shift> lstShift = new List<Shift>();
-    private Shift shift = new Shift();
+    private Shift shift { get; set; }
 
     //lưu trạng thái của từng nhân viên khi ấn checkbox
     private List<bool> selectedUsers = new List<bool>();
+    private int selectedShiftId;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,11 +117,12 @@ else
     // load lai du lieu
     protected async Task LoadData()
     {
-        var user = await httpClient.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
+        var user = await _client.GetAll();
         lstUser = user.Data;
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
+
     }
 
 
@@ -128,9 +132,7 @@ else
             return true;
         if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.Email} {element.Position} {element.PhoneNumber}".Contains(searchString))
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
@@ -151,25 +153,30 @@ else
     {
         if (await Confirm() == true)
         {
-            var response = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={userName}");
-            if (response.IsSuccess)
+            var response2 = await _client.GetByIdRemove(userName);
+            if (response2.IsSuccess)
             {
-                var respone = await httpClient.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={response.Data}");
-                if (respone.IsSuccess)
-                {
-                    Message($"Đã xoá nhân viên{userName}", Severity.Success);
-                    await LoadData();
-                }
-                else
-                {
-                    Message("Xoá thất bại", Severity.Error);
-
-                }
+                Message($"Đã xoá nhân viên {userName}", Severity.Success);
+                await LoadData();
             }
+            else
+            {
+                Message("Không tìm thấy nhân viên", Severity.Error);
+            }
+        }
+    }
+
+    private async Task activeAc(string username)
+    {
+        var repon = await _client.activeUser(username);
+        if (repon.IsSuccess)
+        {
+            Message("Đã kích hoạt trạng thái", Severity.Success);
+            await LoadData();
         }
         else
         {
-            Message("Xoá không thành công", Severity.Error);
+            Message("Chưa kích hoạt", Severity.Success);
         }
     }
 
@@ -248,16 +255,54 @@ else
             await LoadData();
         }
     }
+    private void HandleShiftChange(ChangeEventArgs e)
+    {
+        // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
+        selectedShiftId = Convert.ToInt32(e.Value);
+    }
+    //thêm nhân viên vào ca làm
     private async Task AddToShift()
     {
         var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
         var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
+        var selectedShiftId = this.selectedShiftId;
         // Xử lý logic để thêm selectedUsers vào một ca làm
-        if (selectedUser1s.Count >0 && selectedUser1s != null)
+        var listIdUser = new List<string>();
+        if (await Confirm2()== true)
         {
-            
+            // nứng à
+            if (selectedUser1s.Count > 0 && selectedUser1s != null)
+            {
+                foreach (var user2 in selectedUser1s)
+                {
+                    var idUser = await _client.GetById(user2.UserName);
+                    listIdUser.Add(idUser.Data);
+                }
+                var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
+                Message(repo.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message("Thêm hông thành công", Severity.Error);
+            }
         }
-        
+        else
+        {
+            Message("Lỗi không xác định!!", Severity.Warning);
+
+        }
+
+    }
+    //hỏi trước khi thêm
+    private async Task<bool?> Confirm2()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận thêm ca cho nhân viên?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
     }
 
     //messenge
@@ -267,8 +312,4 @@ else
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
-
-
-
-
 }

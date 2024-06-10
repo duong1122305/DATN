@@ -18,7 +18,7 @@
             <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;">STT</MudTh>
             <MudTh Style="text-align:center;">Ca làm</MudTh>
             <MudTh Style="text-align:center;">Từ</MudTh>
             <MudTh Style="text-align:center;">Đến</MudTh>
@@ -32,8 +32,8 @@
             <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
             <MudTd DataLabel="To" Style="text-align:center;">@context.To</MudTd>
             <MudTd Style="text-align:center;">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))">Sửa</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary" OnClick="@(async()=> await OpenDialog(context.Id))">Xem</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Edit" IconSize="Size.Large" IconColor="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))"></MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconSize="Size.Large" IconColor="Color.Info" OnClick="@(async()=> await OpenDialog(context.Id))"></MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -43,8 +43,9 @@
 }
 else
 {
-    <div style="justify-content:center; justify-items:center">
+        <div style="justify-content:center; justify-items:center">
         <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        
     </div>
 }
 
@@ -81,7 +82,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+            await LoadData();
     }
 
     private bool FilterFunc1(Shift element) => FilterFunc(element, searchString1);
@@ -104,16 +105,6 @@ else
         Snackbar.Add(message, severity);
     }
 
-    // thông báo
-    private async Task<bool?> Confirm()
-    {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận xóa ca làm?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-        StateHasChanged();
-        return confirm;
-    }
 
     private async Task OpenDialog(int? id)
     {
@@ -121,17 +112,18 @@ else
         string nameDialog = "Thêm mới ca làm";
         if (id != null)
         {
-          var view = lstShift.FirstOrDefault(c => c.Id == id);
+            var view = lstShift.FirstOrDefault(c => c.Id == id);
             var updateView = new ShiftView()
                 {
                     Name = view.Name,
                     From = view.From.Hours,
                     To = view.To.Hours,
                 };
-            // parameters.Add("Id", id);
-            parameters.Add("Id", id);
+            parameters.Add("id", id);
+            parameters.Add("shiftView", updateView);
             nameDialog = "Cập nhật ca làm";
         }
+        parameters.Add("id", id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -140,14 +132,15 @@ else
                 CloseButton = true,
                 FullWidth = true
             };
-       try
+        try
         {
-            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog, parameters, options);
+            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog,parameters,options);
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
                 await LoadData();
+                await OnInitializedAsync();
             }
         }
         catch (Exception)

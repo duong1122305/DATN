@@ -19,24 +19,43 @@ namespace DATN.ADMIN.Services
             _client = client;
 
         }
+
+        public async Task<ResponseData<string>> activeUser(string id)
+        {
+            var respone = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+            var repon = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Active-user?id={respone.Data}");
+            return repon;
+        }
+
+        public async Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift)
+        {
+            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/them-ca-one-staff?shift={idShift}", lstStaff);
+            return await lst.Content.ReadFromJsonAsync<ResponseData<string>>();
+        }
+
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
             return repon;
         }
 
-        public async Task<ResponseData<UserInfView>> GetById(Guid id)
+        public async Task<ResponseData<string>> GetById(string id)
         {
-            return await _client.GetFromJsonAsync<ResponseData<UserInfView>>($"api/UserLogin/{id}");
+          return await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+        }
+
+        public async Task<ResponseData<string>> GetByIdRemove(string id)
+        {
+            var respone = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+            var result = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={respone.Data}");
+            return result;
         }
 
         public async Task<ResponseData<string>> Login(UserLoginView user)
         {
             var response = await _client.PostAsJsonAsync("api/UserLogin/User-Login", user);
             var result = await response.Content.ReadFromJsonAsync<ResponseData<string>>();
-
             return result;
-
         }
 
         public async Task<ResponseData<UserInfView>> GetInfoUser(string id)
@@ -46,15 +65,19 @@ namespace DATN.ADMIN.Services
         }
 
         public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
+        public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
-            var response = await _client.PutAsJsonAsync("api/UserLogin", deleteRequest);
-            return await response.Content.ReadFromJsonAsync<UserInfView>();
+            var respone= await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
+            var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
+            return result;
         }
 
-        public async Task<UserInfView> UpdateUser(UserInfView userInfView)
+        public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id)
         {
-            var response = await _client.PutAsJsonAsync("api/UserLogin", userInfView);
-            return await response.Content.ReadFromJsonAsync<UserInfView>();
+            var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+            var respone =  await _client.PutAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
+            var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
+            return result;
         }
 
         public async Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView)
