@@ -53,6 +53,14 @@ namespace DATN.API.Controllers
             return result;
         }
 
+        //change password
+        [HttpPut("changePassword")]
+        public async Task<ResponseData<string>> ChangePassword(UserChangePasswordView changePasswordView)
+        {
+            var result = await _userrepo.ChangePassword(changePasswordView);
+            return result;
+        }
+
         //api lấy danh sách tài khoản nhân viên
         [HttpGet("List-User")]
         public async Task<ResponseData<List<UserInfView>>> GetUsers()
@@ -191,11 +199,10 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ActiveAccount(id);
         }
-        [HttpGet("Get-user-inf-by-token")]
-        public async Task<ResponseData<UserInfView>> GetInfByToken()
+        [HttpGet("Get-user-inf-by-token/{id}")]
+        public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
-            return await _userrepo.GetInfByToken();
+            return await _userrepo.GetInfByToken(id);
         }
-
     }
 }
