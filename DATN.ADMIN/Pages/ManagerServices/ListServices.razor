@@ -1,0 +1,73 @@
+﻿@page "/ListServices"
+@using System.Net.Http.Json
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice
+<PageTitle>Danh sách dịch vụ</PageTitle>
+
+    <MudTable Items="@lstServies">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Danh sách dịch vụ</MudText>
+            <MudSpacer />
+            <MudTextField T="string" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">STT</MudTh>
+            <MudTh Style="text-align:center;">Tên dịch vụ</MudTh>
+            <MudTh Style="text-align:center;">Trạng thái</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+        <MudTd DataLabel="STT" Style="text-align:center;">
+            @(lstServies.IndexOf(context) + 1)
+        </MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+           @if (!context.IsDetele)
+        {
+            <MudTd DataLabel="Email" Style="text-align:center;">
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động">Hiển thị</MudChip>
+            </MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="Email" Style="text-align:center;">
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Hoạt động">Không hiển thị</MudChip>
+            </MudTd>
+        }
+            <MudTd Style="text-align:center;">
+            @if (context.IsDetele)
+                {
+                    <MudButton IconSize="Size.Large" IconColor="Color.Success" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt"></MudButton>
+                }
+                else
+                {
+                    <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error"  title="Xoá"></MudButton>
+                }
+
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+        </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+@code {
+    private List<Service> lstServies = new List<Service>()
+    {
+(new Service{Name="Cắt lông mèo",IsDetele=true}),
+        (new Service{Name="Cắt lông chó",IsDetele=false}),
+        (new Service{Name="Nhuộm lông chó",IsDetele=false}),
+    };
+    
+}
