@@ -1,4 +1,5 @@
-﻿using DATN.Data.Entities;
+﻿using DATN.Aplication.Services.IServices;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class VoucherManagementService: IVoucherManagementService
+    public class VoucherManagementService : IVoucherManagementService
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -60,7 +61,7 @@ namespace DATN.Aplication.Services
                 try
                 {
                     var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                where voucherView.VoucherCode == discount.VoucherCode
+                                where voucherView.Id == discount.Id
                                 select discount;
                     if (query.Count() == 1)
                     {
@@ -75,7 +76,7 @@ namespace DATN.Aplication.Services
                         voucher.Quantity = voucherView.Quantity;
                         await _unitOfWork.DiscountRepository.UpdateAsync(voucher);
                         await _unitOfWork.SaveChangeAsync();
-                        return new ResponseData<string> { IsSuccess = true, Data = "Đã thêm voucher thành công!!" };
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa voucher thành công!!" };
                     }
                     return new ResponseData<string> { IsSuccess = false, Data = "Voucher nhập trùng voucher code đã có!!!   " };
                 }
@@ -84,7 +85,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = true, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
                 }
             }
-            return new ResponseData<string> { IsSuccess = false, Error = "Chưa có data" };
+            return new ResponseData<string> { IsSuccess = false, Error = "Không có id này" };
         }
         public async Task<ResponseData<List<VoucherView>>> GetAllVoucher()
         {

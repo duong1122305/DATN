@@ -10,7 +10,6 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
-using DATN.Aplication.Services;
 
 namespace DATN.API.Controllers
 {

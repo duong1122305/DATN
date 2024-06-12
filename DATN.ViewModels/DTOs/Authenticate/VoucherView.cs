@@ -8,10 +8,11 @@ namespace DATN.ViewModels.DTOs.Authenticate
 {
     public class VoucherView
     {
+        public int? Id { get; set; }
         public string VoucherCode { get; set; }
 
         public int Quantity { get; set; }
-        
+
         public string VoucherName { get; set; }
 
         public string Description { get; set; }
