@@ -16,15 +16,15 @@
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh Style="text-align:center;">ID</MudTh>
-        <MudTh Style="text-align:center;">Số lượng</MudTh>
+        <MudTh Style="text-align:center;">STT</MudTh>
+        <MudTh Style="text-align:center;">VoucherName</MudTh>
         <MudTh Style="text-align:center;">Voucher Code</MudTh>
+        <MudTh Style="text-align:center;">% Giảm giá</MudTh>
         <MudTh Style="text-align:center;">Mô tả</MudTh>
-        <MudTh Style="text-align:center;">Có hiệu lực từ</MudTh>
-        <MudTh Style="text-align:center;">Có hiệu lực đến</MudTh>
-        <MudTh Style="text-align:center;">% giảm</MudTh>
+        <MudTh Style="text-align:center;">Ngày bắt đầu</MudTh>
+        <MudTh Style="text-align:center;">Ngày kết thúc</MudTh>
+        <MudTh Style="text-align:center;">Số tiền tối thiểu</MudTh>
         <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
-        <MudTh Style="text-align:center;">Số tiền hoá đơn tối thiểu</MudTh>
         <MudTh Style="text-align:center;">Trạng thái</MudTh>
         <MudTh Style="text-align:center;">Hành động</MudTh>
     </HeaderContent>
@@ -36,17 +36,15 @@
         <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.VoucherCode</MudTd>
         <MudTd DataLabel="Address" Style="text-align:center;">@context.DiscountPercent</MudTd>
         <MudTd DataLabel="Email" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.StartDate</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.EndDate</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
         <MudTd DataLabel="Email" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">
-            <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
-        </MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">Chưa có trạng thái</MudTd>
         <MudTd Style="text-align:center;">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"></MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning"></MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary"></MudButton>
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -88,6 +86,47 @@
         isVisible = true;
         StateHasChanged();
     }
+
+    //thêm mới
+    // private async Task OpenDialog(string username)
+    // {
+    //     var parameters = new DialogParameters();
+    //     string nameDialog = "Thêm mới nhân viên";
+    //     if (username != null)
+    //     {
+    //         _userView = lstUser.FirstOrDefault(c => c.UserName == username);
+    //         var updateView = new UserRegisterView()
+    //             {
+    //                 UserName = username,
+    //                 FullName = _userView.FullName,
+    //                 Address = _userView.Address,
+    //                 PhoneNumber = _userView.PhoneNumber,
+    //                 Email = _userView.Email,
+    //             };
+    //         parameters.Add("username", username);
+    //         parameters.Add("user", updateView);
+    //         nameDialog = "Cập nhật nhân viên";
+    //     }
+    //     if (true)
+    //     {
+
+    //     }
+    //     DialogOptions options = new DialogOptions()
+    //         {
+    //             CloseOnEscapeKey = true,
+    //             Position = DialogPosition.Center,
+    //             MaxWidth = MaxWidth.Small,
+    //             CloseButton = true,
+    //             FullWidth = true
+    //         };
+    //     var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
+    //     var result = await createUpdateDialog.Result;
+    //     if (!result.Canceled)
+    //     {
+    //         createUpdateDialog.Close();
+    //         await LoadData();
+    //     }
+    // }
 
 
 }

@@ -1,0 +1,139 @@
+﻿@inject ISnackbar Snackbar
+@inject IDialogService _diagService;
+@inject HttpClient httpClient
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+<EditForm Model="@voucherCreate">
+    <MudItem xs="12" sm="12">
+        <MudCard>
+            <MudCardContent>
+                <MudTextField T="string" @bind-Value="voucherCreate.VoucherName" Label="Họ và tên" For="@(() => voucherCreate.VoucherName)" />
+                <MudTextField T="Timer" @* @bind-Value="voucherCreate.StartDate" Label="Tên đăng nhập" For="@(() => voucherCreate.StartDate)" *@ />
+                <MudTextField T="string" @* @bind-Value="voucherCreate.EndDate" Label="Địa chỉ" For="@(() => voucherCreate.EndDate)" *@ />
+                <MudTextField T="string" @bind-Value="voucherCreate.Description" Label="Email" For="@(() => voucherCreate.Description)" />
+                <MudTextField T="int" @bind-Value="voucherCreate.Quantity" Label="Số điện thoại" For="@(() => voucherCreate.Quantity)" />
+@*                 <MudTextField T="float" @bind-Value="voucherCreate.DiscountPercent" Label="Số điện thoại" For="@(() => voucherCreate.DiscountPercent)" />
+                <MudTextField T="string" @bind-Value="voucherCreate.VoucherCode" Label="Số điện thoại" For="@(() => voucherCreate.VoucherCode)" />
+                <MudTextField T="float" @bind-Value="voucherCreate.MinMoneyApplicable" Label="Số điện thoại" For="@(() => voucherCreate.MinMoneyApplicable)" />
+                <MudTextField T="float" @bind-Value="voucherCreate.MaxMoneyDiscount" Label="Số điện thoại" For="@(() => voucherCreate.MaxMoneyDiscount)" /> *@
+                <hr class="hr" />
+                <div class="mt-5" style="text-align: end;">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string userName { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+    private string _nameButton = "Thêm mới";
+    [Inject]
+    private IVoucherServices _client { get; set; }
+    //nó đây
+    [Parameter]
+    public VoucherView voucherCreate { get; set; } = new VoucherView();
+
+    VoucherView updateVoucher = new VoucherView();
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (userName != null)
+        {
+            _nameButton = "Cập nhật";
+        }
+    }
+
+    //thêm
+    protected async Task Create()
+    {
+        //gọi api thêm
+        var result = await _client.CreateVoucher(voucherCreate);
+        if (result.IsSuccess)
+        {
+            Message(result.Data, Severity.Success);
+            _dialogBox.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Message(result.Error, Severity.Error);
+        }
+    }
+    //thông báo xác nhận
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo",
+    "Xác nhận cập nhật voucher?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
+    //cập nhật
+    // public async Task Update()
+    // {
+    //     if (await Confirm() == true)
+    //     {
+    //         updateVoucher.VoucherName = voucherCreate.VoucherName;
+    //         updateVoucher.StartDate = voucherCreate.StartDate;
+    //         updateVoucher.EndDate = voucherCreate.EndDate;
+    //         updateVoucher.Description = voucherCreate.Description;
+    //         updateVoucher.DiscountPercent = voucherCreate.DiscountPercent;
+    //         updateVoucher.MinMoneyApplicable = voucherCreate.MinMoneyApplicable;
+    //         updateVoucher.MaxMoneyDiscount = voucherCreate.MaxMoneyDiscount;
+    //         updateVoucher.Quantity = voucherCreate.Quantity;
+    //         var result = await _client.UpdateUser(updateVoucher, userName);
+    //         if (result.IsSuccess)
+    //         {
+    //             Message(result.Data, Severity.Success);
+    //             _dialogBox.Close(DialogResult.Ok(true));
+    //         }
+    //         else
+    //         {
+    //             Message(result.Error, Severity.Error);
+    //         }
+
+    //     }
+    // }
+    private async Task Submid()
+    {
+        // if (voucherCreate != null)
+        // {
+        //     var response = await _client.GetById(userName);
+        //     if (response.Data == null)
+        //     {
+        //         await Create();
+        //     }
+        //     else
+        //     {
+        //         Message("Tài khoản đã đăng ký!", Severity.Warning);
+        //     }
+        // }
+        // else
+        // {
+        //     var response = await _client.GetById(userName);
+        //     if (response.IsSuccess)
+        //     {
+        //         await Update();
+        //     }
+        //     else
+        //     {
+        //         Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
+        //     }
+        // }
+        // StateHasChanged();
+    }
+
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+    bool success = false;
+} 
