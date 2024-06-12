@@ -1,0 +1,93 @@
+﻿@page "/ListVoucher"
+@using System.Net.Http.Json
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Danh sách mã giảm giá</PageTitle>
+
+<MudTable Items="@lstVoucher" Hover="true" Filter="new Func<VoucherView,bool>(FilterFunc)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Danh sách mã giảm giá</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh Style="text-align:center;">ID</MudTh>
+        <MudTh Style="text-align:center;">Số lượng</MudTh>
+        <MudTh Style="text-align:center;">Voucher Code</MudTh>
+        <MudTh Style="text-align:center;">Mô tả</MudTh>
+        <MudTh Style="text-align:center;">Có hiệu lực từ</MudTh>
+        <MudTh Style="text-align:center;">Có hiệu lực đến</MudTh>
+        <MudTh Style="text-align:center;">% giảm</MudTh>
+        <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
+        <MudTh Style="text-align:center;">Số tiền hoá đơn tối thiểu</MudTh>
+        <MudTh Style="text-align:center;">Trạng thái</MudTh>
+        <MudTh Style="text-align:center;">Hành động</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="STT" Style="text-align:center;">
+            @(lstVoucher.IndexOf(context) + 1)
+        </MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.VoucherName</MudTd>
+        <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.VoucherCode</MudTd>
+        <MudTd DataLabel="Address" Style="text-align:center;">@context.DiscountPercent</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.Description</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.StartDate</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.EndDate</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
+        <MudTd DataLabel="Email" Style="text-align:center;">
+            <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success">Đã xác thực</MudChip>
+        </MudTd>
+        <MudTd Style="text-align:center;">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Xoá</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning">Sửa</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Details" Color="Color.Tertiary">Xem</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+@code {
+    //button trạng thái
+    private bool _disableElevation = false;
+    private string searchString = "";
+    private List<VoucherView> lstVoucher = new List<VoucherView>();
+    [Inject]
+    private IVoucherServices _client{get;set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+        var voucher = await _client.GetAll();
+        lstVoucher = voucher.Data;
+    }
+
+
+    private bool FilterFunc(VoucherView voucher)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (voucher.VoucherName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (voucher.VoucherCode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{voucher.StartDate} {voucher.EndDate} {voucher.DiscountPercent}".Contains(searchString))
+            return true;
+        return false;
+    }
+    //overlay màn
+    private bool isVisible;
+
+    public void OpenOverlay()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+
+}

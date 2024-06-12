@@ -19,6 +19,7 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/"), Timeout = TimeSpan.FromMinutes(30) });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
+builder.Services.AddScoped<IVoucherServices, VoucherServices>();
 builder.Services.AddScoped<HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMudServices();
