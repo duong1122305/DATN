@@ -10,6 +10,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
+using DATN.Aplication.Services;
 
 namespace DATN.API.Controllers
 {
@@ -21,13 +22,15 @@ namespace DATN.API.Controllers
         private readonly IWorkShiftManagementService _worshiftmanagement;
         private readonly IEmployeeScheduleManagementService _employeeSchedule;
         private readonly IShiftManagementService _shiftManagement;
+        private readonly IVoucherManagementService _vouchermanagement;
 
-        public UserLoginController(IAuthenticate userRepo, IWorkShiftManagementService workShiftManagementService, IEmployeeScheduleManagementService employeeScheduleManagementService, IShiftManagementService shiftManagementService)
+        public UserLoginController(IAuthenticate userRepo, IWorkShiftManagementService workShiftManagementService, IEmployeeScheduleManagementService employeeScheduleManagementService, IShiftManagementService shiftManagementService, IVoucherManagementService voucherManagementService)
         {
             _userrepo = userRepo;
             _worshiftmanagement = workShiftManagementService;
             _employeeSchedule = employeeScheduleManagementService;
             _shiftManagement = shiftManagementService;
+            _vouchermanagement = voucherManagementService;
         }
         //api đăng nhập tài khoản
         [HttpPost("User-Login")]
@@ -203,6 +206,22 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
             return await _userrepo.GetInfByToken(id);
+        }
+        [HttpPost("Create-Voucher")]
+        public async Task<ResponseData<string>> CreateVoucher(VoucherView voucherView)
+        {
+            return await _vouchermanagement.CreateVoucher(voucherView);
+        }
+
+        [HttpPut("Update-Voucher")]
+        public async Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView)
+        {
+            return await _vouchermanagement.UpdateVoucher(voucherView);
+        }
+        [HttpGet("List-Voucher")]
+        public async Task<ResponseData<List<VoucherView>>> ListVoucher()
+        {
+            return await _vouchermanagement.GetAllVoucher();
         }
     }
 }
