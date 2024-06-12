@@ -9,6 +9,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
 <PageTitle>Danh sách dịch vụ</PageTitle>
+<MudButton Variant="Variant.Filled" Href="/ListServicesDetails" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Dịch vụ chi tiết</MudButton>
 
     <MudTable Items="@lstServies">
         <ToolBarContent>
