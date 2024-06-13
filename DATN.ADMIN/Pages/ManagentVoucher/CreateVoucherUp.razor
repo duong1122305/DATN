@@ -9,15 +9,15 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="voucherCreate.VoucherName" Label="Họ và tên" For="@(() => voucherCreate.VoucherName)" />
-                <MudTextField T="Timer" @* @bind-Value="voucherCreate.StartDate" Label="Tên đăng nhập" For="@(() => voucherCreate.StartDate)" *@ />
-                <MudTextField T="string" @* @bind-Value="voucherCreate.EndDate" Label="Địa chỉ" For="@(() => voucherCreate.EndDate)" *@ />
-                <MudTextField T="string" @bind-Value="voucherCreate.Description" Label="Email" For="@(() => voucherCreate.Description)" />
-                <MudTextField T="int" @bind-Value="voucherCreate.Quantity" Label="Số điện thoại" For="@(() => voucherCreate.Quantity)" />
-@*                 <MudTextField T="float" @bind-Value="voucherCreate.DiscountPercent" Label="Số điện thoại" For="@(() => voucherCreate.DiscountPercent)" />
-                <MudTextField T="string" @bind-Value="voucherCreate.VoucherCode" Label="Số điện thoại" For="@(() => voucherCreate.VoucherCode)" />
-                <MudTextField T="float" @bind-Value="voucherCreate.MinMoneyApplicable" Label="Số điện thoại" For="@(() => voucherCreate.MinMoneyApplicable)" />
-                <MudTextField T="float" @bind-Value="voucherCreate.MaxMoneyDiscount" Label="Số điện thoại" For="@(() => voucherCreate.MaxMoneyDiscount)" /> *@
+                <MudTextField T="string" @bind-Value="voucherCreate.VoucherName" Label="VoucherName" For="@(() => voucherCreate.VoucherName)" />
+                <MudTextField T="DateTime" @bind-Value="voucherCreate.StartDate" Label="Ngày bắt đầu" For="@(() => voucherCreate.StartDate)" />
+                <MudTextField T="DateTime" @bind-Value="voucherCreate.EndDate" Label="Ngày kết thúc" For="@(() => voucherCreate.EndDate)" />
+                <MudTextField T="string" @bind-Value="voucherCreate.Description" Label="Mô tả" For="@(() => voucherCreate.Description)" />
+                <MudTextField T="int" @bind-Value="voucherCreate.Quantity" Label="Số lượng" For="@(() => voucherCreate.Quantity)" />
+                <MudTextField T="decimal" @bind-Value="voucherCreate.DiscountPercent" Label="% Giảm" For="@(() => voucherCreate.DiscountPercent)" />
+                <MudTextField T="string" @bind-Value="voucherCreate.VoucherCode" Label="VoucherCode" For="@(() => voucherCreate.VoucherCode)" />
+                <MudTextField T="double" @bind-Value="voucherCreate.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => voucherCreate.MinMoneyApplicable)" />
+                <MudTextField T="double" @bind-Value="voucherCreate.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => voucherCreate.MaxMoneyDiscount)" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -74,58 +74,58 @@
         return confirm;
     }
     //cập nhật
-    // public async Task Update()
-    // {
-    //     if (await Confirm() == true)
-    //     {
-    //         updateVoucher.VoucherName = voucherCreate.VoucherName;
-    //         updateVoucher.StartDate = voucherCreate.StartDate;
-    //         updateVoucher.EndDate = voucherCreate.EndDate;
-    //         updateVoucher.Description = voucherCreate.Description;
-    //         updateVoucher.DiscountPercent = voucherCreate.DiscountPercent;
-    //         updateVoucher.MinMoneyApplicable = voucherCreate.MinMoneyApplicable;
-    //         updateVoucher.MaxMoneyDiscount = voucherCreate.MaxMoneyDiscount;
-    //         updateVoucher.Quantity = voucherCreate.Quantity;
-    //         var result = await _client.UpdateUser(updateVoucher, userName);
-    //         if (result.IsSuccess)
-    //         {
-    //             Message(result.Data, Severity.Success);
-    //             _dialogBox.Close(DialogResult.Ok(true));
-    //         }
-    //         else
-    //         {
-    //             Message(result.Error, Severity.Error);
-    //         }
+    public async Task Update()
+    {
+        if (await Confirm() == true)
+        {
+            updateVoucher.VoucherName = voucherCreate.VoucherName;
+            updateVoucher.StartDate = voucherCreate.StartDate;
+            updateVoucher.EndDate = voucherCreate.EndDate;
+            updateVoucher.Description = voucherCreate.Description;
+            updateVoucher.DiscountPercent = voucherCreate.DiscountPercent;
+            updateVoucher.MinMoneyApplicable = voucherCreate.MinMoneyApplicable;
+            updateVoucher.MaxMoneyDiscount = voucherCreate.MaxMoneyDiscount;
+            updateVoucher.Quantity = voucherCreate.Quantity;
+            var result = await _client.UpdateVoucher(updateVoucher);
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
 
-    //     }
-    // }
+        }
+    }
     private async Task Submid()
     {
-        // if (voucherCreate != null)
-        // {
-        //     var response = await _client.GetById(userName);
-        //     if (response.Data == null)
-        //     {
-        //         await Create();
-        //     }
-        //     else
-        //     {
-        //         Message("Tài khoản đã đăng ký!", Severity.Warning);
-        //     }
-        // }
-        // else
-        // {
-        //     var response = await _client.GetById(userName);
-        //     if (response.IsSuccess)
-        //     {
-        //         await Update();
-        //     }
-        //     else
-        //     {
-        //         Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
-        //     }
-        // }
-        // StateHasChanged();
+        if (voucherCreate.Id == null)
+        {
+            var response = await _client.CreateVoucher(voucherCreate);
+            if (response.Data !=null)
+            {
+                await Create();
+            }
+            else
+            {
+                Message("Them khong thanh cong!", Severity.Warning);
+            }
+        }
+        else
+        {
+            var response = await _client.UpdateVoucher(updateVoucher);
+            if (response.IsSuccess)
+            {
+                await Update();
+            }
+            else
+            {
+                Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
+            }
+        }
+        StateHasChanged();
     }
 
     //thông báo
