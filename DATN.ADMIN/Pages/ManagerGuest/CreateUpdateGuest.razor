@@ -82,7 +82,7 @@
 					Address = guest.Address,
 					Gender = guest.Gender,
 					PhoneNumber = guest.PhoneNumber,
-
+					Email=guest.Email
 				});
 		if (response.IsSuccess)
 		{
@@ -100,7 +100,7 @@
 	//thông báo xác nhận
 	private async Task<bool> Confirm(string text)
 	{
-		var confirm = await _diagService.ShowMessageBox("Thông báo",	$"Xác nhận {text} nhân viên?",
+		var confirm = await _diagService.ShowMessageBox("Thông báo",	$"Xác nhận {text} khách hàng?",
 					yesText: "Xác nhận",
 					cancelText: "Hủy", noText: null,
 					options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });

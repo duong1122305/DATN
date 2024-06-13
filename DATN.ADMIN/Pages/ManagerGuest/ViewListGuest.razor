@@ -17,10 +17,10 @@
 @if (lstGuest!=null&& lstGuest.Count>0)
 {
 	
-	<MudDrawerContainer Class="mud-height-full">
+	<MudDrawerContainer Class="mud-height-full" Style="padding:20px">
 
 
-		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="400px" Height="80%"  Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent">
+		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="650px" Height="100%"  Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
 			<MudDrawerHeader style="display: flex; justify-content: space-between; align-items: center;">
 				<MudText Typo="Typo.h6">Thông tin khách hàng</MudText>
 				<MudIconButton Icon="@Icons.Material.Filled.Close"  @onclick="() => ChangDetailPopup()" />

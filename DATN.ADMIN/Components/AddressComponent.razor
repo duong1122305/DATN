@@ -63,6 +63,7 @@
 			selectedDistrict = districs.First(p=>p.id=="019");// đặt mặc định là quận nam từ liêm
 			wards = await addressService.GetWards("019");// lấy các phường ở Nam Từ Liêm
 			selectedWards = wards.First(p => p.id == "00623");// lấy xã mặc định Phương Canh
+			AddressFullName = await addressService.GetFullNameByWard("00623");
 		}
 		else
 		{
