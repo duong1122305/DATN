@@ -35,7 +35,6 @@
     //nó đây
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
-    private 
 
     protected async override Task OnInitializedAsync()
     {
@@ -49,17 +48,17 @@
     protected async Task Create()
     {
         // gọi api thêm
-        var result = await httpClient.PostAsJsonAsync<ResponseData<string>>("/api/UserLogin/test_them_ca_cho_1_thang");
-        bool val = result.IsSuccessStatusCode;
-        if (val)
-        {
-            Message("Thêm mới thành công", Severity.Success);
-            _dialogBox.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            Message("Thêm mới thất bại", Severity.Error);
-        }
+        // var result = await httpClient.PostAsJsonAsync<ResponseData<string>>("/api/UserLogin/test_them_ca_cho_1_thang");
+        // bool val = result.IsSuccessStatusCode;
+        // if (val)
+        // {
+        //     Message("Thêm mới thành công", Severity.Success);
+        //     _dialogBox.Close(DialogResult.Ok(true));
+        // }
+        // else
+        // {
+        //     Message("Thêm mới thất bại", Severity.Error);
+        // }
     }
     //thông báo xác nhận
     private async Task<bool?> Confirm()
