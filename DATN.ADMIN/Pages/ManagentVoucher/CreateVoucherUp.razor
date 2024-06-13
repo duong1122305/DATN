@@ -54,7 +54,9 @@
     //thêm
     protected async Task Create()
     {
-        // Voucher.StartDate = startDate;
+
+        Voucher.StartDate = startDate.Value;
+        Voucher.EndDate = endDate.Value;
         //gọi api thêm
         var result = await _client.CreateVoucher(Voucher);
         
