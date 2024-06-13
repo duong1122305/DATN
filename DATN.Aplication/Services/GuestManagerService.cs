@@ -164,6 +164,7 @@ namespace DATN.Aplication.Services
 					Name = request.Name,
 					PhoneNumber = request.PhoneNumber,
 					Gender = request.Gender,
+					Email = request.Email,
 					IsComfirm = true,
 					IsDeleted = false,
 					RegisteredAt = DateTime.Now,
