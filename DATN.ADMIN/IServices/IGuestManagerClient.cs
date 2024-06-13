@@ -9,6 +9,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> ChangStatus(bool value, Guid Id);
         Task<ResponseData<string>> RegisterHasUser(GuestRegisterUserRequest request);
         Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request);
+        Task<ResponseData<string>> UpdateGuets(GuestUpdateRequest request);
 
 
     }

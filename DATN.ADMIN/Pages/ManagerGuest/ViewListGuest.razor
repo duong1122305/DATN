@@ -9,6 +9,7 @@
 
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
+@inject IAddressService _addressServive;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
@@ -19,7 +20,7 @@
 	<MudDrawerContainer Class="mud-height-full">
 
 
-		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="400px" Height="100%"  Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent">
+		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="400px" Height="80%"  Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent">
 			<MudDrawerHeader style="display: flex; justify-content: space-between; align-items: center;">
 				<MudText Typo="Typo.h6">Thông tin khách hàng</MudText>
 				<MudIconButton Icon="@Icons.Material.Filled.Close"  @onclick="() => ChangDetailPopup()" />
@@ -28,11 +29,20 @@
 			<MudCard Style="padding: 30px">
 				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Name" Label="Tên khách hàng: "></MudTextField>
 				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.PhoneNumber" Label="PhoneNumber"></MudTextField>
-				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Address" Label="Address"></MudTextField>
+				@{
+					var address = _addressServive.GetAddress(selectedGuest.Address);
+				}
+				<MudTextField ReadOnly="true" @bind-Value="@address" Label="Address"></MudTextField>
 				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Email" Label="Email" ></MudTextField>
-				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Gender" Label="Giới tính"></MudTextField>
-				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.UserName" Label="Tên đăng nhập"></MudTextField>
-				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Password" Label="Mật khẩu" Variant="Variant.Filled" InputType=@PasswordInput Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonShowclick"></MudTextField>
+				@{
+					string gtinh = "Không xác định";
+					if (selectedGuest.Gender.HasValue)
+					{
+						gtinh = selectedGuest.Gender.Value ? "Nam" : "Nữ";
+					}
+				}
+				<MudTextField ReadOnly="true" @bind-Value="@gtinh" Label="Giới tính"></MudTextField>
+				
 			</MudCard>
 		</MudDrawer>
 		
@@ -71,7 +81,7 @@
 				}
 			}
 			<MudTd DataLabel="Giới tính">@gender</MudTd>
-			<MudTd DataLabel="Địa chỉ">@context.Address</MudTd>
+				<MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Address))</MudTd>
 			<MudTd DataLabel="Email">@context.Email</MudTd>
 			<MudTd >
 				<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
@@ -79,7 +89,7 @@
 			<MudTd>
 				<MudButtonGroup  Variant="Variant.Filled">
 					<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem thông tin cá nhân" OnClick="()=>OpenGuestDetails(context.Id)"></MudIconButton>
-					<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Sửa thông tin cá nhân"></MudIconButton>
+						<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
 					<MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
 				
 				</MudButtonGroup>
@@ -214,7 +224,7 @@ else
 			{
 				CloseOnEscapeKey = true,
 				Position = DialogPosition.Center,
-				MaxWidth = MaxWidth.Medium,
+				MaxWidth = MaxWidth.Large,
 				CloseButton = true,
 				FullWidth = true
 			};
@@ -224,6 +234,7 @@ else
 		{
 			createUpdateDialog.Close();
 			await LoadData();
+			StateHasChanged();
 		}
 	}
 
