@@ -19,5 +19,8 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien();
         Task<ResponseData<string>> UpdateCaNhanVien(List<string> lstStaff, int idShift);
 
+        //Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest);
+        Task<ResponseData<UserInfView>> GetInfoUser(string id);
+        Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView);
     }
 }

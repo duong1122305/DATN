@@ -1,0 +1,16 @@
+﻿@inject ISnackbar Snackbar
+
+<MudButton @onclick="@(() => Message("Top-Start", Severity ,Defaults.Classes.Position.TopStart))" Color="Color.Primary">Top-Start</MudButton>
+
+@code {
+    [Parameter]
+    public Severity Severity { get; set; }
+
+    private void Message(string message, Severity severity, string position)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = position;
+        Snackbar.Add(message, severity);
+    }
+}

@@ -1,6 +1,8 @@
 ﻿    @using System.Security.Policy
     @using DATN.Aplication.CustomProvider
-    @inject IDialogService _dialogservice;
+    @using System.IdentityModel.Tokens.Jwt
+    @using System.Security.Claims
+    @inject IDialogService _dialogservice
     @inject AuthenticationStateProvider AuthenticationStateProvider
     @inherits LayoutComponentBase
 <MudThemeProvider />
@@ -10,11 +12,13 @@
     <MudAppBar Elevation="5">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
-        <MudAvatar><MudImage Src="img/images.jpg"></MudImage></MudAvatar>
-        <MudMenu Label="Admin" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3 text-white">
-                <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
-                <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
-            </MudMenu>
+        <MudAvatar>
+            <MudImage Src="img/logo_bc.png"></MudImage>
+        </MudAvatar>
+        <MudMenu Label="@name" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
+            <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
+            <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
+        </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
         <img src="./img/logo_name.png" alt="Website Logo" style="padding-left:45px;width: 200px; height: 120px;" />
@@ -26,17 +30,14 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
-
 @code {
     [Inject]
     protected NavigationManager navigationManager { get; set; }
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
 
-
-    //màu
-    private MudTheme Theme = new MudTheme();
     bool _drawerOpen = true;
+    private string name = "";
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -60,10 +61,18 @@
     protected async override Task OnInitializedAsync()
     {
         var session = httpContextAccessor.HttpContext.Session.GetString("Key");
+
         if (string.IsNullOrEmpty(session))
         {
             // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
             navigationManager.NavigateTo("/dangnhap", true);
+        }
+        else
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
+            // var listClaims = jwtSecurityToken.Claims.ToArray();
+            name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
         }
 
     }

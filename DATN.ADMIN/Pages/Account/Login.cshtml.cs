@@ -60,7 +60,7 @@ namespace DATN.ADMIN.Pages.Account
                         Page();
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     TempData["Error"] = "Đã xảy ra lỗi khi đăng nhập.";
                     Redirect("~/dangnhap");
