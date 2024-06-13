@@ -101,19 +101,8 @@
         if (id != null)
         {
             voucherView = lstVoucher.FirstOrDefault(c => c.Id == id);
-            var updateVou = new VoucherView()
-                {
-                    Quantity = voucherView.Quantity,
-                    VoucherCode = voucherView.VoucherCode,
-                    Description = voucherView.Description,
-                    StartDate = voucherView.StartDate,
-                    EndDate = voucherView.EndDate,
-                    DiscountPercent = voucherView.DiscountPercent,
-                    MaxMoneyDiscount = voucherView.MaxMoneyDiscount,
-                    MinMoneyApplicable = voucherView.MinMoneyApplicable,
-                };
             parameters.Add("Id", id);
-            parameters.Add("VoucherView", updateVou);
+            parameters.Add("Voucher", voucherView);
             nameDialog = "Cập nhật voucher";
         }
         DialogOptions options = new DialogOptions()

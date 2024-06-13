@@ -5,19 +5,21 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-<EditForm Model="@voucherCreate">
+<EditForm Model="@Voucher">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="voucherCreate.VoucherName" Label="VoucherName" For="@(() => voucherCreate.VoucherName)" />
-                <MudDatePicker Editable="true" @bind-Value="voucherCreate.StartDate" Date="DateTime.Now" Label="Ngày bắt đầu" />
-                <MudDatePicker Editable="true" @bind-Value="voucherCreate.EndDate" Date="DateTime.Now" Label="Ngày kết thúc" />
-                <MudTextField T="string" @bind-Value="voucherCreate.Description" Label="Mô tả" For="@(() => voucherCreate.Description)" />
-                <MudTextField T="int" @bind-Value="voucherCreate.Quantity" Label="Số lượng" For="@(() => voucherCreate.Quantity)" />
-                <MudTextField T="decimal" @bind-Value="voucherCreate.DiscountPercent" Label="% Giảm" For="@(() => voucherCreate.DiscountPercent)" />
-                <MudTextField T="string" @bind-Value="voucherCreate.VoucherCode" Label="VoucherCode" For="@(() => voucherCreate.VoucherCode)" />
-                <MudTextField T="double" @bind-Value="voucherCreate.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => voucherCreate.MinMoneyApplicable)" />
-                <MudTextField T="double" @bind-Value="voucherCreate.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => voucherCreate.MaxMoneyDiscount)" />
+                <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" For="@(() => Voucher.VoucherName)" />
+                <MudTextField @bind-Date="Voucher.StartDate" Label="Ngày bắt đầu" For="@(() => Voucher.StartDate)" />
+                <MudTextField @bind-Date="Voucher.EndDate" Label="Ngày kết thúc" For="@(() => Voucher.EndDate)" />
+@*                 <MudDatePicker Editable="true" @bind-Date="Voucher.StartDate" Label="Ngày bắt đầu" />
+                <MudDatePicker Editable="true" @bind-Date="Voucher.EndDate" Label="Ngày kết thúc" /> *@
+                <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" />
+                <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
+                <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" />
+                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" />
+                <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => Voucher.MinMoneyApplicable)" />
+                <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -29,20 +31,23 @@
 
 @code {
     [Parameter]
-    public int id { get; set; }
+    public int Id { get; set; }
+    [Parameter]
+    public VoucherView Voucher { get; set; } = new VoucherView();
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
     [Inject]
     private IVoucherServices _client { get; set; }
     public VoucherView voucherCreate{ get; set; } = new VoucherView();
 
-    VoucherView updateVoucher{ get; set; } = new VoucherView();
 
     protected async override Task OnInitializedAsync()
     {
-        if (id > 0)
+        if (Id > 0)
         {
             _nameButton = "Cập nhật";
+            Voucher.StartDate = new DateTime(Voucher.StartDate.Year,Voucher.StartDate.Month,Voucher.StartDate.Day);
+            Voucher.EndDate = new DateTime(Voucher.EndDate.Year, Voucher.EndDate.Month, Voucher.EndDate.Day);
         }
     }
 
@@ -74,17 +79,17 @@
     //cập nhật
     public async Task Update()
     {
-        if (await Confirm() == true)
+        if (await Confirm()==true)
         {
-            updateVoucher.VoucherName = voucherCreate.VoucherName;
-            updateVoucher.StartDate = voucherCreate.StartDate;
-            updateVoucher.EndDate = voucherCreate.EndDate;
-            updateVoucher.Description = voucherCreate.Description;
-            updateVoucher.DiscountPercent = voucherCreate.DiscountPercent;
-            updateVoucher.MinMoneyApplicable = voucherCreate.MinMoneyApplicable;
-            updateVoucher.MaxMoneyDiscount = voucherCreate.MaxMoneyDiscount;
-            updateVoucher.Quantity = voucherCreate.Quantity;
-            var result = await _client.UpdateVoucher(updateVoucher);
+            Voucher.VoucherName = voucherCreate.VoucherName;
+            Voucher.StartDate = voucherCreate.StartDate;
+            Voucher.EndDate = voucherCreate.EndDate;
+            Voucher.Description = voucherCreate.Description;
+            Voucher.DiscountPercent = voucherCreate.DiscountPercent;
+            Voucher.MinMoneyApplicable = voucherCreate.MinMoneyApplicable;
+            Voucher.MaxMoneyDiscount = voucherCreate.MaxMoneyDiscount;
+            Voucher.Quantity = voucherCreate.Quantity;
+            var result = await _client.UpdateVoucher(Voucher);
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
