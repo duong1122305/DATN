@@ -10,8 +10,8 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="voucherCreate.VoucherName" Label="VoucherName" For="@(() => voucherCreate.VoucherName)" />
-                <MudTextField T="DateTime" @bind-Value="voucherCreate.StartDate" Label="Ngày bắt đầu" For="@(() => voucherCreate.StartDate)" />
-                <MudTextField T="DateTime" @bind-Value="voucherCreate.EndDate" Label="Ngày kết thúc" For="@(() => voucherCreate.EndDate)" />
+                <MudDatePicker Editable="true" @bind-Value="voucherCreate.StartDate" Date="DateTime.Now" Label="Ngày bắt đầu" />
+                <MudDatePicker Editable="true" @bind-Value="voucherCreate.EndDate" Date="DateTime.Now" Label="Ngày kết thúc" />
                 <MudTextField T="string" @bind-Value="voucherCreate.Description" Label="Mô tả" For="@(() => voucherCreate.Description)" />
                 <MudTextField T="int" @bind-Value="voucherCreate.Quantity" Label="Số lượng" For="@(() => voucherCreate.Quantity)" />
                 <MudTextField T="decimal" @bind-Value="voucherCreate.DiscountPercent" Label="% Giảm" For="@(() => voucherCreate.DiscountPercent)" />
@@ -29,20 +29,18 @@
 
 @code {
     [Parameter]
-    public string userName { get; set; }
+    public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
     [Inject]
     private IVoucherServices _client { get; set; }
-    //nó đây
-    [Parameter]
-    public VoucherView voucherCreate { get; set; } = new VoucherView();
+    public VoucherView voucherCreate{ get; set; } = new VoucherView();
 
-    VoucherView updateVoucher = new VoucherView();
+    VoucherView updateVoucher{ get; set; } = new VoucherView();
 
     protected async override Task OnInitializedAsync()
     {
-        if (userName != null)
+        if (id > 0)
         {
             _nameButton = "Cập nhật";
         }
@@ -103,27 +101,11 @@
     {
         if (voucherCreate.Id == null)
         {
-            var response = await _client.CreateVoucher(voucherCreate);
-            if (response.Data !=null)
-            {
                 await Create();
-            }
-            else
-            {
-                Message("Them khong thanh cong!", Severity.Warning);
-            }
         }
         else
         {
-            var response = await _client.UpdateVoucher(updateVoucher);
-            if (response.IsSuccess)
-            {
                 await Update();
-            }
-            else
-            {
-                Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
-            }
         }
         StateHasChanged();
     }

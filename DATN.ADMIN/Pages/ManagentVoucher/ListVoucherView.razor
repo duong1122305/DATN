@@ -32,32 +32,33 @@
         <MudTd DataLabel="STT" Style="text-align:center;">
             @(lstVoucher.IndexOf(context) + 1)
         </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.VoucherName</MudTd>
-        <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.VoucherCode</MudTd>
-        <MudTd DataLabel="Address" Style="text-align:center;">@context.DiscountPercent</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy")</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
-        <MudTd DataLabel="Email" Style="text-align:center;">Chưa có trạng thái</MudTd>
+        <MudTd DataLabel="VoucherName" Style="text-align:center;">@context.VoucherName</MudTd>
+        <MudTd DataLabel="VoucherCode" Style="text-align:center;">@context.VoucherCode</MudTd>
+        <MudTd DataLabel="DiscourPercent" Style="text-align:center;">@context.DiscountPercent</MudTd>
+        <MudTd DataLabel="Description" Style="text-align:center;">@context.Description</MudTd>
+        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
+        <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
+        <MudTd DataLabel="Trạng thái" Style="text-align:center;">Chưa có trạng thái</MudTd>
         <MudTd Style="text-align:center;">
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"></MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning"></MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary"></MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá"></MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.Id))"></MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudButton>
         </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
 </MudTable>
+
 @code {
     //button trạng thái
     private bool _disableElevation = false;
     private string searchString = "";
     private List<VoucherView> lstVoucher = new List<VoucherView>();
 
-    VoucherView voucherView = new VoucherView();
+    private VoucherView voucherView = new VoucherView();
     [Inject]
     private IVoucherServices _client{get;set;}
 
