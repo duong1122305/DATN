@@ -63,7 +63,7 @@ namespace DATN.Aplication.Services
                             workshift.WorkDate.Month == nextMonth &&
                             workshift.ShiftId == shift
                             select workshift;
-
+                int numberOfSuccess = 0;
                 foreach (var workShift in query)
                 {
                     foreach (var user in listUser)
@@ -81,10 +81,11 @@ namespace DATN.Aplication.Services
                         {
                             await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
+                            numberOfSuccess++;
                         }
                     }
                 }
-                return new ResponseData<string> { IsSuccess = true, Data = $"Thêm lịch làm việc thành công!" };
+                return new ResponseData<string> { IsSuccess = true, Data = $"Thêm lịch làm việc thành công số dòng thêm thành công là: {numberOfSuccess}!" };
             }
             catch (Exception e)
             {

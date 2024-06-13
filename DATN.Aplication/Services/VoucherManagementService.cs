@@ -92,6 +92,7 @@ namespace DATN.Aplication.Services
             var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
                         select new VoucherView
                         {
+                            Id=discount.Id,
                             VoucherCode = discount.VoucherCode,
                             StartDate = discount.StartDate,
                             EndDate = discount.EndDate,

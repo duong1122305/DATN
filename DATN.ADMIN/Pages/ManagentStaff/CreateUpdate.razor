@@ -100,7 +100,7 @@
         if (user.Password != null)
         {
             var response = await _client.GetById(userName);
-            if (response.Data == null)
+            if (response.Data != null)
             {
                 await Create();
             }
