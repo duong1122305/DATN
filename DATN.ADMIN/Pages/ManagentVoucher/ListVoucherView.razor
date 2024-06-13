@@ -75,7 +75,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (voucher.VoucherName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (voucher.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (voucher.VoucherCode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;

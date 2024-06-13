@@ -36,7 +36,6 @@
     private string _nameButton = "Thêm mới";
     [Inject]
     private IVoucherServices _client { get; set; }
-    public VoucherView voucherCreate{ get; set; } = new VoucherView();
 
     private DateTime? startDate;
     private DateTime? endDate;
@@ -47,7 +46,6 @@
             _nameButton = "Cập nhật";
             startDate = new DateTime(Voucher.StartDate.Year, Voucher.StartDate.Month, Voucher.StartDate.Day);
             endDate = new DateTime(Voucher.EndDate.Year, Voucher.EndDate.Month, Voucher.EndDate.Day);
-
         }
     }
 
@@ -85,14 +83,8 @@
     {
         if (await Confirm()==true)
         {
-            Voucher.VoucherName = voucherCreate.VoucherName;
-            startDate = voucherCreate.StartDate;
-            endDate = voucherCreate.EndDate;
-            Voucher.Description = voucherCreate.Description;
-            Voucher.DiscountPercent = voucherCreate.DiscountPercent;
-            Voucher.MinMoneyApplicable = voucherCreate.MinMoneyApplicable;
-            Voucher.MaxMoneyDiscount = voucherCreate.MaxMoneyDiscount;
-            Voucher.Quantity = voucherCreate.Quantity;
+            Voucher.StartDate=startDate.Value;
+            Voucher.EndDate = endDate.Value;
             var result = await _client.UpdateVoucher(Voucher);
             if (result.IsSuccess)
             {
@@ -108,7 +100,7 @@
     }
     private async Task Submid()
     {
-        if (voucherCreate.Id == null)
+        if (Voucher.Id ==0)
         {
                 await Create();
         }

@@ -27,7 +27,9 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView)
         {
-            throw new NotImplementedException();
+            var respone = await _client.PutAsJsonAsync<VoucherView>($"api/UserLogin/Update-Voucher",voucherView);
+            var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
+            return result;
         }
     }
 }
