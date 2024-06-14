@@ -29,11 +29,12 @@
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">Chọn</MudTh>
-            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
-            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
-            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
-            <MudTh Style="text-align:center;"><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh>Chọn</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;">Trạng thái</MudTh>
             <MudTh Style="text-align:center;">Hành động</MudTh> 
         </HeaderContent>
@@ -48,10 +49,11 @@
                     <MudCheckBox Disabled="@true" Checked="@false" />
                 }
             </MudTd>
-            <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
-            <MudTd DataLabel="PhoneNumber" Style="text-align:center;">@context.PhoneNumber</MudTd>
-            <MudTd DataLabel="Address" Style="text-align:center;">@context.Address</MudTd>
-            <MudTd DataLabel="Email" Style="text-align:center;">@context.Email</MudTd>
+            <MudTd DataLabel="Name">@context.FullName</MudTd>
+            <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Address">@context.Address</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Gender">@context.Gender</MudTd>
             @if (!context.IsDeleted)
             {
                 <MudTd DataLabel="Email" Style="text-align:center;">
