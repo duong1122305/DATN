@@ -25,7 +25,6 @@
         <MudTh Style="text-align:center;">Ngày kết thúc</MudTh>
         <MudTh Style="text-align:center;">Số tiền tối thiểu</MudTh>
         <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
-        <MudTh Style="text-align:center;">Trạng thái</MudTh>
         <MudTh Style="text-align:center;">Hành động</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -40,11 +39,11 @@
         <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
         <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
         <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
-        <MudTd DataLabel="Trạng thái" Style="text-align:center;">Chưa có trạng thái</MudTd>
         <MudTd Style="text-align:center;">
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá"></MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.Id))"></MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudButton>
+            <MudButtonGroup Variant="Variant.Filled">
+                <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
+            </MudButtonGroup>
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -77,7 +76,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (voucher.VoucherName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (voucher.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (voucher.VoucherCode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
