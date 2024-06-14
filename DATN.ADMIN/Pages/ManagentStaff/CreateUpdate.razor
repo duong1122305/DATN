@@ -13,6 +13,8 @@
                 <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+
+
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>

@@ -2,103 +2,92 @@
 @using DATN.ViewModels.Common.Location;
 @using DATN.ADMIN.IServices;
 
-<div class="d-flex m-3">
-
-	<MudSelect Class="mud-mb-2" T="DataAdress" Value="selectedProvinces" Label="Tỉnh/ Thành phố" ValueChanged="ChooseProvinces" Width="200px">
-			@foreach (var item in provinces)
-			{
-			<MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
-			}
-		</MudSelect>
-
-
-
-
-	<MudSelect Class="mud-mb-2" T="DataAdress" Value=@selectedDistrict Label="Quận/ Huyện" ValueChanged="ChooseDistricts" Width="200px">
-			@foreach (var item in districs)
-			{
-			<MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
-			}
-		</MudSelect>
-
-
-	<MudSelect Class="mud-mb-2" T="DataAdress" Value="@selectedWards" Label="Xã/ Phường" Width="200px" ValueChanged="ChooseWards">
-			@foreach (var item in wards)
-			{
-			<MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
-			}
-		</MudSelect>
-	
+<div class="d-flex m-3" style="margin-top:10px">
+    <MudSelect Class="mud-mb-2" T="DataAdress" Value="selectedProvinces" Label="Tỉnh/ Thành phố" AnchorOrigin="Origin.BottomCenter" ValueChanged="ChooseProvinces">
+        @foreach (var item in provinces)
+        {
+            <MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect Class="mud-mb-2" T="DataAdress" Value=@selectedDistrict Label="Quận/ Huyện" AnchorOrigin="Origin.BottomCenter" Style="margin-left:10px" ValueChanged="ChooseDistricts">
+        @foreach (var item in districs)
+        {
+            <MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect Class="mud-mb-2" T="DataAdress" Value="@selectedWards" Style="margin-left:10px" AnchorOrigin="Origin.BottomCenter" Label="Xã/ Phường" ValueChanged="ChooseWards">
+        @foreach (var item in wards)
+        {
+            <MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
+        }
+    </MudSelect>
 </div>
-
-	<MudTextField T="string" @bind-Value="@Address" Label="Số nhà" TextChanged="this.UpdateAddress" Immediate="true"  />
-
-
+<MudTextField T="string" @bind-Value="@Address" Label="Số nhà" TextChanged="this.UpdateAddress" Immediate="true" />
 @code {
-	[Parameter]
-	public EventCallback<string> OnAddressChanged { get; set; }
-	[Parameter]
-	public string AddressCode { get; set; } = null;
+    [Parameter]
+    public EventCallback<string> OnAddressChanged { get; set; }
+    [Parameter]
+    public string AddressCode { get; set; } = null;
 
 
 
-	[Inject] public IAddressService addressService { get; set; }
-	private List<DataAdress> provinces = new List<DataAdress>();
-	private List<DataAdress> districs = new List<DataAdress>();
-	private List<DataAdress> wards = new List<DataAdress>();
-	protected DataAdress selectedProvinces;
-	protected DataAdress selectedDistrict;
-	protected DataAdress selectedWards;
-	protected string Address = null;
-	protected string AddressFullName = "";
-	public string AddressReturn = "";
-	protected override async Task OnInitializedAsync()
-	{
-		provinces = await addressService.GetProvinces();
-		if (string.IsNullOrEmpty(AddressCode))
-		{
+    [Inject] public IAddressService addressService { get; set; }
+    private List<DataAdress> provinces = new List<DataAdress>();
+    private List<DataAdress> districs = new List<DataAdress>();
+    private List<DataAdress> wards = new List<DataAdress>();
+    protected DataAdress selectedProvinces;
+    protected DataAdress selectedDistrict;
+    protected DataAdress selectedWards;
+    protected string Address = null;
+    protected string AddressFullName = "";
+    public string AddressReturn = "";
+    protected override async Task OnInitializedAsync()
+    {
+        provinces = await addressService.GetProvinces();
+        if (string.IsNullOrEmpty(AddressCode))
+        {
 
-			selectedProvinces = provinces.First(p => p.id=="01");// gắn mặc định vào Hà nội
-			districs = await addressService.GetDistricts("01");// dât các quận
-			selectedDistrict = districs.First(p=>p.id=="019");// đặt mặc định là quận nam từ liêm
-			wards = await addressService.GetWards("019");// lấy các phường ở Nam Từ Liêm
-			selectedWards = wards.First(p => p.id == "00623");// lấy xã mặc định Phương Canh
-		}
-		else
-		{
-			var data = AddressCode.Split('!');
-			AddressFullName = data[2];
-			DataAdress response = await addressService.GetFullCodeByWard(data[0]);
-			selectedProvinces = provinces.First(p => p.id == response.tinh);
-			districs = await addressService.GetDistricts(response.tinh);
-			selectedDistrict = districs.First(p => p.id == response.quan);
-			wards = await addressService.GetWards(response.quan);
-			selectedWards = wards.First(p => p.id == response.phuong);
-			Address = data[1];
-		}
-	}
+            selectedProvinces = provinces.First(p => p.id == "01");// gắn mặc định vào Hà nội
+            districs = await addressService.GetDistricts("01");// dât các quận
+            selectedDistrict = districs.First(p => p.id == "019");// đặt mặc định là quận nam từ liêm
+            wards = await addressService.GetWards("019");// lấy các phường ở Nam Từ Liêm
+            selectedWards = wards.First(p => p.id == "00623");// lấy xã mặc định Phương Canh
+        }
+        else
+        {
+            var data = AddressCode.Split('!');
+            AddressFullName = data[2];
+            DataAdress response = await addressService.GetFullCodeByWard(data[0]);
+            selectedProvinces = provinces.First(p => p.id == response.tinh);
+            districs = await addressService.GetDistricts(response.tinh);
+            selectedDistrict = districs.First(p => p.id == response.quan);
+            wards = await addressService.GetWards(response.quan);
+            selectedWards = wards.First(p => p.id == response.phuong);
+            Address = data[1];
+        }
+    }
 
 
-	public async Task ChooseProvinces(DataAdress value)
-	{
-		selectedProvinces = value;
-		districs = await addressService.GetDistricts(value.id);
-	}
+    public async Task ChooseProvinces(DataAdress value)
+    {
+        selectedProvinces = value;
+        districs = await addressService.GetDistricts(value.id);
+    }
 
-	public async Task ChooseDistricts(DataAdress value)
-	{
-		selectedDistrict = value;
-		wards = await addressService.GetWards(selectedDistrict.id);
-	}
-	public async Task ChooseWards(DataAdress value)
-	{
-		AddressFullName = await addressService.GetFullNameByWard(value.id);
-		selectedWards = value;
-		UpdateAddress(Address);
-	}
-	private void UpdateAddress(string? value)
-	{
-		AddressReturn = selectedWards.id + "!" + value + "!" + AddressFullName;
-		OnAddressChanged.InvokeAsync(AddressReturn);
-	}
+    public async Task ChooseDistricts(DataAdress value)
+    {
+        selectedDistrict = value;
+        wards = await addressService.GetWards(selectedDistrict.id);
+    }
+    public async Task ChooseWards(DataAdress value)
+    {
+        AddressFullName = await addressService.GetFullNameByWard(value.id);
+        selectedWards = value;
+        UpdateAddress(Address);
+    }
+    private void UpdateAddress(string? value)
+    {
+        AddressReturn = selectedWards.id + "!" + value + "!" + AddressFullName;
+        OnAddressChanged.InvokeAsync(AddressReturn);
+    }
 }

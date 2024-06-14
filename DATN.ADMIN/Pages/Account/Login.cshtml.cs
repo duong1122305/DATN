@@ -54,11 +54,11 @@ namespace DATN.ADMIN.Pages.Account
                         _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
                         _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
                     }
-                    else if (checkLogin.Error != null)
-                    {
-                        TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
-                        Page();
-                    }
+                        else if (checkLogin.Error != null)
+                        {
+                            TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
+                            Page();
+                        }
                 }
                 catch (Exception)
                 {
