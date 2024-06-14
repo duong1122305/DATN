@@ -1,9 +1,13 @@
-﻿@page "/CreateUpdateServices"
+﻿@page "/CreateUpdateServicesDetails"
 <EditForm>
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" Label="Tên dịch vụ" />
+                <MudTextField T="string" Label="Tên chi tiết" />
+                <MudTextField T="string" Label="Giá" />
+                <MudTextField T="string" Label="Thời gian làm" />
+                <MudTextField T="string" Label="Mô tả" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"></MudButton>
@@ -14,6 +18,5 @@
 </EditForm>
 
 @code {
-    [Parameter]
-    public int id { get; set; }
+ 
 }

@@ -9,6 +9,8 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
 <PageTitle>Danh sách dịch vụ chi tiết</PageTitle>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
+
 <MudButton Variant="Variant.Filled" Href="/ListServices" Style="margin-block-end" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Danh sách dịch vụ</MudButton>
 <MudTable Items="@lstServiesDetails">
     <ToolBarContent>
@@ -114,6 +116,37 @@
     {
         open = true;
         this.anchor = anchor;
+
+    }
+
+    private async Task OpenDialog(int? id)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới dịch vụ chi tiết";
+        parameters.Add("id", id);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        try
+        {
+            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpServicesDetails>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await OnInitializedAsync();
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
 
     }
 
