@@ -36,7 +36,7 @@
     private string _nameButton = "Thêm mới";
     [Inject]
     private IVoucherServices _client { get; set; }
-    public VoucherView voucherCreate{ get; set; } = new VoucherView();
+    public VoucherView voucherCreate { get; set; } = new VoucherView();
 
     private DateTime? startDate;
     private DateTime? endDate;
@@ -54,10 +54,10 @@
     //thêm
     protected async Task Create()
     {
-        // Voucher.StartDate = startDate;
+        Voucher.StartDate = startDate ?? DateTime.Now;
         //gọi api thêm
         var result = await _client.CreateVoucher(Voucher);
-        
+
         if (result.IsSuccess)
         {
             Message(result.Data, Severity.Success);
@@ -81,7 +81,7 @@
     //cập nhật
     public async Task Update()
     {
-        if (await Confirm()==true)
+        if (await Confirm() == true)
         {
             Voucher.VoucherName = voucherCreate.VoucherName;
             startDate = voucherCreate.StartDate;
@@ -108,11 +108,11 @@
     {
         if (voucherCreate.Id == null)
         {
-                await Create();
+            await Create();
         }
         else
         {
-                await Update();
+            await Update();
         }
         StateHasChanged();
     }

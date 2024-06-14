@@ -170,6 +170,7 @@ namespace DATN.Aplication.System
                     userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
                     if (userInfView.Position != "Admin")
                     {
+                        userInfView.Gender = user.Gender == false ? "Nữ" : "Nam";
                         userInfView.FullName = user.FullName;
                         userInfView.UserName = user.UserName;
                         userInfView.Address = user.Address;
@@ -241,16 +242,7 @@ namespace DATN.Aplication.System
             }
         }
 
-        public async Task<ResponseData<string>> GetConfirmCode(string username)
-        {
-            var user = await CheckUser(username);
-            if (user == null) return new ResponseData<string> { IsSuccess = true, Error = "Tài khoản nhập chưa được đăng kí" };
-            else
-            {
-                return new ResponseData<string> { IsSuccess = true, Data = user.CodeConfirm };
-            }
-        }
-        public async Task<ResponseData<bool>> CheckCodeConfirm(string username, string code)
+        public async Task<ResponseData<string>> CheckCodeConfirm(string username, string code)
         {
             var user = await CheckUser(username);
             if (user != null)
@@ -259,11 +251,11 @@ namespace DATN.Aplication.System
                 {
                     user.CodeConfirm = null;
                     await _userManager.UpdateAsync(user);
-                    return new ResponseData<bool> { IsSuccess = true };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Code chuẩn rồi" };
                 }
-                return new ResponseData<bool> { IsSuccess = false, Error = "Code chưa đúng" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Code chưa đúng" };
             }
-            return new ResponseData<bool> { IsSuccess = false, Error = "Tài khoản hoặc mật khẩu chưa đúng!" };
+            return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản hoặc mật khẩu chưa đúng!" };
         }
         private async Task<User> CheckUser(string username)
         {
@@ -403,6 +395,26 @@ namespace DATN.Aplication.System
             {
                 return new ResponseData<UserInfView> { IsSuccess = true, Error = e.Message };
             }
+        }
+
+        public async Task<ResponseData<string>> ResetPassword(UserResetPassView user)
+        {
+            var userIden = await CheckUser(user.UserName);
+            if (userIden != null)
+            {
+                if (user.NewPassWord == user.ConfirmPassWord)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(userIden);
+                    var check = await _userManager.ResetPasswordAsync(userIden, token, user.ConfirmPassWord);
+                    if (check.Succeeded)
+                        return new ResponseData<string> { IsSuccess = true, Data = "Đổi thành công" };
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Đổi chưa được do pass chưa đúng định dạng" };
+                }
+                else
+                    return new ResponseData<string> { IsSuccess=false,Error = "Mật khẩu mới và xác nhận mật khẩu mới không trùng nhau"};
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản sai" };
         }
     }
 }

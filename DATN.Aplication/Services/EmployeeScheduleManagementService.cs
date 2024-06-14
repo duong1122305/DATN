@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using DATN.Aplication.Services.IServices;
@@ -63,10 +64,10 @@ namespace DATN.Aplication.Services
                             workshift.WorkDate.Month == nextMonth &&
                             workshift.ShiftId == shift
                             select workshift;
-                int numberOfSuccess = 0;
-                foreach (var workShift in query)
+                List<string> listSuccess = new List<string>();
+                foreach (var user in listUser)
                 {
-                    foreach (var user in listUser)
+                    foreach (var workShift in query)
                     {
                         var schedule = new EmployeeSchedule()
                         {
@@ -81,11 +82,25 @@ namespace DATN.Aplication.Services
                         {
                             await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
-                            numberOfSuccess++;
+                        }
+                        else
+                        {
+                            int count = 0;
+                            foreach (var item in listSuccess)
+                            {
+                                if (item != querycheck.FirstOrDefault().UserId.ToString())
+                                {
+                                    count++;
+                                }
+                            }
+                            if (count == listSuccess.Count)
+                            {
+                                listSuccess.Add(querycheck.First().UserId.ToString());
+                            }
                         }
                     }
                 }
-                return new ResponseData<string> { IsSuccess = true, Data = $"Thêm lịch làm việc thành công số dòng thêm thành công là: {numberOfSuccess}!" };
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
             }
             catch (Exception e)
             {
@@ -102,14 +117,19 @@ namespace DATN.Aplication.Services
                         on workShift.Id equals schedule.WorkShiftId
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
+                        group new { schedule.WorkShiftId, shifttable.Name, workShift.WorkDate }
+                        by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To }
+                        into view
                         select new ScheduleView
                         {
-                            Name = user.FullName,
-                            WorkDate = workShift.WorkDate,
-                            Shift = shifttable.Name,
-                            To = shifttable.To,
-                            From = shifttable.From
+                            Name = view.Count().ToString() + " người",
+                            WorkDate = view.Key.WorkDate,
+                            Shift = view.Key.Name,
+                            To = view.Key.To,
+                            From = view.Key.From,
+
                         };
+
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
@@ -140,7 +160,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error="Kh có dữ liệu"};
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Kh có dữ liệu" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleForShift(int shift)

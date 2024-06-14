@@ -12,6 +12,7 @@ using System.Text;
 using MudBlazor.Services;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
