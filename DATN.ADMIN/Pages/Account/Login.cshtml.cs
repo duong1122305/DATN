@@ -56,8 +56,8 @@ namespace DATN.ADMIN.Pages.Account
                     }
                     else if (checkLogin.Error != null)
                     {
-                        TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
-                        Page();
+                        //TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
+                        //Page();
                     }
                 }
                 catch (Exception)

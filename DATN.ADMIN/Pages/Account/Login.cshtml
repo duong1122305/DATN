@@ -36,17 +36,13 @@
                                 <div>
                                     <label class="form-label" for="email">Email</label>
                                     <input class="form-control"  id="email" value="binh1234" name="email" required="required" autofocus="autofocus">
+                                    <div id="error-message2" class="alert alert-danger" style="display: none;"></div>
                                 </div>
                                 <!-- Password -->
                                 <div class="mt-4">
                                     <label class="form-label" for="password">Mật khẩu</label>
                                     <input class="form-control" id="password" type="password" value="Binh1234@@" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
-                                    <div style="padding-top: 10px">
-                                        @if (TempData["Error"] != null)
-                                        {
-                                            <div class="alert alert-danger" style="margin-top=5px">@TempData["Error"]</div>
-                                        }
-                                    </div>
+                                    <div id="error-message" class="alert alert-danger" style="display: none;"></div>
                                 </div> 
 
                                 <!-- Remember Me -->
