@@ -12,13 +12,12 @@
 @inject IAddressService _addressServive;
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Error" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
 
 @if (lstGuest!=null&& lstGuest.Count>0)
 {
 	
 	<MudDrawerContainer Class="mud-height-full" Style="padding:20px">
-
 
 		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="650px" Height="100%"  Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
 			<MudDrawerHeader style="display: flex; justify-content: space-between; align-items: center;">

@@ -30,7 +30,7 @@ namespace DATN.Aplication.Services
 				return new ResponseData<string>()
 				{
 					IsSuccess = false,
-					Error = "Có lỗi khi lấy dữ liệu"
+					Error = "Có lỗi khi thêm dữ liệu"
 				};
 			}
 		}
@@ -71,10 +71,28 @@ namespace DATN.Aplication.Services
 			}
 		}
 
-
-		public Task<ResponseData<string>> Update(PetSpecies request)
+		public Task<ResponseData<string>> SoftDelete(DeleteRequest<Guid> request)
 		{
 			throw new NotImplementedException();
+		}
+
+		public async Task<ResponseData<string>> Update(PetSpecies request)
+		{
+
+			try
+			{
+				var data = await _unitOfWork.PetSpeciesRepository.UpdateAsync(request);
+				return new ResponseData<string>("Cập nhật thành công");
+
+			}
+			catch (Exception)
+			{
+				return new ResponseData<string>()
+				{
+					IsSuccess = false,
+					Error = "Có lỗi khi cập nhật dữ liệu"
+				};
+			}
 		}
 	}
 }

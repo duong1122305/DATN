@@ -162,6 +162,11 @@ namespace DATN.Aplication.Services
 		{
 			try
 			{
+				string randomPass = "";
+				if (string.IsNullOrEmpty(request.Email))
+                {
+					randomPass = GeneratePassword();
+				}
 				var guest = new Guest()
 				{
 					Address = request.Address,
@@ -169,12 +174,18 @@ namespace DATN.Aplication.Services
 					PhoneNumber = request.PhoneNumber,
 					Gender = request.Gender,
 					Email = request.Email,
-					IsComfirm = true,
+					UserName = request.Email,
+					PasswordHash = randomPass != "" ? _passwordExtensitons.HashPassword(randomPass) : null,
+					IsComfirm = false,
 					IsDeleted = false,
 					RegisteredAt = DateTime.Now,
 				};
 				await _unitOfWork.GuestRepository.AddAsync(guest);
 				var result = await _unitOfWork.SaveChangeAsync();
+				if (string.IsNullOrEmpty(request.Email))
+				{
+					await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, randomPass, guest.Id.ToString());
+				}
 				if (result > 0)
 				{
 					return new ResponseData<string>
@@ -384,6 +395,25 @@ namespace DATN.Aplication.Services
 			}
 		}
 
+		private string GeneratePassword()
+		{
+			int passLength = 6;
+			const string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
+			const string digits = "0123456789";
+			const string specialChars = "!@#$%^&*()_+<>?";
+
+			string allChars = upperCase + lowerCase + digits + specialChars;
+			Random random = new Random();
+
+			StringBuilder password = new StringBuilder();
+			for (int i = 0; i < passLength; i++)
+			{
+				password.Append(allChars[random.Next(allChars.Length)]);
+			}
+
+			return password.ToString();
+		}
 
 	}
 }

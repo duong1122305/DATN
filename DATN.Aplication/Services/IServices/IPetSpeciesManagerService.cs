@@ -15,5 +15,6 @@ namespace DATN.Aplication.Services.IServices
 		Task<ResponseData<string>> Update(PetSpecies request);
 		Task<ResponseData<List<PetSpecies>>> GetAll();
 		Task<ResponseData<PetSpecies>> FindGuestByID(int id);
+		Task<ResponseData<string>> SoftDelete(DeleteRequest<Guid> request);
 	}
 }
