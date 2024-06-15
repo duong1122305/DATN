@@ -50,7 +50,6 @@ namespace DATN.Aplication.Services
             return new ResponseData<List<ScheduleView>> { IsSuccess = true, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year}" };
         }
 
-
         public async Task<ResponseData<string>> InsertEmployeeNextMonthCompareCurrentMonth(List<string> listUser, int shift)
         {
             try
@@ -65,6 +64,7 @@ namespace DATN.Aplication.Services
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
+                int count = 0;
                 foreach (var user in listUser)
                 {
                     foreach (var workShift in query)
@@ -82,20 +82,12 @@ namespace DATN.Aplication.Services
                         {
                             await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            int count = 0;
                             foreach (var item in listSuccess)
                             {
-                                if (item != querycheck.FirstOrDefault().UserId.ToString())
+                                if (item != schedule.UserId.ToString())
                                 {
-                                    count++;
+                                    listSuccess.Add(schedule.UserId.ToString());
                                 }
-                            }
-                            if (count == listSuccess.Count)
-                            {
-                                listSuccess.Add(querycheck.First().UserId.ToString());
                             }
                         }
                     }
@@ -107,7 +99,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = true, Error = e.Message };
             }
         }
-
+        
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
