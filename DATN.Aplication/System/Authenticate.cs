@@ -37,7 +37,6 @@ namespace DATN.Aplication.System
         {
             try
             {
-
                 var userIdentity = await CheckUser(userView.UserName);
                 if (userIdentity == null)
                     return new ResponseData<string>
@@ -89,7 +88,7 @@ namespace DATN.Aplication.System
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user))),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
             SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -106,17 +105,26 @@ namespace DATN.Aplication.System
 
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
-            var userIdentity = new User()
+            int count = 1;
+            var name = CutString.CutName(userRegisterView.FullName);
+            foreach (var item in await _userManager.Users.ToListAsync())
             {
-                FullName = userRegisterView.FullName,
-                UserName = userRegisterView.UserName,
-                Email = userRegisterView.Email,
-                PhoneNumber = userRegisterView.PhoneNumber,
-                Address = userRegisterView.Address,
-                NormalizedEmail = userRegisterView.Email.ToUpper(),
-                NormalizedUserName = userRegisterView.UserName.ToUpper(),
-                IsDeleted = false,
-            };
+                if (item.UserName.Contains(name))
+                {
+                    count++;
+                }
+            }
+            name += count.ToString();
+            var userIdentity = new User();
+            userIdentity.UserName = name;
+            userIdentity.FullName = userRegisterView.FullName;
+            userIdentity.Email = userRegisterView.Email;
+            userIdentity.PhoneNumber = userRegisterView.PhoneNumber;
+            userIdentity.Address = userRegisterView.Address;
+            userIdentity.NormalizedEmail = userRegisterView.Email.ToUpper();
+            userIdentity.NormalizedUserName = userIdentity.UserName.ToUpper();
+            userIdentity.IsDeleted = false;
+            userRegisterView.Password = CutString.RandomPass();
             var checkEmail = await _userManager.FindByEmailAsync(userRegisterView.Email);
             var checkPhone = await GetUserAtPhoneNumber(userIdentity.PhoneNumber);
             if (checkEmail == null && checkPhone.Data == null)
@@ -126,7 +134,7 @@ namespace DATN.Aplication.System
                 {
                     var userInf = new UserLoginView()
                     {
-                        UserName = userRegisterView.UserName,
+                        UserName = userIdentity.UserName,
                         Password = userRegisterView.Password
                     };
                     return new ResponseData<string> { IsSuccess = true, Data = await _mail.SendMailAccountStaffAsync(userRegisterView.Email, userInf) };
@@ -259,7 +267,9 @@ namespace DATN.Aplication.System
         }
         private async Task<User> CheckUser(string username)
         {
-            var userName = await _userManager.FindByNameAsync(username);
+
+            var userName = _userManager.Users.AsEnumerable()
+                        .FirstOrDefault(u => u.UserName.Equals(username, StringComparison.Ordinal));
             var userEmail = await _userManager.FindByEmailAsync(username);
             var userPhone = await _userManager.Users.FirstOrDefaultAsync(c => c.PhoneNumber == username);
             if (userPhone == null && userName == null && userEmail == null) return null;
@@ -412,7 +422,7 @@ namespace DATN.Aplication.System
                         return new ResponseData<string> { IsSuccess = false, Error = "Đổi chưa được do pass chưa đúng định dạng" };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess=false,Error = "Mật khẩu mới và xác nhận mật khẩu mới không trùng nhau"};
+                    return new ResponseData<string> { IsSuccess = false, Error = "Mật khẩu mới và xác nhận mật khẩu mới không trùng nhau" };
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản sai" };
         }

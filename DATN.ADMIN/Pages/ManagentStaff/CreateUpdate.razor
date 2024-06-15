@@ -30,7 +30,7 @@
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
     [Inject]
-    private IUserClientSev _client {get; set;}
+    private IUserClientSev _client { get; set; }
     //nó đây
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
@@ -39,7 +39,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        if (userName!= null)
+        if (userName != null)
         {
             _nameButton = "Cập nhật";
         }
@@ -79,7 +79,7 @@
             view.Address = user.Address;
             view.PhoneNumber = user.PhoneNumber;
             view.Email = user.Email;
-            var result = await _client.UpdateUser(view,userName);
+            var result = await _client.UpdateUser(view, userName);
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
@@ -94,17 +94,9 @@
     }
     private async Task Submid()
     {
-        if (user.Password != null)
+        if (_nameButton == "Thêm mới")
         {
-            var response = await _client.GetById(userName);
-            if (response.Data != null)
-            {
                 await Create();
-            }
-            else
-            {
-                Message("Tài khoản đã đăng ký!", Severity.Warning);
-            }
         }
         else
         {
