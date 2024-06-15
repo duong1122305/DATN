@@ -57,7 +57,7 @@
         Voucher.EndDate = endDate.Value;
         //gọi api thêm
         var result = await _client.CreateVoucher(Voucher);
-        
+
         if (result.IsSuccess)
         {
             Message(result.Data, Severity.Success);
@@ -81,7 +81,7 @@
     //cập nhật
     public async Task Update()
     {
-        if (await Confirm()==true)
+        if (await Confirm() == true)
         {
             Voucher.StartDate=startDate.Value;
             Voucher.EndDate = endDate.Value;
@@ -102,11 +102,11 @@
     {
         if (Voucher.Id ==0)
         {
-                await Create();
+            await Create();
         }
         else
         {
-                await Update();
+            await Update();
         }
         StateHasChanged();
     }

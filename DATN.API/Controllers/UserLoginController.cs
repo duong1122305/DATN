@@ -222,5 +222,10 @@ namespace DATN.API.Controllers
         {
             return await _vouchermanagement.GetAllVoucher();
         }
+        [HttpPost("Reset-Pass")]
+        public async Task<ResponseData<string>> ResetPass(UserResetPassView user)
+        {
+            return await _userrepo.ResetPassword(user);
+        }
     }
 }

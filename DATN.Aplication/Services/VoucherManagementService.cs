@@ -31,6 +31,7 @@ namespace DATN.Aplication.Services
                     {
                         var voucher = new Discount()
                         {
+                            VoucherName=voucherView.VoucherName,
                             VoucherCode = voucherView.VoucherCode,
                             Created = DateTime.Now,
                             StartDate = voucherView.StartDate,
@@ -66,6 +67,7 @@ namespace DATN.Aplication.Services
                     if (query.Count() == 1)
                     {
                         var voucher = query.FirstOrDefault();
+                        voucher.VoucherName= voucherView.VoucherName;
                         voucher.VoucherCode = voucherView.VoucherCode;
                         voucher.StartDate = voucherView.StartDate;
                         voucher.EndDate = voucherView.EndDate;
@@ -93,6 +95,7 @@ namespace DATN.Aplication.Services
                         select new VoucherView
                         {
                             Id=discount.Id,
+                            VoucherName = discount.VoucherName,
                             VoucherCode = discount.VoucherCode,
                             StartDate = discount.StartDate,
                             EndDate = discount.EndDate,
