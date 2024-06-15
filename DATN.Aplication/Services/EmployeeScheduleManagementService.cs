@@ -99,7 +99,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = true, Error = e.Message };
             }
         }
-        
+
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
@@ -110,11 +110,11 @@ namespace DATN.Aplication.Services
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
                         group new { schedule.WorkShiftId, shifttable.Name, workShift.WorkDate }
-                        by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To,shifttable.Id}
+                        by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To, shifttable.Id }
                         into view
                         select new ScheduleView
                         {
-                            ShiftID=view.Key.Id,
+                            ShiftID = view.Key.Id,
                             Name = view.Count().ToString() + " người",
                             WorkDate = view.Key.WorkDate,
                             Shift = view.Key.Name,
@@ -175,6 +175,28 @@ namespace DATN.Aplication.Services
                         };
             if (query.Count() > 0) return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Chưa có dữ liệu" };
+        }
+        public async Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate)
+        {
+            var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                        join workShift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                        on shifttable.Id equals workShift.ShiftId
+                        join schedule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                        on workShift.Id equals schedule.WorkShiftId
+                        join user in await _usermanager.Users.ToListAsync()
+                        on schedule.UserId equals user.Id
+                        where shifttable.Id == shift && workShift.WorkDate.Year == workdate.Year
+                        && workShift.WorkDate.Month == workdate.Month && workShift.WorkDate.Day == workdate.Day
+                        select new NumberOfScheduleView
+                        {
+                            FullName=user.FullName,
+                            UserName=user.UserName,
+                            Date = workShift.WorkDate,
+                        };
+            if (query.ToList().Count > 0)
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = query.ToList() };
+            else
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess= false, Error=$"Không có dữ liệu về nhân viên trong ca" };
         }
     }
 }
