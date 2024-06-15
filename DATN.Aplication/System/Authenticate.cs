@@ -223,7 +223,8 @@ namespace DATN.Aplication.System
                 userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
                 userIdentity.Address = userUpdateView.Address;
                 userIdentity.Email = userUpdateView.Email;
-
+                userIdentity.Gender = userUpdateView.Gender;
+                userIdentity.DoB = userUpdateView.DoB;
                 var result = await _userManager.UpdateAsync(userIdentity);
                 if (result.Succeeded)
                     return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };

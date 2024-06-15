@@ -6,6 +6,7 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @inject HttpClient httpClient
+@inject IAddressService _addressServive;
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 
@@ -35,6 +36,7 @@
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.UserName)">Mã nhân viên</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Position)">Chức vụ</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:center;">Trạng thái</MudTh>
@@ -51,10 +53,11 @@
                     <MudCheckBox Disabled="@true" Checked="@false" />
                 }
             </MudTd>
-            <MudTd DataLabel="Name">@context.FullName</MudTd>
-            <MudTd DataLabel="Name">@context.UserName</MudTd>
+            <MudTd DataLabel="FullName">@context.FullName</MudTd>
+            <MudTd DataLabel="UserName">@context.UserName</MudTd>
             <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
             <MudTd DataLabel="Position">@context.Position</MudTd>
+            <MudTd DataLabel="Địa chỉ" Style="width:150px">@(_addressServive.GetAddress(context.Address))</MudTd>
             <MudTd DataLabel="Email">@context.Email</MudTd>
             <MudTd DataLabel="Gender">@context.Gender</MudTd>
             @if (!context.IsDeleted)
@@ -69,17 +72,19 @@
                     <MudChip Icon="@Icons.Material.Filled.Close" Color="Color.Error" title="Ngưng hoạt động"></MudChip>
                 </MudTd>
             }
-            <MudTd Style="text-align:center;">
-                @if (context.IsDeleted)
-                {
-                    <MudButton IconSize="Size.Large" IconColor="Color.Success" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.UserName))" Style="margin-right: 5px"></MudButton>
-                }
-                else
-                {
-                    <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá" Style="margin-right: 5px"></MudButton>
-                }
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa" Style="margin-right: 5px"></MudButton>
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết" Style="margin-right: 5px"></MudButton>
+            <MudTd Style="text-align:center">
+                <MudButtonGroup Variant="Variant.Filled">
+                    @if (context.IsDeleted)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.UserName))"></MudIconButton>
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá"></MudIconButton>
+                    }
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết"></MudIconButton>
+                </MudButtonGroup>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -203,6 +208,7 @@ else
                     Address = _userView.Address,
                     PhoneNumber = _userView.PhoneNumber,
                     Email = _userView.Email,
+                    Gender = _userView.Gender == "Nam"?true : false
                 };
             parameters.Add("username", username);
             parameters.Add("user", updateView);

@@ -92,6 +92,7 @@
             view.Address = user.Address;
             view.PhoneNumber = user.PhoneNumber;
             view.Email = user.Email;
+            view.Gender = user.Gender;
             var result = await _client.UpdateUser(view, userName);
         if (result.IsSuccess)
         {
