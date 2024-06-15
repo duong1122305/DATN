@@ -238,5 +238,15 @@ namespace DATN.API.Controllers
         {
             return await _employeeSchedule.GetListStaffInDay(shift, workdate);
         }
+        [HttpGet("Get-List-Staff-Not-Working-in-Day")]
+        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId,DateTime workDate)
+        {
+            return await _employeeSchedule.ListStaffNotWorkingInDay(shiftId,workDate);
+        }
+        [HttpPost("Change-Shift")]
+        public async Task<ResponseData<string>> ChangeShiftStaffToStaff([FromForm]ChangeShiftView changeShiftView)
+        {
+            return await _employeeSchedule.ChangeShiftStaffToStaff(changeShiftView);
+        }
     }
 }
