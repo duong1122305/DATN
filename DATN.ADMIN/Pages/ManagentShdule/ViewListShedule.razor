@@ -26,7 +26,6 @@
             <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
             <MudTh Style="text-align:center;">Ngày làm</MudTh>
             <MudTh Style="text-align:center;">Hành động</MudTh>
-
         </HeaderContent>
         <GroupHeaderTemplate>
             <MudTh colspan="8"> @($" {context.GroupName}: {((DateTime)context.Key).ToString("dd/MM/yyyy")}") </MudTh>
@@ -39,11 +38,12 @@
             <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
             <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
             <MudTd Style="text-align:center;">
-                <MudButton StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" IconSize="Size.Large" title="Sửa"></MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" IconSize="Size.Large" title="Xem chi tiết" OnClick="@(async()=>await OpenDialog(2,context.WorkDate))"></MudButton>
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem thông tin khách hàng" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Sửa thông tin khách hàng"></MudIconButton>
+                </MudButtonGroup>
             </MudTd>
         </RowTemplate>
-
     </MudTable>
 }
 else
@@ -59,10 +59,8 @@ else
     private bool hover = true;
     private string searchString = "";
     private List<ScheduleView> lstUser = new List<ScheduleView>();
-
     [Inject]
     IUserClientSev _client { get; set; }
-
     protected async Task LoadData()
     {
         try
@@ -96,8 +94,6 @@ else
             IsInitiallyExpanded = false,
             Selector = (e) => e.WorkDate
         };
-
-
     private bool FilterFunc(ScheduleView element)
     {
         if (string.IsNullOrWhiteSpace(searchString))
