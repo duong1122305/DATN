@@ -189,8 +189,8 @@ namespace DATN.Aplication.Services
                         && workShift.WorkDate.Month == workdate.Month && workShift.WorkDate.Day == workdate.Day
                         select new NumberOfScheduleView
                         {
-                            FullName=user.FullName,
-                            UserName=user.UserName,
+                            FullName = user.FullName,
+                            UserName = user.UserName,
                             Date = workShift.WorkDate,
                             ShiftName = shifttable.Name,
                             shiftId = shifttable.Id,
@@ -198,7 +198,78 @@ namespace DATN.Aplication.Services
             if (query.ToList().Count > 0)
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess= false, Error=$"Không có dữ liệu về nhân viên trong ca" };
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = $"Không có dữ liệu về nhân viên trong ca" };
+        }
+        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate)
+        {
+            var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                        join workShift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                        on shifttable.Id equals workShift.ShiftId
+                        join schedule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                        on workShift.Id equals schedule.WorkShiftId
+                        join user in await _usermanager.Users.ToListAsync()
+                        on schedule.UserId equals user.Id
+                        where shifttable.Id == shiftId &&
+                        workShift.WorkDate.Year == workDate.Year &&
+                        workShift.WorkDate.Month == workDate.Month &&
+                        workShift.WorkDate.Day == workDate.Day
+                        select new UserInfView
+                        {
+                            UserName = user.UserName,
+                            FullName = user.FullName,
+                        };
+            var listUser = new List<UserInfView>();
+            foreach (var item in await _usermanager.Users.ToListAsync())
+            {
+                int count = 0;
+                foreach (var item2 in query.ToList())
+                {
+                    if (item.UserName != item2.UserName)
+                    {
+                        count++;
+                    }
+                }
+                if (count == query.ToList().Count)
+                {
+                    listUser.Add(new UserInfView
+                    {
+                        UserName = item.UserName,
+                        FullName = item.FullName,
+                    });
+                }
+            }
+            if (listUser.Count > 0)
+                return new ResponseData<List<UserInfView>> { Data = listUser, IsSuccess = true };
+            else
+                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+        }
+
+        public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
+        {
+            var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                        join workShift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                        on shifttable.Id equals workShift.ShiftId
+                        join schedule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                        on workShift.Id equals schedule.WorkShiftId
+                        join user in await _usermanager.Users.ToListAsync()
+                        on schedule.UserId equals user.Id
+                        where user.Id == Guid.Parse(changeShiftView.UserIdFirst) &&
+                        shifttable.Id == changeShiftView.ShiftId &&
+                        workShift.WorkDate.Year == changeShiftView.Date.Year && workShift.WorkDate.Month == changeShiftView.Date.Month
+                        && workShift.WorkDate.Day == changeShiftView.Date.Day
+                        select schedule;
+            if (query.ToList().Count > 0)
+            {
+                foreach (var item in query.ToList())
+                {
+                    item.UserId = Guid.Parse(changeShiftView.UserIdSecond);
+                    _unitOfWork.EmployeeScheduleRepository.UpdateAsync(item);
+                    _unitOfWork.SaveChangeAsync();
+                }
+                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại" };
         }
     }
 }
