@@ -192,6 +192,8 @@ namespace DATN.Aplication.Services
                             FullName=user.FullName,
                             UserName=user.UserName,
                             Date = workShift.WorkDate,
+                            ShiftName = shifttable.Name,
+                            shiftId = shifttable.Id,
                         };
             if (query.ToList().Count > 0)
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = query.ToList() };

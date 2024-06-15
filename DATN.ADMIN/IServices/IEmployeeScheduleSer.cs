@@ -9,5 +9,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<ScheduleView>>> Create(ScheduleView scheduleView);
         Task<ResponseData<List<ScheduleView>>> GetAll();
         Task<ScheduleView> UpdateUser(ScheduleView scheduleView);
+        Task<ResponseData<List<NumberOfScheduleView>>> ListStaffOfDay(int id, DateTime workDate); 
     }
 }

@@ -25,6 +25,12 @@ namespace DATN.ADMIN.Services
             return repon;
         }
 
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffOfDay(int id, DateTime workDate)
+        {
+            var respone = await _client.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"api/UserLogin/Get-List-Staff-Work-in-Day?shift={id}&workdate={workDate.Year}-{workDate.Month}-{workDate.Day}");
+            return respone;
+        }
+
         public Task<ScheduleView> UpdateUser(ScheduleView scheduleView)
         {
             throw new NotImplementedException();

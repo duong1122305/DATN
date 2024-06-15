@@ -39,8 +39,7 @@
             <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
             <MudTd Style="text-align:center;">
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem thông tin khách hàng" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
-                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Sửa thông tin khách hàng"></MudIconButton>
+                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
@@ -117,8 +116,11 @@ else
                 Position = DialogPosition.Center,
                 MaxWidth = MaxWidth.Large,
                 CloseButton = true,
-                FullWidth = true
+                FullWidth = true,
+                DisableBackdropClick = true
             };
+        parameters.Add("id", id);
+        parameters.Add("workDate", workDate);
         var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)

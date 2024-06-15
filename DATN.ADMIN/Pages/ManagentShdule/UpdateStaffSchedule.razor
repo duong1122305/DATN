@@ -1,0 +1,24 @@
+﻿<h3>UpdateSheduleStaff</h3>
+<MudTable T="string" Dense="true">
+    <HeaderContent>
+        <MudTh>Mã nhân viên</MudTh>
+        <MudTh>Ca làm</MudTh>
+        <MudTh>Họ và tên</MudTh>
+        <MudTh>Ngày làm</MudTh>
+        <MudTh Style="text-align:center;">Hành động</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">HIHI</MudTd>
+        <MudTd DataLabel="Name">HAHÂ</MudTd>
+        <MudTd DataLabel="Shift">HAHAHA</MudTd>
+        <MudTd DataLabel="WorkDate">HEHEH</MudTd>
+    </RowTemplate>
+</MudTable>
+@code {
+    [Parameter]
+    public int idShift { get; set; }
+    [Parameter]
+    public DateTime workDate { get; set; }
+    [Parameter]
+    public string idNhanVien { get; set; }
+}
