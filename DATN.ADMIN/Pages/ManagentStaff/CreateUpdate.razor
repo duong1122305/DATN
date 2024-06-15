@@ -9,12 +9,10 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
-                <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />    
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
-
-
+                <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -34,7 +32,7 @@
     //nó đây
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
-
+    private string AddressCode = "";
     UserUpdateView view = new UserUpdateView();
 
     protected async override Task OnInitializedAsync()
@@ -92,12 +90,13 @@
 
         }
     }
+
     private async Task Submid()
     {
-        if (user.Password != null)
+        if (true)
         {
-            var response = await _client.GetById(userName);
-            if (response.Data != null)
+            var response = await _client.GetById(user.UserName);
+            if (response.Data == null)
             {
                 await Create();
             }
@@ -105,6 +104,7 @@
             {
                 Message("Tài khoản đã đăng ký!", Severity.Warning);
             }
+
         }
         else
         {
@@ -118,6 +118,8 @@
                 Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
             }
         }
+    
+        
         StateHasChanged();
     }
 
@@ -129,4 +131,9 @@
         Snackbar.Add(message, severity);
     }
     bool success = false;
+
+    private void HandleAddressChanged(string address)
+    {
+        user.Address = address;
+    }
 } 

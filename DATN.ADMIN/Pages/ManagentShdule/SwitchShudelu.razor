@@ -1,4 +1,4 @@
-﻿@page "/ListStaff"
+﻿@page "/SwitchShudule"
 @using System.Net.Http.Json
 @using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
@@ -11,7 +11,7 @@
 
 <PageTitle>Danh sách nhân viên</PageTitle>
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm">Thêm vào ca làm</MudButton>
 <MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;" title="Chọn ca làm">
     <MudSelectItem Value="Convert.ToInt32(null)">Chọn ca làm</MudSelectItem>
@@ -78,8 +78,7 @@
                 {
                     <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá" Style="margin-right: 5px"></MudButton>
                 }
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa" Style="margin-right: 5px"></MudButton>
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết" Style="margin-right: 5px"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.SwitchRight" IconColor="Color.Warning" title="Chuyển ca làm việc" Style="margin-right: 5px"></MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -186,81 +185,81 @@ else
         }
     }
 
-    //thêm sửa !
-    private async Task OpenDialog(string username)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Thêm mới nhân viên";
-        if (username != null)
-        {
-            _userView = lstUser.FirstOrDefault(c => c.UserName == username);
-            var updateView = new UserRegisterView()
-                {
-                    UserName = username,
-                    FullName = _userView.FullName,
-                    Address = _userView.Address,
-                    PhoneNumber = _userView.PhoneNumber,
-                    Email = _userView.Email,
-                };
-            parameters.Add("username", username);
-            parameters.Add("user", updateView);
-            nameDialog = "Cập nhật nhân viên";
-        }
-        if (true)
-        {
-            
-        }
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
-                CloseButton = true,
-                FullWidth = true
-            };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-        }
-    }
+    // //thêm sửa !
+    // private async Task OpenDialog(string username)
+    // {
+    //     var parameters = new DialogParameters();
+    //     string nameDialog = "Thêm mới nhân viên";
+    //     if (username != null)
+    //     {
+    //         _userView = lstUser.FirstOrDefault(c => c.UserName == username);
+    //         var updateView = new UserRegisterView()
+    //             {
+    //                 UserName = username,
+    //                 FullName = _userView.FullName,
+    //                 Address = _userView.Address,
+    //                 PhoneNumber = _userView.PhoneNumber,
+    //                 Email = _userView.Email,
+    //             };
+    //         parameters.Add("username", username);
+    //         parameters.Add("user", updateView);
+    //         nameDialog = "Cập nhật nhân viên";
+    //     }
+    //     if (true)
+    //     {
+
+    //     }
+    //     DialogOptions options = new DialogOptions()
+    //         {
+    //             CloseOnEscapeKey = true,
+    //             Position = DialogPosition.Center,
+    //             MaxWidth = MaxWidth.Small,
+    //             CloseButton = true,
+    //             FullWidth = true
+    //         };
+    //     var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
+    //     var result = await createUpdateDialog.Result;
+    //     if (!result.Canceled)
+    //     {
+    //         createUpdateDialog.Close();
+    //         await LoadData();
+    //     }
+    // }
     //xem chi tiết
-    private async Task OpenDialogDetails(string username)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Chi tiết nhân viên";
-        if (username != null)
-        {
-            _userView = lstUser.FirstOrDefault(c => c.UserName == username);
-            var updateView = new UserRegisterView()
-                {
-                    UserName = username,
-                    FullName = _userView.FullName,
-                    Address = _userView.Address,
-                    PhoneNumber = _userView.PhoneNumber,
-                    Email = _userView.Email,
-                };
-            parameters.Add("username", username);
-            parameters.Add("user", updateView);
-        }
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
-                CloseButton = true,
-                FullWidth = true
-            };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-        }
-    }
+    // private async Task OpenDialogDetails(string username)
+    // {
+    //     var parameters = new DialogParameters();
+    //     string nameDialog = "Chi tiết nhân viên";
+    //     if (username != null)
+    //     {
+    //         _userView = lstUser.FirstOrDefault(c => c.UserName == username);
+    //         var updateView = new UserRegisterView()
+    //             {
+    //                 UserName = username,
+    //                 FullName = _userView.FullName,
+    //                 Address = _userView.Address,
+    //                 PhoneNumber = _userView.PhoneNumber,
+    //                 Email = _userView.Email,
+    //             };
+    //         parameters.Add("username", username);
+    //         parameters.Add("user", updateView);
+    //     }
+    //     DialogOptions options = new DialogOptions()
+    //         {
+    //             CloseOnEscapeKey = true,
+    //             Position = DialogPosition.Center,
+    //             MaxWidth = MaxWidth.Small,
+    //             CloseButton = true,
+    //             FullWidth = true
+    //         };
+    //     var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
+    //     var result = await createUpdateDialog.Result;
+    //     if (!result.Canceled)
+    //     {
+    //         createUpdateDialog.Close();
+    //         await LoadData();
+    //     }
+    // }
     private void HandleShiftChange(ChangeEventArgs e)
     {
         // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
@@ -275,7 +274,7 @@ else
 
         // Xử lý logic để thêm selectedUsers vào một ca làm
         var listIdUser = new List<string>();
-        if (await Confirm2()== true)
+        if (await Confirm2() == true)
         {
             // nứng à
             if (selectedUser1s.Count > 0 && selectedUser1s != null)
@@ -285,7 +284,7 @@ else
                     var idUser = await _client.GetById(user2.UserName);
                     listIdUser.Add(idUser.Data);
                 }
-                if (selectedShiftId>0)
+                if (selectedShiftId > 0)
                 {
                     var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
                     Message(repo.Data, Severity.Success);
@@ -312,7 +311,7 @@ else
     private async Task<bool?> Confirm2()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận thêm ca cho nhân viên?",
+                    "Xác nhận đổi ca cho nhân viên?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();

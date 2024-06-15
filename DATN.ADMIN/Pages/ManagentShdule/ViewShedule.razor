@@ -6,31 +6,33 @@
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
-<PageTitle>Danh sách ca làm</PageTitle>
+<PageTitle>Lịch làm việc</PageTitle>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())" title="Thêm ca 1 tháng tiếp theo">Thêm ca 1 tháng tiếp theo</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Href="/ListStaff" title="Danh sách nhân viên">Danh sách nhân viên</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@((args) => _tableRef?.ExpandAllGroups())">Mở hết danh sách</MudButton>
+
 @if (lstUser.Count > 0 && lstUser != null)
 {
-  <MudTable Items="@lstUser" Hover="@hover" Filter="new Func<ScheduleView,bool>(FilterFunc)">
+    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
         <ToolBarContent>
-            <MudText Typo="Typo.h3">Danh sách ca làm</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">ID</MudTh>
+            <MudTh Style="text-align:center;">Ngày làm</MudTh>
             <MudTh Style="text-align:center;">Ca làm</MudTh>
-            <MudTh Style="text-align:center;">Tên nhân viên</MudTh>
+            <MudTh Style="text-align:center;">Tổng người làm</MudTh>
             <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
             <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
             <MudTh Style="text-align:center;">Ngày làm</MudTh>
             <MudTh Style="text-align:center;">Hành động</MudTh>
 
         </HeaderContent>
+        <GroupHeaderTemplate>
+            <MudTh colspan="8"> @($" {context.GroupName}: {((DateTime)context.Key).ToString("dd/MM/yyyy")}") </MudTh>
+        </GroupHeaderTemplate>
         <RowTemplate>
-            <MudTd DataLabel="STT" Style="text-align:center;">
-                @(lstUser.IndexOf(context) + 1)
-            </MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
             <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
             <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
             <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
@@ -41,9 +43,7 @@
                 <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" IconSize="Size.Large" title="Xem chi tiết"></MudButton>
             </MudTd>
         </RowTemplate>
-        <PagerContent>
-            <MudTablePager TransformOrigin="Origin.TopCenter" />
-        </PagerContent>
+
     </MudTable>
 }
 else
@@ -52,8 +52,6 @@ else
         <MudProgressCircular Color="Color.Default" Indeterminate="true" />
     </div>
 }
-
-
 @code {
     //button trạng thái
     private bool _disableElevation = false;
@@ -63,7 +61,7 @@ else
     private List<ScheduleView> lstUser = new List<ScheduleView>();
 
     [Inject]
-    IUserClientSev _client{get;set;}
+    IUserClientSev _client { get; set; }
 
     protected async Task LoadData()
     {
@@ -80,15 +78,24 @@ else
             }
         }
         catch (Exception)
-        { 
+        {
             throw;
         }
     }
-
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
     }
+    private MudTable<ScheduleView> _tableRef;
+
+    private TableGroupDefinition<ScheduleView> _groupDefinition = new()
+        {
+            GroupName = "Ngày làm",
+            Indentation = false,
+            Expandable = true,
+            IsInitiallyExpanded = false,
+            Selector = (e) => e.WorkDate
+        };
 
 
     private bool FilterFunc(ScheduleView element)
@@ -143,7 +150,7 @@ else
     //thêm ca làm 1 tháng khi chưa có ca nào trong 1 tháng tới
     private async Task CreateCa()
     {
-        if (await Confirm()==true)
+        if (await Confirm() == true)
         {
             var result = await httpClient.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/them-ca-for-all-staff");
             if (result.IsSuccess)
@@ -154,7 +161,8 @@ else
             {
                 Message(result.Error, Severity.Error);
             }
-        }else
+        }
+        else
         {
             Message("Bạn đã huỷ thao tác", Severity.Warning);
         }
@@ -162,7 +170,7 @@ else
 
     private async Task CreateCaNhanVien()
     {
-        
+
     }
     //thông báo
     private void Message(string message, Severity severity)
