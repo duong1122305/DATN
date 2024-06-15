@@ -83,7 +83,7 @@
     {
         if (await Confirm() == true)
         {
-            Voucher.StartDate=startDate.Value;
+            Voucher.StartDate = startDate.Value;
             Voucher.EndDate = endDate.Value;
             var result = await _client.UpdateVoucher(Voucher);
             if (result.IsSuccess)
@@ -100,7 +100,7 @@
     }
     private async Task Submid()
     {
-        if (Voucher.Id ==0)
+        if (Voucher.Id == null || Voucher.Id == 0)
         {
             await Create();
         }
