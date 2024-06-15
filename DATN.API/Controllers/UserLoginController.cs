@@ -232,5 +232,11 @@ namespace DATN.API.Controllers
         {
             return await _worshiftmanagement.InsertWorkShiftCurrentMonth();
         }
+
+        [HttpPost("Get-List-Staff-Work-in-Day")]
+        public async Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate)
+        {
+            return await _employeeSchedule.GetListStaffInDay(shift, workdate);
+        }
     }
 }
