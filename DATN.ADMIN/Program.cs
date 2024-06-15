@@ -69,6 +69,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IAddressService,AddressService>();
 builder.Services.AddScoped<IGuestManagerClient,GuestManagerClient>();
+builder.Services.AddScoped<IEmployeeScheduleSer,EmployeeScheduleSer>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 builder.Services.AddMudServices(config =>
