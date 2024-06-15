@@ -116,6 +116,7 @@ namespace DATN.Aplication.System
             }
             name += count.ToString();
             var userIdentity = new User();
+            userIdentity.Gender = userRegisterView.Gender;
             userIdentity.UserName = name;
             userIdentity.FullName = userRegisterView.FullName;
             userIdentity.Email = userRegisterView.Email;
