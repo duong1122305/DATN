@@ -52,48 +52,57 @@
     //thêm
     protected async Task Create()
     {
+        var confirm = await Confirm("tạo mới");
+        if (!confirm)
+        {
+            return;
+        }
         //gọi api thêm
         var result = await _client.Register(user);
         if (result.IsSuccess)
         {
             Message(result.Data, Severity.Success);
-            _dialogBox.Close(DialogResult.Ok(true));
+            _dialogBox.Close();
         }
         else
         {
-            Message(result.Error, Severity.Error);
+            Message(result.Error, Severity.Warning);
         }
     }
     //thông báo xác nhận
-    private async Task<bool?> Confirm()
+    private async Task<bool> Confirm(string text)
     {
-        var confirm = await _diagService.ShowMessageBox("Thông báo", "Xác nhận cập nhật nhân viên?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
-        return confirm;
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
     //cập nhật
     public async Task Update()
     {
-        if (await Confirm() == true)
+        var confirm = await Confirm("cập nhật");
+        if (!confirm)
         {
+            return;
+        }
             view.FullName = user.FullName;
             view.Address = user.Address;
             view.PhoneNumber = user.PhoneNumber;
             view.Email = user.Email;
             var result = await _client.UpdateUser(view, userName);
-            if (result.IsSuccess)
-            {
-                Message(result.Data, Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Message(result.Error, Severity.Error);
-            }
-
+        if (result.IsSuccess)
+        {
+            Message(result.Data, Severity.Success);
+            _dialogBox.Close();
         }
+        else
+        {
+            Message(result.Error, Severity.Warning);
+        }
+
     }
 
     private async Task Submid()
@@ -104,7 +113,6 @@
         }
         else
         {
-
             await Update();
         }
         StateHasChanged();

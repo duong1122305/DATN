@@ -36,7 +36,7 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
-            return repon;
+                return repon;
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien()

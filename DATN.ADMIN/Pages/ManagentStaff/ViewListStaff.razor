@@ -22,7 +22,7 @@
 </MudSelect>
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudTable Items="@lstUser" Hover="true" Filter="new Func<UserInfView,bool>(FilterFunc)">
+    <MudTable Items="@lstUser" Hover="true" SortLabel="Sort By" Filter="new Func<UserInfView,bool>(FilterFunc)">
         <ToolBarContent>
 
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
@@ -32,7 +32,7 @@
         <HeaderContent>
             <MudTh>Chọn</MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Mã nhân viên</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.UserName)">Mã nhân viên</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Position)">Chức vụ</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
@@ -52,7 +52,7 @@
                 }
             </MudTd>
             <MudTd DataLabel="Name">@context.FullName</MudTd>
-            <MudTd DataLabel="Name">123</MudTd>
+            <MudTd DataLabel="Name">@context.UserName</MudTd>
             <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
             <MudTd DataLabel="Position">@context.Position</MudTd>
             <MudTd DataLabel="Email">@context.Email</MudTd>
@@ -118,6 +118,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+
     }
 
     // load lai du lieu
@@ -128,6 +129,7 @@ else
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
+        StateHasChanged();
 
     }
 
@@ -206,10 +208,6 @@ else
             parameters.Add("user", updateView);
             nameDialog = "Cập nhật nhân viên";
         }
-        if (true)
-        {
-            
-        }
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -224,6 +222,7 @@ else
         {
             createUpdateDialog.Close();
             await LoadData();
+            StateHasChanged();
         }
     }
     //xem chi tiết
@@ -259,6 +258,7 @@ else
         {
             createUpdateDialog.Close();
             await LoadData();
+            StateHasChanged();
         }
     }
     private void HandleShiftChange(ChangeEventArgs e)
