@@ -8,7 +8,16 @@ namespace DATN.ViewModels.Common
 {
 	public class ResponseData<T>
 	{
-		public bool IsSuccess { get; set; }
+        public ResponseData()
+        {
+            
+        }
+        public ResponseData(T data)
+        {
+            IsSuccess = true;
+            Data = data;
+        }
+        public bool IsSuccess { get; set; }
 		public string? Error { get; set; }
 		public T? Data { get; set; }
 	}

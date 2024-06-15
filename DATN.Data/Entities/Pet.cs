@@ -18,8 +18,6 @@ namespace DATN.Data.Entities
 
 		public int SpeciesId { get; set; } // Khóa ngoại đến ID giống thú cưng
 
-		public bool IsGuest { get; set; } // Thú cưng của khách hàng hay không
-
 		public string Name { get; set; } // Tên thú cưng
 
 		public bool Gender { get; set; } // Giới tính

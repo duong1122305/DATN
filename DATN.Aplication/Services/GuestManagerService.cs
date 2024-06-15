@@ -69,6 +69,7 @@ namespace DATN.Aplication.Services
 			try
 			{
 				var result = await _unitOfWork.GuestRepository.GetAllAsync();
+				var lstPet = await _unitOfWork.PetRepository.GetAllAsync();
 				var response = result.Where(p => p.IsComfirm == true).OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
 				{
 					Address = p.Address,
@@ -81,7 +82,10 @@ namespace DATN.Aplication.Services
 					PhoneNumber = p.PhoneNumber,
 					UserName = p.UserName,
 				}).ToList();
-
+				foreach (var item in response)
+				{
+					item.CountPet= lstPet.Where(p=>p.OwnerId==item.Id).Count();
+				}
 				int totalCount = result.Count();
 				if (totalCount != 0)
 				{
