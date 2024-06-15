@@ -9,9 +9,15 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />    
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+                <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
+                    <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">
+                        <MudRadio Value="true" Color="Color.Primary">Nam</MudRadio>
+                        <MudRadio Value="false" Color="Color.Secondary">Nữ</MudRadio>
+                    </MudRadioGroup>
+                </MudField>
                 <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
@@ -61,8 +67,7 @@
     //thông báo xác nhận
     private async Task<bool?> Confirm()
     {
-        var confirm = await _diagService.ShowMessageBox("Thông báo",
-    "Xác nhận cập nhật nhân viên?",
+        var confirm = await _diagService.ShowMessageBox("Thông báo", "Xác nhận cập nhật nhân viên?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
@@ -95,22 +100,13 @@
     {
         if (_nameButton == "Thêm mới")
         {
-                await Create();
+            await Create();
         }
         else
         {
-            var response = await _client.GetById(userName);
-            if (response.IsSuccess)
-            {
-                await Update();
-            }
-            else
-            {
-                Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
-            }
+
+            await Update();
         }
-    
-        
         StateHasChanged();
     }
 
