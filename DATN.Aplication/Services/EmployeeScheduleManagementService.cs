@@ -110,16 +110,16 @@ namespace DATN.Aplication.Services
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
                         group new { schedule.WorkShiftId, shifttable.Name, workShift.WorkDate }
-                        by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To }
+                        by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To,shifttable.Id}
                         into view
                         select new ScheduleView
                         {
+                            ShiftID=view.Key.Id,
                             Name = view.Count().ToString() + " người",
                             WorkDate = view.Key.WorkDate,
                             Shift = view.Key.Name,
                             To = view.Key.To,
                             From = view.Key.From,
-
                         };
 
             if (query.Count() > 0)
