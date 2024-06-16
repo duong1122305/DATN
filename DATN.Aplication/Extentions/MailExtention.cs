@@ -76,7 +76,7 @@ namespace DATN.Aplication.Extentions
                 MailAddress mailTo = new MailAddress(userMail);
                 MailMessage message = new MailMessage(mailFrom, mailTo);
                 message.Subject = "Tài khoản đăng nhập của bạn";
-                string verificationLink = $"https://localhost:7039/api/GuestManager/verify-user?verifyToken={Verification}&mail={userMail}";
+                string verificationLink = $"https://localhost:7039/api/GuestManager/verify-user?verifyConstring={Verification}&mail={userMail}";
                 message.Body = $@"
                 <body style=""font-family: Arial, sans-serif;"">
                     <h2>Tài khoản đăng nhập cá nhân vui lòng không để lộ!!</h2>

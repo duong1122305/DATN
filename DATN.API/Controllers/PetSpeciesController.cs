@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
+using DATN.ViewModels.DTOs.PetSpecies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,10 +18,35 @@ namespace DATN.API.Controllers
         {
 			_service = service;
 		}
-        [HttpPost("get-all")]
+
+        [HttpGet("get-all")]
 		public async Task<ResponseData<List<PetSpecies>>> GetALl()
 		{
 			return await _service.GetAll();
+		}
+
+		[HttpPost("create-species")]
+		public async Task<ResponseData<string>> Create(PetSpeciesCreateUpdate resquest)
+		{
+			return await _service.Create(resquest);
+
+		}
+		[HttpPost("update-species")]
+		public async Task<ResponseData<string>> Update(PetSpeciesCreateUpdate resquest)
+		{
+			return await _service.Update(resquest);
+		}
+
+		[HttpGet("get-by-id-species")]
+		public async Task<ResponseData<PetSpecies>> GetById(int id)
+		{
+			return await _service.FindPetSpeciesByID(id);
+		}
+
+		[HttpPost("delete-species")]
+		public async Task<ResponseData<string>> Delete(DeleteRequest<int> resquest)
+		{
+			return await _service.SoftDelete(resquest);
 		}
 	}
 }

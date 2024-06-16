@@ -163,7 +163,7 @@ namespace DATN.Aplication.Services
 			try
 			{
 				string randomPass = "";
-				if (string.IsNullOrEmpty(request.Email))
+				if (!string.IsNullOrEmpty(request.Email))
                 {
 					randomPass = GeneratePassword();
 				}
@@ -182,7 +182,7 @@ namespace DATN.Aplication.Services
 				};
 				await _unitOfWork.GuestRepository.AddAsync(guest);
 				var result = await _unitOfWork.SaveChangeAsync();
-				if (string.IsNullOrEmpty(request.Email))
+				if (!string.IsNullOrEmpty(request.Email))
 				{
 					await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, randomPass, guest.Id.ToString());
 				}
