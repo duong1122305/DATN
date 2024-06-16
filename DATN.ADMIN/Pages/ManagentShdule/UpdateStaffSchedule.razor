@@ -1,30 +1,27 @@
 ﻿@using DATN.ADMIN.IServices
-@* @if (lstUser.Count > 0 && lstUser != null)
+@using DATN.ViewModels.DTOs.Authenticate
+@inject IDialogService _diagService;
+@inject ISnackbar Snackbar
+
+@if (lst.Count > 0 && lst != null)
 {
-    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
+    <MudTable Items="@lst" Dense="true" Filter="new Func<UserInfView,bool>(FilterFunc)" onchange="_tableRef">
         <ToolBarContent>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">Ngày làm</MudTh>
-            <MudTh Style="text-align:center;">Ca làm</MudTh>
-            <MudTh Style="text-align:center;">Tổng người làm</MudTh>
-            <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
-            <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
-            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Họ và tên</MudTh>
+            <MudTh Style="text-align:center;">Mã nhân viên</MudTh>
             <MudTh Style="text-align:center;">Hành động</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
-            <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
-            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
-            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
-            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
-            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.UserName</MudTd>
             <MudTd Style="text-align:center;">
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                    @* <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.SwapHorizontalCircle" Title="Đổi ca" OnClick="@(async()=>await Update(context.UserName))"></MudIconButton> *@
+                    <MudButton IconColor="Color.Primary" StartIcon="@Icons.Material.Filled.SwapHorizontalCircle" title="Đổi ca" OnClick="@(async()=>await Update(context.UserName,context.FullName))">Đổi ca</MudButton>
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
@@ -35,37 +32,93 @@ else
     <div style="justify-content:center; justify-items:center">
         <MudProgressCircular Color="Color.Default" Indeterminate="true" />
     </div>
-} *@
+}
 @code {
+    private string searchString = "";
     [Parameter]
     public int idShift { get; set; }
     [Parameter]
     public DateTime workDate { get; set; }
     [Parameter]
-    public string idNhanVien { get; set; }
+    public string idNhanVien { get; set; }//id của nhân viên về nấu cơm
+    [Parameter]
+    public string fulName{ get; set; }
     [Inject]
-    IEmployeeScheduleSer _client{ get; set; }
+    IEmployeeScheduleSer _client { get; set; }
+    [Inject]
+    IUserClientSev _clienId{ get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    
 
-    
+    private List<UserInfView> lst { get; set; } = new List<UserInfView>();
 
+    private async Task loadData()
+    {
+        var res = await _client.lstUsrInffor(idShift, workDate);
+        lst = res.Data;
+        StateHasChanged();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await loadData();
+    }
 
 
 
     // // tìm kiếm
-    // private bool FilterFunc(ScheduleView element)
-    // {
-    //     if (string.IsNullOrWhiteSpace(searchString))
-    //         return true;
-    //     if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-    //         return true;
-    //     if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-    //         return true;
-    //     if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
-    //         return true;
-    //     return false;
-    // }
+    private bool FilterFunc(UserInfView element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task<bool?> Confirm(string fulname2)
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo",
+    $"Xác nhận đổi ca làm của {fulName} vào ngày {workDate.ToString("dd/MM/yyyy")} cho nhân viên {fulname2}?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Medium, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
+
+    public async Task Update(string userName,string fulname2)
+    {
+        if (await Confirm(fulname2)==true)
+        {
+            var idUser = await _clienId.GetById(userName);
+            ChangeShiftView changeShiftView = new ChangeShiftView();
+            changeShiftView.ShiftId = idShift;
+            changeShiftView.Date = workDate;
+            changeShiftView.UserIdFirst = idNhanVien;
+            changeShiftView.UserIdSecond = idUser.Data;
+            var result = await _client.changgeShift(changeShiftView);
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+                await loadData();
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+
+        }
+    }
+
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
 
 
 }

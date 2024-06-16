@@ -17,12 +17,12 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Name">@context.UserName</MudTd>
-            <MudTd DataLabel="Name">@context.ShiftName</MudTd>
-            <MudTd DataLabel="Shift">@context.FullName</MudTd>
+            <MudTd DataLabel="ShiftName">@context.ShiftName</MudTd>
+            <MudTd DataLabel="FullName">@context.FullName</MudTd>
             <MudTd DataLabel="WorkDate">@context.Date.ToString("dd/MM/yyyy")</MudTd>
             <MudTd Style="text-align:center;">
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date))"></MudIconButton>
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
@@ -39,10 +39,9 @@
     IEmployeeScheduleSer _client{ get; set; }
     [Inject]
     IUserClientSev _userClient{ get; set; }
-    //nó đây
     [Parameter]
     public List<NumberOfScheduleView> lsstvi { get; set; } = new List<NumberOfScheduleView>();
-
+    //lấy các nhân viên làm việc trong ca ngày hôm ấy
     protected async Task LoadData()
     {
         var respone = await _client.ListStaffOfDay(id, workDate);
@@ -56,11 +55,11 @@
         }
     }
 
-    private async Task OpenDialog(int idShift, string idNhanVien, DateTime workDate)
+    private async Task OpenDialog(int idShift, string idNhanVien, DateTime workDate,string fulName)
     {
         var idRespone = await _userClient.GetById(idNhanVien);
         var parameters = new DialogParameters();
-        string nameDialog = "Xem thông tin chi tiết ca làm";
+        string nameDialog = "Danh sách nhân viên trống ca";
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -73,6 +72,7 @@
         parameters.Add("idShift", idShift);
         parameters.Add("idNhanVien", idRespone.Data);
         parameters.Add("workDate", workDate);
+        parameters.Add("fulName", fulName);
         var createUpdateDialog = await _dialogservice.ShowAsync<UpdateStaffSchedule>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
