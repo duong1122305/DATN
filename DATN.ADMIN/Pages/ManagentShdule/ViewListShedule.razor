@@ -1,0 +1,176 @@
+﻿@page "/ViewListShudule"
+@using System.Net.Http.Json
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Lịch làm việc</PageTitle>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())" title="Thêm ca 1 tháng tiếp theo">Thêm ca 1 tháng tiếp theo</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Href="/ListStaff" title="Danh sách nhân viên">Danh sách nhân viên</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@((args) => _tableRef?.ExpandAllGroups())">Mở hết danh sách</MudButton>
+
+@if (lstUser.Count > 0 && lstUser != null)
+{
+    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Ca làm</MudTh>
+            <MudTh Style="text-align:center;">Tổng người làm</MudTh>
+            <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
+            <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
+            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh>
+        </HeaderContent>
+        <GroupHeaderTemplate>
+            <MudTh colspan="8"> @($" {context.GroupName}: {((DateTime)context.Key).ToString("dd/MM/yyyy")}") </MudTh>
+        </GroupHeaderTemplate>
+        <RowTemplate>
+            <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
+            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd Style="text-align:center;">
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                </MudButtonGroup>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+else
+{
+    <div style="justify-content:center; justify-items:center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    </div>
+}
+@code {
+    //button trạng thái
+    private bool _disableElevation = false;
+    //hiệu ứng hover
+    private bool hover = true;
+    private string searchString = "";
+    private List<ScheduleView> lstUser = new List<ScheduleView>();
+    [Inject]
+    IUserClientSev _client { get; set; }
+    protected async Task LoadData()
+    {
+        try
+        {
+            var user = await _client.GetAllCaNhanVien();
+            if (!user.IsSuccess)
+            {
+                lstUser = null;
+            }
+            else
+            {
+                lstUser = user.Data;
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private MudTable<ScheduleView> _tableRef;
+
+    private TableGroupDefinition<ScheduleView> _groupDefinition = new()
+        {
+            GroupName = "Ngày làm",
+            Indentation = false,
+            Expandable = true,
+            IsInitiallyExpanded = false,
+            Selector = (e) => e.WorkDate
+        };
+    private bool FilterFunc(ScheduleView element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    private async Task OpenDialog(int id, DateTime workDate)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Xem thông tin chi tiết ca làm";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("id", id);
+        parameters.Add("workDate", workDate);
+        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+
+    //thông báo khi thêm ca làm cho 1 tháng tiếp theo
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+    "Xác nhận thêm ca làm cho 1 tháng tiếp theo?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
+    //thêm ca làm 1 tháng khi chưa có ca nào trong 1 tháng tới
+    private async Task CreateCa()
+    {
+        if (await Confirm() == true)
+        {
+            var result = await httpClient.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/them-ca-for-all-staff");
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+        }
+        else
+        {
+            Message("Bạn đã huỷ thao tác", Severity.Warning);
+        }
+    }
+
+    private async Task CreateCaNhanVien()
+    {
+
+    }
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
+}
