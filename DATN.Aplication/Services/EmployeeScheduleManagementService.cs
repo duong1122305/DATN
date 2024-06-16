@@ -263,8 +263,8 @@ namespace DATN.Aplication.Services
 
                 var user = query.FirstOrDefault();
                 user.UserId = Guid.Parse(changeShiftView.UserIdSecond);
-                _unitOfWork.EmployeeScheduleRepository.UpdateAsync(user);
-                _unitOfWork.SaveChangeAsync();
+                await _unitOfWork.EmployeeScheduleRepository.UpdateAsync(user);
+                await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
             }
             else
