@@ -5,13 +5,14 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-<EditForm Model="@user">
+<EditForm Model="@user" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
-                <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
-                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên *" For="@(() => user.FullName)"/>
+                <MudTextField T="string" @bind-Value="user.Email" Label="Email *" For="@(() => user.Email)" />
+                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại *" For="@(() => user.PhoneNumber)"/>
                 <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                     <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">
                         <MudRadio Value="true" Color="Color.Primary">Nam</MudRadio>
@@ -21,7 +22,7 @@
                 <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -40,13 +41,21 @@
     public UserRegisterView user { get; set; } = new UserRegisterView();
     private string AddressCode = "";
     UserUpdateView view = new UserUpdateView();
+    private EditContext editContext;
+
 
     protected async override Task OnInitializedAsync()
     {
+        editContext = new EditContext(view);
+        editContext.OnFieldChanged += EditContext_OnFieldChanged;
         if (userName != null)
         {
             _nameButton = "Cập nhật";
         }
+    }
+    private void EditContext_OnFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        StateHasChanged();
     }
 
     //thêm
@@ -105,8 +114,7 @@
         }
 
     }
-
-    private async Task Submid()
+    private async void OnValidSubmit(EditContext context)
     {
         if (_nameButton == "Thêm mới")
         {

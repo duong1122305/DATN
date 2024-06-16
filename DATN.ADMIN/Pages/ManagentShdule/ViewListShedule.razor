@@ -13,7 +13,7 @@
 
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
+    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition"  Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
         <ToolBarContent>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>

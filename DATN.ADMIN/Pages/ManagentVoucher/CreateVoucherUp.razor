@@ -10,15 +10,15 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" For="@(() => Voucher.VoucherName)" />
-                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true"/>
-                <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" />
-                <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" />
-                <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
-                <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" />
-                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" />
-                <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => Voucher.MinMoneyApplicable)" />
-                <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" />
+                <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" Required="true" For="@(() => Voucher.VoucherName)" MaxLength="50"/>
+                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true" Required="true"/>
+                <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" Required="true" />
+                <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" Required="true" MaxLength="250" />
+                <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" Required="true" />
+                <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" Required="true" />
+                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" MaxLength="15" Required="true" />
+                <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => Voucher.MinMoneyApplicable)" Required="true" />
+                <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" Required="true"/>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
