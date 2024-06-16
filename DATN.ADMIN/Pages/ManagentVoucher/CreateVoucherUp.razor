@@ -5,7 +5,8 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-<EditForm Model="@Voucher">
+<EditForm Model="@Voucher" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
@@ -39,6 +40,9 @@
 
     private DateTime? startDate;
     private DateTime? endDate;
+
+    bool success;
+
     protected async override Task OnInitializedAsync()
     {
         if (Id > 0)
@@ -49,6 +53,11 @@
         }
     }
 
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
     //thêm
     protected async Task Create()
     {
@@ -125,6 +134,5 @@
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
-    bool success = false;
 
 } 
