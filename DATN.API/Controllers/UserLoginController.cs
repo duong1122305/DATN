@@ -244,7 +244,7 @@ namespace DATN.API.Controllers
             return await _employeeSchedule.ListStaffNotWorkingInDay(shiftId,workDate);
         }
         [HttpPost("Change-Shift")]
-        public async Task<ResponseData<string>> ChangeShiftStaffToStaff([FromForm]ChangeShiftView changeShiftView)
+        public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
         {
             return await _employeeSchedule.ChangeShiftStaffToStaff(changeShiftView);
         }
