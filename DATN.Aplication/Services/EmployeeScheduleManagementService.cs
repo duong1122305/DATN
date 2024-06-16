@@ -47,7 +47,7 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             }
-            return new ResponseData<List<ScheduleView>> { IsSuccess = true, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year}" };
+            return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year}" };
         }
 
         public async Task<ResponseData<string>> InsertEmployeeNextMonthCompareCurrentMonth(List<string> listUser, int shift)
@@ -96,7 +96,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception e)
             {
-                return new ResponseData<string> { IsSuccess = true, Error = e.Message };
+                return new ResponseData<string> { IsSuccess = false, Error = e.Message };
             }
         }
 
@@ -125,7 +125,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Kh có dữ liệu" };
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleFromMonthToMonth(ScheduleMonthToMonthView scheduleMonthToMonthView)
@@ -152,7 +152,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Kh có dữ liệu" };
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleForShift(int shift)

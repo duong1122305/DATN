@@ -44,7 +44,7 @@ namespace DATN.Aplication.Services
             catch (Exception e)
             {
 
-                return new ResponseData<string> { IsSuccess = true, Error = e.Message };
+                return new ResponseData<string> { IsSuccess = false, Error = e.Message };
 
             }
         }

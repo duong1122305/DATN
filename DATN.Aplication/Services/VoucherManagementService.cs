@@ -65,7 +65,7 @@ namespace DATN.Aplication.Services
                 }
                 catch (Exception)
                 {
-                    return new ResponseData<string> { IsSuccess = true, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
+                    return new ResponseData<string> { IsSuccess = false, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
                 }
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Chưa có data" };
@@ -95,11 +95,11 @@ namespace DATN.Aplication.Services
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa voucher thành công!!" };
                     }
-                    return new ResponseData<string> { IsSuccess = false, Data = "Voucher nhập trùng voucher code đã có!!!   " };
+                    return new ResponseData<string> { IsSuccess = false, Data = "Voucher nhập trùng voucher code đã có!!!" };
                 }
                 catch (Exception)
                 {
-                    return new ResponseData<string> { IsSuccess = true, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
+                    return new ResponseData<string> { IsSuccess = false, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
                 }
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Không có id này" };
