@@ -260,11 +260,12 @@ namespace DATN.Aplication.Services
                         select schedule;
             if (query.ToList().Count == 1)
             {
-             
-                    query.FirstOrDefault().UserId = Guid.Parse(changeShiftView.UserIdSecond);
-                    _unitOfWork.EmployeeScheduleRepository.UpdateAsync(query.FirstOrDefault());
-                    _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
+
+                var user = query.FirstOrDefault();
+                user.UserId = Guid.Parse(changeShiftView.UserIdSecond);
+                _unitOfWork.EmployeeScheduleRepository.UpdateAsync(user);
+                _unitOfWork.SaveChangeAsync();
+                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
             }
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại" };
