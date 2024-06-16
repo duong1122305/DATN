@@ -1,6 +1,7 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
+using Newtonsoft.Json;
 
 namespace DATN.ADMIN.Services
 {
@@ -14,6 +15,13 @@ namespace DATN.ADMIN.Services
 
         }
 
+        public async Task<ResponseData<string>> changgeShift(ChangeShiftView changeShiftView)
+        {
+            var res = await _client.PostAsJsonAsync<ChangeShiftView>("/api/UserLogin/Change-Shift", changeShiftView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await res.Content.ReadAsStringAsync());
+            return result;
+        }
+
         public async Task<ResponseData<List<ScheduleView>>> Create(ScheduleView scheduleView)
         {
             throw new NotImplementedException();
@@ -23,6 +31,19 @@ namespace DATN.ADMIN.Services
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/get-all-ca-lam");
             return repon;
+        }
+        //nhân viên trong ca
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffOfDay(int id, DateTime workDate)
+        {
+            var respone = await _client.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"api/UserLogin/Get-List-Staff-Work-in-Day?shift={id}&workdate={workDate.Year}-{workDate.Month}-{workDate.Day}");
+            return respone;
+        }
+
+        //list thông tin nhân viên trống ca làm
+        public async Task<ResponseData<List<UserInfView>>> lstUsrInffor(int idUser, DateTime workDate)
+        {
+            var respone = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>($"api/UserLogin/Get-List-Staff-Not-Working-in-Day?shiftId={idUser}&workdate={workDate.Year}-{workDate.Month}-{workDate.Day}");
+            return respone;
         }
 
         public Task<ScheduleView> UpdateUser(ScheduleView scheduleView)

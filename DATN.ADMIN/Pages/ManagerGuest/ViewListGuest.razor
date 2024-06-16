@@ -11,10 +11,8 @@
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
 <PageTitle>Danh sách nhân viên</PageTitle>
-
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
-
-@if (lstGuest!=null&& lstGuest.Count>0)
+@if (lstGuest != null && lstGuest.Count > 0)
 {
 	
 	<MudDrawerContainer Class="mud-height-full" Style="padding:20px">
@@ -107,137 +105,137 @@
 }
 else
 {
-	<LoadingIndicator></LoadingIndicator>
+    <LoadingIndicator></LoadingIndicator>
 }
 <style>
-	.my-custom-class {
-		backdrop-filter: blur(10px);
-	}
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
 </style>
 @code {
-	//button trạng thái
-	private string searchString = "";
-	private bool cusDetailOpen = false;
-	[CascadingParameter]
-	public bool Rtl { get; set; }
-	private GuestViewModel selectedGuest = new GuestViewModel();
-	private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
-	[Inject]
-	private IGuestManagerClient _guestService { get; set; }
-	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadData();
-	}
+    //button trạng thái
+    private string searchString = "";
+    private bool cusDetailOpen = false;
+    [CascadingParameter]
+    public bool Rtl { get; set; }
+    private GuestViewModel selectedGuest = new GuestViewModel();
+    private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
+    [Inject]
+    private IGuestManagerClient _guestService { get; set; }
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
 
-	// load lai du lieu
-	protected async Task LoadData()
-	{
-		//var response = await _client.GetGuest();
-		var response = await _guestService.GetGuest();
-		lstGuest = response.Data;
+    // load lai du lieu
+    protected async Task LoadData()
+    {
+        //var response = await _client.GetGuest();
+        var response = await _guestService.GetGuest();
+        lstGuest = response.Data;
 
-		StateHasChanged();
-	}
-	// mở details
-	private void ChangDetailPopup()
-	{
-		cusDetailOpen = !cusDetailOpen;
-	}
-	bool isShowPass = false;
-	InputType PasswordInput = InputType.Password;
-	void ButtonShowclick()
-	{
-		@if (isShowPass)
-		{
-			isShowPass = false;
-			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-			PasswordInput = InputType.Password;
-		}
-		else
-		{
-			isShowPass = true;
-			PasswordInputIcon = Icons.Material.Filled.Visibility;
-			PasswordInput = InputType.Text;
-		}
-	}
+        StateHasChanged();
+    }
+    // mở details
+    private void ChangDetailPopup()
+    {
+        cusDetailOpen = !cusDetailOpen;
+    }
+    bool isShowPass = false;
+    InputType PasswordInput = InputType.Password;
+    void ButtonShowclick()
+    {
+        @if (isShowPass)
+        {
+            isShowPass = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShowPass = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
 
 
-	private async Task OnchangeStatus(bool value,Guid id)
-	{
-		ChangeUIStatus(value, id);
-		var response = await _guestService.ChangStatus(!value,id);
-		if (response.IsSuccess)
-		{
-			Snackbar.Add(response.Data!, Severity.Success);
-			return;
-		}
-		Snackbar.Add(response.Error!, Severity.Error);
-		await LoadData();
+    private async Task OnchangeStatus(bool value, Guid id)
+    {
+        ChangeUIStatus(value, id);
+        var response = await _guestService.ChangStatus(!value, id);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add(response.Data!, Severity.Success);
+            return;
+        }
+        Snackbar.Add(response.Error!, Severity.Error);
+        await LoadData();
 
-	}
-	public void ChangeUIStatus(bool value, Guid id)
-	{
-		var guestToUpdate = lstGuest.FirstOrDefault(g => g.Id == id);
-		if (guestToUpdate != null)
-		{
-			guestToUpdate.IsDelete = !value;
-			StateHasChanged(); 
-		}
-	}
+    }
+    public void ChangeUIStatus(bool value, Guid id)
+    {
+        var guestToUpdate = lstGuest.FirstOrDefault(g => g.Id == id);
+        if (guestToUpdate != null)
+        {
+            guestToUpdate.IsDelete = !value;
+            StateHasChanged();
+        }
+    }
 
-	private bool FilterFunc(GuestViewModel element)// lọc data
-	{
-		if (string.IsNullOrWhiteSpace(searchString))
-			return true;
-		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-			return true;
-		if (element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-			return true;
-		return false;
-	}
-	public void OpenGuestDetails(Guid id)
-	{
-		bool result = id == selectedGuest.Id;
-		selectedGuest = lstGuest!.Find(p=>p.Id==id);
-		if (result || !cusDetailOpen)
-		{
-			ChangDetailPopup();
+    private bool FilterFunc(GuestViewModel element)// lọc data
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    public void OpenGuestDetails(Guid id)
+    {
+        bool result = id == selectedGuest.Id;
+        selectedGuest = lstGuest!.Find(p => p.Id == id);
+        if (result || !cusDetailOpen)
+        {
+            ChangDetailPopup();
 
-		}
-		else 
-		{
-		}
-	}
-	// them sửa khách
-	public async Task OpenDialog(Guid id)
-	{
+        }
+        else
+        {
+        }
+    }
+    // them sửa khách
+    public async Task OpenDialog(Guid id)
+    {
 
-		var parameters = new DialogParameters();
-		string nameDialog = "Thêm mới khách hàng";
-		if (id != Guid.Empty)
-		{
-			var guest = lstGuest.FirstOrDefault(c => c.Id == id);
-			
-			parameters.Add("guest", guest);
-			nameDialog = "Cập nhật khách hàng";
-		}
-		DialogOptions options = new DialogOptions()
-			{
-				CloseOnEscapeKey = true,
-				Position = DialogPosition.Center,
-				MaxWidth = MaxWidth.Large,
-				CloseButton = true,
-				FullWidth = true
-			};
-		var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, parameters, options);
-		var result = await createUpdateDialog.Result;
-		if (!result.Canceled)
-		{
-			createUpdateDialog.Close();
-			await LoadData();
-			StateHasChanged();
-		}
-	}
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới khách hàng";
+        if (id != Guid.Empty)
+        {
+            var guest = lstGuest.FirstOrDefault(c => c.Id == id);
+
+            parameters.Add("guest", guest);
+            nameDialog = "Cập nhật khách hàng";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
 
 }

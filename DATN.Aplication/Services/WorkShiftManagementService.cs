@@ -77,5 +77,42 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = $"Tháng {nextMonth} của {nextYear} đã có rồi" };
             }
         }
+        public async Task<ResponseData<string>> InsertWorkShiftCurrentMonth()
+        {
+            var currentDay = DateTime.Now;
+            int currentMonth = currentDay.Month;
+            var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                        where workshift.WorkDate.Month == currentMonth
+                        select workshift;
+            if (query.ToList().Count == 0)
+            {
+                try
+                {
+                    var dayInMonth = DateTime.DaysInMonth(currentDay.Year, currentDay.Month);
+                    for (var i = 1; i <= dayInMonth; i++)
+                    {
+                        foreach (var day in await _unitOfWork.ShiftRepository.GetAllAsync())
+                        {
+                            var workshift = new WorkShift()
+                            {
+                                ShiftId = day.Id,
+                                WorkDate = new DateTime(currentDay.Year, currentDay.Month, i)
+                            };
+                            await _unitOfWork.WorkShiftRepository.AddAsync(workshift);
+                            await _unitOfWork.WorkShiftRepository.SaveChangesAsync();
+                        }
+                    }
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm xong lịch 30 ngày" };
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Data = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = $"Tháng {currentMonth} của {currentDay.Year} đã có rồi" };
+            }
+        }
     }
 }

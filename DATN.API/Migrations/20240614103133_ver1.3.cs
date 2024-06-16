@@ -4,9 +4,12 @@
 
 namespace DATN.API.Migrations
 {
+    /// <inheritdoc />
+
 
 
     public partial class ver13 : Migration
+
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,6 +21,7 @@ namespace DATN.API.Migrations
             migrationBuilder.DropColumn(
                 name: "IsGuest",
                 table: "Pets");
+
             migrationBuilder.AddColumn<string>(
                 name: "VoucherName",
                 table: "Discounts",
@@ -33,6 +37,7 @@ namespace DATN.API.Migrations
                 oldClrType: typeof(bool),
                 oldType: "bit",
                 oldNullable: true);
+
         }
 
         /// <inheritdoc />
@@ -44,12 +49,15 @@ namespace DATN.API.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
+
+
             migrationBuilder.AddColumn<bool>(
                 name: "IsGuest",
                 table: "Pets",
                 type: "bit",
                 nullable: false,
                 defaultValue: false);
+
             migrationBuilder.DropColumn(
                 name: "VoucherName",
                 table: "Discounts");
@@ -61,6 +69,7 @@ namespace DATN.API.Migrations
                 nullable: true,
                 oldClrType: typeof(bool),
                 oldType: "bit");
+
         }
     }
 }

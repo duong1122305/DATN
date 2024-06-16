@@ -37,7 +37,6 @@ namespace DATN.Aplication.System
         {
             try
             {
-
                 var userIdentity = await CheckUser(userView.UserName);
                 if (userIdentity == null)
                     return new ResponseData<string>
@@ -89,7 +88,7 @@ namespace DATN.Aplication.System
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user))),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
             SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -106,17 +105,27 @@ namespace DATN.Aplication.System
 
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
-            var userIdentity = new User()
+            int count = 1;
+            var name = CutString.CutName(userRegisterView.FullName);
+            foreach (var item in await _userManager.Users.ToListAsync())
             {
-                FullName = userRegisterView.FullName,
-                UserName = userRegisterView.UserName,
-                Email = userRegisterView.Email,
-                PhoneNumber = userRegisterView.PhoneNumber,
-                Address = userRegisterView.Address,
-                NormalizedEmail = userRegisterView.Email.ToUpper(),
-                NormalizedUserName = userRegisterView.UserName.ToUpper(),
-                IsDeleted = false,
-            };
+                if (item.UserName.Contains(name))
+                {
+                    count++;
+                }
+            }
+            name += count.ToString();
+            var userIdentity = new User();
+            userIdentity.Gender = userRegisterView.Gender;
+            userIdentity.UserName = name;
+            userIdentity.FullName = userRegisterView.FullName;
+            userIdentity.Email = userRegisterView.Email;
+            userIdentity.PhoneNumber = userRegisterView.PhoneNumber;
+            userIdentity.Address = userRegisterView.Address;
+            userIdentity.NormalizedEmail = userRegisterView.Email.ToUpper();
+            userIdentity.NormalizedUserName = userIdentity.UserName.ToUpper();
+            userIdentity.IsDeleted = false;
+            userRegisterView.Password = CutString.RandomPass();
             var checkEmail = await _userManager.FindByEmailAsync(userRegisterView.Email);
             var checkPhone = await GetUserAtPhoneNumber(userIdentity.PhoneNumber);
             if (checkEmail == null && checkPhone.Data == null)
@@ -126,7 +135,7 @@ namespace DATN.Aplication.System
                 {
                     var userInf = new UserLoginView()
                     {
-                        UserName = userRegisterView.UserName,
+                        UserName = userIdentity.UserName,
                         Password = userRegisterView.Password
                     };
                     return new ResponseData<string> { IsSuccess = true, Data = await _mail.SendMailAccountStaffAsync(userRegisterView.Email, userInf) };
@@ -170,6 +179,7 @@ namespace DATN.Aplication.System
                     userInfView.Position = string.Join("", await _userManager.GetRolesAsync(user));
                     if (userInfView.Position != "Admin")
                     {
+                        userInfView.Gender = user.Gender == false ? "Nữ" : "Nam";
                         userInfView.FullName = user.FullName;
                         userInfView.UserName = user.UserName;
                         userInfView.Address = user.Address;
@@ -213,7 +223,8 @@ namespace DATN.Aplication.System
                 userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
                 userIdentity.Address = userUpdateView.Address;
                 userIdentity.Email = userUpdateView.Email;
-
+                userIdentity.Gender = userUpdateView.Gender;
+                userIdentity.DoB = userUpdateView.DoB;
                 var result = await _userManager.UpdateAsync(userIdentity);
                 if (result.Succeeded)
                     return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
@@ -241,16 +252,7 @@ namespace DATN.Aplication.System
             }
         }
 
-        public async Task<ResponseData<string>> GetConfirmCode(string username)
-        {
-            var user = await CheckUser(username);
-            if (user == null) return new ResponseData<string> { IsSuccess = true, Error = "Tài khoản nhập chưa được đăng kí" };
-            else
-            {
-                return new ResponseData<string> { IsSuccess = true, Data = user.CodeConfirm };
-            }
-        }
-        public async Task<ResponseData<bool>> CheckCodeConfirm(string username, string code)
+        public async Task<ResponseData<string>> CheckCodeConfirm(string username, string code)
         {
             var user = await CheckUser(username);
             if (user != null)
@@ -259,15 +261,17 @@ namespace DATN.Aplication.System
                 {
                     user.CodeConfirm = null;
                     await _userManager.UpdateAsync(user);
-                    return new ResponseData<bool> { IsSuccess = true };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Code chuẩn rồi" };
                 }
-                return new ResponseData<bool> { IsSuccess = false, Error = "Code chưa đúng" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Code chưa đúng" };
             }
-            return new ResponseData<bool> { IsSuccess = false, Error = "Tài khoản hoặc mật khẩu chưa đúng!" };
+            return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản hoặc mật khẩu chưa đúng!" };
         }
         private async Task<User> CheckUser(string username)
         {
-            var userName = await _userManager.FindByNameAsync(username);
+
+            var userName = _userManager.Users.AsEnumerable()
+                        .FirstOrDefault(u => u.UserName.Equals(username, StringComparison.Ordinal));
             var userEmail = await _userManager.FindByEmailAsync(username);
             var userPhone = await _userManager.Users.FirstOrDefaultAsync(c => c.PhoneNumber == username);
             if (userPhone == null && userName == null && userEmail == null) return null;
@@ -403,6 +407,26 @@ namespace DATN.Aplication.System
             {
                 return new ResponseData<UserInfView> { IsSuccess = true, Error = e.Message };
             }
+        }
+
+        public async Task<ResponseData<string>> ResetPassword(UserResetPassView user)
+        {
+            var userIden = await CheckUser(user.UserName);
+            if (userIden != null)
+            {
+                if (user.NewPassWord == user.ConfirmPassWord)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(userIden);
+                    var check = await _userManager.ResetPasswordAsync(userIden, token, user.ConfirmPassWord);
+                    if (check.Succeeded)
+                        return new ResponseData<string> { IsSuccess = true, Data = "Đổi thành công" };
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Đổi chưa được do pass chưa đúng định dạng" };
+                }
+                else
+                    return new ResponseData<string> { IsSuccess = false, Error = "Mật khẩu mới và xác nhận mật khẩu mới không trùng nhau" };
+            }
+            return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản sai" };
         }
     }
 }

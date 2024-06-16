@@ -12,8 +12,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    [Migration("20240615113602_ver1.4")]
-    partial class ver14
+
+    [Migration("20240614103133_ver1.3")]
+    partial class ver13
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -243,6 +244,9 @@ namespace DATN.API.Migrations
                     b.Property<string>("VoucherCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VoucherName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -10,6 +10,7 @@ using DATN.Data.EF;
 using DATN.Aplication.Services;
 using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
 builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
 builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
 builder.Services.AddScoped<IShiftManagementService, ShiftManagementService>();
+builder.Services.AddScoped<IVoucherManagementService, VoucherManagementService>();
 builder.Services.AddScoped<IPetSpeciesManagerService, PetSpeciesManagerService>();
 
 
