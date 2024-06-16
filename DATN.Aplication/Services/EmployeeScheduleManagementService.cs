@@ -258,15 +258,13 @@ namespace DATN.Aplication.Services
                         workShift.WorkDate.Year == changeShiftView.Date.Year && workShift.WorkDate.Month == changeShiftView.Date.Month
                         && workShift.WorkDate.Day == changeShiftView.Date.Day
                         select schedule;
-            if (query.ToList().Count > 0)
+            if (query.ToList().Count == 1)
             {
-                foreach (var item in query.ToList())
-                {
-                    item.UserId = Guid.Parse(changeShiftView.UserIdSecond);
-                    _unitOfWork.EmployeeScheduleRepository.UpdateAsync(item);
+             
+                    query.FirstOrDefault().UserId = Guid.Parse(changeShiftView.UserIdSecond);
+                    _unitOfWork.EmployeeScheduleRepository.UpdateAsync(query.FirstOrDefault());
                     _unitOfWork.SaveChangeAsync();
-                }
-                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
             }
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại" };
