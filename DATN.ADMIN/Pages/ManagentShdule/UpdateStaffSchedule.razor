@@ -1,19 +1,41 @@
-﻿<h3>UpdateSheduleStaff</h3>
-<MudTable T="string" Dense="true">
-    <HeaderContent>
-        <MudTh>Mã nhân viên</MudTh>
-        <MudTh>Ca làm</MudTh>
-        <MudTh>Họ và tên</MudTh>
-        <MudTh>Ngày làm</MudTh>
-        <MudTh Style="text-align:center;">Hành động</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Name">HIHI</MudTd>
-        <MudTd DataLabel="Name">HAHÂ</MudTd>
-        <MudTd DataLabel="Shift">HAHAHA</MudTd>
-        <MudTd DataLabel="WorkDate">HEHEH</MudTd>
-    </RowTemplate>
-</MudTable>
+﻿@using DATN.ADMIN.IServices
+@* @if (lstUser.Count > 0 && lstUser != null)
+{
+    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Ca làm</MudTh>
+            <MudTh Style="text-align:center;">Tổng người làm</MudTh>
+            <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
+            <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
+            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Hành động</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
+            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd Style="text-align:center;">
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                </MudButtonGroup>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+else
+{
+    <div style="justify-content:center; justify-items:center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    </div>
+} *@
 @code {
     [Parameter]
     public int idShift { get; set; }
@@ -21,4 +43,29 @@
     public DateTime workDate { get; set; }
     [Parameter]
     public string idNhanVien { get; set; }
+    [Inject]
+    IEmployeeScheduleSer _client{ get; set; }
+
+    
+
+    
+
+
+
+
+    // // tìm kiếm
+    // private bool FilterFunc(ScheduleView element)
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchString))
+    //         return true;
+    //     if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //     if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //     if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
+    //         return true;
+    //     return false;
+    // }
+
+
 }
