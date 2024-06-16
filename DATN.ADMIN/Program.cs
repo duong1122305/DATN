@@ -60,15 +60,16 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // Chỉ định cookie này là cần thiết
+    options.Cookie.IsEssential = true;
 });
 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IAddressService,AddressService>();
 builder.Services.AddScoped<IGuestManagerClient,GuestManagerClient>();
+builder.Services.AddScoped<IEmployeeScheduleSer,EmployeeScheduleSer>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 builder.Services.AddMudServices(config =>

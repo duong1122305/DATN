@@ -227,5 +227,26 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ResetPassword(user);
         }
+        [HttpPost("Create-WorkShift-For-CurrentMonth")]
+        public async Task<ResponseData<string>> CreateShiftForCurrentMonth()
+        {
+            return await _worshiftmanagement.InsertWorkShiftCurrentMonth();
+        }
+
+        [HttpGet("Get-List-Staff-Work-in-Day")]
+        public async Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate)
+        {
+            return await _employeeSchedule.GetListStaffInDay(shift, workdate);
+        }
+        [HttpGet("Get-List-Staff-Not-Working-in-Day")]
+        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId,DateTime workDate)
+        {
+            return await _employeeSchedule.ListStaffNotWorkingInDay(shiftId,workDate);
+        }
+        [HttpPost("Change-Shift")]
+        public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
+        {
+            return await _employeeSchedule.ChangeShiftStaffToStaff(changeShiftView);
+        }
     }
 }

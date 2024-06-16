@@ -10,11 +10,15 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
-                <MudTextField T="string" @bind-Value="user.Address" Label="Địa chỉ" For="@(() => user.Address)" />
                 <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
-
-
+                <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
+                    <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">
+                        <MudRadio Value="true" Color="Color.Primary">Nam</MudRadio>
+                        <MudRadio Value="false" Color="Color.Secondary">Nữ</MudRadio>
+                    </MudRadioGroup>
+                </MudField>
+                <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -30,16 +34,16 @@
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string _nameButton = "Thêm mới";
     [Inject]
-    private IUserClientSev _client {get; set;}
+    private IUserClientSev _client { get; set; }
     //nó đây
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
-
+    private string AddressCode = "";
     UserUpdateView view = new UserUpdateView();
 
     protected async override Task OnInitializedAsync()
     {
-        if (userName!= null)
+        if (userName != null)
         {
             _nameButton = "Cập nhật";
         }
@@ -48,75 +52,69 @@
     //thêm
     protected async Task Create()
     {
+        var confirm = await Confirm("tạo mới");
+        if (!confirm)
+        {
+            return;
+        }
         //gọi api thêm
         var result = await _client.Register(user);
         if (result.IsSuccess)
         {
             Message(result.Data, Severity.Success);
-            _dialogBox.Close(DialogResult.Ok(true));
+            _dialogBox.Close();
         }
         else
         {
-            Message(result.Error, Severity.Error);
+            Message(result.Error, Severity.Warning);
         }
     }
     //thông báo xác nhận
-    private async Task<bool?> Confirm()
+    private async Task<bool> Confirm(string text)
     {
-        var confirm = await _diagService.ShowMessageBox("Thông báo",
-    "Xác nhận cập nhật nhân viên?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
-        return confirm;
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
     //cập nhật
     public async Task Update()
     {
-        if (await Confirm() == true)
+        var confirm = await Confirm("cập nhật");
+        if (!confirm)
         {
+            return;
+        }
             view.FullName = user.FullName;
             view.Address = user.Address;
             view.PhoneNumber = user.PhoneNumber;
             view.Email = user.Email;
-            var result = await _client.UpdateUser(view,userName);
-            if (result.IsSuccess)
-            {
-                Message(result.Data, Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Message(result.Error, Severity.Error);
-            }
-
-        }
-    }
-    private async Task Submid()
-    {
-        if (user.Password != null)
+            view.Gender = user.Gender;
+            var result = await _client.UpdateUser(view, userName);
+        if (result.IsSuccess)
         {
-            var response = await _client.GetById(userName);
-            if (response.Data != null)
-            {
-                await Create();
-            }
-            else
-            {
-                Message("Tài khoản đã đăng ký!", Severity.Warning);
-            }
+            Message(result.Data, Severity.Success);
+            _dialogBox.Close();
         }
         else
         {
-            var response = await _client.GetById(userName);
-            if (response.IsSuccess)
-            {
-                await Update();
-            }
-            else
-            {
-                Message("vui lòng kiểm tra lại thông tin", Severity.Warning);
-            }
+            Message(result.Error, Severity.Warning);
+        }
+
+    }
+
+    private async Task Submid()
+    {
+        if (_nameButton == "Thêm mới")
+        {
+            await Create();
+        }
+        else
+        {
+            await Update();
         }
         StateHasChanged();
     }
@@ -129,4 +127,9 @@
         Snackbar.Add(message, severity);
     }
     bool success = false;
+
+    private void HandleAddressChanged(string address)
+    {
+        user.Address = address;
+    }
 } 

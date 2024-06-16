@@ -36,7 +36,7 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
-            return repon;
+                return repon;
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien()
@@ -95,5 +95,6 @@ namespace DATN.ADMIN.Services
             var response = await _client.PutAsJsonAsync("api/UserLogin/changePassword", userChangePasswordView);
             return await response.Content.ReadFromJsonAsync<ResponseData<UserChangePasswordView>>();
         }
+
     }
 }
