@@ -11,7 +11,7 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" For="@(() => Voucher.VoucherName)" />
-                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true" />
+                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true"/>
                 <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" />
                 <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" />
                 <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
@@ -21,7 +21,7 @@
                 <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="@(async()=>await Submid())" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -42,9 +42,12 @@
     private DateTime? endDate;
 
     bool success;
+    private EditContext editContext;
 
     protected async override Task OnInitializedAsync()
     {
+        editContext = new EditContext(Voucher);
+        editContext.OnFieldChanged += EditContext_OnFieldChanged;
         if (Id > 0)
         {
             _nameButton = "Cập nhật";
@@ -52,12 +55,11 @@
             endDate = new DateTime(Voucher.EndDate.Year, Voucher.EndDate.Month, Voucher.EndDate.Day);
         }
     }
-
-    private void OnValidSubmit(EditContext context)
+    private void EditContext_OnFieldChanged(object sender, FieldChangedEventArgs e)
     {
-        success = true;
         StateHasChanged();
     }
+
     //thêm
     protected async Task Create()
     {
@@ -100,23 +102,24 @@
         {
             return;
         }
-            Voucher.StartDate = startDate.Value;
-            Voucher.EndDate = endDate.Value;
-            var result = await _client.UpdateVoucher(Voucher);
-            if (result.IsSuccess)
-            {
-                Message(result.Data, Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Message(result.Error, Severity.Error);
-            }
+        Voucher.StartDate = startDate.Value;
+        Voucher.EndDate = endDate.Value;
+        var result = await _client.UpdateVoucher(Voucher);
+        if (result.IsSuccess)
+        {
+            Message(result.Data, Severity.Success);
+            _dialogBox.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Message(result.Error, Severity.Error);
+        }
 
     }
-    private async Task Submid()
+
+    private async void OnValidSubmit(EditContext context)
     {
-        if (Voucher.Id == null || Voucher.Id == 0)
+        if (Voucher.Id == 0 || Voucher.Id == null)
         {
             await Create();
         }
