@@ -27,7 +27,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Thêm ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Thêm thất bại!" };
             }
         }
 
@@ -64,7 +64,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Xóa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Xóa thất bại!" };
             }
         }
 
@@ -78,7 +78,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Sửa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Sửa thất bại!" };
             }
         }
     }
