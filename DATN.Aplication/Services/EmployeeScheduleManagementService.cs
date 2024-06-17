@@ -47,7 +47,7 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             }
-            return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year}" };
+            return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year} !" };
         }
 
         public async Task<ResponseData<string>> InsertEmployeeNextMonthCompareCurrentMonth(List<string> listUser, int shift)
@@ -92,7 +92,7 @@ namespace DATN.Aplication.Services
                         }
                     }
                 }
-                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count} !" };
             }
             catch (Exception e)
             {
@@ -125,7 +125,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleFromMonthToMonth(ScheduleMonthToMonthView scheduleMonthToMonthView)
@@ -152,7 +152,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleForShift(int shift)
@@ -174,7 +174,7 @@ namespace DATN.Aplication.Services
                             From = shifttable.From
                         };
             if (query.Count() > 0) return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
-            else return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Chưa có dữ liệu" };
+            else return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Chưa có dữ liệu!" };
         }
         public async Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate)
         {
@@ -241,7 +241,7 @@ namespace DATN.Aplication.Services
             if (listUser.Count > 0)
                 return new ResponseData<List<UserInfView>> { Data = listUser, IsSuccess = true };
             else
-                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
 
         public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
@@ -265,10 +265,10 @@ namespace DATN.Aplication.Services
                 user.UserId = Guid.Parse(changeShiftView.UserIdSecond);
                 await _unitOfWork.EmployeeScheduleRepository.UpdateAsync(user);
                 await _unitOfWork.SaveChangeAsync();
-                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
+                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công!" };
             }
             else
-                return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại!" };
         }
     }
 }

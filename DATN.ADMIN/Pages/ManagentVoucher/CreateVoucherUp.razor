@@ -11,8 +11,8 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" For="@(() => Voucher.VoucherName)" />
-                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true"/>
-                <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" />
+                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true" DateFormat="dd//MM/yyyy"/>
+                <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" DateFormat="dd//MM/yyyy" />
                 <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" />
                 <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
                 <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" />
