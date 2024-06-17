@@ -31,17 +31,20 @@
             <MudTh colspan="8"> @($" {context.GroupName}: {((DateTime)context.Key).ToString("dd/MM/yyyy")}") </MudTh>
         </GroupHeaderTemplate>
         <RowTemplate>
-            <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
-            <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
-            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
-            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
-            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
-            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd Style="text-align:center;">
-                <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
-                </MudButtonGroup>
-            </MudTd>
+            @if (context.WorkDate.CompareTo(dateNow) == 0 ? true : context.WorkDate.CompareTo(dateNow) == 1 ? true : false)
+            {
+                <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
+                <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
+                <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
+                <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
+                <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
+                <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
+                <MudTd Style="text-align:center;">
+                    <MudButtonGroup Variant="Variant.Filled">
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                    </MudButtonGroup>
+                </MudTd>
+            }
         </RowTemplate>
     </MudTable>
 }
@@ -52,6 +55,7 @@ else
     </div>
 }
 @code {
+    private DateTime dateNow = DateTime.Now;
     //button trạng thái
     private bool _disableElevation = false;
     //hiệu ứng hover
