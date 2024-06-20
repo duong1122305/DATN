@@ -48,7 +48,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<ServiceDetail> { IsSuccess = true, Data = query.FirstOrDefault() };
             else
-                return new ResponseData<ServiceDetail> { IsSuccess = false, Error = "Ko có" };
+                return new ResponseData<ServiceDetail> { IsSuccess = false, Error = "Không tồn tại thông tin tìm kiếm" };
         }
 
         public async Task<ResponseData<List<ServiceDetail>>> GetServicesByIdService(int id)
@@ -78,7 +78,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Xóa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Xóa không thành công!" };
             }
         }
 
@@ -92,7 +92,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Sửa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Sửa không thành công!" };
             }
         }
     }

@@ -6,7 +6,6 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 <EditForm Model="@user">
-    <DataAnnotationsValidator/>
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
@@ -41,7 +40,6 @@
     public UserRegisterView user { get; set; } = new UserRegisterView();
     private string AddressCode = "";
     UserUpdateView view = new UserUpdateView();
-
     protected async override Task OnInitializedAsync()
     {
         if (userName != null)
@@ -69,6 +67,7 @@
         {
             Message(result.Error, Severity.Warning);
         }
+        Message("Vui lòng nhập đủ dữ liệu!", Severity.Error);
     }
     //thông báo xác nhận
     private async Task<bool> Confirm(string text)
@@ -76,7 +75,7 @@
         var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
                     yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();
         if (!confirm.HasValue) return false;
         return confirm.Value;
@@ -89,12 +88,12 @@
         {
             return;
         }
-            view.FullName = user.FullName;
-            view.Address = user.Address;
-            view.PhoneNumber = user.PhoneNumber;
-            view.Email = user.Email;
-            view.Gender = user.Gender;
-            var result = await _client.UpdateUser(view, userName);
+        view.FullName = user.FullName;
+        view.Address = user.Address;
+        view.PhoneNumber = user.PhoneNumber;
+        view.Email = user.Email;
+        view.Gender = user.Gender;
+        var result = await _client.UpdateUser(view, userName);
         if (result.IsSuccess)
         {
             Message(result.Data, Severity.Success);

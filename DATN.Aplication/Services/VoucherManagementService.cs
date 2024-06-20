@@ -45,13 +45,13 @@ namespace DATN.Aplication.Services
                         var dateNow = DateTime.Now;
                         if (voucher.StartDate.Year < dateNow.Year || voucher.StartDate.Month < dateNow.Month || voucher.StartDate.Day < dateNow.Day)
                         {
-                            return new ResponseData<string> { IsSuccess = false, Data = "Ngày bắt đầu phải lớn hơn ngày hiện tại" };
+                            return new ResponseData<string> { IsSuccess = false, Error = "Ngày bắt đầu phải lớn hơn ngày hiện tại" };
                         }
                         else
                         {
                             if (voucher.StartDate.Year > voucher.EndDate.Year || voucher.StartDate.Month > voucher.EndDate.Month || voucher.StartDate.Day > voucher.EndDate.Day)
                             {
-                                return new ResponseData<string> { IsSuccess = false, Data = "Ngày bắt đầu phải nhỏ hơn ngày kết thúc" };
+                                return new ResponseData<string> { IsSuccess = false, Error = "Ngày bắt đầu phải nhỏ hơn ngày kết thúc" };
                             }
                             else
                             {
@@ -61,11 +61,11 @@ namespace DATN.Aplication.Services
                             }
                         }
                     }
-                    return new ResponseData<string> { IsSuccess = false, Data = "Voucher nhập trùng voucher code đã có!!!" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Voucher nhập trùng voucher code đã có!!!" };
                 }
                 catch (Exception)
                 {
-                    return new ResponseData<string> { IsSuccess = false, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Quá trình thêm voucher sảy ra lỗi!!" };
                 }
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Chưa có data" };
@@ -95,11 +95,11 @@ namespace DATN.Aplication.Services
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa voucher thành công!!" };
                     }
-                    return new ResponseData<string> { IsSuccess = false, Data = "Voucher nhập trùng voucher code đã có!!!" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Voucher nhập trùng voucher code đã có!!!" };
                 }
                 catch (Exception)
                 {
-                    return new ResponseData<string> { IsSuccess = false, Data = "Quá trình thêm voucher sảy ra lỗi!!" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Quá trình thêm voucher sảy ra lỗi!!" };
                 }
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Không có id này" };

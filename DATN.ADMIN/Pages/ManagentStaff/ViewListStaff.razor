@@ -321,7 +321,7 @@ else
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
                     "Xác nhận thêm ca cho nhân viên?",
            yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
         return confirm;
     }

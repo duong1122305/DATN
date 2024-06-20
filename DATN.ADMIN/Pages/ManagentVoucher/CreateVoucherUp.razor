@@ -16,7 +16,7 @@
                 <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" />
                 <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
                 <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" />
-                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" />
+                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" MaxLength="15" />
                 <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => Voucher.MinMoneyApplicable)" />
                 <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" />
                 <hr class="hr" />
@@ -82,6 +82,7 @@
         {
             Message(result.Error, Severity.Error);
         }
+        Message(result.Data, Severity.Error);
     }
     //thông báo xác nhận
     private async Task<bool> Confirm(string text)

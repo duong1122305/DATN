@@ -12,6 +12,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
         public int? Id { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập vào trường này")]
         [RegularExpression("^([a-zA-Z]){15,15}$",ErrorMessage ="Mã giảm giá phải đủ 15 ký tự và viết ko dấu")]
+        [MaxLength(15)]
         public string VoucherCode { get; set; }
         [Required(ErrorMessage ="Vui lòng nhập vào trường này")]
         public int Quantity { get; set; }

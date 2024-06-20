@@ -274,13 +274,13 @@ namespace DATN.Aplication.Services
 					return new ResponseData<string>
 					{
 						IsSuccess = true,
-						Data = "Thay đôi trạng thái thành công"
+						Data = "Thay đổi trạng thái thành công"
 					};
 				}
 				return new ResponseData<string>
 				{
 					IsSuccess = false,
-					Data = "Thay đôi trạng thái không thành công"
+					Data = "Thay đổi trạng thái không thành công!"
 				};
 			}
 			catch (Exception ex)
