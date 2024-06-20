@@ -7,7 +7,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách ca làm</PageTitle>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Disabled>Thêm</MudButton>
 
 @if (lstShift.Count > 0 && lstShift != null)
 {
