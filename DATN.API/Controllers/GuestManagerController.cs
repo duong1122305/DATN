@@ -28,10 +28,11 @@ namespace DATN.API.Controllers
             return await _guestManagerService.RegisterNoUser(request);
         }
   
-        [HttpPost("GetGuest")]
-        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging()
+        [HttpGet("GetGuest")]
+        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging( )
         {
-            return await _guestManagerService.GetGuest();
+            var response= await _guestManagerService.GetGuest();
+            return response;
         } 
         [HttpGet("find-by-id")]
         public async Task<ResponseData<GuestViewModel>> FindByID(Guid id)

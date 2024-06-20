@@ -50,13 +50,22 @@ namespace DATN.Aplication.Repository
 
         public async Task<bool> SoftDelete(DeleteRequest<Guid> request)
         {
-            var result = await _context.Guests.FirstOrDefaultAsync(x => x.Id == request.ID);
-            if (result != null)
+            try
             {
-                result.IsDeleted = result.IsDeleted;
-             
+                var result = await _context.Guests.FirstOrDefaultAsync(x => x.Id == request.ID);
+                if (result != null)
+                {
+                    result.IsDeleted = request.IsDelete;
+                    return await SaveChangesAsync() > 0;
+
+                }
+                return false;
             }
-            return false;
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
     }
 }

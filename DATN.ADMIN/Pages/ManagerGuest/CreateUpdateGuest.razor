@@ -1,0 +1,161 @@
+﻿@inject ISnackbar Snackbar
+@inject IDialogService _diagService;
+@inject HttpClient httpClient
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.Guest
+@using System.ComponentModel.DataAnnotations
+<EditForm Model="@guest" OnValidSubmit="@(async()=>await Submit())">
+	<DataAnnotationsValidator />
+	<MudItem xs="12" sm="12">
+		<MudCard Style="padding:40px">
+			<MudGrid>
+				<MudItem xs="12" sm="12">
+					<MudCardContent>
+						<MudTextField @bind-Value="@guest.Name" Label="Họ và tên" For="@(() => guest.Name)" />
+						<MudTextField @bind-Value="@guest.PhoneNumber" Label="Số điện thoại" For="@(() => guest.PhoneNumber)" />
+
+						<MudRadioGroup @bind-Value="Gender" Name="Giới tính">
+							<MudRadio Value="@(1)" Color="Color.Primary">Nam</MudRadio>
+							<MudRadio Value="@(0)" Color="Color.Secondary">Nữ</MudRadio>
+							<MudRadio Value="-1">Không xác định</MudRadio>
+						</MudRadioGroup>
+						<DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
+						<MudTextField ReadOnly="@(!IsNew)" T="string" @bind-Value="@guest.Email" Label="Email" For="@(() => guest.Email)" />
+					</MudCardContent>
+				</MudItem>
+
+			</MudGrid>
+			<hr class="hr" />
+			<div class="mt-5 me-5" style="text-align: end;">
+				<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+			</div>
+
+		</MudCard>
+	</MudItem>
+</EditForm>
+
+@code {
+	[Inject]
+	private IGuestManagerClient _client { get; set; }
+	[Inject]
+	private ISnackbar snackbar { get; set; }
+
+	[CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+	private string _nameButton = "Thêm mới";
+
+	[Parameter]
+	public GuestViewModel guest { get; set; } = new GuestViewModel();
+	private bool registerUser = false;
+	private bool IsNew = true;
+	private int Gender = 1;
+	private string AddressCode = "";
+
+	protected override void OnInitialized()
+	{
+		if (!string.IsNullOrEmpty(guest.Name))
+		{
+			_nameButton = "Cập nhật";
+			Gender = !guest.Gender.HasValue ? -1 : guest.Gender == true ? 1 : 0;
+			if (!string.IsNullOrEmpty(guest.Address))
+			{
+				AddressCode = guest.Address;
+			}
+			IsNew = false;
+		}
+	}
+
+	//thêm
+	protected async Task Create()
+	{
+
+		var confirm = await Confirm("tạo mới");
+		if (!confirm)
+		{
+			return;
+		}
+		var response = await _client.RegisterNoUser(new GuestRegisterNoUserRequest()
+				{
+					Name = guest.Name,
+					Address = guest.Address,
+					Gender = guest.Gender,
+					PhoneNumber = guest.PhoneNumber,
+					Email=guest.Email
+				});
+		if (response.IsSuccess)
+		{
+			snackbar.Add(response.Data, Severity.Success);
+			_dialogBox.Close();
+		}
+		else
+		{
+			snackbar.Add(response.Error, Severity.Warning);
+		}
+
+
+
+	}
+	//thông báo xác nhận
+	private async Task<bool> Confirm(string text)
+	{
+		var confirm = await _diagService.ShowMessageBox("Thông báo",	$"Xác nhận {text} khách hàng?",
+					yesText: "Xác nhận",
+					cancelText: "Hủy", noText: null,
+					options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+		StateHasChanged();
+		if (!confirm.HasValue) return false;
+		return confirm.Value;
+	}
+	//cập nhật
+	public async Task Update()
+	{
+		var confirm = await Confirm("cập nhật");
+		if (!confirm)
+		{
+			return;
+		}
+		var response = await _client.UpdateGuets(new GuestUpdateRequest()
+			{
+				Id= guest.Id,
+				Name = guest.Name,
+				Address = guest.Address,
+				Gender = guest.Gender,
+				PhoneNumber = guest.PhoneNumber,
+				
+
+			});
+		if (response.IsSuccess)
+		{
+			snackbar.Add(response.Data, Severity.Success);
+			_dialogBox.Close();
+		}
+		else
+		{
+			snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	private async Task Submit()
+	{
+		if (Gender != -1)
+		{
+			guest.Gender = Gender == 1 ? true : false;
+		}
+		if (IsNew)
+		{
+			await Create();
+		}
+		else
+		{
+			await Update();
+		}
+		StateHasChanged();
+	}
+
+
+	private void HandleAddressChanged(string address)
+	{
+		guest.Address = address;
+	}
+} 
