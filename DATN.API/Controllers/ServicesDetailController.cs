@@ -47,8 +47,8 @@ namespace DATN.API.Controllers
 
             var result = await _serviceDetailManagementService.CreateNewService(serviceDetail);
 
-            if (result.IsSuccess == false) return Content(result.Error); 
-            
+            if (result.IsSuccess == false) return Content(result.Error);
+
             return Ok(result);
         }
 
@@ -56,10 +56,10 @@ namespace DATN.API.Controllers
         public async Task<IActionResult> UpdateServiceDetail(ServiceDetail serviceDetail)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            
+
             var result = await _serviceDetailManagementService.UpdateService(serviceDetail);
 
-            if(result.IsSuccess == false) return Content(result.Error);
+            if (result.IsSuccess == false) return Content(result.Error);
 
             return Ok(result);
         }
@@ -68,10 +68,10 @@ namespace DATN.API.Controllers
         public async Task<IActionResult> RemoveServiceDetail(int id)
         {
             if (id == 0 || id == null) return BadRequest();
-            
+
             var result = await _serviceDetailManagementService.RemoveService(id);
 
-            if(result.IsSuccess == false) return Content(result.Error);
+            if (result.IsSuccess == false) return Content(result.Error);
 
             return Ok(result);
         }
@@ -80,10 +80,10 @@ namespace DATN.API.Controllers
         public async Task<IActionResult> GetServiceDetailByServiceId(int id)
         {
             if (id == 0 || id == null) return BadRequest();
-            
+
             var result = await _serviceDetailManagementService.GetServicesByIdService(id);
 
-            if(result.IsSuccess == false) return Content(result.Error);
+            if (result.IsSuccess == false) return Content(result.Error);
 
             return Ok(result);
         }

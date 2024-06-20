@@ -12,6 +12,5 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> Update(ServiceDetail serviceDetail);
         public Task<ResponseData<string>> Remove(int id);
         public Task<ResponseData<List<ServiceDetail>>> GetServiceDetailByServiceId(int id);
-        public Task<string> GetSerivceNameByServiceId(int id);
     }
 }

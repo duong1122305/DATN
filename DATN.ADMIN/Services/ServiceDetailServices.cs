@@ -41,27 +41,6 @@ namespace DATN.ADMIN.Services
             return data;
         }
 
-        public async Task<string> GetSerivceNameByServiceId(int id)
-        {
-            string name = "";
-            var findServiceId = await _client.GetAsync($"api/Services/getServiceById/{id}");
-            var result = await findServiceId.Content.ReadAsStringAsync();
-            var data = JsonConvert.DeserializeObject<ResponseData<Service>>(result);
-            if (data != null)
-            {
-                foreach (var item in GetAll().GetAwaiter().GetResult().Data)
-                {
-                    if (item.ServiceId == data.Data.Id)
-                    {
-                        name = data.Data.Name;
-                        break;
-                    }
-                }
-            }
-
-            return name;
-        }
-
         public async Task<ResponseData<List<ServiceDetail>>> GetServiceDetailByServiceId(int id)
         {
             var response = await _client.GetAsync($"api/ServicesDetail/getServiceDetailByServiceId/{id}");

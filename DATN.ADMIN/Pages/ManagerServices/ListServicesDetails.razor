@@ -5,6 +5,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.ServiceDetail
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
@@ -33,7 +34,8 @@
         <MudTd DataLabel="STT" Style="text-align:center;">
             @(lstServiesDetails.IndexOf(context) + 1)
         </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@serviceName</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">
+        </MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Price</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Duration Phút</MudTd>
@@ -106,8 +108,6 @@
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
 
-    string serviceName = "";
-
     bool open;
     Anchor anchor;
 
@@ -117,18 +117,6 @@
         if (result.IsSuccess == true)
         {
             lstServiesDetails = result.Data;
-        }
-        GetServiceName();
-    }
-
-    public async Task GetServiceName()
-    {
-        if (lstServiesDetails != null)
-        {
-            foreach (var item in lstServiesDetails)
-            {
-                serviceName = await _serviceDetailService.GetSerivceNameByServiceId(item.ServiceId);
-            }
         }
     }
 
