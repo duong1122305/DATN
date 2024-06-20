@@ -1,16 +1,28 @@
 ﻿@page "/CreateUpdateServicesDetails"
-<EditForm>
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.ServiceDetail
+<EditForm Model="@createServiceDetailVM">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" Label="Tên dịch vụ" />
-                <MudTextField T="string" Label="Tên chi tiết" />
-                <MudTextField T="string" Label="Giá" />
-                <MudTextField T="string" Label="Thời gian làm" />
-                <MudTextField T="string" Label="Mô tả" />
+                <MudSelect Margin="Margin.Dense"
+                           T="int"
+                           @bind-Value="@createServiceDetailVM.ServiceId"
+                           Label="Chọn dịch vụ"
+                           Variant="Variant.Text">
+                    @foreach (var item in lstService)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@createServiceDetailVM.Name" />
+                <MudTextField T="float" Label="Giá" @bind-Value="@createServiceDetailVM.Price" />
+                <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" />
+                <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"></MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" OnClick="async () => await Submit()" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Thêm mới</MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -18,5 +30,31 @@
 </EditForm>
 
 @code {
- 
+    [Parameter]
+    public int id { get; set; }
+
+    [Parameter]
+    public CreateServiceDetailVM createServiceDetailVM { get; set; } = new CreateServiceDetailVM();
+
+    private List<Service> lstService = new List<Service>();
+
+    [Inject]
+    public IServiceManagermentService _serviceManagermentService { get; set; }
+
+    [Inject]
+    public IServiceDetailServices _serviceDetailService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _serviceManagermentService.GetAll();
+        if (result.IsSuccess)
+        {
+            lstService = result.Data;
+        }
+    }
+
+    public async Task Submit()
+    {
+        var result = await _serviceDetailService.Create(createServiceDetailVM);
+    }
 }

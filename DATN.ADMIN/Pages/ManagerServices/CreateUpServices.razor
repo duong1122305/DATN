@@ -1,12 +1,16 @@
 ﻿@page "/CreateUpdateServices"
-<EditForm>
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.ServiceManager
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
+<EditForm Model="@service">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" Label="Tên dịch vụ" />
+                <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"></MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Thêm mới</MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -16,4 +20,45 @@
 @code {
     [Parameter]
     public int id { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+    [Parameter]
+    public CreateServiceVM service { get; set; } = new CreateServiceVM();
+
+    [Inject]
+    private IServiceManagermentService _serviceManagerment { get; set; }
+
+    public async Task Submit()
+    {
+        if (await Confirm() == true)
+        {
+            var result = await _serviceManagerment.Create(service);
+            if (result.IsSuccess == true)
+            {
+                Message("Thêm dịch vụ mới thành công", Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+                Message("Thêm dịch vụ mới không thành công", Severity.Error);
+        }
+    }
+
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo",
+    "Xác nhận thêm dịch vụ này ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
+
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+        Snackbar.Add(message, severity);
+    }
 }

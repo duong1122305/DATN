@@ -62,8 +62,8 @@ builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
 builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
 builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleManagementService>();
 builder.Services.AddScoped<IShiftManagementService, ShiftManagementService>();
-
-
+builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
+builder.Services.AddScoped<IServiceDetailManagementService, ServiceDetailManagementService>();
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(Program));

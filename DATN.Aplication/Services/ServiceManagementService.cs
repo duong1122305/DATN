@@ -1,6 +1,7 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.ServiceManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +12,21 @@ namespace DATN.Aplication.Services
 {
     public class ServiceManagementService : IServiceManagementService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ServiceManagementService(UnitOfWork unitOfWork)
+        public ServiceManagementService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> CreateNewService(Service service)
+        public async Task<ResponseData<string>> CreateNewService(CreateServiceVM service)
         {
             try
             {
-                await _unitOfWork.ServiceRepository.AddAsync(service);
+                var newService = new Service
+                {
+                    Name = service.Name
+                };
+                await _unitOfWork.ServiceRepository.AddAsync(newService);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công!" };
             }
@@ -57,14 +62,24 @@ namespace DATN.Aplication.Services
             {
                 var service = await _unitOfWork.ServiceRepository.FindAsync(c => c.Id == idSer);
                 var serviceUpdate = service.FirstOrDefault();
-                serviceUpdate.IsDetele = true;
+                switch (serviceUpdate.IsDetele)
+                {
+                    case false:
+                        serviceUpdate.IsDetele = true;
+                        break;
+                    case true:
+                        serviceUpdate.IsDetele = false;
+                        break;
+                    default:
+                        break;
+                }
                 await _unitOfWork.ServiceRepository.UpdateAsync(serviceUpdate);
                 await _unitOfWork.SaveChangeAsync();
-                return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công!" };
+                return new ResponseData<string> { IsSuccess = true, Data = "Thay đổi trạng thái thành công" };
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Xóa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Thay đổi trạng thái không thành công!" };
             }
         }
 

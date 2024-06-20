@@ -1,6 +1,7 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.ServiceDetail;
 using Newtonsoft.Json;
 
 namespace DATN.ADMIN.Services
@@ -13,10 +14,10 @@ namespace DATN.ADMIN.Services
         {
             _client = client;
         }
-        public async Task<ResponseData<string>> Create(ServiceDetail serviceDetail)
+        public async Task<ResponseData<string>> Create(CreateServiceDetailVM serviceDetail)
         {
             var response = await _client.PostAsJsonAsync("api/ServicesDetail/createServiceDetail", serviceDetail);
-            var result =await response.Content.ReadAsStringAsync();
+            var result = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(result);
 
             return data;
@@ -24,7 +25,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<List<ServiceDetail>>> GetAll()
         {
-            var response = await _client.GetAsync("api/ServicesDetail/getAllServiceDetail");
+            var response = await _client.GetAsync("api/ServicesDetail/getAllServicesDetail");
             var result = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<ResponseData<List<ServiceDetail>>>(result);
 
@@ -38,6 +39,27 @@ namespace DATN.ADMIN.Services
             var data = JsonConvert.DeserializeObject<ResponseData<ServiceDetail>>(result);
 
             return data;
+        }
+
+        public async Task<string> GetSerivceNameByServiceId(int id)
+        {
+            string name = "";
+            var findServiceId = await _client.GetAsync($"api/Services/getServiceById/{id}");
+            var result = await findServiceId.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<ResponseData<Service>>(result);
+            if (data != null)
+            {
+                foreach (var item in GetAll().GetAwaiter().GetResult().Data)
+                {
+                    if (item.ServiceId == data.Data.Id)
+                    {
+                        name = data.Data.Name;
+                        break;
+                    }
+                }
+            }
+
+            return name;
         }
 
         public async Task<ResponseData<List<ServiceDetail>>> GetServiceDetailByServiceId(int id)

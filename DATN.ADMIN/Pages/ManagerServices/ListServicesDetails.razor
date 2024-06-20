@@ -33,7 +33,7 @@
         <MudTd DataLabel="STT" Style="text-align:center;">
             @(lstServiesDetails.IndexOf(context) + 1)
         </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceId</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@serviceName</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Price</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Duration Phút</MudTd>
@@ -75,7 +75,7 @@
         <MudText Typo="Typo.h6">CHI TIẾT DỊCH VỤ</MudText>
         <MudToggleIconButton @bind-Toggled="@open" ToggledIcon="@Icons.Material.Filled.Close"></MudToggleIconButton>
     </div>
-  <div style="margin:10px">
+    <div style="margin:10px">
         <MudForm Style="p-4">
             <MudTextField T="string" Label="Tên dịch vụ" Required="true" RequiredError="Tên dịch vụ không được để trống" />
             <MudTextField T="string" Label="Tên chi tiết" Required="true" RequiredError="Tên chi tiết không được để trống" />
@@ -93,7 +93,7 @@
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Cập nhật</MudButton>
             </div>
         </MudForm>
-  </div>
+    </div>
 </MudDrawer>
 <style>
     .my-custom-class {
@@ -101,16 +101,36 @@
     }
 </style>
 @code {
-    private List<ServiceDetail> lstServiesDetails = new List<ServiceDetail>()
-    {
-(new ServiceDetail{Id=1,ServiceId=1,Name="Nhuộm lông chó",Price=100000f,Duration=30d,Description="Dành cho thú cưng chó",CreateAt=DateTime.Now,IsDeleted=false}),
-(new ServiceDetail{Id=2,ServiceId=2,Name="Cắt tỉa lông chó",Price=100000f,Duration=30d,Description="Dành cho thú cưng chó",CreateAt=DateTime.Now,IsDeleted=true}),
-(new ServiceDetail{Id=3,ServiceId=3,Name="Nhuộm lông mèo",Price=100000f,Duration=30d,Description="Dành cho thú cưng mèo",CreateAt=DateTime.Now,IsDeleted=false}),
-(new ServiceDetail{Id=4,ServiceId=4,Name="Cắt tỉa lông mèo",Price=100000f,Duration=30d,Description="Dành cho thú cưng mèo",CreateAt=DateTime.Now,IsDeleted=true}),
-    };
+    private List<ServiceDetail> lstServiesDetails = new List<ServiceDetail>();
+
+    [Inject]
+    public IServiceDetailServices _serviceDetailService { get; set; }
+
+    string serviceName = "";
 
     bool open;
     Anchor anchor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _serviceDetailService.GetAll();
+        if (result.IsSuccess == true)
+        {
+            lstServiesDetails = result.Data;
+        }
+        GetServiceName();
+    }
+
+    public async Task GetServiceName()
+    {
+        if (lstServiesDetails != null)
+        {
+            foreach (var item in lstServiesDetails)
+            {
+                serviceName = await _serviceDetailService.GetSerivceNameByServiceId(item.ServiceId);
+            }
+        }
+    }
 
     void OpenDrawer(Anchor anchor)
     {

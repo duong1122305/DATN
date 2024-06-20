@@ -1,5 +1,6 @@
 ﻿using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.ServiceManager;
 
 namespace DATN.ADMIN.IServices
 {
@@ -7,7 +8,7 @@ namespace DATN.ADMIN.IServices
     {
         public Task<ResponseData<List<Service>>> GetAll();
         public Task<ResponseData<Service>> GetById(int id);
-        public Task<ResponseData<string>> Create(Service service);
+        public Task<ResponseData<string>> Create(CreateServiceVM service);
         public Task<ResponseData<string>> Update(Service service);
         public Task<ResponseData<string>> Remove(int id);
     }

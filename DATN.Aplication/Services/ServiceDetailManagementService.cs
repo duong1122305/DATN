@@ -1,6 +1,7 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.ServiceDetail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +12,26 @@ namespace DATN.Aplication.Services
 {
     public class ServiceDetailManagementService : IServiceDetailManagementService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ServiceDetailManagementService(UnitOfWork unitOfWork)
+        public ServiceDetailManagementService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> CreateNewService(ServiceDetail serviceDetail)
+        public async Task<ResponseData<string>> CreateNewService(CreateServiceDetailVM serviceDetail)
         {
             try
             {
-                await _unitOfWork.ServiceDetailRepository.AddAsync(serviceDetail);
+                var newServiceDetail = new ServiceDetail
+                {
+                    ServiceId = serviceDetail.ServiceId,
+                    Name = serviceDetail.Name,
+                    Price = serviceDetail.Price,
+                    Duration = serviceDetail.Duration,
+                    Description = serviceDetail.Description,
+                    CreateAt = DateTime.Now
+                };
+                await _unitOfWork.ServiceDetailRepository.AddAsync(newServiceDetail);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công!" };
             }
