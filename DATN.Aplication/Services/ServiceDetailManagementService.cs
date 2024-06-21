@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceDetail;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,6 +105,29 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<string> { IsSuccess = false, Error = "Sửa ko thành công!" };
             }
+        }
+
+        public async Task<List<GetServiceNameVM>> GetServiceName()
+        {
+            var lstService = await _unitOfWork.ServiceRepository.GetAllAsync();
+            var lstServiceDetail = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
+            var query = (from sv in lstService.ToList()
+                        join sd in lstServiceDetail.ToList()
+                        on sv.Id equals sd.ServiceId
+                        select new GetServiceNameVM
+                        {
+                            ServiceDetailName = sd.Name,
+                            ServiceName = sv.Name,
+                            Price = sd.Price,
+                            Duration = sd.Duration,
+                            Description = sd.Description,
+                            CreatedAt = sd.CreateAt,
+                            IsDeleted = sd.IsDeleted
+                        }).AsQueryable();
+
+            if (query == null) return new List<GetServiceNameVM>();
+
+            return query.ToList();
         }
     }
 }

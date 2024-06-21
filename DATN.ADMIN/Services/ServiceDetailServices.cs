@@ -50,6 +50,14 @@ namespace DATN.ADMIN.Services
             return data;
         }
 
+        public async Task<List<GetServiceNameVM>> GetServiceName()
+        {
+            var response = await _client.GetAsync("api/ServicesDetail/getServiceName");
+            var result = await response.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<List<GetServiceNameVM>>(result);
+            return data;
+        }
+
         public async Task<ResponseData<string>> Remove(int id)
         {
             var response = await _client.PatchAsJsonAsync($"api/ServicesDetail/removeServiceDetail", id);

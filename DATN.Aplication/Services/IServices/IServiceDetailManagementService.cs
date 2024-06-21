@@ -12,5 +12,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> CreateNewService(CreateServiceDetailVM service);
         public Task<ResponseData<string>> UpdateService(ServiceDetail service);
         public Task<ResponseData<string>> RemoveService(int idSer);
+        public Task<List<GetServiceNameVM>> GetServiceName();
     }
 }

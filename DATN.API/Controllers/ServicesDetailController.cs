@@ -87,5 +87,15 @@ namespace DATN.API.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("getServiceName")]
+        public async Task<IActionResult> GetServiceName()
+        {
+            var result = await _serviceDetailManagementService.GetServiceName();
+            if(result != null) return Ok(result);
+
+            return BadRequest();
+        }
     }
 }
+

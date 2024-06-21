@@ -13,7 +13,7 @@
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
 
 <MudButton Variant="Variant.Filled" Href="/ListServices" Style="margin-block-end" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Danh sách dịch vụ</MudButton>
-<MudTable Items="@lstServiesDetails">
+<MudTable Items="@lstServiceName">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Danh sách dịch vụ chi tiết</MudText>
         <MudSpacer />
@@ -32,15 +32,14 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="STT" Style="text-align:center;">
-            @(lstServiesDetails.IndexOf(context) + 1)
+            @(lstServiceName.IndexOf(context) + 1)
         </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">
-        </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceName</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceDetailName</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Price</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Duration Phút</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.CreateAt</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.CreatedAt</MudTd>
         @if (!context.IsDeleted)
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
@@ -103,8 +102,8 @@
     }
 </style>
 @code {
-    private List<ServiceDetail> lstServiesDetails = new List<ServiceDetail>();
-
+    // private List<ServiceDetail> lstServiesDetails = new List<ServiceDetail>();
+    private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
 
@@ -113,10 +112,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await _serviceDetailService.GetAll();
-        if (result.IsSuccess == true)
+        var result = await _serviceDetailService.GetServiceName();
+
+        if (result != null)
         {
-            lstServiesDetails = result.Data;
+            lstServiceName = result;
         }
     }
 

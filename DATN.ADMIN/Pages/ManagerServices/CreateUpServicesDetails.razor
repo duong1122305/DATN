@@ -2,6 +2,8 @@
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.DTOs.ServiceDetail
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
 <EditForm Model="@createServiceDetailVM">
     <MudItem xs="12" sm="12">
         <MudCard>
@@ -44,6 +46,8 @@
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
 
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         var result = await _serviceManagermentService.GetAll();
@@ -55,6 +59,35 @@
 
     public async Task Submit()
     {
-        var result = await _serviceDetailService.Create(createServiceDetailVM);
+        if (await Confirm() == true)
+        {
+            var result = await _serviceDetailService.Create(createServiceDetailVM);
+            if (result.IsSuccess)
+            {
+                Message("Thành công", Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else Message(result.Error, Severity.Error);
+        }
+    }
+
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo",
+    "Xác nhận thêm dịch vụ này ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        return confirm;
+    }
+
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+        Snackbar.Add(message, severity);
     }
 }
