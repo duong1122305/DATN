@@ -5,6 +5,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.ServiceManager
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
@@ -48,7 +49,7 @@
                            StartIcon="@(context.IsDetele ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
                            IconColor="@(context.IsDetele ? Color.Surface : Color.Error)"
                            title="@(context.IsDetele ? "Kích hoạt" : "Xoá")"></MudButton>
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.Id))"></MudButton>
                 <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
             </MudButtonGroup>
         </MudTd>
@@ -93,6 +94,17 @@
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới dịch vụ";
         parameters.Add("id", id);
+        if (id !=0)
+        {
+          var update = lstServies.FirstOrDefault(c => c.Id == id);
+            var updateView = new CreateServiceVM()
+                {
+                    Name = update.Name,
+                };
+            nameDialog = "Cập nhật dịch vụ";
+            parameters.Add("id", id);
+            parameters.Add("service", updateView);
+        }
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
