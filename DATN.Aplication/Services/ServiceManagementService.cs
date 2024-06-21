@@ -26,6 +26,13 @@ namespace DATN.Aplication.Services
                 {
                     Name = service.Name
                 };
+                foreach(var i in await _unitOfWork.ServiceRepository.GetAllAsync())
+                {
+                    if(i.Name == service.Name)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại!" };
+                    }
+                }
                 await _unitOfWork.ServiceRepository.AddAsync(newService);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công!" };
@@ -42,7 +49,7 @@ namespace DATN.Aplication.Services
             if (data.Count() > 0)
                 return new ResponseData<List<Service>> { IsSuccess = true, Data = data.ToList() };
             else
-                return new ResponseData<List<Service>> { IsSuccess = false, Error = "Chưa có dịch vụ chính nào" };
+                return new ResponseData<List<Service>> { IsSuccess = false, Error = "Chưa có dịch vụ chính nào", Data = new List<Service>() };
         }
 
         public async Task<ResponseData<Service>> GetServiceById(int id)

@@ -27,9 +27,14 @@ namespace DATN.ADMIN.Services
         {
             var response = await _client.GetAsync("api/Services/getAllService");
             var result = await response.Content.ReadAsStringAsync();
-            var data = JsonConvert.DeserializeObject<ResponseData<List<Service>>>(result);
+            if (result == null) return new ResponseData<List<Service>>();
+            else
+            {
+                var data = JsonConvert.DeserializeObject<ResponseData<List<Service>>>(result);
+                if (data == null) return new ResponseData<List<Service>>();
 
-            return data;
+                return data;
+            }
         }
 
         public async Task<ResponseData<Service>> GetById(int id)

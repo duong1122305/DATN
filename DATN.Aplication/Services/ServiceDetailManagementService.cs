@@ -32,6 +32,13 @@ namespace DATN.Aplication.Services
                     Description = serviceDetail.Description,
                     CreateAt = DateTime.Now
                 };
+                foreach(var i in await _unitOfWork.ServiceDetailRepository.GetAllAsync())
+                {
+                    if(i.Name == serviceDetail.Name)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại !" };
+                    }
+                }
                 await _unitOfWork.ServiceDetailRepository.AddAsync(newServiceDetail);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công!" };
