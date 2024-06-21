@@ -1,0 +1,21 @@
+﻿@page "/ServicesDetails"
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.ServiceDetail
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
+<MudItem xs="12" sm="12">
+    <MudCard>
+        <MudCardContent>
+            <MudTextField T="string" Label="Id dịch vụ chi tiết" ReadOnly/>
+            <MudTextField T="string" Label="Tên dịch vụ chi tiết" ReadOnly />
+            <MudTextField T="float" Label="Giá" ReadOnly />
+            <MudTextField T="double" Label="Thời gian làm" ReadOnly />
+            <MudTextField T="string" AutoGrow Label="Mô tả" ReadOnly />
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+@code {
+    [Parameter]
+    public int id { get; set; }
+}

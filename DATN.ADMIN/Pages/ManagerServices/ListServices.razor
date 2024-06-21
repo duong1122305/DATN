@@ -10,7 +10,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
 <PageTitle>Danh sách dịch vụ</PageTitle>
-<MudButton Variant="Variant.Filled" OnClick="@(async()=>await OpenDialog(null))" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Thêm dịch vụ</MudButton>
+<MudButton Variant="Variant.Filled" OnClick="@(async()=>await OpenDialog(null))" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm dịch vụ</MudButton>
 <MudButton Variant="Variant.Filled" Href="/ListServicesDetails" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Dịch vụ chi tiết</MudButton>
 
 <MudTable Items="@lstServies">
@@ -111,7 +111,8 @@
                 Position = DialogPosition.Center,
                 MaxWidth = MaxWidth.Small,
                 CloseButton = true,
-                FullWidth = true
+                FullWidth = true,
+                DisableBackdropClick = true
             };
         try
         {

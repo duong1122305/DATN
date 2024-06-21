@@ -62,8 +62,8 @@
                 <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" title="Xoá"></MudButton>
             }
 
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa"></MudButton>
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(() => OpenDrawer(Anchor.End))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(null))"></MudButton>
+            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(null))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
         </MudTd>
 
     </RowTemplate>
@@ -138,11 +138,43 @@
                 Position = DialogPosition.Center,
                 MaxWidth = MaxWidth.Small,
                 CloseButton = true,
-                FullWidth = true
+                FullWidth = true,
+                DisableBackdropClick=true
             };
         try
         {
             var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpServicesDetails>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await OnInitializedAsync();
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+    }
+    private async Task OpenViewDetails(int? id)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Dich vụ chi tiết";
+        // parameters.Add("id", id);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        try
+        {
+            var createUpdateDialog = await _dialogservice.ShowAsync<ViewServicesDetails>(nameDialog, options);
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {

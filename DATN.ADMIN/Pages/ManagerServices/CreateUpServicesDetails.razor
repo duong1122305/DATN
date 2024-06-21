@@ -66,7 +66,7 @@
         var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} voucher?",
                     yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true,DisableBackdropClick=true });
         StateHasChanged();
         if (!confirm.HasValue) return false;
         return confirm.Value;
