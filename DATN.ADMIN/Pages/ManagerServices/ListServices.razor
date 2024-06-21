@@ -1,0 +1,141 @@
+﻿@page "/ListServices"
+@using System.Net.Http.Json
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice
+<PageTitle>Danh sách dịch vụ</PageTitle>
+<MudButton Variant="Variant.Filled" OnClick="@(async()=>await OpenDialog(null))" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm dịch vụ</MudButton>
+<MudButton Variant="Variant.Filled" Href="/ListServicesDetails" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Dịch vụ chi tiết</MudButton>
+
+<MudTable Items="@lstServies">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Danh sách dịch vụ</MudText>
+        <MudSpacer />
+        <MudTextField T="string" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh Style="text-align:center;">STT</MudTh>
+        <MudTh Style="text-align:center;">Tên dịch vụ</MudTh>
+        <MudTh Style="text-align:center;">Trạng thái</MudTh>
+        <MudTh Style="text-align:center;">Hành động</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="STT" Style="text-align:center;">
+            @(lstServies.IndexOf(context) + 1)
+        </MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
+        @if (!context.IsDetele)
+        {
+            <MudTd DataLabel="Email" Style="text-align:center;">
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+            </MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="Email" Style="text-align:center;">
+                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+            </MudTd>
+        }
+        <MudTd Style="text-align:center;">
+            <MudButtonGroup Variant="Variant.Filled">
+                <MudButton IconSize="Size.Large"
+                           OnClick="async () => await UpdateStatusService(context.Id)"
+                           StartIcon="@(context.IsDetele ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
+                           IconColor="@(context.IsDetele ? Color.Surface : Color.Error)"
+                           title="@(context.IsDetele ? "Kích hoạt" : "Xoá")"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))" title="Sửa"></MudButton>
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+            </MudButtonGroup>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+@code {
+    private List<Service> lstServies = new List<Service>();
+
+    [Inject]
+    private IServiceManagermentService _serviceManangerment { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _serviceManangerment.GetAll();
+        if (result.Data != null && result.IsSuccess == true)
+        {
+            lstServies = result.Data;
+        }
+    }
+
+    public async Task UpdateStatusService(int id)
+    {
+        var result = await _serviceManangerment.Remove(id);
+        if (result.IsSuccess == true)
+        {
+            Message(result.Data, Severity.Success);
+            await OnInitializedAsync();
+        }
+        else Message(result.Error, Severity.Error);
+    }
+
+    private async Task OpenDialog(int? id)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới dịch vụ";
+        if (id != null)
+        {
+            var servicesUpdate = lstServies.FirstOrDefault(c => c.Id == id);
+            var updateView = new Service()
+                {
+                    Name = servicesUpdate.Name,
+                };
+            parameters.Add("id", id);
+            parameters.Add("shiftView", servicesUpdate);
+            nameDialog = "Cập nhật dịch vụ";
+        }
+        parameters.Add("id", id);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        try
+        {
+            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpServices>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await OnInitializedAsync();
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+        Snackbar.Add(message, severity);
+    }
+}
