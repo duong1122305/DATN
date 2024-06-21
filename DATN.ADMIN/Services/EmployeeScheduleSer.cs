@@ -14,6 +14,18 @@ namespace DATN.ADMIN.Services
             _client = client;
 
         }
+        //thêm cho tháng hiện tại
+        public async Task<ResponseData<string>> AddSchuduleToMonth()
+        {
+            var res = await _client.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/Create-WorkShift-For-CurrentMonth");
+            return res;
+        }
+
+        public async Task<ResponseData<string>> AddShuduleMonth()
+        {
+            var repon = await _client.GetFromJsonAsync<ResponseData<string>>("api/UserLogin/them-ca-for-all-staff");
+            return repon;
+        }
 
         public async Task<ResponseData<string>> changgeShift(ChangeShiftView changeShiftView)
         {
