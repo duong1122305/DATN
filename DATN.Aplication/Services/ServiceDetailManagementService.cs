@@ -32,9 +32,9 @@ namespace DATN.Aplication.Services
                     Description = serviceDetail.Description,
                     CreateAt = DateTime.Now
                 };
-                foreach(var i in await _unitOfWork.ServiceDetailRepository.GetAllAsync())
+                foreach (var i in await _unitOfWork.ServiceDetailRepository.GetAllAsync())
                 {
-                    if(i.Name == serviceDetail.Name)
+                    if (i.Name == serviceDetail.Name)
                     {
                         return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại !" };
                     }
@@ -89,14 +89,24 @@ namespace DATN.Aplication.Services
             {
                 var service = await _unitOfWork.ServiceDetailRepository.FindAsync(c => c.Id == idSer);
                 var serviceUpdate = service.FirstOrDefault();
-                serviceUpdate.IsDeleted = true;
+                switch (serviceUpdate.IsDeleted)
+                {
+                    case true:
+                        serviceUpdate.IsDeleted = false;
+                        break;
+                    case false:
+                        serviceUpdate.IsDeleted = true;
+                        break;
+                    default:
+                        break;
+                }
                 await _unitOfWork.ServiceDetailRepository.UpdateAsync(serviceUpdate);
                 await _unitOfWork.SaveChangeAsync();
-                return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công!" };
+                return new ResponseData<string> { IsSuccess = true, Data = "Cập nhật trạng thái thành công!" };
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Xóa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Cập nhật trạng thái thất bại!" };
             }
         }
 
@@ -119,18 +129,19 @@ namespace DATN.Aplication.Services
             var lstService = await _unitOfWork.ServiceRepository.GetAllAsync();
             var lstServiceDetail = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
             var query = (from sv in lstService.ToList()
-                        join sd in lstServiceDetail.ToList()
-                        on sv.Id equals sd.ServiceId
-                        select new GetServiceNameVM
-                        {
-                            ServiceDetailName = sd.Name,
-                            ServiceName = sv.Name,
-                            Price = sd.Price,
-                            Duration = sd.Duration,
-                            Description = sd.Description,
-                            CreatedAt = sd.CreateAt,
-                            IsDeleted = sd.IsDeleted
-                        }).AsQueryable();
+                         join sd in lstServiceDetail.ToList()
+                         on sv.Id equals sd.ServiceId
+                         select new GetServiceNameVM
+                         {
+                             ServiceDetailId = sd.Id,
+                             ServiceDetailName = sd.Name,
+                             ServiceName = sv.Name,
+                             Price = sd.Price,
+                             Duration = sd.Duration,
+                             Description = sd.Description,
+                             CreatedAt = sd.CreateAt,
+                             IsDeleted = sd.IsDeleted
+                         }).AsQueryable();
 
             if (query == null) return new List<GetServiceNameVM>();
 

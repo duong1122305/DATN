@@ -53,14 +53,11 @@
             </MudTd>
         }
         <MudTd Style="text-align:center;">
-            @if (context.IsDeleted)
-            {
-                <MudButton IconSize="Size.Large" IconColor="Color.Success" StartIcon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt"></MudButton>
-            }
-            else
-            {
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" title="Xoá"></MudButton>
-            }
+            <MudButton IconSize="Size.Large"
+                           OnClick="async () => await UpdateStatusService(context.ServiceDetailId)"
+                           StartIcon="@(context.IsDeleted ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
+                           IconColor="@(context.IsDeleted ? Color.Surface : Color.Error)"
+                           title="@(context.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
 
             <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa"></MudButton>
             <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(() => OpenDrawer(Anchor.End))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
@@ -120,6 +117,17 @@
         }
     }
 
+    public async Task UpdateStatusService(int id)
+    {
+        var result = await _serviceDetailService.Remove(id);
+        if (result.IsSuccess == true)
+        {
+            Message(result.Data, Severity.Success);
+            await OnInitializedAsync();
+        }
+        else Message(result.Error, Severity.Error);
+    }
+
     void OpenDrawer(Anchor anchor)
     {
         open = true;
@@ -155,7 +163,14 @@
 
             throw;
         }
-
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+        Snackbar.Add(message, severity);
     }
 
 }

@@ -26,6 +26,7 @@ namespace DATN.Aplication.Services
                 {
                     Name = service.Name
                 };
+
                 foreach(var i in await _unitOfWork.ServiceRepository.GetAllAsync())
                 {
                     if(i.Name == service.Name)
@@ -33,6 +34,7 @@ namespace DATN.Aplication.Services
                         return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại!" };
                     }
                 }
+
                 await _unitOfWork.ServiceRepository.AddAsync(newService);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công!" };

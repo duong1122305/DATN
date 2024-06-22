@@ -46,7 +46,7 @@ namespace DATN.API.Controllers
 
             var result = await _serviceManager.CreateNewService(service);
 
-            if(result.IsSuccess == false) return BadRequest(result.Error);
+            if(result.IsSuccess == false) return BadRequest(result);
 
             return Ok(result);
         }

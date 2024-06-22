@@ -60,7 +60,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> Remove(int id)
         {
-            var response = await _client.PatchAsJsonAsync($"api/ServicesDetail/removeServiceDetail", id);
+            var response = await _client.PatchAsJsonAsync($"api/ServicesDetail/removeServiceDetail/{id}", id);
             var result = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(result);
 
