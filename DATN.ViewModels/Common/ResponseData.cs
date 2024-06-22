@@ -16,6 +16,11 @@ namespace DATN.ViewModels.Common
         {
             IsSuccess = true;
             Data = data;
+        } 
+        public ResponseData(bool isSucsses,string error)
+        {
+            IsSuccess = isSucsses;
+            Error = error;
         }
         public bool IsSuccess { get; set; }
 		public string? Error { get; set; }

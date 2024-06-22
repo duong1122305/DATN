@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    [Migration("20240616072654_ver14")]
-    partial class ver14
+    [Migration("20240620040414_no4")]
+    partial class no4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -369,21 +369,25 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Birthday")
+                    b.Property<DateTime?>("Birthday")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Gender")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDelete")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Neutered")
+                    b.Property<bool?>("Neutered")
+                        .IsRequired()
                         .HasColumnType("bit");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OriginalColor")
@@ -396,10 +400,12 @@ namespace DATN.API.Migrations
                     b.Property<int>("SpeciesId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Vaccinated")
+                    b.Property<bool?>("Vaccinated")
+                        .IsRequired()
                         .HasColumnType("bit");
 
-                    b.Property<float>("Weight")
+                    b.Property<float?>("Weight")
+                        .IsRequired()
                         .HasColumnType("real");
 
                     b.HasKey("Id");

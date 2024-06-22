@@ -54,17 +54,27 @@ namespace DATN.Aplication.Services
 			}
 		}
 
-		public async Task<ResponseData<PetSpecies>> FindPetSpeciesByID(int id)
+		public async Task<ResponseData<PetSpeciesVM>> FindPetSpeciesByID(int id)
 		{
 			try
 			{
 				var data = await _unitOfWork.PetSpeciesRepository.GetAsync(id);
-				return new ResponseData<PetSpecies>(data);
+				var listPet = await _unitOfWork.PetRepository.GetAllAsync();
+				var response = new PetSpeciesVM()
+				{
+					Name = data.Name,
+					Id = data.Id,
+					IsDelete = data.IsDelete,
+					PetTypeId = data.PetTypeId,
+					PetPype = data.PetTypeId == 1 ? "Chó" : "Mèo",
+					CountPet = listPet.Count(q => q.SpeciesId == data.Id)
+				};
+				return new ResponseData<PetSpeciesVM>(response);
 
 			}
 			catch (Exception)
 			{
-				return new ResponseData<PetSpecies>()
+				return new ResponseData<PetSpeciesVM>()
 				{
 					IsSuccess = false,
 					Error = "Có lỗi khi lấy dữ liệu"
@@ -72,17 +82,28 @@ namespace DATN.Aplication.Services
 			}
 		}
 
-		public async Task<ResponseData<List<PetSpecies>>> GetAll()
+		public async Task<ResponseData<List<PetSpeciesVM>>> GetAll()
 		{
 			try
 			{
 				var data = await _unitOfWork.PetSpeciesRepository.GetAllAsync();
-				return new ResponseData<List<PetSpecies>>(data.ToList());
+				var listPet= await _unitOfWork.PetRepository.GetAllAsync();
+				var response = data.Select(p => new PetSpeciesVM()
+				{
+					Name = p.Name,
+					Id = p.Id,
+					IsDelete = p.IsDelete,
+					PetTypeId = p.PetTypeId,
+					PetPype = p.PetTypeId == 1 ? "Chó" : "Mèo",
+					CountPet= listPet.Count(q=>q.SpeciesId==p.Id)
+				}).OrderByDescending(p=>p.Id).ToList() ;
+
+				return new ResponseData<List<PetSpeciesVM>>(response);
 
 			}
 			catch (Exception)
 			{
-				return new ResponseData<List<PetSpecies>>()
+				return new ResponseData<List<PetSpeciesVM>>()
 				{
 					IsSuccess = false,
 					Error = "Có lỗi khi lấy dữ liệu"
@@ -149,5 +170,8 @@ namespace DATN.Aplication.Services
 				};
 			}
 		}
+		
+		
+		
 	}
 }

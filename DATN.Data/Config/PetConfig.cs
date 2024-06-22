@@ -30,20 +30,7 @@ namespace DATN.Data.Config
             builder.Property(x => x.Gender)
                 .IsRequired();
 
-            builder.Property(x => x.Weight)
-                .IsRequired();
-
-            builder.Property(x => x.OriginalColor)
-                .IsRequired();
-
-            builder.Property(x => x.Birthday)
-                .IsRequired();
-
-            builder.Property(x => x.Neutered)
-                .IsRequired();
-
-            builder.Property(x => x.Vaccinated)
-                .IsRequired();
+          
         }
     }
 }

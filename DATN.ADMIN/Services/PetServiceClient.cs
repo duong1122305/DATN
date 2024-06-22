@@ -1,27 +1,29 @@
-﻿using DATN.ADMIN.IServices;
+﻿using Azure.Core;
+using DATN.ADMIN.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Guest;
+using DATN.ViewModels.DTOs.Pet;
 using DATN.ViewModels.DTOs.PetSpecies;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DATN.ADMIN.Services
 {
-	public class PetSpeciesServiceClient : IPetSpeciesServiceClient
+    public class PetServiceClient:IPetServiceClient
 	{
 		private readonly HttpClient _client;
+		public PetServiceClient(HttpClient client)
+		{
+			_client = client;
 
-		public PetSpeciesServiceClient(HttpClient httpClient)
-        {
-				_client = httpClient;
 		}
 
-		public async Task<ResponseData<string>> Create(PetSpeciesCreateUpdate request)
+		public async Task<ResponseData<string>> CreatePet(PetCreateUpdate petVM)
 		{
 			try
 			{
 
-				var reponse = _client.PostAsJsonAsync("/api/PetSpecies/create-species", request).GetAwaiter().GetResult();
+				var reponse =  _client.PostAsJsonAsync("/api/PetManager/create-pet", petVM).GetAwaiter().GetResult();
 				if (reponse.IsSuccessStatusCode)
 				{
 					var data = JsonConvert.DeserializeObject<ResponseData<string>>(await reponse.Content.ReadAsStringAsync());
@@ -44,18 +46,18 @@ namespace DATN.ADMIN.Services
 			}
 		}
 
-		public async Task<ResponseData<PetSpeciesVM>> FindPetSpeciesByID(int id)
+		public async Task<ResponseData<List<PetVM>>> GetAll()
 		{
 			try
 			{
 
-				var reponse =  _client.GetFromJsonAsync<ResponseData<PetSpeciesVM>>("/api/PetSpecies/get-by-id-species").GetAwaiter().GetResult();
+				var reponse = _client.GetFromJsonAsync<ResponseData<List<PetVM>>>($"/api/PetManager/get-all-pet").GetAwaiter().GetResult();
 				return reponse;
 			}
 			catch (Exception ex)
 			{
 
-				return new ResponseData<PetSpeciesVM>()
+				return new ResponseData<List<PetVM>>()
 				{
 					IsSuccess = false,
 					Error = $"Có lỗi khi lấy dữ liệu: {ex.Message}"
@@ -63,18 +65,36 @@ namespace DATN.ADMIN.Services
 			}
 		}
 
-		public async Task<ResponseData<List<PetSpeciesVM>>> GetAll()
+		public async Task<ResponseData<List<PetVM>>> GetPetByGuestId(Guid guestId)
 		{
 			try
 			{
 
-				var reponse = _client.GetFromJsonAsync<ResponseData<List<PetSpeciesVM>>>("/api/PetSpecies/get-all").GetAwaiter().GetResult();
+				var reponse = _client.GetFromJsonAsync<ResponseData <List<PetVM>>> ($"/api/PetManager/get-pet-by-guest?id={guestId}").GetAwaiter().GetResult();
 				return reponse;
 			}
 			catch (Exception ex)
 			{
 
-				return new ResponseData<List<PetSpeciesVM>>()
+				return new ResponseData<List<PetVM>>()
+				{
+					IsSuccess = false,
+					Error = $"Có lỗi khi lấy dữ liệu: {ex.Message}"
+				};
+			}
+		}
+		public async Task<ResponseData<List<PetVM>>> GetPetBySpeciesId(int id)
+		{
+			try
+			{
+
+				var reponse = _client.GetFromJsonAsync<ResponseData<List<PetVM>>>($"/api/PetManager/get-pet-by-species?id={id}").GetAwaiter().GetResult();
+				return reponse;
+			}
+			catch (Exception ex)
+			{
+
+				return new ResponseData<List<PetVM>>()
 				{
 					IsSuccess = false,
 					Error = $"Có lỗi khi lấy dữ liệu: {ex.Message}"
@@ -86,12 +106,12 @@ namespace DATN.ADMIN.Services
 		{
 			try
 			{
-				
-				var reponse = _client.PostAsJsonAsync("/api/PetSpecies/delete-species", request).GetAwaiter().GetResult();
+
+				var reponse = _client.PostAsJsonAsync("/api/PetManager/soft-delete-pett", request).GetAwaiter().GetResult();
 				if (reponse.IsSuccessStatusCode)
 				{
 					var data = JsonConvert.DeserializeObject<ResponseData<string>>(await reponse.Content.ReadAsStringAsync());
-					return data;
+					return data!;
 				}
 				return new ResponseData<string>()
 				{
@@ -110,12 +130,12 @@ namespace DATN.ADMIN.Services
 			}
 		}
 
-		public async Task<ResponseData<string>> Update(PetSpeciesCreateUpdate request)
+		public async Task<ResponseData<string>> UpdatePet(PetCreateUpdate petVM)
 		{
 			try
 			{
 
-				var reponse = _client.PostAsJsonAsync("/api/PetSpecies/update-species", request).GetAwaiter().GetResult();
+				var reponse = _client.PostAsJsonAsync("/api/PetManager/update-pet", petVM).GetAwaiter().GetResult();
 				if (reponse.IsSuccessStatusCode)
 				{
 					var data = JsonConvert.DeserializeObject<ResponseData<string>>(await reponse.Content.ReadAsStringAsync());
@@ -139,3 +159,4 @@ namespace DATN.ADMIN.Services
 		}
 	}
 }
+

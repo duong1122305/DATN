@@ -11,6 +11,7 @@ using DATN.Aplication.Services;
 using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
 using System.Net;
+using DATN.Aplication.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,11 +66,12 @@ builder.Services.AddScoped<IEmployeeScheduleManagementService, EmployeeScheduleM
 builder.Services.AddScoped<IShiftManagementService, ShiftManagementService>();
 builder.Services.AddScoped<IVoucherManagementService, VoucherManagementService>();
 builder.Services.AddScoped<IPetSpeciesManagerService, PetSpeciesManagerService>();
+builder.Services.AddScoped<IPetManagerService, PetManagerService>();
 
 
 
 // Add auto mapper
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
 var app = builder.Build();

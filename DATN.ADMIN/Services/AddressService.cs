@@ -114,7 +114,7 @@ namespace DATN.ADMIN.Services
 		{
 			if (string.IsNullOrEmpty(addressCode))
 			{
-				return " ";
+				return null;
 			}
 			var arrAddress = addressCode.Split('!');
 			return arrAddress[1]+", "+ arrAddress[2];

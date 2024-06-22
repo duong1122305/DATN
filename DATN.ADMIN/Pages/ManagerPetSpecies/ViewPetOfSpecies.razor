@@ -1,0 +1,63 @@
+﻿@page "/ViewPetSpe"
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.Pet
+@inject ISnackbar Snackbar
+
+@inject IAddressService _addressServive;
+<MudTable Items="@lstPet" Hover="true" SortLabel="Sort By" Filter="new Func<PetVM,bool>(FilterFunc)">
+	<ToolBarContent>
+		<MudText Typo="Typo.h6">Danh sách loài</MudText>
+		<MudSpacer />
+		<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+	</ToolBarContent>
+	<HeaderContent>
+		<MudTh>STT</MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Name)">Tên pet</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Owner)">Tên khách hàng</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>		
+	
+	</HeaderContent>
+	<RowTemplate>
+
+		<MudTd DataLabel="STT">@(lstPet.IndexOf(context) + 1)</MudTd>
+		<MudTd DataLabel="Tên">@context.Name</MudTd>
+		<MudTd>@context.Owner</MudTd>
+		<MudTd>@(_addressServive.GetAddress(context.Address) ?? "Không có địa chỉ")</MudTd>
+		<MudTd>@context.Gender</MudTd>
+	
+	</RowTemplate>
+	<PagerContent>
+		<MudTablePager />
+	</PagerContent>
+</MudTable>
+@code {
+	[Parameter]
+	public int SpeciesId{ get;set; }
+	[Inject]
+	public IPetServiceClient petService{get; set;}
+	public List<PetVM> lstPet = new List<PetVM>();
+	public string searchString = "";
+
+	protected override async Task OnInitializedAsync()
+	{
+		var response = await petService.GetPetBySpeciesId(SpeciesId);
+		if (response.IsSuccess)
+		{
+			lstPet = response.Data;
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	private bool FilterFunc(PetVM element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString))
+			return true;
+		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+
+}

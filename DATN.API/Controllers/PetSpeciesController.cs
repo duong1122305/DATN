@@ -20,7 +20,7 @@ namespace DATN.API.Controllers
 		}
 
         [HttpGet("get-all")]
-		public async Task<ResponseData<List<PetSpecies>>> GetALl()
+		public async Task<ResponseData<List<PetSpeciesVM>>> GetALl()
 		{
 			return await _service.GetAll();
 		}
@@ -38,7 +38,7 @@ namespace DATN.API.Controllers
 		}
 
 		[HttpGet("get-by-id-species")]
-		public async Task<ResponseData<PetSpecies>> GetById(int id)
+		public async Task<ResponseData<PetSpeciesVM>> GetById(int id)
 		{
 			return await _service.FindPetSpeciesByID(id);
 		}
