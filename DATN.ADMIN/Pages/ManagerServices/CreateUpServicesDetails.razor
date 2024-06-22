@@ -59,26 +59,37 @@
 
     public async Task Submit()
     {
-        if (await Confirm() == true)
-        {
-            var result = await _serviceDetailService.Create(createServiceDetailVM);
-            if (result.IsSuccess)
-            {
-                Message("Thành công", Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
-            }
-            else Message(result.Error, Severity.Error);
-        }
     }
 
-    private async Task<bool?> Confirm()
+    private async Task<bool> Confirm(string text)
     {
-        var confirm = await _diagService.ShowMessageBox("Thông báo",
-    "Xác nhận thêm dịch vụ này ?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} voucher?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true,DisableBackdropClick=true });
         StateHasChanged();
-        return confirm;
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+    }
+
+    protected async Task Create()
+    {
+        var confirm = await Confirm("thêm mới");
+        if (!confirm)
+        {
+            return;
+        }
+        var result = await _serviceDetailService.Create(createServiceDetailVM);
+        if (result.IsSuccess)
+        {
+            Message("Thành công", Severity.Success);
+            _dialogBox.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Message(result.Error, Severity.Error);
+        }
+        
     }
 
     //thông báo
