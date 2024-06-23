@@ -8,19 +8,31 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Lịch làm việc</PageTitle>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())" title="Thêm ca 1 tháng tiếp theo">Thêm ca 1 tháng tiếp theo</MudButton>
-<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Href="/ListStaff" title="Danh sách nhân viên">Danh sách nhân viên</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async()=>await CreateMonthNow())" Color="Color.Primary" title="Danh sách nhân viên">Thêm ca cho tháng hiện tại</MudButton>
-<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@((args) => _tableRef?.ExpandAllGroups())">Mở hết danh sách</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+
+<MudSelect Label="Chọn khoảng thời gian" @bind-Value="selectedTimeRange" @onchange="HandleShiftChange">
+    <MudSelectItem Value="-90">90 ngày trước</MudSelectItem>
+    <MudSelectItem Value="-60">60 ngày trước</MudSelectItem>
+    <MudSelectItem Value="-30">30 ngày trước</MudSelectItem>
+    <MudSelectItem Value="-14">14 ngày trước</MudSelectItem>
+    <MudSelectItem Value="-7">7 ngày trước</MudSelectItem>
+    <MudSelectItem Value="7">7 ngày tới</MudSelectItem>
+    <MudSelectItem Value="14">14 ngày tới</MudSelectItem>
+    <MudSelectItem Value="30">30 ngày tới</MudSelectItem>
+    <MudSelectItem Value="60">60 ngày tới</MudSelectItem>
+    <MudSelectItem Value="90">90 ngày tới</MudSelectItem>
+</MudSelect>
 
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
+    @* <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
         <ToolBarContent>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Ngày thực hiện</MudTh>
             <MudTh Style="text-align:center;">Ca làm</MudTh>
             <MudTh Style="text-align:center;">Tổng người làm</MudTh>
             <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
@@ -65,7 +77,77 @@
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
-    </MudTable>
+    </MudTable> *@
+
+    <MudDataGrid @ref="dataGrid" MultiSelection="true" Items="@lstUser" Filterable="true"
+                 Hideable="true" Groupable="true" GroupExpanded="false" QuickFilter="_quickFilter">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Ca làm của nhân viên</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Shift" Title="Ngày thực hiện" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+                <GroupTemplate>
+                    <span style="font-weight:bold">@context.Grouping.Key</span>
+                </GroupTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Shift" Title="Ca làm" Filterable="false" Groupable="false" />
+            <PropertyColumn Property="x => x.Name" Title="Số người" Filterable="false" Groupable="false" />
+            <TemplateColumn Title="Giờ bắt đầu" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <span style="text-align:center;">@context.Item.To.ToString(@"hh\:mm")</span>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Giờ kết thúc" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <span style="text-align:center;">@context.Item.From.ToString(@"hh\:mm")</span>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Ngày làm" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <span style="text-align:center;">@context.Item.WorkDate.ToString("dd/MM/yyyy")</span>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (dateNow.Month == context.Item.WorkDate.Month && dateNow.Day == context.Item.WorkDate.Day && dateNow.Year == context.Item.WorkDate.Year)
+                    {
+                        @if (dateNow.Hour < context.Item.From.Hours)
+                        {
+                            <span DataLabel="WorkDate" Style="text-align:center;">Chưa diễn ra</span>
+                        }
+                        else if (dateNow.Hour > context.Item.From.Hours && dateNow.Hour < context.Item.To.Hours)
+                        {
+                            <span DataLabel="WorkDate" Style="text-align:center;">Đang diễn ra</span>
+                        }
+                        else if (dateNow.Hour > context.Item.To.Hours)
+                        {
+                            <span DataLabel="WorkDate" Style="text-align:center;">Đã diễn ra</span>
+
+                        }
+                    }
+                    else
+                    {
+                        <span DataLabel="WorkDate" Style="text-align:center;">Chưa diễn ra</span>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x=>x.ShiftID" Title="Hành động" Filterable="false" Sortable="false">
+                <CellTemplate>
+                    <MudTd Style="text-align:center;">
+                        <MudButtonGroup Variant="Variant.Filled">
+                            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.Item.ShiftID,context.Item.WorkDate,context.Item.From.Hours,context.Item.To.Hours))"></MudIconButton>
+                        </MudButtonGroup>
+                    </MudTd>
+                </CellTemplate>
+            </PropertyColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="ScheduleView" />
+        </PagerContent>
+    </MudDataGrid>
 }
 else
 {
@@ -75,38 +157,110 @@ else
 }
 @code {
     private DateTime dateNow = DateTime.Now;
+    private int selectedTimeRange = 7;
+    MudDataGrid<ScheduleView> dataGrid;
+    bool _customizeGroupTemplate;
+    static bool _customizeGroupBy;
     //button trạng thái
     private bool _disableElevation = false;
     //hiệu ứng hover
     private bool hover = true;
+
     private string searchString = "";
     private List<ScheduleView> lstUser = new List<ScheduleView>();
     [Inject]
     IUserClientSev _client { get; set; }
     [Inject]
     IEmployeeScheduleSer _Employyes { get; set; }
+
+    private Func<ScheduleView, string> _groupBy = x =>
+     {
+         if (_customizeGroupBy)
+         {
+             return x.Name;
+         }
+         else
+         {
+             return x.WorkDate.ToString("dd/MM/yyyy");
+         }
+     };
+    void ExpandAllGroups()
+    {
+        dataGrid?.ExpandAllGroups();
+    }
     protected async Task LoadData()
     {
         try
         {
-            var user = await _client.GetAllCaNhanVien();
-            if (!user.IsSuccess)
+            DateTime fromDate;
+
+            if (selectedTimeRange >= 0)
             {
-                lstUser = null;
+                fromDate = dateNow.Date;
             }
             else
             {
-                lstUser = user.Data.Where(x => x.WorkDate.CompareTo(dateNow.Date) >= 0).ToList();
+                fromDate = dateNow.AddDays(selectedTimeRange);
+            }
+
+            var user = await _client.GetAllCaNhanVien();
+            if (!user.IsSuccess)
+            {
+                lstUser = new List<ScheduleView>();
+            }
+            else
+            {
+                if (selectedTimeRange > 0)
+                {
+                    lstUser = user.Data.Where(x => x.WorkDate.Date >= fromDate).Take(selectedTimeRange).ToList();
+                }
+                else
+                {
+                    lstUser = user.Data.Where(x => x.WorkDate.Date <= fromDate).Take(-selectedTimeRange).ToList();
+                }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            // Handle exceptions if needed
+            Console.WriteLine($"Lỗi không xác định: {ex.Message}");
         }
     }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+    }
+    private Func<ScheduleView, bool> _quickFilter => x =>
+    {
+        bool isInTimeRange = selectedTimeRange != 0;
+
+        if (isInTimeRange)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+
+            string searchLower = searchString.Trim().ToLower();
+
+            if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.ToLower().Contains(searchLower))
+                return true;
+
+            if (!string.IsNullOrWhiteSpace(x.Shift) && x.Shift.ToLower().Contains(searchLower))
+                return true;
+
+            string dateTimeString = $"{x.From} {x.To} {x.WorkDate:dd/MM/yyyy}";
+            if (dateTimeString.Contains(searchLower))
+                return true;
+        }
+
+        return false;
+    };
+
+
+    private void HandleShiftChange(ChangeEventArgs e)
+    {
+        // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
+        selectedTimeRange = Convert.ToInt32(e.Value);
     }
     private MudTable<ScheduleView> _tableRef;
 
@@ -118,20 +272,20 @@ else
             IsInitiallyExpanded = false,
             Selector = (e) => e.WorkDate
         };
-    private bool FilterFunc(ScheduleView element)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
-            return true;
-        return false;
-    }
+    // private bool FilterFunc(ScheduleView element)
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchString))
+    //         return true;
+    //     if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //     if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //     if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
+    //         return true;
+    //     return false;
+    // }
 
-    private async Task OpenDialog(int id, DateTime workDate,int from,int to)
+    private async Task OpenDialog(int id, DateTime workDate, int from, int to)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Xem thông tin chi tiết ca làm";
