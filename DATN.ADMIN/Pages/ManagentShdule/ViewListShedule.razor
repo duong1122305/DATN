@@ -192,17 +192,6 @@ else
     {
         try
         {
-            DateTime fromDate;
-
-            if (selectedTimeRange >= 0)
-            {
-                fromDate = dateNow.Date;
-            }
-            else
-            {
-                fromDate = dateNow.AddDays(selectedTimeRange);
-            }
-
             var user = await _client.GetAllCaNhanVien();
             if (!user.IsSuccess)
             {
@@ -210,14 +199,7 @@ else
             }
             else
             {
-                if (selectedTimeRange > 0)
-                {
-                    lstUser = user.Data.Where(x => x.WorkDate.Date >= fromDate).Take(selectedTimeRange).ToList();
-                }
-                else
-                {
-                    lstUser = user.Data.Where(x => x.WorkDate.Date <= fromDate).Take(-selectedTimeRange).ToList();
-                }
+                lstUser = user.Data;
             }
         }
         catch (Exception ex)
@@ -233,34 +215,47 @@ else
     }
     private Func<ScheduleView, bool> _quickFilter => x =>
     {
-        bool isInTimeRange = selectedTimeRange != 0;
 
-        if (isInTimeRange)
+
+        // if (selectedTimeRange == 30 || selectedTimeRange == 60 || selectedTimeRange == 90 || selectedTimeRange == 14 || selectedTimeRange == 7 || selectedTimeRange == -14 || selectedTimeRange == -30 || selectedTimeRange == -60 ||selectedTimeRange ==-90)
+        // {
+        //     if (string.IsNullOrWhiteSpace(searchString))
+        //         return true;
+
+        //     string searchLower = searchString.Trim().ToLower();
+
+        //     if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.ToLower().Contains(searchLower))
+        //         return true;
+
+        //     if (!string.IsNullOrWhiteSpace(x.Shift) && x.Shift.ToLower().Contains(searchLower))
+        //         return true;
+
+        //     string dateTimeString = $"{x.From} {x.To} {x.WorkDate:dd/MM/yyyy}";
+        //     if (dateTimeString.Contains(searchLower))
+        //         return true;
+        // }
+
+        // return false;
+        if (selectedTimeRange > 0)
         {
-            if (string.IsNullOrWhiteSpace(searchString))
-                return true;
-
-            string searchLower = searchString.Trim().ToLower();
-
-            if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.ToLower().Contains(searchLower))
-                return true;
-
-            if (!string.IsNullOrWhiteSpace(x.Shift) && x.Shift.ToLower().Contains(searchLower))
-                return true;
-
-            string dateTimeString = $"{x.From} {x.To} {x.WorkDate:dd/MM/yyyy}";
-            if (dateTimeString.Contains(searchLower))
-                return true;
+            return x.WorkDate.Date >= dateNow.Date;
         }
-
-        return false;
+        else if (selectedTimeRange < 0)
+        {
+            return x.WorkDate.Date >= dateNow.Date.AddDays(selectedTimeRange) && x.WorkDate.Date <= dateNow.Date;
+        }
+        else
+        {
+            return true; // selectedTimeRange = 0, show all
+        }
     };
 
 
-    private void HandleShiftChange(ChangeEventArgs e)
+    private async void HandleShiftChange(ChangeEventArgs e)
     {
         // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
         selectedTimeRange = Convert.ToInt32(e.Value);
+        await LoadData();
     }
     private MudTable<ScheduleView> _tableRef;
 
