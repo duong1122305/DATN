@@ -24,7 +24,7 @@
 
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudTable Items="@lstUser" Hover="true" SortLabel="Sort By" Filter="new Func<UserInfView,bool>(FilterFunc)">
+    @*  <MudTable Items="@lstUser" Hover="true" SortLabel="Sort By" Filter="new Func<UserInfView,bool>(FilterFunc)">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
@@ -91,7 +91,77 @@
         <PagerContent>
             <MudTablePager />
         </PagerContent>
-    </MudTable>
+    </MudTable> *@
+    <MudDataGrid Items="@lstUser" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+
+            <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <span>@(lstUser.IndexOf(context.Item) + 1)</span>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+                <CellTemplate>
+                        @if (!context.Item.IsDeleted)
+                        {
+                            <MudCheckBox @bind-Checked="selectedUsers[lstUser.IndexOf(context.Item)]" />
+                        }
+                        else
+                        {
+                            <MudCheckBox Disabled="@true" Checked="@false" />
+                        }
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Position" Title="Chức vụ" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Email" Title="Email" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Địa chỉ" SortBy="@(x => $"{x.Address}")" style="width:400px;" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @(_addressServive.GetAddress(context.Item.Address))
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x=>x.IsDeleted" Title="Trạng thái" SortBy="@(x => $"{x.IsDeleted}")" Sortable="false">
+                <CellTemplate>
+                    @if (!context.Item.IsDeleted)
+                    {
+                        <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động"></MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Icon="@Icons.Material.Filled.Close" Color="Color.Error" title="Ngưng hoạt động"></MudChip>
+                    }
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x=>x.UserName" Title="Hành động" Filterable="false" Sortable="false">
+                <CellTemplate>
+                    <MudButtonGroup Variant="Variant.Filled">
+                        @if (context.Item.IsDeleted)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.Item.UserName))"></MudIconButton>
+                        }
+                        else
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.Item.UserName))" title="Xoá"></MudIconButton>
+                        }
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.UserName))" title="Sửa"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.Item.UserName))" title="Xem chi tiết"></MudIconButton>
+                    </MudButtonGroup>
+                </CellTemplate>
+            </PropertyColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="UserInfView" />
+        </PagerContent>
+    </MudDataGrid>
+
 }
 else
 {
@@ -141,16 +211,21 @@ else
     }
 
 
-    private bool FilterFunc(UserInfView element)
+    private Func<UserInfView, bool> _quickFilter => x =>
     {
-        if (string.IsNullOrWhiteSpace(searchString.TrimStart()))
+        if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.Address.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+
+        if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+
+        if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
             return true;
         return false;
-    }
+    };
 
     //hoi truoc khi xoa
     private async Task<bool?> Confirm()
@@ -210,7 +285,7 @@ else
                     Address = _userView.Address,
                     PhoneNumber = _userView.PhoneNumber,
                     Email = _userView.Email,
-                    Gender = _userView.Gender == "Nam"?true : false
+                    Gender = _userView.Gender == "Nam" ? true : false
                 };
             parameters.Add("username", username);
             parameters.Add("user", updateView);
@@ -284,7 +359,7 @@ else
 
         // Xử lý logic để thêm selectedUsers vào một ca làm
         var listIdUser = new List<string>();
-        if (await Confirm2()== true)
+        if (await Confirm2() == true)
         {
             // nứng à
             if (selectedUser1s.Count > 0 && selectedUser1s != null)
@@ -294,7 +369,7 @@ else
                     var idUser = await _client.GetById(user2.UserName);
                     listIdUser.Add(idUser.Data);
                 }
-                if (selectedShiftId>0)
+                if (selectedShiftId > 0)
                 {
                     var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
                     Message(repo.Data, Severity.Success);

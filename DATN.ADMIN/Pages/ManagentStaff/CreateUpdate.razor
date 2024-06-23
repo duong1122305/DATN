@@ -43,8 +43,6 @@
     UserUpdateView view = new UserUpdateView();
     protected async override Task OnInitializedAsync()
     {
-        editContext = new EditContext(view);
-        editContext.OnFieldChanged += EditContext_OnFieldChanged;
         if (userName != null)
         {
             _nameButton = "Cập nhật";
