@@ -14,7 +14,7 @@
 
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition"  Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
+    <MudTable Items="@lstUser" Hover="@hover" GroupBy="@_groupDefinition" Dense="true" @ref="_tableRef" Filter="new Func<ScheduleView,bool>(FilterFunc)" onchange="_tableRef">
         <ToolBarContent>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
@@ -26,23 +26,44 @@
             <MudTh Style="text-align:center;">Giờ bắt đầu</MudTh>
             <MudTh Style="text-align:center;">Giờ kết thúc</MudTh>
             <MudTh Style="text-align:center;">Ngày làm</MudTh>
+            <MudTh Style="text-align:center;">Trạng thái</MudTh>
             <MudTh Style="text-align:center;">Hành động</MudTh>
         </HeaderContent>
         <GroupHeaderTemplate>
             <MudTh colspan="8"> @($" {context.GroupName}: {((DateTime)context.Key).ToString("dd/MM/yyyy")}") </MudTh>
         </GroupHeaderTemplate>
         <RowTemplate>
-                <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
-                <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
-                <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
-                <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
-                <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
-                <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
-                <MudTd Style="text-align:center;">
-                    <MudButtonGroup Variant="Variant.Filled">
-                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
-                    </MudButtonGroup>
-                </MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
+            <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
+            <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
+            <MudTd DataLabel="From" Style="text-align:center;">@context.From.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="To" Style="text-align:center;">@context.To.ToString(@"hh\:mm")</MudTd>
+            <MudTd DataLabel="WorkDate" Style="text-align:center;">@context.WorkDate.ToString("dd/MM/yyyy")</MudTd>
+            @if (dateNow.Month == context.WorkDate.Month && dateNow.Day == context.WorkDate.Day && dateNow.Year == context.WorkDate.Year)
+            {
+                @if (dateNow.Hour < context.From.Hours)
+                {
+                    <MudTd DataLabel="WorkDate" Style="text-align:center;">Chưa diễn ra</MudTd>
+                }
+                else if (dateNow.Hour > context.From.Hours && dateNow.Hour < context.To.Hours)
+                {
+                    <MudTd DataLabel="WorkDate" Style="text-align:center;">Đang diễn ra</MudTd>
+                }
+                else if (dateNow.Hour > context.To.Hours)
+                {
+                    <MudTd DataLabel="WorkDate" Style="text-align:center;">Đã diễn ra</MudTd>
+
+                }
+            }
+            else
+            {
+                <MudTd DataLabel="WorkDate" Style="text-align:center;">Chưa diễn ra</MudTd>
+            }
+            <MudTd Style="text-align:center;">
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                </MudButtonGroup>
+            </MudTd>
         </RowTemplate>
     </MudTable>
 }
@@ -153,16 +174,16 @@ else
         {
             return;
         }
-            var result = await _Employyes.AddShuduleMonth();
-            if (result.IsSuccess)
-            {
-                Message(result.Data, Severity.Success);
-            }
-            else
-            {
-                Message(result.Error, Severity.Error);
-            }
-       
+        var result = await _Employyes.AddShuduleMonth();
+        if (result.IsSuccess)
+        {
+            Message(result.Data, Severity.Success);
+        }
+        else
+        {
+            Message(result.Error, Severity.Error);
+        }
+
     }
 
     private async Task CreateMonthNow()
@@ -172,15 +193,15 @@ else
         {
             return;
         }
-            var result = await _Employyes.AddSchuduleToMonth();
-            if (result.IsSuccess)
-            {
-                Message(result.Data, Severity.Success);
-            }
-            else
-            {
-                Message(result.Error, Severity.Error);
-            }
+        var result = await _Employyes.AddSchuduleToMonth();
+        if (result.IsSuccess)
+        {
+            Message(result.Data, Severity.Success);
+        }
+        else
+        {
+            Message(result.Error, Severity.Error);
+        }
     }
     //thông báo
     private void Message(string message, Severity severity)
