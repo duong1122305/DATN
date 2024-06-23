@@ -21,6 +21,12 @@
         <MudSelectItem Value="@item.Id" title="@item.Name">@item.Name</MudSelectItem>
     }
 </MudSelect>
+<MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
+    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
+    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
+    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
+</MudSelect>
+
 
 @if (lstUser.Count > 0 && lstUser != null)
 {
@@ -60,7 +66,7 @@
                     @(_addressServive.GetAddress(context.Item.Address))
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x=>x.IsDeleted" Title="Trạng thái" SortBy="@(x => $"{x.IsDeleted}")" Sortable="false">
+            <PropertyColumn Property="x=>x.IsDeleted" Title="Trạng thái" SortBy="@(x => $"{x.IsDeleted}")" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (!context.Item.IsDeleted)
                     {
@@ -122,7 +128,14 @@ else
     //lưu trạng thái của từng nhân viên khi ấn checkbox
     private List<bool> selectedUsers = new List<bool>();
     private int selectedShiftId;
+    private enum UserStatus
+    {
+        All = -1, // Represents all statuses
+        Active = 0, // Represents active status (IsDeleted = false)
+        Inactive = 1 // Represents inactive status (IsDeleted = true)
+    }
 
+    private UserStatus selectedStatus = UserStatus.All;
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,6 +148,12 @@ else
     {
         var user = await _client.GetAll();
         lstUser = user.Data;
+        if (selectedStatus != UserStatus.All)
+        {
+            lstUser = lstUser.Where(u => (selectedStatus == UserStatus.Active && !u.IsDeleted) ||
+                                         (selectedStatus == UserStatus.Inactive && u.IsDeleted)).ToList();
+        }
+
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
@@ -142,22 +161,49 @@ else
 
     }
 
-
-    private Func<UserInfView, bool> _quickFilter => x =>
+    private async Task HandleStatusChange(ChangeEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
+        selectedStatus = (UserStatus)e.Value;
+        await LoadData();
+    }
 
-        if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-            return true;
 
-        if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-            return true;
 
-        if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
-            return true;
-        return false;
-    };
+    // private Func<UserInfView, bool> _quickFilter => x =>
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchString))
+    //         return true;
+
+    //     if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+    //         return true;
+
+    //     if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+    //         return true;
+
+    //     if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
+    //         return true;
+    //     return false;
+    // };
+    private Func<UserInfView, bool> _quickFilter => x =>
+      {
+      if (selectedStatus == UserStatus.All || (selectedStatus == UserStatus.Active && !x.IsDeleted) || (selectedStatus == UserStatus.Inactive && x.IsDeleted))
+      {
+          if (string.IsNullOrWhiteSpace(searchString))
+              return true;
+
+          if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+              return true;
+
+          if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+              return true;
+
+          if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
+              return true;
+      }
+
+      return false;
+      };
+
 
     //hoi truoc khi xoa
     private async Task<bool?> Confirm()
