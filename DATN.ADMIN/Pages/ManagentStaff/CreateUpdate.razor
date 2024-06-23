@@ -10,9 +10,9 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên *" For="@(() => user.FullName)"/>
-                <MudTextField T="string" @bind-Value="user.Email" Label="Email *" For="@(() => user.Email)" />
-                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại *" For="@(() => user.PhoneNumber)"/>
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" MaxLength="50" />
+                <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50"/>
+                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" MaxLength="10" />
                 <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                     <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">
                         <MudRadio Value="true" Color="Color.Primary">Nam</MudRadio>
@@ -41,9 +41,6 @@
     public UserRegisterView user { get; set; } = new UserRegisterView();
     private string AddressCode = "";
     UserUpdateView view = new UserUpdateView();
-    private EditContext editContext;
-
-
     protected async override Task OnInitializedAsync()
     {
         editContext = new EditContext(view);
@@ -77,6 +74,7 @@
         {
             Message(result.Error, Severity.Warning);
         }
+        Message("Vui lòng nhập đủ dữ liệu!", Severity.Error);
     }
     //thông báo xác nhận
     private async Task<bool> Confirm(string text)
@@ -84,7 +82,7 @@
         var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
                     yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();
         if (!confirm.HasValue) return false;
         return confirm.Value;
@@ -97,12 +95,12 @@
         {
             return;
         }
-            view.FullName = user.FullName;
-            view.Address = user.Address;
-            view.PhoneNumber = user.PhoneNumber;
-            view.Email = user.Email;
-            view.Gender = user.Gender;
-            var result = await _client.UpdateUser(view, userName);
+        view.FullName = user.FullName;
+        view.Address = user.Address;
+        view.PhoneNumber = user.PhoneNumber;
+        view.Email = user.Email;
+        view.Gender = user.Gender;
+        var result = await _client.UpdateUser(view, userName);
         if (result.IsSuccess)
         {
             Message(result.Data, Severity.Success);

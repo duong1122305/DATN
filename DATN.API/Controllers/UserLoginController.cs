@@ -227,7 +227,7 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ResetPassword(user);
         }
-        [HttpPost("Create-WorkShift-For-CurrentMonth")]
+        [HttpGet("Create-WorkShift-For-CurrentMonth")]
         public async Task<ResponseData<string>> CreateShiftForCurrentMonth()
         {
             return await _worshiftmanagement.InsertWorkShiftCurrentMonth();

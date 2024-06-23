@@ -9,6 +9,7 @@
 <PageTitle>Lịch làm việc</PageTitle>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())" title="Thêm ca 1 tháng tiếp theo">Thêm ca 1 tháng tiếp theo</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Href="/ListStaff" title="Danh sách nhân viên">Danh sách nhân viên</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async()=>await CreateMonthNow())" Color="Color.Primary" title="Danh sách nhân viên">Thêm ca cho tháng hiện tại</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@((args) => _tableRef?.ExpandAllGroups())">Mở hết danh sách</MudButton>
 
 @if (lstUser.Count > 0 && lstUser != null)
@@ -31,8 +32,6 @@
             <MudTh colspan="8"> @($" {context.GroupName}: {((DateTime)context.Key).ToString("dd/MM/yyyy")}") </MudTh>
         </GroupHeaderTemplate>
         <RowTemplate>
-            @if (context.WorkDate.CompareTo(dateNow) == 0 ? true : context.WorkDate.CompareTo(dateNow) == 1 ? true : false)
-            {
                 <MudTd DataLabel="Name" Style="text-align:center;"></MudTd>
                 <MudTd DataLabel="Name" Style="text-align:center;">@context.Shift</MudTd>
                 <MudTd DataLabel="Shift" Style="text-align:center;">@context.Name</MudTd>
@@ -44,7 +43,6 @@
                         <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
                     </MudButtonGroup>
                 </MudTd>
-            }
         </RowTemplate>
     </MudTable>
 }
@@ -64,6 +62,8 @@ else
     private List<ScheduleView> lstUser = new List<ScheduleView>();
     [Inject]
     IUserClientSev _client { get; set; }
+    [Inject]
+    IEmployeeScheduleSer _Employyes { get; set; }
     protected async Task LoadData()
     {
         try
@@ -75,7 +75,7 @@ else
             }
             else
             {
-                lstUser = user.Data;
+                lstUser = user.Data.Where(x => x.WorkDate.CompareTo(dateNow.Date) >= 0).ToList();
             }
         }
         catch (Exception)
@@ -135,21 +135,25 @@ else
     }
 
     //thông báo khi thêm ca làm cho 1 tháng tiếp theo
-    private async Task<bool?> Confirm()
+    private async Task<bool> Confirm(string text)
     {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-    "Xác nhận thêm ca làm cho 1 tháng tiếp theo?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text}?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
-        return confirm;
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
     //thêm ca làm 1 tháng khi chưa có ca nào trong 1 tháng tới
     private async Task CreateCa()
     {
-        if (await Confirm() == true)
+        var confirm = await Confirm("thêm ca cho tháng sau");
+        if (!confirm)
         {
-            var result = await httpClient.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/them-ca-for-all-staff");
+            return;
+        }
+            var result = await _Employyes.AddShuduleMonth();
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
@@ -158,16 +162,25 @@ else
             {
                 Message(result.Error, Severity.Error);
             }
-        }
-        else
-        {
-            Message("Bạn đã huỷ thao tác", Severity.Warning);
-        }
+       
     }
 
-    private async Task CreateCaNhanVien()
+    private async Task CreateMonthNow()
     {
-
+        var confirm = await Confirm("thêm ca cho tháng hiện tại");
+        if (!confirm)
+        {
+            return;
+        }
+            var result = await _Employyes.AddSchuduleToMonth();
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
     }
     //thông báo
     private void Message(string message, Severity severity)
