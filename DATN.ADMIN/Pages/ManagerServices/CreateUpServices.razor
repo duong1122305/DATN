@@ -1,4 +1,4 @@
-﻿@page "/CreateUpdateServices"
+﻿@* @page "/CreateUpdateServices"
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.DTOs.ServiceManager
 @inject ISnackbar Snackbar
@@ -26,7 +26,7 @@
     private string _nameButton = "Thêm mới";
 
     [Inject]
-    private IServiceManagermentService _serviceManagerment { get; set; }
+    // private IServiceManagermentService _serviceManagerment { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -103,3 +103,4 @@
         Snackbar.Add(message, severity);
     }
 }
+ *@

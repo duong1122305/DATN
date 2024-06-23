@@ -141,11 +141,11 @@ else
 
     private bool FilterFunc(UserInfView element)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
+        if (string.IsNullOrWhiteSpace(searchString.TrimStart()))
             return true;
-        if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Address.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }

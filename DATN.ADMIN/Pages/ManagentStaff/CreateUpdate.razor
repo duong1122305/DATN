@@ -9,9 +9,9 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" />
-                <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" />
-                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" />
+                <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" MaxLength="50" />
+                <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50"/>
+                <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" MaxLength="10" />
                 <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                     <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">
                         <MudRadio Value="true" Color="Color.Primary">Nam</MudRadio>
