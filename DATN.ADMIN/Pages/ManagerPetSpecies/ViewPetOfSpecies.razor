@@ -24,7 +24,7 @@
 		<MudTd DataLabel="Tên">@context.Name</MudTd>
 		<MudTd>@context.Owner</MudTd>
 		<MudTd>@(_addressServive.GetAddress(context.Address) ?? "Không có địa chỉ")</MudTd>
-		<MudTd>@context.Gender</MudTd>
+		<MudTd>@(context.Gender?"Đực":"Cái")</MudTd>
 	
 	</RowTemplate>
 	<PagerContent>
