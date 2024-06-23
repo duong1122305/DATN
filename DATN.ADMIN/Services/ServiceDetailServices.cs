@@ -67,9 +67,9 @@ namespace DATN.ADMIN.Services
             return data;
         }
 
-        public async Task<ResponseData<string>> Update(ServiceDetail serviceDetail)
+        public async Task<ResponseData<string>> Update(int id, UpdateServiceDetailVM serviceDetail)
         {
-            var response = await _client.PutAsJsonAsync("api/ServicesDetail/updateServiceDetail", serviceDetail);
+            var response = await _client.PutAsJsonAsync($"api/ServicesDetail/updateServiceDetail/{id}", serviceDetail);
             var result = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(result);
 

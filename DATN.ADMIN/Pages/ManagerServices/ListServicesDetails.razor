@@ -3,6 +3,7 @@
 @using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
+@using DATN.Utilites
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.ServiceDetail
@@ -36,31 +37,31 @@
         </MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceName</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceDetailName</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.Price</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@CurrencyHelper.FormatCurrency(context.Price)</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Duration Phút</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Description</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.CreatedAt</MudTd>
         @if (!context.IsDeleted)
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động">Hiển thị</MudChip>
+                <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
             </MudTd>
         }
         else
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Hoạt động">Không hiển thị</MudChip>
+                <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
             </MudTd>
         }
         <MudTd Style="text-align:center;">
             <MudButton IconSize="Size.Large"
-                           OnClick="async () => await UpdateStatusService(context.ServiceDetailId)"
-                           StartIcon="@(context.IsDeleted ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
-                           IconColor="@(context.IsDeleted ? Color.Surface : Color.Error)"
-                           title="@(context.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
+                       OnClick="async () => await UpdateStatusService(context.ServiceDetailId)"
+                       StartIcon="@(context.IsDeleted ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
+                       IconColor="@(context.IsDeleted ? Color.Surface : Color.Error)"
+                       title="@(context.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
 
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(null))"></MudButton>
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(null))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.ServiceDetailId))"></MudButton>
+            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(context.ServiceDetailId))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
         </MudTd>
 
     </RowTemplate>
@@ -106,7 +107,6 @@
 
     bool open;
     Anchor anchor;
-
     protected override async Task OnInitializedAsync()
     {
         var result = await _serviceDetailService.GetServiceName();
@@ -140,6 +140,11 @@
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới dịch vụ chi tiết";
         parameters.Add("id", id);
+        if (id != null)
+        {
+            nameDialog = "Chỉnh sửa dịch vụ chi tiết";
+            parameters.Add("id", id);
+        }
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -147,7 +152,7 @@
                 MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
-                DisableBackdropClick=true
+                DisableBackdropClick = true
             };
         try
         {
@@ -177,7 +182,7 @@
     {
         var parameters = new DialogParameters();
         string nameDialog = "Dich vụ chi tiết";
-        // parameters.Add("id", id);
+        parameters.Add("id", id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -189,7 +194,7 @@
             };
         try
         {
-            var createUpdateDialog = await _dialogservice.ShowAsync<ViewServicesDetails>(nameDialog, options);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ViewServicesDetails>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {

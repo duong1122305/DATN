@@ -8,10 +8,28 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
+                @if (id == 0 || id == null)
+                {
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
+                }
+                else
+                {
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Name" />
+                }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    @if (id == null || id == 0)
+                    {
+                        <MudButton ButtonType="ButtonType.Submit" OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                            @_nameButton
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton ButtonType="ButtonType.Submit" OnClick="@Update" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                            @_nameButton
+                        </MudButton>
+                    }
                 </div>
             </MudCardContent>
         </MudCard>
@@ -25,21 +43,32 @@
 
     [Parameter]
     public CreateServiceVM service { get; set; } = new CreateServiceVM();
-    string _nameButton = "Thêm mới";
+
+    [Parameter]
+    public UpdateServiceVM serviceUpdate { get; set; } = new UpdateServiceVM();
+    // [Parameter]
+    // public Service sev { get; set; } = new Service();
+    string _nameButton = "";
     [Inject]
     private IServiceManagermentService _serviceManagerment { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        if (id !=0)
+        if (id != null && id != 0)
         {
             _nameButton = "Cập nhật";
+            var findServiceById = await _serviceManagerment.GetById(id);
+            serviceUpdate.Name = findServiceById.Data.Name;
+        }
+        else
+        {
+            _nameButton = "Thêm mới";
         }
     }
 
     public async Task Submit()
     {
-        if (id!=0)
+        if (await Confirm("thêm mới") == true)
         {
             var result = await _serviceManagerment.Create(service);
             if (result.IsSuccess == true)
@@ -49,6 +78,10 @@
             }
             else
                 Message("Thêm dịch vụ mới không thành công", Severity.Error);
+        }
+        else
+        {
+            return;
         }
     }
 
@@ -60,16 +93,24 @@
         {
             return;
         }
-        // var result = await _serviceManagerment.Update(service);
-        // if (result.IsSuccess)
-        // {
-        //     Message(result.Data, Severity.Success);
-        //     _dialogBox.Close(DialogResult.Ok(true));
-        // }
-        // else
-        // {
-        //     Message(result.Error, Severity.Error);
-        // }
+
+        if (serviceUpdate != null)
+        {
+            var result = await _serviceManagerment.Update(id, serviceUpdate);
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+        }
+        else
+        {
+            Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+        }
 
     }
 

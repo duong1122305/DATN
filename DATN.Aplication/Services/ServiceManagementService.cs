@@ -27,9 +27,9 @@ namespace DATN.Aplication.Services
                     Name = service.Name
                 };
 
-                foreach(var i in await _unitOfWork.ServiceRepository.GetAllAsync())
+                foreach (var i in await _unitOfWork.ServiceRepository.GetAllAsync())
                 {
-                    if(i.Name == service.Name)
+                    if (i.Name == service.Name)
                     {
                         return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại!" };
                     }
@@ -92,11 +92,13 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<string>> UpdateService(Service service)
+        public async Task<ResponseData<string>> UpdateService(int id, UpdateServiceVM service)
         {
             try
             {
-                await _unitOfWork.ServiceRepository.UpdateAsync(service);
+                var findId = await _unitOfWork.ServiceRepository.GetAsync(id);
+                findId.Name = service.Name;
+                await _unitOfWork.ServiceRepository.UpdateAsync(findId);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công!" };
             }

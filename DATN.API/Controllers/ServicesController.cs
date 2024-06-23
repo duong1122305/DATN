@@ -22,7 +22,7 @@ namespace DATN.API.Controllers
         {
             var result = await _serviceManager.GetAllService();
 
-            if(result.Data == null && result.IsSuccess == false) return NotFound(result.Error);
+            if (result.Data == null && result.IsSuccess == false) return NotFound(result.Error);
 
             return Ok(result);
         }
@@ -30,11 +30,11 @@ namespace DATN.API.Controllers
         [HttpGet("getServiceById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            if(id == 0 || id == null) return BadRequest("Không tìm thấy sản phẩm");
+            if (id == 0 || id == null) return BadRequest("Không tìm thấy sản phẩm");
 
             var result = await _serviceManager.GetServiceById(id);
 
-            if(result.Data == null && result.IsSuccess == false) return NotFound(result.Error);
+            if (result.Data == null && result.IsSuccess == false) return NotFound(result.Error);
 
             return Ok(result);
         }
@@ -42,23 +42,23 @@ namespace DATN.API.Controllers
         [HttpPost("createService")]
         public async Task<IActionResult> CreateService(CreateServiceVM service)
         {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var result = await _serviceManager.CreateNewService(service);
 
-            if(result.IsSuccess == false) return BadRequest(result);
+            if (result.IsSuccess == false) return BadRequest(result);
 
             return Ok(result);
         }
 
-        [HttpPut("updateService")]
-        public async Task<IActionResult> UpdateService(Service service)
+        [HttpPut("updateService/{id}")]
+        public async Task<IActionResult> UpdateService(int id, UpdateServiceVM service)
         {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _serviceManager.UpdateService(service);
+            var result = await _serviceManager.UpdateService(id, service);
 
-            if(result.IsSuccess == false) return BadRequest(result.Error);
+            if (result.IsSuccess == false) return BadRequest(result.Error);
 
             return Ok(result);
         }
@@ -70,7 +70,7 @@ namespace DATN.API.Controllers
 
             var result = await _serviceManager.RemoveService(id);
 
-            if(result.IsSuccess == false) return Content(result.Error);
+            if (result.IsSuccess == false) return Content(result.Error);
 
             return Ok(result);
         }

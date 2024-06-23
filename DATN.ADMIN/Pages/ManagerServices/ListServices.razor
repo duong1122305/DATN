@@ -33,13 +33,13 @@
         @if (!context.IsDetele)
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+                <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
             </MudTd>
         }
         else
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+                <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
             </MudTd>
         }
         <MudTd Style="text-align:center;">
@@ -50,7 +50,6 @@
                            IconColor="@(context.IsDetele ? Color.Surface : Color.Error)"
                            title="@(context.IsDetele ? "Kích hoạt" : "Xoá")"></MudButton>
                 <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.Id))"></MudButton>
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
             </MudButtonGroup>
         </MudTd>
     </RowTemplate>
@@ -94,16 +93,10 @@
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới dịch vụ";
         parameters.Add("id", id);
-        if (id !=0)
+        if (id != null)
         {
-          var update = lstServies.FirstOrDefault(c => c.Id == id);
-            var updateView = new CreateServiceVM()
-                {
-                    Name = update.Name,
-                };
             nameDialog = "Cập nhật dịch vụ";
             parameters.Add("id", id);
-            parameters.Add("service", updateView);
         }
         DialogOptions options = new DialogOptions()
             {
@@ -126,7 +119,6 @@
         }
         catch (Exception)
         {
-
             throw;
         }
     }

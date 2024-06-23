@@ -1,5 +1,6 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
+using DATN.Utilites.Check;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceDetail;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ namespace DATN.Aplication.Services
                 var newServiceDetail = new ServiceDetail
                 {
                     ServiceId = serviceDetail.ServiceId,
-                    Name = serviceDetail.Name,
+                    Name = serviceDetail.Name.TrimStart().TrimEnd(),
                     Price = serviceDetail.Price,
                     Duration = serviceDetail.Duration,
                     Description = serviceDetail.Description,
@@ -39,13 +40,24 @@ namespace DATN.Aplication.Services
                         return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại !" };
                     }
                 }
+
+                if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.Name) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
+                }
+
+                if(CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giá nhập không đúng" };
+                }
+
                 await _unitOfWork.ServiceDetailRepository.AddAsync(newServiceDetail);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công!" };
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Thêm ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Thêm không thành công!" };
             }
         }
 
@@ -66,7 +78,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<ServiceDetail> { IsSuccess = true, Data = query.FirstOrDefault() };
             else
-                return new ResponseData<ServiceDetail> { IsSuccess = false, Error = "Ko có" };
+                return new ResponseData<ServiceDetail> { IsSuccess = false, Error = "Không có dữ liệu về dịch vụ chi tiết này" };
         }
 
         public async Task<ResponseData<List<ServiceDetail>>> GetServicesByIdService(int id)
@@ -80,7 +92,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ServiceDetail>> { IsSuccess = false, Error = "Không có" };
+                return new ResponseData<List<ServiceDetail>> { IsSuccess = false, Error = "Không tìm thấy dịch vụ chi tiết" };
         }
 
         public async Task<ResponseData<string>> RemoveService(int idSer)
@@ -110,17 +122,34 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<string>> UpdateService(ServiceDetail serviceDetail)
+        public async Task<ResponseData<string>> UpdateService(int id, UpdateServiceDetailVM serviceDetail)
         {
             try
             {
-                await _unitOfWork.ServiceDetailRepository.UpdateAsync(serviceDetail);
+                var findServiceDetailById = await _unitOfWork.ServiceDetailRepository.GetAsync(id);
+                findServiceDetailById.Name = serviceDetail.ServiceDetailName.TrimStart().TrimEnd();
+                findServiceDetailById.Price = serviceDetail.Price;
+                findServiceDetailById.Duration = serviceDetail.Duration;
+                findServiceDetailById.Description = serviceDetail.Description;
+                findServiceDetailById.UpdateAt = DateTime.Now;
+
+                if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.ServiceDetailName) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
+                }
+
+                if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giá nhập không đúng" };
+                }
+
+                await _unitOfWork.ServiceDetailRepository.UpdateAsync(findServiceDetailById);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công!" };
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Sửa ko thành công!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Sửa không thành công!" };
             }
         }
 

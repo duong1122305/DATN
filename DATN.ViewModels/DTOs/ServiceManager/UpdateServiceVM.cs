@@ -9,6 +9,5 @@ namespace DATN.ViewModels.DTOs.ServiceManager
     public class UpdateServiceVM
     {
         public string Name { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }
