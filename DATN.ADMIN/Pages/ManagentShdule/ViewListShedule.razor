@@ -119,7 +119,6 @@ else
     IUserClientSev _client { get; set; }
     [Inject]
     IEmployeeScheduleSer _Employyes { get; set; }
-
     private Func<ScheduleView, string> _groupBy = x =>
      {
          if (_customizeGroupBy)
@@ -177,13 +176,20 @@ else
         {
             return x.WorkDate >= dateNow;
         }
-        else if (selectedTimeRange < 0)
+        else if (selectedTimeRange > 0)
         {
             return x.WorkDate <= dateNow;
         }
         else
         {
-            return true; // selectedTimeRange = 0, show all
+            if (string.IsNullOrWhiteSpace(searchString.Trim()))
+                return true;
+            if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                return true;
+            if ($"{x.To} {x.From} {x.WorkDate}".Contains(searchString.Trim()))
+                return true;
+            // Chỉ lấy các bản ghi trong tháng hiện tại
+            return x.WorkDate.Year == targetDate.Year && x.WorkDate.Month == targetDate.Month;
         }
     };
 
