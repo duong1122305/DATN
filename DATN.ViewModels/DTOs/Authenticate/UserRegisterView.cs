@@ -15,6 +15,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
         public string FullName { get; set; }
         public bool Gender { get; set; }
         public string? Password { get; set; }
+        [Required(ErrorMessage = "Vui lòng không để trống trường này")]
         [EmailAddress(ErrorMessage ="Email chưa đúng định dạng!")]
         public string Email { get; set; }
         public string Address { get; set; }

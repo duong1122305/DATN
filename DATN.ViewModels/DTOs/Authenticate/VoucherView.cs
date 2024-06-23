@@ -15,6 +15,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
         [MaxLength(15)]
         public string VoucherCode { get; set; }
         [Required(ErrorMessage ="Vui lòng nhập vào trường này")]
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
         public int Quantity { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập vào trường này")]
         public string VoucherName { get; set; }
@@ -28,8 +29,10 @@ namespace DATN.ViewModels.DTOs.Authenticate
         [Required(ErrorMessage = "Vui lòng nhập vào trường này")]
         public decimal DiscountPercent { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập vào trường này")]
+        [Range(1000, int.MaxValue, ErrorMessage = "Số tiền nhập vào phải lớn hơn 1000")]
         public double MaxMoneyDiscount { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập vào trường này")]
+        [Range(0, int.MaxValue, ErrorMessage = "Số tiền nhập vào phải lớn hơn 0")]
         public double MinMoneyApplicable { get; set; }
 
     }
