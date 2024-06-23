@@ -23,7 +23,8 @@
                         }
                     </MudSelect>
                     <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@createServiceDetailVM.Name" />
-                    <MudTextField T="float" Label="Giá" @bind-Value="@createServiceDetailVM.Price" />
+                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" />
+                    <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
                     <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" />
                     <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" />
                 }
@@ -102,19 +103,27 @@
         else
         {
             _nameButton = "Thêm mới";
+            await OnPriceChanged(createServiceDetailVM.Price);
         }
     }
 
     private async Task OnPriceChanged(float value)
     {
         tempPrice = value; // Cập nhật biến trung gian
-        updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
+        if (id != null && id != 0)
+        {
+            updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
+        }
+        else
+        {
+            createServiceDetailVM.Price = value;
+        }
         await FormatPrice(); // Định dạng giá
     }
 
     private async Task FormatPrice()
     {
-        double price = (double)updateServiceDetailVM.Price;
+        double price = id != null && id != 0 ? (double)updateServiceDetailVM.Price : (double)createServiceDetailVM.Price;
         await JSRuntime.InvokeVoidAsync("formatCurrencyVN", price);
     }
 
