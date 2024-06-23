@@ -159,7 +159,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = e.Message };
             }
         }
-
+        
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()

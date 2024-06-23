@@ -1,14 +1,8 @@
 ﻿using DATN.Data.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mail;
-using System.Net;
 using DATN.Aplication.System;
-using Azure;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
-using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
 
 namespace DATN.API.Controllers
