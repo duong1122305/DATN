@@ -61,7 +61,7 @@
             }
             <MudTd Style="text-align:center;">
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate))"></MudIconButton>
+                    <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.ShiftID,context.WorkDate,context.From.Hours,context.To.Hours))"></MudIconButton>
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
@@ -131,7 +131,7 @@ else
         return false;
     }
 
-    private async Task OpenDialog(int id, DateTime workDate)
+    private async Task OpenDialog(int id, DateTime workDate,int from,int to)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Xem thông tin chi tiết ca làm";
@@ -146,6 +146,8 @@ else
             };
         parameters.Add("id", id);
         parameters.Add("workDate", workDate);
+        parameters.Add("from", from);
+        parameters.Add("to", to);
         var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
