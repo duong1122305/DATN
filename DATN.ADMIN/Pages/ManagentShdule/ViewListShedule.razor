@@ -27,7 +27,7 @@
 @if (lstUser.Count > 0 && lstUser != null)
 {
     <MudDataGrid @ref="dataGrid" MultiSelection="true" Items="@lstUser" Filterable="true"
-                 Hideable="true" Groupable="true" GroupExpanded="false" >
+                 Hideable="true" Groupable="true" GroupExpanded="false" QuickFilter="_quickFilter">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Ca làm của nhân viên</MudText>
             <MudSpacer />
@@ -172,7 +172,15 @@ else
     }
     private Func<ScheduleView, bool> _quickFilter => x =>
     {
-        return true;
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (x.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (x.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{x.From} {x.To} {x.WorkDate} {x.Shift}".Contains(searchString))
+            return true;
+        return false;
     };
 
     private async Task Change(int selected)

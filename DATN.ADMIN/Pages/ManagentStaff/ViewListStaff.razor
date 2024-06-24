@@ -58,9 +58,21 @@
             <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (context.Item.Gender == "Nam")
+                    {
+                        <span>Nam</span>
+                    }
+                    else
+                    {
+                        <span>Nữ</span>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
             <PropertyColumn Property="x => x.Position" Title="Chức vụ" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Email" Title="Email" Sortable="false" Filterable="false" />
-            <TemplateColumn Title="Địa chỉ" SortBy="@(x => $"{x.Address}")" style="width:400px;" Sortable="false" Filterable="false">
+            <TemplateColumn Title="Địa chỉ" SortBy="@(x => $"{x.Address}")" Style="width:400px;" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @(_addressServive.GetAddress(context.Item.Address))
                 </CellTemplate>
@@ -129,9 +141,9 @@ else
     private int selectedShiftId;
     private enum UserStatus
     {
-        All = -1, // Represents all statuses
-        Active = 0, // Represents active status (IsDeleted = false)
-        Inactive = 1 // Represents inactive status (IsDeleted = true)
+        All = -1, // lấy tất cả isdeleted
+        Active = 0, // (IsDeleted = false)
+        Inactive = 1 //(IsDeleted = true)
     }
 
     private UserStatus selectedStatus = UserStatus.All;
@@ -166,23 +178,6 @@ else
         await LoadData();
     }
 
-
-
-    // private Func<UserInfView, bool> _quickFilter => x =>
-    // {
-    //     if (string.IsNullOrWhiteSpace(searchString))
-    //         return true;
-
-    //     if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-    //         return true;
-
-    //     if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-    //         return true;
-
-    //     if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
-    //         return true;
-    //     return false;
-    // };
     private Func<UserInfView, bool> _quickFilter => x =>
       {
       if (selectedStatus == UserStatus.All || (selectedStatus == UserStatus.Active && !x.IsDeleted) || (selectedStatus == UserStatus.Inactive && x.IsDeleted))
