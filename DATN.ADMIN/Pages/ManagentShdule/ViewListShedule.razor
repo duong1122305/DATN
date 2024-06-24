@@ -147,7 +147,7 @@ else
             {
                 if (selectedTimeRange > 0)
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate.Month > dateNow.Month ? c.WorkDate.Day > 0 : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange).ToList();
                 }
                 else if (selectedTimeRange < 0)
                 {
@@ -170,16 +170,10 @@ else
     {
         await LoadData();
     }
-    // private Func<ScheduleView, bool> _quickFilter => x =>
-    // {
-    //     if (string.IsNullOrWhiteSpace(searchString.Trim()))
-    //         return true;
-    //     if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-    //         return true;
-    //     if ($"{x.To} {x.From} {x.WorkDate}".Contains(searchString.Trim()))
-    //         return true;
-    //     return false;
-    // };
+    private Func<ScheduleView, bool> _quickFilter => x =>
+    {
+        return true;
+    };
 
     private async Task Change(int selected)
     {
