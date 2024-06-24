@@ -159,17 +159,15 @@ else
     {
         var user = await _client.GetAll();
         lstUser = user.Data;
-        if (selectedStatus != UserStatus.All)
-        {
-            lstUser = lstUser.Where(u => (selectedStatus == UserStatus.Active && !u.IsDeleted) ||
-                                         (selectedStatus == UserStatus.Inactive && u.IsDeleted)).ToList();
-        }
-
+        // // if (selectedStatus != UserStatus.All)
+        // // {
+        // //     lstUser = lstUser.Where(u => (selectedStatus == UserStatus.Active && !u.IsDeleted) ||
+        // //                                  (selectedStatus == UserStatus.Inactive && u.IsDeleted)).ToList();
+        // // }
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
         StateHasChanged();
-
     }
 
     private async Task HandleStatusChange(ChangeEventArgs e)
@@ -179,25 +177,26 @@ else
     }
 
     private Func<UserInfView, bool> _quickFilter => x =>
-      {
-      if (selectedStatus == UserStatus.All || (selectedStatus == UserStatus.Active && !x.IsDeleted) || (selectedStatus == UserStatus.Inactive && x.IsDeleted))
-      {
-          if (string.IsNullOrWhiteSpace(searchString))
-              return true;
+     {
+         if (selectedStatus == UserStatus.All ||
+         (selectedStatus == UserStatus.Active && !x.IsDeleted) ||
+         (selectedStatus == UserStatus.Inactive && x.IsDeleted))
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
 
-          if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-              return true;
+             if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
 
-          if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-              return true;
+             if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
 
-          if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
-              return true;
-      }
-
-      return false;
-      };
-
+             if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
+                 return true;
+             StateHasChanged();
+         }
+         return false;
+     };
 
     //hoi truoc khi xoa
     private async Task<bool?> Confirm()
@@ -288,7 +287,7 @@ else
             StateHasChanged();
         }
     }
-   
+
     private void HandleShiftChange(ChangeEventArgs e)
     {
         // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
