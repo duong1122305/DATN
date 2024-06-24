@@ -64,6 +64,7 @@ namespace DATN.Aplication.Services
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
+                List < EmployeeSchedule > employeeSchedules = new List<EmployeeSchedule>();
                 int count = 0;
                 foreach (var user in listUser)
                 {
@@ -72,7 +73,7 @@ namespace DATN.Aplication.Services
                         var schedule = new EmployeeSchedule()
                         {
                             UserId = Guid.Parse(user),
-                            WorkShiftId = workShift.Id
+                            WorkShiftId = workShift.Id,
                         };
                         var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
                                          where scheduletable.UserId == schedule.UserId &&
@@ -80,8 +81,7 @@ namespace DATN.Aplication.Services
                                          select scheduletable;
                         if (querycheck.ToList().Count == 0)
                         {
-                            await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
-                            await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
+                            employeeSchedules.Add(schedule);
                             if (listSuccess.Count == 0)
                             {
                                 listSuccess.Add(schedule.UserId.ToString());
@@ -99,6 +99,7 @@ namespace DATN.Aplication.Services
                         }
                     }
                 }
+                await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
                 return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
             }
             catch (Exception e)

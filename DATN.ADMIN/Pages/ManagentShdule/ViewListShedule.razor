@@ -201,9 +201,7 @@ else
             {
                 if (selectedTimeRange > 0)
                 {
-                    lstUser = user.Data
-                        .Where(c => FilterBySelectedTimeRange(c))
-                        .ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate.Month > dateNow.Month ? c.WorkDate.Day > 0 : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange*2).ToList();
                 }
                 else if (selectedTimeRange < 0)
                 {
