@@ -257,7 +257,6 @@ else
             _userView = lstUser.FirstOrDefault(c => c.UserName == username);
             var updateView = new UserRegisterView()
                 {
-                    UserName = username,
                     FullName = _userView.FullName,
                     Address = _userView.Address,
                     PhoneNumber = _userView.PhoneNumber,
