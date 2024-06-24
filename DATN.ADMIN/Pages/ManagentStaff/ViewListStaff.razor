@@ -101,7 +101,6 @@
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.Item.UserName))" title="Xoá"></MudIconButton>
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.UserName))" title="Sửa"></MudIconButton>
-                        <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.Item.UserName))" title="Xem chi tiết"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
             </PropertyColumn>
@@ -128,6 +127,7 @@ else
     private string searchString = "";
     private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
+    private bool isEditing = false;
     [Inject]
     private IUserClientSev _client { get; set; }
     private UserUpdateView updateUserView = new UserUpdateView();
@@ -205,7 +205,7 @@ else
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
                     "Xác nhận xóa nhân viên?",
            yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true,DisableBackdropClick=true });
         StateHasChanged();
         return confirm;
     }
@@ -245,6 +245,12 @@ else
     //thêm sửa !
     private async Task OpenDialog(string username)
     {
+        if (isEditing)
+        {
+            return; // Exit if already editing
+        }
+
+        isEditing = true; // Set flag to true to indicate editing in progress
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới nhân viên";
         if (username != null)
@@ -274,6 +280,7 @@ else
             };
         var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
+        isEditing = false;
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -281,42 +288,7 @@ else
             StateHasChanged();
         }
     }
-    //xem chi tiết
-    private async Task OpenDialogDetails(string username)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Chi tiết nhân viên";
-        if (username != null)
-        {
-            _userView = lstUser.FirstOrDefault(c => c.UserName == username);
-            var updateView = new UserRegisterView()
-                {
-                    UserName = username,
-                    FullName = _userView.FullName,
-                    Address = _userView.Address,
-                    PhoneNumber = _userView.PhoneNumber,
-                    Email = _userView.Email,
-                };
-            parameters.Add("username", username);
-            parameters.Add("user", updateView);
-        }
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
-                CloseButton = true,
-                FullWidth = true
-            };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-            StateHasChanged();
-        }
-    }
+   
     private void HandleShiftChange(ChangeEventArgs e)
     {
         // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
