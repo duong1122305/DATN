@@ -147,7 +147,7 @@ else
             {
                 if (selectedTimeRange > 0)
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate.Month > dateNow.Month ? c.WorkDate.Day > 0 : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange).ToList();
                 }
                 else if (selectedTimeRange < 0)
                 {
@@ -172,25 +172,7 @@ else
     }
     private Func<ScheduleView, bool> _quickFilter => x =>
     {
-        if (selectedTimeRange > 0)
-        {
-            return x.WorkDate >= dateNow;
-        }
-        else if (selectedTimeRange > 0)
-        {
-            return x.WorkDate <= dateNow;
-        }
-        else
-        {
-            if (string.IsNullOrWhiteSpace(searchString.Trim()))
-                return true;
-            if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                return true;
-            if ($"{x.To} {x.From} {x.WorkDate}".Contains(searchString.Trim()))
-                return true;
-            // Chỉ lấy các bản ghi trong tháng hiện tại
-            return x.WorkDate.Year == targetDate.Year && x.WorkDate.Month == targetDate.Month;
-        }
+        return true;
     };
 
     private async Task Change(int selected)
