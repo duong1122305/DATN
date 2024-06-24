@@ -64,7 +64,7 @@ namespace DATN.Aplication.Services
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
-                List < EmployeeSchedule > employeeSchedules = new List<EmployeeSchedule>();
+                List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
                 int count = 0;
                 foreach (var user in listUser)
                 {
@@ -115,6 +115,7 @@ namespace DATN.Aplication.Services
                 int nextMonth = currentDay.Month;
                 var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                             where workshift.WorkDate.Month == nextMonth &&
+                            workshift.WorkDate.Day >= currentDay.Day &&
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
@@ -160,7 +161,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = e.Message };
             }
         }
-        
+
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
