@@ -27,7 +27,7 @@
 @if (lstUser.Count > 0 && lstUser != null)
 {
     <MudDataGrid @ref="dataGrid" MultiSelection="true" Items="@lstUser" Filterable="true"
-                 Hideable="true" Groupable="true" GroupExpanded="false" QuickFilter="_quickFilter">
+                 Hideable="true" Groupable="true" GroupExpanded="false" >
         <ToolBarContent>
             <MudText Typo="Typo.h6">Ca làm của nhân viên</MudText>
             <MudSpacer />
@@ -35,21 +35,21 @@
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Property="x => x.Shift" Title="Ngày thực hiện" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+            <TemplateColumn Title="Ngày thực hiện" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
                 <GroupTemplate>
                     <span style="font-weight:bold">@context.Grouping.Key</span>
                 </GroupTemplate>
-            </PropertyColumn>
+            </TemplateColumn>
             <PropertyColumn Property="x => x.Shift" Title="Ca làm" Filterable="false" Groupable="false" />
             <PropertyColumn Property="x => x.Name" Title="Số người" Filterable="false" Groupable="false" />
             <TemplateColumn Title="Giờ bắt đầu" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <span style="text-align:center;">@context.Item.To.ToString(@"hh\:mm")</span>
+                    <span style="text-align:center;">@context.Item.From.ToString(@"hh\:mm")</span>
                 </CellTemplate>
             </TemplateColumn>
             <TemplateColumn Title="Giờ kết thúc" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <span style="text-align:center;">@context.Item.From.ToString(@"hh\:mm")</span>
+                    <span style="text-align:center;">@context.Item.To.ToString(@"hh\:mm")</span>
                 </CellTemplate>
             </TemplateColumn>
             <TemplateColumn Title="Ngày làm" Sortable="false" Filterable="false">
@@ -170,28 +170,16 @@ else
     {
         await LoadData();
     }
-    private Func<ScheduleView, bool> _quickFilter => x =>
-    {
-        if (selectedTimeRange > 0)
-        {
-            return x.WorkDate >= dateNow;
-        }
-        else if (selectedTimeRange > 0)
-        {
-            return x.WorkDate <= dateNow;
-        }
-        else
-        {
-            if (string.IsNullOrWhiteSpace(searchString.Trim()))
-                return true;
-            if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                return true;
-            if ($"{x.To} {x.From} {x.WorkDate}".Contains(searchString.Trim()))
-                return true;
-            // Chỉ lấy các bản ghi trong tháng hiện tại
-            return x.WorkDate.Year == targetDate.Year && x.WorkDate.Month == targetDate.Month;
-        }
-    };
+    // private Func<ScheduleView, bool> _quickFilter => x =>
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchString.Trim()))
+    //         return true;
+    //     if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //     if ($"{x.To} {x.From} {x.WorkDate}".Contains(searchString.Trim()))
+    //         return true;
+    //     return false;
+    // };
 
     private async Task Change(int selected)
     {
