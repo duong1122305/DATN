@@ -37,6 +37,8 @@
     </PackageReference>
     <PackageReference Include="MudBlazor" Version="6.19.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Syncfusion.Blazor" Version="26.1.38" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.1.38" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
   </ItemGroup>
 
