@@ -84,7 +84,7 @@ namespace DATN.Aplication.Services
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
                             if (listSuccess.Count == 0)
                             {
-                                listSuccess.Add(schedule.Id.ToString());
+                                listSuccess.Add(schedule.UserId.ToString());
                             }
                             else
                             {
@@ -137,7 +137,7 @@ namespace DATN.Aplication.Services
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
                             if (listSuccess.Count == 0)
                             {
-                                listSuccess.Add(schedule.Id.ToString());
+                                listSuccess.Add(schedule.UserId.ToString());
                             }
                             else
                             {
