@@ -22,7 +22,7 @@
                         </MudRadioGroup>
                     </MudField>
                     <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
-                    <MudTextField ReadOnly="@(!IsNew)" T="string" @bind-Value="@guest.Email" Label="Email" For="@(() => guest.Email)" style="margin-top:15px" />
+                    <MudTextField HelperText="Nhập email để đăng ký tài khoản" ReadOnly="@(!IsNew)" Required="true" T="string" @bind-Value="@guest.Email" Label="Email" For="@(() => guest.Email)" style="margin-top:15px" />
                     <hr class="hr" />
                     <div class="mt-5 me-5" style="text-align: end;">
                         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -65,59 +65,59 @@
     protected async Task Create()
     {
 
-        var confirm = await Confirm("tạo mới");
-        if (!confirm)
-        {
-            return;
-        }
-        var response = await _client.RegisterNoUser(new GuestRegisterNoUserRequest()
-            {
-                Name = guest.Name,
-                Address = guest.Address,
-                Gender = guest.Gender,
-                PhoneNumber = guest.PhoneNumber,
+		var confirm = await Confirm("tạo mới");
+		if (!confirm)
+		{
+			return;
+		}
+		var response = await _client.RegisterNoUser(new GuestRegisterNoUserRequest()
+				{
+					Name = guest.Name,
+					Address = guest.Address,
+					Gender = guest.Gender,
+					PhoneNumber = guest.PhoneNumber,
+					Email=guest.Email
+				});
+		if (response.IsSuccess)
+		{
+			snackbar.Add(response.Data, Severity.Success);
+			_dialogBox.Close();
+		}
+		else
+		{
+			snackbar.Add(response.Error, Severity.Warning);
+		}
 
-            });
-        if (response.IsSuccess)
-        {
-            snackbar.Add(response.Data, Severity.Success);
-            _dialogBox.Close();
-        }
-        else
-        {
-            snackbar.Add(response.Error, Severity.Warning);
-        }
 
 
-
-    }
-    //thông báo xác nhận
-    private async Task<bool> Confirm(string text)
-    {
-        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
-                    yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-        StateHasChanged();
-        if (!confirm.HasValue) return false;
-        return confirm.Value;
-    }
-    //cập nhật
-    public async Task Update()
-    {
-        var confirm = await Confirm("cập nhật");
-        if (!confirm)
-        {
-            return;
-        }
-        var response = await _client.UpdateGuets(new GuestUpdateRequest()
-            {
-                Id = guest.Id,
-                Name = guest.Name,
-                Address = guest.Address,
-                Gender = guest.Gender,
-                PhoneNumber = guest.PhoneNumber,
-
+	}
+	//thông báo xác nhận
+	private async Task<bool> Confirm(string text)
+	{
+		var confirm = await _diagService.ShowMessageBox("Thông báo",	$"Xác nhận {text} khách hàng?",
+					yesText: "Xác nhận",
+					cancelText: "Hủy", noText: null,
+					options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+		StateHasChanged();
+		if (!confirm.HasValue) return false;
+		return confirm.Value;
+	}
+	//cập nhật
+	public async Task Update()
+	{
+		var confirm = await Confirm("cập nhật");
+		if (!confirm)
+		{
+			return;
+		}
+		var response = await _client.UpdateGuets(new GuestUpdateRequest()
+			{
+				Id= guest.Id,
+				Name = guest.Name,
+				Address = guest.Address,
+				Gender = guest.Gender,
+				PhoneNumber = guest.PhoneNumber,
+				
 
             });
         if (response.IsSuccess)

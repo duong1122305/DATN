@@ -1,5 +1,8 @@
-﻿@* @page "/CreateUpdateServices"
+
+﻿@page "/CreateUpdateServices"
 @using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+
 @using DATN.ViewModels.DTOs.ServiceManager
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
@@ -7,10 +10,29 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-                <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
+
+                @if (id == 0 || id == null)
+                {
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
+                }
+                else
+                {
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Name" />
+                }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    @if (id == null || id == 0)
+                    {
+                        <MudButton ButtonType="ButtonType.Submit" OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                            @_nameButton
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton ButtonType="ButtonType.Submit" OnClick="@Update" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                            @_nameButton
+                        </MudButton>
+                    }
                 </div>
             </MudCardContent>
         </MudCard>
@@ -21,76 +43,95 @@
     [Parameter]
     public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+
     [Parameter]
     public CreateServiceVM service { get; set; } = new CreateServiceVM();
-    private string _nameButton = "Thêm mới";
 
+    [Parameter]
+    public UpdateServiceVM serviceUpdate { get; set; } = new UpdateServiceVM();
+    // [Parameter]
+    // public Service sev { get; set; } = new Service();
+    string _nameButton = "";
     [Inject]
-    // private IServiceManagermentService _serviceManagerment { get; set; }
+    private IServiceManagermentService _serviceManagerment { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        if (id != 0)
+        if (id != null && id != 0)
         {
             _nameButton = "Cập nhật";
+            var findServiceById = await _serviceManagerment.GetById(id);
+            serviceUpdate.Name = findServiceById.Data.Name;
+        }
+        else
+        {
+            _nameButton = "Thêm mới";
         }
     }
 
     public async Task Submit()
     {
+        if (await Confirm("thêm mới") == true)
 
-        if (id != 0)
-        {
-            await Update();
-        }
-        else
-        {
-            await Create();
-        }
-
-        StateHasChanged();
-    }
-
-    private async Task Create()
-    {
-        if (await Confirm() == true)
         {
             var result = await _serviceManagerment.Create(service);
             if (result.IsSuccess == true)
             {
-                Message(result.Data, Severity.Success);
+
+                Message("Thêm dịch vụ mới thành công", Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
-                Message(result.Error, Severity.Error);
+                Message("Thêm dịch vụ mới không thành công", Severity.Error);
+        }
+        else
+        {
+            return;
         }
     }
+
 
     public async Task Update()
     {
-        if (await Confirm() == true)
+        var confirm = await Confirm("cập nhật");
+        if (!confirm)
         {
-            var servicesUp = await _serviceManagerment.Update(service);
-            if (servicesUp.IsSuccess)
+            return;
+        }
+
+        if (serviceUpdate != null)
+        {
+            var result = await _serviceManagerment.Update(id, serviceUpdate);
+            if (result.IsSuccess)
             {
-                Message(servicesUp.Data, Severity.Success);
+                Message(result.Data, Severity.Success);
+
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message(servicesUp.Error, Severity.Error);
+
+                Message(result.Error, Severity.Error);
             }
         }
+        else
+        {
+            Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+        }
+
     }
 
-    private async Task<bool?> Confirm()
+    private async Task<bool> Confirm(string text)
     {
-        var confirm = await _diagService.ShowMessageBox("Thông báo",
-    $"Xác nhận {text} dịch vụ này ?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
-        return confirm;
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+
     }
 
     //thông báo
@@ -103,4 +144,3 @@
         Snackbar.Add(message, severity);
     }
 }
- *@

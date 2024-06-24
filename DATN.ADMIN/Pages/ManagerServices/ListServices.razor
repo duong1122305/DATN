@@ -1,10 +1,15 @@
-﻿@* @page "/ListServices"
+
+﻿@page "/ListServices"
+
 @using System.Net.Http.Json
 @using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+
+@using DATN.ViewModels.DTOs.ServiceManager
+
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
@@ -32,13 +37,17 @@
         @if (!context.IsDetele)
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+
+                <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+
             </MudTd>
         }
         else
         {
             <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+
+                <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+
             </MudTd>
         }
         <MudTd Style="text-align:center;">
@@ -48,8 +57,9 @@
                            StartIcon="@(context.IsDetele ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
                            IconColor="@(context.IsDetele ? Color.Surface : Color.Error)"
                            title="@(context.IsDetele ? "Kích hoạt" : "Xoá")"></MudButton>
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))" title="Sửa"></MudButton>
-                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+
+                <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.Id))"></MudButton>
+
             </MudButtonGroup>
         </MudTd>
     </RowTemplate>
@@ -92,25 +102,23 @@
     {
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới dịch vụ";
+
+        parameters.Add("id", id);
         if (id != null)
         {
-            var servicesUpdate = lstServies.FirstOrDefault(c => c.Id == id);
-            var updateView = new Service()
-                {
-                    Name = servicesUpdate.Name,
-                };
-            parameters.Add("id", id);
-            parameters.Add("shiftView", servicesUpdate);
             nameDialog = "Cập nhật dịch vụ";
+            parameters.Add("id", id);
         }
-        parameters.Add("id", id);
+
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
                 MaxWidth = MaxWidth.Small,
                 CloseButton = true,
-                FullWidth = true
+
+                FullWidth = true,
+                DisableBackdropClick = true
             };
         try
         {
@@ -138,4 +146,6 @@
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
         Snackbar.Add(message, severity);
     }
-} *@
+
+}
+

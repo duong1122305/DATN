@@ -47,25 +47,27 @@ namespace DATN.ADMIN.Pages.Account
                         UserName = email,
                         Password = password
                     };
-                    var checkLogin = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
 
-                    if (checkLogin.IsSuccess && checkLogin.Data != null)
+                    if (userLoginView.UserName != null && userLoginView.Password != null)
                     {
-                        _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
-                        _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
-                    }
-                        else if (checkLogin.Error != null)
+                        var checkLogin = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
+
+                        if (checkLogin.IsSuccess && checkLogin.Data != null)
                         {
-                            TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
-                            Page();
-                        
+
+                            _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
+                            _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+
                         }
+                        else if (!checkLogin.IsSuccess)
+                        {
+                            TempData["Error"] = checkLogin.Error;
+                        }
+                    }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    TempData["Error"] = "Đã xảy ra lỗi khi đăng nhập.";
-                    Redirect("~/dangnhap");
-                    //_contextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                    throw new Exception(ex.Message);
                 }
             }
         }

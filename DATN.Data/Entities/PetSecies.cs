@@ -17,10 +17,8 @@ namespace DATN.Data.Entities
 		public int PetTypeId { get; set; } // Khóa ngoại đến ID loại thú cưng
 
 		public string Name { get; set; } // Tên giống thú cưng
-
-		public string Type { get; set; } // Loại (nếu cần)
-
-		public virtual PetType PetType { get; set; } // Loại thú cưng
+        public bool? IsDelete { get; set; }// Xoá mềm loài
+        public virtual PetType PetType { get; set; } // Loại thú cưng
 		public virtual ICollection<Pet> Pets { get; set; } // Loại thú cưng
 	}
 }

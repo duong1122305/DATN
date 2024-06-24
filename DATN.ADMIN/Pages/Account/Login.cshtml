@@ -21,7 +21,11 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <title>Đăng nhập</title>
 </head>
-<body>
+@{
+    Model.email = "binh1234";
+    Model.password = "Binh1234@";
+}
+<body onload="@Model.HandleLogin()">
     <div class="container">
         <div class="row justify-content-center align-items-center vh-100">
             <div class="col-md-6 col-sm-12">
@@ -33,21 +37,21 @@
                         <div>
                             <form method="post">
                                 <input type="hidden">
-                               <!-- Email Address -->
+                                <!-- Email Address -->
                                 <div>
                                     <label class="form-label" for="email">Email</label>
-                                    <input class="form-control"  id="email" value="binh1234" name="email" required="required" autofocus="autofocus">
+                                    <input class="form-control"  id="email" name="email" value="binh1234" required="required" autofocus="autofocus">
                                 </div>
                                 <!-- Password -->
                                 <div class="mt-4">
                                     <label class="form-label" for="password">Mật khẩu</label>
-                                    <input class="form-control" id="password" type="password" value="Binh1234@@" name="password" required="required" autocomplete="current-password" placeholder="abc@123">
-                                    <div style="padding-top: 10px">
-                                        @if (TempData["Error"] != null)
-                                        {
-                                            <div class="alert alert-danger" style="margin-top=5px">@TempData["Error"]</div>
-                                        }
-                                    </div>
+                                    <input class="form-control" id="password" type="password" value="Binh1234@@" name="password" required="required" autocomplete="current-password">
+                                    @if (TempData["Error"] != null)
+                                    {
+                                        <div style="padding-top: 10px; color:red" id="error-message">
+                                            @TempData["Error"]
+                                        </div>
+                                    }
                                 </div> 
 
                                 <!-- Remember Me -->
@@ -59,7 +63,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-center mt-4">
-                                    <button type="submit" id="btn" onclick="@Model.HandleLogin()" class="btn btn-outline-info">Đăng nhập</button>
+                                    <button type="submit" id="btn" class="btn btn-outline-info">Đăng nhập</button>
                                 </div>
                             </form>
                             <div>

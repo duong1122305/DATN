@@ -81,7 +81,7 @@ namespace DATN.API.Controllers
             return result;
         }
 
-        //api thêm ca cho nhân vêin
+        //api thêm ca cho nhiều nhân viên
         [HttpPost("them-ca-one-staff")]
         public async Task<ResponseData<string>> Test1(List<string> listUser, int shift)
         {

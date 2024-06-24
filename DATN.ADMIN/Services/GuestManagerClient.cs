@@ -3,6 +3,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Guest;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace DATN.ADMIN.Services
 {
@@ -143,5 +144,6 @@ namespace DATN.ADMIN.Services
                 };
             }
         }
-    }
+
+	}
 }

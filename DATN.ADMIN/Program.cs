@@ -13,8 +13,11 @@ using MudBlazor.Services;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System.Net;
+using Syncfusion.Blazor;
 var builder = WebApplication.CreateBuilder(args);
 
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
+builder.Services.AddSyncfusionBlazor();
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -68,8 +71,12 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IAddressService,AddressService>();
+builder.Services.AddScoped<IServiceManagermentService, ServiceManagermentService>();
+builder.Services.AddScoped<IServiceDetailServices, ServiceDetailServices>();
 builder.Services.AddScoped<IGuestManagerClient,GuestManagerClient>();
 builder.Services.AddScoped<IEmployeeScheduleSer,EmployeeScheduleSer>();
+builder.Services.AddScoped<IPetSpeciesServiceClient,PetSpeciesServiceClient>();
+builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 builder.Services.AddMudServices(config =>
