@@ -162,8 +162,10 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var checkMail= _unitOfWork.GuestRepository.CheckEmailExist(request.Email);
-                if (checkMail != null)
+                bool checkMail= true;
+                if(request.Email != null)
+                    checkMail = await _unitOfWork.GuestRepository.CheckEmailExist(request.Email);
+                if (!checkMail)
                 {
                     return new ResponseData<string>(false, "Tài khoản email đã được đăng ký trước đó");
                 }
