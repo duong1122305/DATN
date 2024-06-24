@@ -21,13 +21,15 @@ namespace DATN.API.Controllers
         private readonly IWorkShiftManagementService _worshiftmanagement;
         private readonly IEmployeeScheduleManagementService _employeeSchedule;
         private readonly IShiftManagementService _shiftManagement;
+        private readonly IVoucherManagementService _vouchermanagement;
 
-        public UserLoginController(IAuthenticate userRepo, IWorkShiftManagementService workShiftManagementService, IEmployeeScheduleManagementService employeeScheduleManagementService, IShiftManagementService shiftManagementService)
+        public UserLoginController(IAuthenticate userRepo, IWorkShiftManagementService workShiftManagementService, IEmployeeScheduleManagementService employeeScheduleManagementService, IShiftManagementService shiftManagementService, IVoucherManagementService voucherManagementService)
         {
             _userrepo = userRepo;
             _worshiftmanagement = workShiftManagementService;
             _employeeSchedule = employeeScheduleManagementService;
             _shiftManagement = shiftManagementService;
+            _vouchermanagement = voucherManagementService;
         }
         //api đăng nhập tài khoản
         [HttpPost("User-Login")]
@@ -85,7 +87,7 @@ namespace DATN.API.Controllers
             return result;
         }
 
-        //api thêm ca cho nhân vêin
+        //api thêm ca cho nhiều nhân viên
         [HttpPost("them-ca-one-staff")]
         public async Task<ResponseData<string>> Test1(List<string> listUser, int shift)
         {
@@ -203,6 +205,48 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
             return await _userrepo.GetInfByToken(id);
+        }
+        [HttpPost("Create-Voucher")]
+        public async Task<ResponseData<string>> CreateVoucher(VoucherView voucherView)
+        {
+            return await _vouchermanagement.CreateVoucher(voucherView);
+        }
+
+        [HttpPut("Update-Voucher")]
+        public async Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView)
+        {
+            return await _vouchermanagement.UpdateVoucher(voucherView);
+        }
+        [HttpGet("List-Voucher")]
+        public async Task<ResponseData<List<VoucherView>>> ListVoucher()
+        {
+            return await _vouchermanagement.GetAllVoucher();
+        }
+        [HttpPost("Reset-Pass")]
+        public async Task<ResponseData<string>> ResetPass(UserResetPassView user)
+        {
+            return await _userrepo.ResetPassword(user);
+        }
+        [HttpPost("Create-WorkShift-For-CurrentMonth")]
+        public async Task<ResponseData<string>> CreateShiftForCurrentMonth()
+        {
+            return await _worshiftmanagement.InsertWorkShiftCurrentMonth();
+        }
+
+        [HttpGet("Get-List-Staff-Work-in-Day")]
+        public async Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate)
+        {
+            return await _employeeSchedule.GetListStaffInDay(shift, workdate);
+        }
+        [HttpGet("Get-List-Staff-Not-Working-in-Day")]
+        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId,DateTime workDate)
+        {
+            return await _employeeSchedule.ListStaffNotWorkingInDay(shiftId,workDate);
+        }
+        [HttpPost("Change-Shift")]
+        public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
+        {
+            return await _employeeSchedule.ChangeShiftStaffToStaff(changeShiftView);
         }
     }
 }

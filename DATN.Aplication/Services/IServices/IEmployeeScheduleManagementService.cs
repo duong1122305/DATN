@@ -10,6 +10,10 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<List<ScheduleView>>> GetScheduleForShift(int shift);
         public Task<ResponseData<List<ScheduleView>>> GetAll();
         public Task<ResponseData<List<ScheduleView>>> GetScheduleFromMonthToMonth(ScheduleMonthToMonthView scheduleMonthToMonthView);
+        public Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate);
+        public Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId,DateTime workDate);
+        public Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView);
+
 
     }
 }

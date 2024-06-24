@@ -12,14 +12,19 @@ using System.Text;
 using MudBlazor.Services;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System.Net;
+using Syncfusion.Blazor;
 var builder = WebApplication.CreateBuilder(args);
 
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
+builder.Services.AddSyncfusionBlazor();
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/"), Timeout = TimeSpan.FromMinutes(30) });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
+builder.Services.AddScoped<IVoucherServices, VoucherServices>();
 builder.Services.AddScoped<HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMudServices();
@@ -58,9 +63,9 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // Chỉ định cookie này là cần thiết
+    options.Cookie.IsEssential = true;
 });
 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
@@ -69,6 +74,9 @@ builder.Services.AddScoped<IAddressService,AddressService>();
 builder.Services.AddScoped<IServiceManagermentService, ServiceManagermentService>();
 builder.Services.AddScoped<IServiceDetailServices, ServiceDetailServices>();
 builder.Services.AddScoped<IGuestManagerClient,GuestManagerClient>();
+builder.Services.AddScoped<IEmployeeScheduleSer,EmployeeScheduleSer>();
+builder.Services.AddScoped<IPetSpeciesServiceClient,PetSpeciesServiceClient>();
+builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 builder.Services.AddMudServices(config =>

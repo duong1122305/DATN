@@ -5,7 +5,7 @@
 namespace DATN.API.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class ver13 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,12 +17,21 @@ namespace DATN.API.Migrations
                 nullable: false,
                 defaultValue: false);
 
-            migrationBuilder.AddColumn<bool>(
+            migrationBuilder.AddColumn<string>(
+                name: "VoucherName",
+                table: "Discounts",
+                type: "nvarchar(max)",
+                nullable: true);
+
+            migrationBuilder.AlterColumn<bool>(
                 name: "IsDeleted",
                 table: "AspNetUsers",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false,
+                oldClrType: typeof(bool),
+                oldType: "bit",
+                oldNullable: true);
         }
 
         /// <inheritdoc />
@@ -33,8 +42,16 @@ namespace DATN.API.Migrations
                 table: "ServiceDetails");
 
             migrationBuilder.DropColumn(
+                name: "VoucherName",
+                table: "Discounts");
+
+            migrationBuilder.AlterColumn<bool>(
                 name: "IsDeleted",
-                table: "AspNetUsers");
+                table: "AspNetUsers",
+                type: "bit",
+                nullable: true,
+                oldClrType: typeof(bool),
+                oldType: "bit");
         }
     }
 }

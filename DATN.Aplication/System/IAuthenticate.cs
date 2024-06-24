@@ -14,8 +14,8 @@ namespace DATN.Aplication.System
         public Task<ResponseData<string>> UpdateInformationUser(UserUpdateView userUpdateView, string id);
         public Task<ResponseData<string>> RemoveUser(string id);
         public Task<ResponseData<string>> ChangePassword(UserChangePasswordView user);
-        public Task<ResponseData<string>> GetConfirmCode(string username);
-        public Task<ResponseData<bool>> CheckCodeConfirm(string username, string code);
+        public Task<ResponseData<string>> ResetPassword(UserResetPassView user);
+        public Task<ResponseData<string>> CheckCodeConfirm(string username, string code);
         public Task<ResponseData<string>> GetIdUser(string username);
         public Task<ResponseData<string>> GetRoleUser(string id);
         public Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView);

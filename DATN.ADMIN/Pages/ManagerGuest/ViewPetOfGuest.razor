@@ -1,0 +1,125 @@
+﻿@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.Pet
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice
+@inject IAddressService _addressServive
+<style>
+	.add {
+		margin: 40px;
+		width: 100px;
+		padding: 10px;
+	}
+
+</style>
+<MudButton Class="add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(0))">Thêm</MudButton>
+<MudTable Items="@lstPet" Hover="true" SortLabel="Sort By" Filter="new Func<PetVM,bool>(FilterFunc)">
+	<ToolBarContent>
+		<MudSpacer />
+		<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+	</ToolBarContent>
+	<HeaderContent>
+		<MudTh>STT</MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Name)">Tên pet</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Species)">Loài</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Weight)">Cân nặng</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Vaccinated)">Tiêm phòng</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Neutered)">Triệt sản</MudTableSortLabel></MudTh>
+		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Note)">Ghi chú</MudTableSortLabel></MudTh>
+		<MudTh>Thao tác</MudTh>
+
+	</HeaderContent>
+	<RowTemplate>
+
+		<MudTd DataLabel="STT">@(lstPet.IndexOf(context) + 1)</MudTd>
+		<MudTd DataLabel="Tên">@context.Name</MudTd>
+		<MudTd>@(context.Species)</MudTd>
+		<MudTd>@(context.Gender ? "Đực" : "Cái")</MudTd>
+		<MudTd>@(context.Weight ?? 0.0f)</MudTd>
+		<MudTd>@(!context.Vaccinated.HasValue ? "Chưa có thông tin" : context.Vaccinated!.Value ? "Đã tiêm" : "Chưa tiêm")</MudTd>
+		<MudTd>@(!context.Neutered.HasValue ? "Chưa có thông tin" : context.Neutered!.Value ? "Đã triệt sản" : "Chưa triệt sản")</MudTd>
+		<MudTd>@(context.Note ?? "Chưa có ghi chú")</MudTd>
+		<MudTd>	<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton></MudTd>
+		
+	</RowTemplate>
+	<PagerContent>
+		<MudTablePager />
+	</PagerContent>
+</MudTable>
+@code {
+	[Parameter]
+	public Guid Id { get; set; }
+	[Inject]
+	public IPetServiceClient petService { get; set; }
+	public List<PetVM> lstPet = new List<PetVM>();
+	public string searchString = "";
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+	private async Task LoadData()
+	{
+		var response = await petService.GetPetByGuestId(Id);
+		if (response.IsSuccess)
+		{
+			lstPet = response.Data;
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	private bool FilterFunc(PetVM element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString))
+			return true;
+		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+	public async Task OpenDialog(int id)
+	{
+
+		var parameters = new DialogParameters();
+		string nameDialog = "Thêm mới thú cưng";
+		parameters.Add("guestID", Id);
+		if (id != 0)
+		{
+			var pet = lstPet.FirstOrDefault(c => c.Id == id);
+			var petVM = new PetCreateUpdate()
+				{
+					Birthday = pet.Birthday,
+					Gender = pet.Gender,
+					Id = pet.Id,
+					Name = pet.Name,
+					Neutered = pet.Neutered,
+					Note = pet.Note,
+					OwnerId = pet.OwnerId,
+					SpeciesId = pet.SpeciesId,
+					Vaccinated = pet.Vaccinated,
+					Weight = pet.Weight
+				};
+			parameters.Add("pet", petVM);
+			parameters.Add("guestID", Id);
+
+			nameDialog = "Cập nhật thú cưng";
+		}
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdatePet>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		
+	}
+}

@@ -1,0 +1,205 @@
+﻿@page "/ListPetSpecies"
+@using System.Net.Http.Json
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.Guest
+@using DATN.ViewModels.DTOs.PetSpecies
+
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(0))">Thêm</MudButton>
+@if (lstPetSpecies != null && lstPetSpecies.Count > 0)
+{
+
+
+
+
+	<MudTable Items="@lstPetSpecies" Hover="true" SortLabel="Sort By" Filter="new Func<PetSpeciesVM,bool>(FilterFunc)">
+		<ToolBarContent>
+			<MudText Typo="Typo.h6">Danh sách loài</MudText>
+			<MudSpacer />
+			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>STT</MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetSpeciesVM, object>(x=>x.Name)">Tên Loài</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetSpecies, object>(x=>x.PetTypeId)">Loại thú cưng</MudTableSortLabel></MudTh>
+			<MudTh>Số thú cưng thuộc loài</MudTh>
+			<MudTh>Trạng thái</MudTh>
+			<MudTh Class="justify-center">Thao tác</MudTh>
+		</HeaderContent>
+		<RowTemplate>
+
+			<MudTd DataLabel="STT">@(lstPetSpecies.IndexOf(context) + 1)</MudTd>
+			<MudTd DataLabel="Tên">@context.Name</MudTd>
+	
+			<MudTd>@context.PetPype</MudTd>
+			<MudTd>@context.CountPet</MudTd>
+			<MudTd>
+				<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
+			</MudTd>
+			<MudTd>
+				<MudButtonGroup Variant="Variant.Filled">
+
+					<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
+					<MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" OnClick="@(async()=>await OpenSpecies(context.Id))" Title="Xem thông tin đơn hàng"></MudIconButton>
+
+				</MudButtonGroup>
+			</MudTd>
+		</RowTemplate>
+		<PagerContent>
+			<MudTablePager />
+		</PagerContent>
+	</MudTable>
+
+
+
+}
+else
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+<style>
+	.my-custom-class {
+		backdrop-filter: blur(10px);
+	}
+</style>
+@code {
+	//button trạng thái
+	private string searchString = "";
+	[CascadingParameter]
+	public bool Rtl { get; set; }
+	private PetSpeciesVM selectedPetSpecies = new PetSpeciesVM();
+	private List<PetSpeciesVM> lstPetSpecies = new List<PetSpeciesVM>();
+	[Inject]
+	private IPetSpeciesServiceClient _petSpecies { get; set; }
+	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+
+	// load lai du lieu
+	protected async Task LoadData()
+	{
+		//var response = await _client.GetGuest();
+		var response = await _petSpecies.GetAll();
+		lstPetSpecies = response.Data!;
+
+		StateHasChanged();
+	}
+
+	bool isShowPass = false;
+	InputType PasswordInput = InputType.Password;
+	void ButtonShowclick()
+	{
+		@if (isShowPass)
+		{
+			isShowPass = false;
+			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+			PasswordInput = InputType.Password;
+		}
+		else
+		{
+			isShowPass = true;
+			PasswordInputIcon = Icons.Material.Filled.Visibility;
+			PasswordInput = InputType.Text;
+		}
+	}
+
+
+	private async Task OnchangeStatus(bool value, int id)
+	{
+		ChangeUIStatus(value, id);
+		DeleteRequest<int> request = new DeleteRequest<int>()
+			{
+				ID = id,
+				IsDelete = !value,
+			};
+		var response = await _petSpecies.SoftDelete(request);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data!, Severity.Success);
+			return;
+		}
+		Snackbar.Add(response.Error!, Severity.Error);
+		await LoadData();
+
+	}
+	public void ChangeUIStatus(bool value, int id)
+	{
+		var petSpeciesChange = lstPetSpecies.FirstOrDefault(g => g.Id == id);
+		if (petSpeciesChange != null)
+		{
+			petSpeciesChange.IsDelete = !value;
+			StateHasChanged();
+		}
+	}
+
+	private bool FilterFunc(PetSpeciesVM element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString))
+			return true;
+		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+
+	// them sửa khách
+	public async Task OpenDialog(int id)
+	{
+
+		var parameters = new DialogParameters();
+		string nameDialog = "Thêm mới loài";
+		if (id != 0)
+		{
+			var petSpecies = lstPetSpecies.FirstOrDefault(c => c.Id == id);
+
+			parameters.Add("petSpeciesVM", petSpecies);
+			nameDialog = "Cập nhật loài";
+		}
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdatePetSpecial>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+	}
+	public async Task OpenSpecies(int id)
+	{
+
+		var parameters = new DialogParameters();
+		string nameDialog = "Danh sách thú cưng theo loài";
+		parameters.Add("SpeciesId", id);
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<ViewPetOfSpecies>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+	}
+
+}

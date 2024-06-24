@@ -11,19 +11,16 @@
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
 <PageTitle>Danh sách nhân viên</PageTitle>
-
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
-
-@if (lstGuest!=null&& lstGuest.Count>0)
+@if (lstGuest != null && lstGuest.Count > 0)
 {
-	
+
 	<MudDrawerContainer Class="mud-height-full" Style="padding:20px">
 
-
-		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="650px" Height="100%"  Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
+		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="650px" Height="100%" Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
 			<MudDrawerHeader style="display: flex; justify-content: space-between; align-items: center;">
 				<MudText Typo="Typo.h6">Thông tin khách hàng</MudText>
-				<MudIconButton Icon="@Icons.Material.Filled.Close"  @onclick="() => ChangDetailPopup()" />
+				<MudIconButton Icon="@Icons.Material.Filled.Close" @onclick="() => ChangDetailPopup()" />
 
 			</MudDrawerHeader>
 			<MudCard Style="padding: 30px">
@@ -33,7 +30,7 @@
 					var address = _addressServive.GetAddress(selectedGuest.Address);
 				}
 				<MudTextField ReadOnly="true" @bind-Value="@address" Label="Address"></MudTextField>
-				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Email" Label="Email" ></MudTextField>
+				<MudTextField ReadOnly="true" @bind-Value="@selectedGuest.Email" Label="Email"></MudTextField>
 				@{
 					string gtinh = "Không xác định";
 					if (selectedGuest.Gender.HasValue)
@@ -42,66 +39,75 @@
 					}
 				}
 				<MudTextField ReadOnly="true" @bind-Value="@gtinh" Label="Giới tính"></MudTextField>
-				
+
 			</MudCard>
 		</MudDrawer>
-		
-	
 
 
 
-	<MudTable Items="@lstGuest" Hover="true" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
-		<ToolBarContent>
+
+
+		<MudTable Items="@lstGuest" Hover="true" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
+			<ToolBarContent>
 				<MudText Typo="Typo.h6">Danh sách khách hàng</MudText>
-			<MudSpacer />
-			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-		</ToolBarContent>
-		<HeaderContent>
-			<MudTh>STT</MudTh>
-			<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Name)">Tên</MudTableSortLabel></MudTh>
-			<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
-			<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
-			<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
-			<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
-			<MudTh Class="text-center">Trạng thái</MudTh>
-			<MudTh Class="justify-center">Thao tác</MudTh>
-		</HeaderContent>
-		<RowTemplate>
+				<MudSpacer />
+				<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+			</ToolBarContent>
+			<HeaderContent>
+				<MudTh>STT</MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Name)">Tên</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.CountPet)">Thú cưng</MudTableSortLabel></MudTh>
+				<MudTh Class="text-center">Trạng thái</MudTh>
+				<MudTh Class="justify-center">Thao tác</MudTh>
+			</HeaderContent>
+			<RowTemplate>
 				@{
 					var stt = 1;
 				}
-				<MudTd DataLabel="STT">@(lstGuest.IndexOf(context)+1)</MudTd>
-			<MudTd DataLabel="Tên">@context.Name</MudTd>
-			<MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
-			@{
-				string gender = "Không xác định";
-				if (context.Gender.HasValue)
-				{
-					gender = context.Gender.Value ? "Nam" : "Nữ";
+				<MudTd DataLabel="STT">@(lstGuest.IndexOf(context) + 1)</MudTd>
+				<MudTd DataLabel="Tên">@context.Name</MudTd>
+				<MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+				@{
+					string gender = "Không xác định";
+					if (context.Gender.HasValue)
+					{
+						gender = context.Gender.Value ? "Nam" : "Nữ";
+					}
 				}
-			}
-			<MudTd DataLabel="Giới tính">@gender</MudTd>
-				<MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Address))</MudTd>
-			<MudTd DataLabel="Email">@context.Email</MudTd>
-			<MudTd >
-				<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
-			</MudTd>
-			<MudTd>
-				<MudButtonGroup  Variant="Variant.Filled">
-					<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem thông tin cá nhân" OnClick="()=>OpenGuestDetails(context.Id)"></MudIconButton>
-						<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
-					<MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
-				
-				</MudButtonGroup>
-			</MudTd>
-		</RowTemplate>
-		<PagerContent>
-			<MudTablePager />
-		</PagerContent>
-	</MudTable>
-		</MudDrawerContainer>
+				<MudTd DataLabel="Giới tính">@gender</MudTd>
+				<MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Address) ?? "Không có địa chỉ")</MudTd>
+				<MudTd DataLabel="Email">@context.Email</MudTd>
+				<MudTd @onclick="@(async()=>await OpeListPetDialog(context.Id))" DataLabel="Thú cưng">
+					<div style="display: flex; align-items: center;">
+						<span>@context.CountPet</span>
+						<MudIcon Color="Color.Primary" Icon="@Icons.Material.Filled.AddBox" style="margin-left: 8px;" />
+					</div>
+				</MudTd>
 
-		
+
+				<MudTd>
+					<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
+				</MudTd>
+				<MudTd>
+					<MudButtonGroup Variant="Variant.Filled">
+						<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem thông tin cá nhân" OnClick="()=>OpenGuestDetails(context.Id)"></MudIconButton>
+						<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
+						<MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
+
+					</MudButtonGroup>
+				</MudTd>
+			</RowTemplate>
+			<PagerContent>
+				<MudTablePager />
+			</PagerContent>
+		</MudTable>
+	</MudDrawerContainer>
+
+
 }
 else
 {
@@ -161,10 +167,10 @@ else
 	}
 
 
-	private async Task OnchangeStatus(bool value,Guid id)
+	private async Task OnchangeStatus(bool value, Guid id)
 	{
 		ChangeUIStatus(value, id);
-		var response = await _guestService.ChangStatus(!value,id);
+		var response = await _guestService.ChangStatus(!value, id);
 		if (response.IsSuccess)
 		{
 			Snackbar.Add(response.Data!, Severity.Success);
@@ -180,7 +186,7 @@ else
 		if (guestToUpdate != null)
 		{
 			guestToUpdate.IsDelete = !value;
-			StateHasChanged(); 
+			StateHasChanged();
 		}
 	}
 
@@ -197,13 +203,13 @@ else
 	public void OpenGuestDetails(Guid id)
 	{
 		bool result = id == selectedGuest.Id;
-		selectedGuest = lstGuest!.Find(p=>p.Id==id);
+		selectedGuest = lstGuest!.Find(p => p.Id == id);
 		if (result || !cusDetailOpen)
 		{
 			ChangDetailPopup();
 
 		}
-		else 
+		else
 		{
 		}
 	}
@@ -216,7 +222,7 @@ else
 		if (id != Guid.Empty)
 		{
 			var guest = lstGuest.FirstOrDefault(c => c.Id == id);
-			
+
 			parameters.Add("guest", guest);
 			nameDialog = "Cập nhật khách hàng";
 		}
@@ -224,13 +230,37 @@ else
 			{
 				CloseOnEscapeKey = true,
 				Position = DialogPosition.Center,
-				MaxWidth = MaxWidth.Large,
+				MaxWidth = MaxWidth.Small,
 				CloseButton = true,
-				FullWidth = true
+				FullWidth = true,
+				DisableBackdropClick = true,
 			};
 		var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, parameters, options);
 		var result = await createUpdateDialog.Result;
 		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+	}// them sửa khách
+	public async Task OpeListPetDialog(Guid id)
+	{
+		var parameters = new DialogParameters();
+		parameters.Add("Id", id);
+		string nameDialog = "Danh sách thú cưng";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<ViewPetOfGuest>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (result.Canceled)
 		{
 			createUpdateDialog.Close();
 			await LoadData();
