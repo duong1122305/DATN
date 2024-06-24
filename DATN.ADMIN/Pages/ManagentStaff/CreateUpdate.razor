@@ -15,10 +15,10 @@
                 {
                     <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50" />
                 }
-                else
+               @*  else
                 {
                     <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50" Disabled/>
-                }
+                } *@
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" MaxLength="10" />
                 <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                     <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">

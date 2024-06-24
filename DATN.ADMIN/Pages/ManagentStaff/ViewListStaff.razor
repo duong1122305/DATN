@@ -81,11 +81,11 @@
                 <CellTemplate>
                     @if (!context.Item.IsDeleted)
                     {
-                        <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động"></MudChip>
+                        <span>Đang hoạt động</span>
                     }
                     else
                     {
-                        <MudChip Icon="@Icons.Material.Filled.Close" Color="Color.Error" title="Ngưng hoạt động"></MudChip>
+                        <span>Ngừng hoạt động</span>
                     }
                 </CellTemplate>
             </PropertyColumn>
