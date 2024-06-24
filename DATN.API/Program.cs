@@ -67,8 +67,8 @@ builder.Services.AddScoped<IShiftManagementService, ShiftManagementService>();
 builder.Services.AddScoped<IVoucherManagementService, VoucherManagementService>();
 builder.Services.AddScoped<IPetSpeciesManagerService, PetSpeciesManagerService>();
 builder.Services.AddScoped<IPetManagerService, PetManagerService>();
-
-
+builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
+builder.Services.AddScoped<IServiceDetailManagementService, ServiceDetailManagementService>();
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

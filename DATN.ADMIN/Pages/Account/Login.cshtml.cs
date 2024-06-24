@@ -52,19 +52,17 @@ namespace DATN.ADMIN.Pages.Account
                     {
                         var checkLogin = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
 
-                        if (checkLogin.IsSuccess && checkLogin.Data != null)
-                        {
-                            _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
-                            _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
-                        }
-                        else if (checkLogin.Error != null)
-                        {
-                            TempData["Error"] = "Sai tài khoản hoặc mật khẩu?!";
-                            Page();
-                        }
+                    if (checkLogin.IsSuccess && checkLogin.Data != null)
+                    {
+                        _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
+                        _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                    }
+                    else if (!checkLogin.IsSuccess)
+                    {
+                        TempData["Error"] = checkLogin.Error;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw new Exception(ex.Message);
                 }

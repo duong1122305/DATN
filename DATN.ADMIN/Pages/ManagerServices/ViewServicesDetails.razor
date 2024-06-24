@@ -1,0 +1,42 @@
+﻿@page "/ServicesDetails"
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.ServiceDetail
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
+<MudItem xs="12" sm="12">
+    <MudCard>
+        <MudCardContent>
+            <MudTextField T="string" Label="Tên dịch vụ chi tiết" ReadOnly Value="@serviceDetail.Name"/>
+            <MudTextField T="string" Label="Giá" ReadOnly Value="@CurrencyHelper.FormatCurrency(serviceDetail.Price)"/>
+            <MudTextField T="string" Label="Thời gian làm" ReadOnly Value="@(serviceDetail.Duration + " phút")"/>
+            <MudTextField T="string" AutoGrow Label="Mô tả" ReadOnly Value="@serviceDetail.Description"/>
+            <MudTextField T="string" AutoGrow Label="Thời gian tạo" ReadOnly Value="@createdAt"/>
+            <MudTextField T="string" AutoGrow Label="Thời gian cập nhật" ReadOnly Value="@updatedAt"/>
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    [Inject]
+    public IServiceDetailServices serviceDetailService { get; set; }
+
+    ServiceDetail serviceDetail { get; set; } = new ServiceDetail();
+
+    string createdAt = string.Empty;
+    string updatedAt = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id != null && id != 0)
+        {
+            var result = await serviceDetailService.GetById(id);
+            serviceDetail = result.Data;
+            createdAt = serviceDetail.CreateAt.ToShortDateString();
+            updatedAt = serviceDetail.UpdateAt == null ? "Chưa được cập nhật" : serviceDetail.UpdateAt?.ToShortDateString();
+        }
+    }
+}
