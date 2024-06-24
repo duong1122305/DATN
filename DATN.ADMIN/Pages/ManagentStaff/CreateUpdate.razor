@@ -14,7 +14,10 @@
                   @if (userName ==null)
                 {
                     <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50" />
-
+                }
+                else
+                {
+                    <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50" Disabled/>
                 }
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" MaxLength="10" />
                 <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
@@ -100,7 +103,7 @@
         view.FullName = user.FullName;
         view.Address = user.Address;
         view.PhoneNumber = user.PhoneNumber;
-        view.Email = user.Email;
+        user.Email = view.Email;
         view.Gender = user.Gender;
         var result = await _client.UpdateUser(view, userName);
         if (result.IsSuccess)
