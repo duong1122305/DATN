@@ -1,6 +1,8 @@
+
 ﻿@page "/CreateUpdateServices"
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
+
 @using DATN.ViewModels.DTOs.ServiceManager
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
@@ -8,6 +10,7 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
+
                 @if (id == 0 || id == null)
                 {
                     <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
@@ -41,6 +44,7 @@
     public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
+
     [Parameter]
     public CreateServiceVM service { get; set; } = new CreateServiceVM();
 
@@ -69,10 +73,12 @@
     public async Task Submit()
     {
         if (await Confirm("thêm mới") == true)
+
         {
             var result = await _serviceManagerment.Create(service);
             if (result.IsSuccess == true)
             {
+
                 Message("Thêm dịch vụ mới thành công", Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
@@ -100,10 +106,12 @@
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
+
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
+
                 Message(result.Error, Severity.Error);
             }
         }
@@ -123,6 +131,7 @@
         StateHasChanged();
         if (!confirm.HasValue) return false;
         return confirm.Value;
+
     }
 
     //thông báo

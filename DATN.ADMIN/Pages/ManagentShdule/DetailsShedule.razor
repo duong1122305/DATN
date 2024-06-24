@@ -22,7 +22,25 @@
             <MudTd DataLabel="WorkDate">@context.Date.ToString("dd/MM/yyyy")</MudTd>
             <MudTd Style="text-align:center;">
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
+                    @if (dateNow.Month == context.Date.Month && dateNow.Day == context.Date.Day && dateNow.Year == context.Date.Year)
+                    {
+                        @if (dateNow.Hour < from)
+                        {
+                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
+                        }
+                        else if (dateNow.Hour > from && dateNow.Hour < to)
+                        {
+                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))" Disabled></MudIconButton>
+                        }
+                        else if (dateNow.Hour > to)
+                        {
+                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))" Disabled></MudIconButton>
+                        }
+                    }
+                    else
+                    {
+                        <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
+                    }
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
@@ -34,6 +52,10 @@
     public int id { get; set; }
     [Parameter]
     public DateTime workDate { get; set; }
+    [Parameter]
+    public int from { get; set; }
+    [Parameter]
+    public int to { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     [Inject]
     IEmployeeScheduleSer _client{ get; set; }
@@ -42,6 +64,8 @@
     [Parameter]
     public List<NumberOfScheduleView> lsstvi { get; set; } = new List<NumberOfScheduleView>();
     //lấy các nhân viên làm việc trong ca ngày hôm ấy
+
+    public DateTime dateNow { get; set; } = DateTime.Now;
     protected async Task LoadData()
     {
         var respone = await _client.ListStaffOfDay(id, workDate);

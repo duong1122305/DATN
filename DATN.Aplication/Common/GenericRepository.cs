@@ -1,4 +1,5 @@
 ﻿using DATN.Data.EF;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,14 @@ namespace DATN.Aplication.Common
         {
             var entityEntry = await _context.Set<T>().AddAsync(entity); // Chỉ thêm entity vào context
             return entityEntry.Entity;                                  // Trả về entity đã được thêm
+        }
+        public virtual async Task AddRangeAsync(List<T> entities)
+        {
+           await _context.BulkInsertAsync(entities);
+        }
+        public virtual async Task UpdateRangeAsync(List<T> entities)
+        {
+            await _context.BulkUpdateAsync(entities);
         }
 
         public virtual async Task<T> UpdateAsync(T entity)

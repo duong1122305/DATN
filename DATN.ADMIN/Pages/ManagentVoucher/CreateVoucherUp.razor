@@ -11,12 +11,14 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" For="@(() => Voucher.VoucherName)" />
-                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true"/>
-                <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" />
+                <MudDatePicker @bind-Date="startDate" Label="Ngày bắt đầu" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" />
+                <MudDatePicker @bind-Date="endDate" Label="Ngày kết thúc" Editable="true" DateFormat="dd/MM/yyyy"  Mask="@(new DateMask("dd/MM/yyyy"))" />
+                <MudTimePicker PickerVariant="PickerVariant.Dialog" Label="Giờ bắt đầu" @bind-Time="timeStart"/>
+                <MudTimePicker PickerVariant="PickerVariant.Dialog" Label="Giờ kết thúc" @bind-Time="timeEnd"/>
                 <MudTextField T="string" @bind-Value="Voucher.Description" Label="Mô tả" For="@(() => Voucher.Description)" />
                 <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
                 <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" />
-                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" />
+                <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" MaxLength="15" />
                 <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => Voucher.MinMoneyApplicable)" />
                 <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" />
                 <hr class="hr" />
@@ -40,6 +42,8 @@
 
     private DateTime? startDate;
     private DateTime? endDate;
+    TimeSpan? timeStart;
+    TimeSpan? timeEnd;
 
     bool success;
     private EditContext editContext;
@@ -51,8 +55,12 @@
         if (Id > 0)
         {
             _nameButton = "Cập nhật";
-            startDate = new DateTime(Voucher.StartDate.Year, Voucher.StartDate.Month, Voucher.StartDate.Day);
-            endDate = new DateTime(Voucher.EndDate.Year, Voucher.EndDate.Month, Voucher.EndDate.Day);
+            // startDate = new DateTime(Voucher.StartDate.Year, Voucher.StartDate.Month, Voucher.StartDate.Day);
+            // endDate = new DateTime(Voucher.EndDate.Year, Voucher.EndDate.Month, Voucher.EndDate.Day);
+            startDate = Voucher.StartDate; // Initialize with existing values
+            endDate = Voucher.EndDate;
+            timeStart = new TimeSpan(Voucher.StartDate.Hour,Voucher.StartDate.Minute,Voucher.StartDate.Microsecond);
+            timeStart = new TimeSpan(Voucher.EndDate.Hour,Voucher.EndDate.Minute,Voucher.EndDate.Microsecond);
         }
     }
     private void EditContext_OnFieldChanged(object sender, FieldChangedEventArgs e)
@@ -68,8 +76,11 @@
         {
             return;
         }
-        Voucher.StartDate = startDate.Value;
-        Voucher.EndDate = endDate.Value;
+        // Voucher.StartDate = startDate.Value;
+        // Voucher.EndDate = endDate.Value;
+        Voucher.StartDate = startDate.Value.Add(timeStart ?? TimeSpan.Zero);
+        Voucher.EndDate = endDate.Value.Add(timeEnd ?? TimeSpan.Zero);
+
         //gọi api thêm
         var result = await _client.CreateVoucher(Voucher);
 
@@ -102,8 +113,11 @@
         {
             return;
         }
-        Voucher.StartDate = startDate.Value;
-        Voucher.EndDate = endDate.Value;
+        // Voucher.StartDate = startDate.Value;
+        // Voucher.EndDate = endDate.Value;
+        Voucher.StartDate = startDate.Value.Add(timeStart ?? TimeSpan.Zero);
+        Voucher.EndDate = endDate.Value.Add(timeEnd ?? TimeSpan.Zero);
+
         var result = await _client.UpdateVoucher(Voucher);
         if (result.IsSuccess)
         {
