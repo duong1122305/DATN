@@ -1,0 +1,134 @@
+﻿@page "/ViewShuduleDay"
+@using System.Net.Http.Json
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Danh sách ca làm</PageTitle>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Href="/ListStaff" title="Danh sách nhân viên">Danh sách nhân viên</MudButton>
+@if (lstUser.Count > 0 && lstUser != null)
+{
+    <MudTable Items="@lstUserView">
+        <ToolBarContent>
+            <MudText Typo="Typo.h3">Danh sách ca làm</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Style="text-align:center;">Nhân Viên</MudTh>
+            <MudTh Style="text-align:center;">Thứ 2 <MudChip Text="info">@DateTime.Now.Day</MudChip></MudTh>
+            <MudTh Style="text-align:center;">Thứ 3 <MudChip Text="grey">@DateTime.Now.Day</MudChip></MudTh>
+            <MudTh Style="text-align:center;">Thứ 4 <MudChip Text="grey">@DateTime.Now.Day</MudChip></MudTh>
+            <MudTh Style="text-align:center;">Thứ 5 <MudChip Text="grey">@DateTime.Now.Day</MudChip></MudTh>
+            <MudTh Style="text-align:center;">Thứ 6 <MudChip Text="grey">@DateTime.Now.Day</MudChip></MudTh>
+            <MudTh Style="text-align:center;">Thứ 7 <MudChip Text="grey">@DateTime.Now.Day</MudChip></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+                <MudTd>Nguyễn Đức Việt</MudTd>
+            
+            <MudTd Style="text-align:center;" @onmouseenter="() => ToggleHover(true)" @onmouseleave="() => ToggleHover(false)">
+                @if (hover)
+                {
+                    <button onclick="@(async () => await OpenDialog())">Thêm ca</button>
+                }
+            </MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager TransformOrigin="Origin.TopCenter" />
+        </PagerContent>
+    </MudTable>
+}
+else
+{
+    <div style="justify-content:center; justify-items:center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    </div>
+}
+
+
+@code {
+    //button trạng thái
+    private bool _disableElevation = false;
+    //hiệu ứng hover
+    private bool hover = false;
+    private string searchString = "";
+    private List<ScheduleView> lstUser = new List<ScheduleView>();
+    private List<UserInfView> lstUserView = new List<UserInfView>();
+
+    [Inject]
+    IUserClientSev _client { get; set; }
+    [Inject]
+    private IUserClientSev _clientUsser { get; set; }
+
+
+  async Task ToggleHover(bool isHovering)
+{
+    hover = isHovering;
+    await InvokeAsync(StateHasChanged);
+}
+
+    protected async Task LoadData()
+    {
+        try
+        {
+            var user = await _client.GetAllCaNhanVien();
+            var user2 = await _client.GetAll();
+            lstUserView = user2.Data;
+            if (!user.IsSuccess)
+            {
+                lstUser = null;
+            }
+            else
+            {
+                lstUser = user.Data;
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+
+    private bool FilterFunc(ScheduleView element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Shift.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.From} {element.To} {element.WorkDate} {element.Shift}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    private async Task OpenDialog()
+    {
+        string nameDialog = "Nguyễn việt hưng";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateShuduleDay>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+
+}
