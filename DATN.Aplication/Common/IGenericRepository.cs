@@ -16,5 +16,7 @@ namespace DATN.Aplication.Common
         Task<IEnumerable<T>> GetAllAsync();
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task<int> SaveChangesAsync();
+        Task AddRangeAsync(List<T> entities);
+        Task UpdateRangeAsync(List<T> entities);
     }
 }
