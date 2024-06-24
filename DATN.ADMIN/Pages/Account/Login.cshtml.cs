@@ -52,17 +52,18 @@ namespace DATN.ADMIN.Pages.Account
                     {
                         var checkLogin = _userClienSev.Login(userLoginView).GetAwaiter().GetResult();
 
-                    if (checkLogin.IsSuccess && checkLogin.Data != null)
-                    {
-                        _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
-                        _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
-                    }
-                    else if (!checkLogin.IsSuccess)
-                    {
-                        TempData["Error"] = checkLogin.Error;
+                        if (checkLogin.IsSuccess && checkLogin.Data != null)
+                        {
+                            _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
+                            _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                        }
+                        else if (!checkLogin.IsSuccess)
+                        {
+                            TempData["Error"] = checkLogin.Error;
+                        }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     throw new Exception(ex.Message);
                 }
