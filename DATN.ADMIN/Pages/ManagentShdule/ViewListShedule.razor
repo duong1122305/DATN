@@ -94,7 +94,7 @@
             </PropertyColumn>
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="ScheduleView" />
+            <MudDataGridPager T="ViewModels.DTOs.Authenticate.ScheduleView" />
         </PagerContent>
     </MudDataGrid>
 }
@@ -107,7 +107,7 @@ else
 @code {
     private DateTime dateNow = DateTime.Now;
     private int selectedTimeRange;
-    MudDataGrid<ScheduleView> dataGrid;
+    MudDataGrid<ViewModels.DTOs.Authenticate.ScheduleView> dataGrid;
     bool _customizeGroupTemplate;
     static bool _customizeGroupBy;
     //button trạng thái
@@ -121,7 +121,7 @@ else
     IUserClientSev _client { get; set; }
     [Inject]
     IEmployeeScheduleSer _Employyes { get; set; }
-    private Func<ScheduleView, string> _groupBy = x =>
+    private Func<ViewModels.DTOs.Authenticate.ScheduleView, string> _groupBy = x =>
      {
          if (_customizeGroupBy)
          {
@@ -143,7 +143,7 @@ else
             var user = await _client.GetAllCaNhanVien();
             if (!user.IsSuccess)
             {
-                lstUser = new List<ScheduleView>();
+                lstUser = new List<ViewModels.DTOs.Authenticate.ScheduleView>();
             }
             else
             {
@@ -229,7 +229,7 @@ else
         await LoadData();
     }
 
-    private Func<ScheduleView, bool> _quickFilter => x =>
+    private Func<ViewModels.DTOs.Authenticate.ScheduleView, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -248,7 +248,7 @@ else
         await LoadData();
     }
 
-    private MudTable<ScheduleView> _tableRef;
+    private MudTable<ViewModels.DTOs.Authenticate.ScheduleView> _tableRef;
 
 
 

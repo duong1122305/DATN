@@ -55,7 +55,7 @@ else
     //hiệu ứng hover
     private bool hover = false;
     private string searchString = "";
-    private List<ScheduleView> lstUser = new List<ScheduleView>();
+    private List<ViewModels.DTOs.Authenticate.ScheduleView> lstUser = new List<ViewModels.DTOs.Authenticate.ScheduleView>();
     private List<UserInfView> lstUserView = new List<UserInfView>();
 
     [Inject]
@@ -98,7 +98,7 @@ else
     }
 
 
-    private bool FilterFunc(ScheduleView element)
+    private bool FilterFunc(ViewModels.DTOs.Authenticate.ScheduleView element)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
