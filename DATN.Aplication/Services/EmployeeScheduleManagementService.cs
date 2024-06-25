@@ -119,41 +119,86 @@ namespace DATN.Aplication.Services
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
+                List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
                 int count = 0;
                 foreach (var user in listUser)
                 {
                     foreach (var workShift in query)
                     {
-                        var schedule = new EmployeeSchedule()
+                        if (workShift.WorkDate.Day == currentDay.Day && workShift.WorkDate.Month == currentDay.Month && workShift.WorkDate.Year == currentDay.Year)
                         {
-                            UserId = Guid.Parse(user),
-                            WorkShiftId = workShift.Id
-                        };
-                        var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                         where scheduletable.UserId == schedule.UserId &&
-                                         scheduletable.WorkShiftId == schedule.WorkShiftId
-                                         select scheduletable;
-                        if (querycheck.ToList().Count == 0)
-                        {
-                            await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
-                            await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
-                            if (listSuccess.Count == 0)
+                            var queryShift = (from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                              where shifttable.Id == shift
+                                              select shifttable).FirstOrDefault();
+
+                            if (currentDay.Hour >= queryShift.To.Hours || currentDay.Hour >= queryShift.From.Hours && currentDay.Hour <= queryShift.To.Hours)
                             {
-                                listSuccess.Add(schedule.UserId.ToString());
+                                continue;
                             }
                             else
                             {
-                                foreach (var item in listSuccess)
+                                var schedule = new EmployeeSchedule()
                                 {
-                                    if (item != schedule.UserId.ToString())
+                                    UserId = Guid.Parse(user),
+                                    WorkShiftId = workShift.Id
+                                };
+                                var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                                 where scheduletable.UserId == schedule.UserId &&
+                                                 scheduletable.WorkShiftId == schedule.WorkShiftId
+                                                 select scheduletable;
+                                if (querycheck.ToList().Count == 0)
+                                {
+                                    employeeSchedules.Add(schedule);
+                                    if (listSuccess.Count == 0)
                                     {
                                         listSuccess.Add(schedule.UserId.ToString());
+                                    }
+                                    else
+                                    {
+                                        foreach (var item in listSuccess)
+                                        {
+                                            if (item != schedule.UserId.ToString())
+                                            {
+                                                listSuccess.Add(schedule.UserId.ToString());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var schedule = new EmployeeSchedule()
+                            {
+                                UserId = Guid.Parse(user),
+                                WorkShiftId = workShift.Id
+                            };
+                            var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                             where scheduletable.UserId == schedule.UserId &&
+                                             scheduletable.WorkShiftId == schedule.WorkShiftId
+                                             select scheduletable;
+                            if (querycheck.ToList().Count == 0)
+                            {
+                                employeeSchedules.Add(schedule);
+                                if (listSuccess.Count == 0)
+                                {
+                                    listSuccess.Add(schedule.UserId.ToString());
+                                }
+                                else
+                                {
+                                    foreach (var item in listSuccess)
+                                    {
+                                        if (item != schedule.UserId.ToString())
+                                        {
+                                            listSuccess.Add(schedule.UserId.ToString());
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
                 return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count} !" };
             }
             catch (Exception e)
