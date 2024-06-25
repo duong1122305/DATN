@@ -38,23 +38,24 @@
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
         </ToolBarContent>
         <Columns>
+            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (!context.Item.IsDeleted)
+                    {
+                        <MudCheckBox @bind-Checked="selectedUsers[lstUser.IndexOf(context.Item)]" />
+                    }
+                    else
+                    {
+                        <MudCheckBox Disabled="@true" Checked="@false" />
+                    }
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn Title="STT" Sortable="false" Filterable="false">
                 <CellTemplate>
                     <span>@(lstUser.IndexOf(context.Item) + 1)</span>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
-                <CellTemplate>
-                        @if (!context.Item.IsDeleted)
-                        {
-                            <MudCheckBox @bind-Checked="selectedUsers[lstUser.IndexOf(context.Item)]" />
-                        }
-                        else
-                        {
-                            <MudCheckBox Disabled="@true" Checked="@false" />
-                        }
-                </CellTemplate>
-            </TemplateColumn>
+           
             <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />

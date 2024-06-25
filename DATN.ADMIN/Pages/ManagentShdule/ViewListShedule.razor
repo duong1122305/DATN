@@ -106,7 +106,7 @@ else
 }
 @code {
     private DateTime dateNow = DateTime.Now;
-    private int selectedTimeRange;
+    private int selectedTimeRange = 7;  
     MudDataGrid<ScheduleView> dataGrid;
     bool _customizeGroupTemplate;
     static bool _customizeGroupBy;
@@ -168,62 +168,7 @@ else
         }
     }
 
-    // private async Task LoadData()
-    // {
-    //     try
-    //     {
-    //         var user = await _client.GetAllCaNhanVien();
-    //         if (!user.IsSuccess)
-    //         {
-    //             lstUser = new List<ScheduleView>();
-    //         }
-    //         else
-    //         {
-    //             if (selectedTimeRange > 0)
-    //             {
-    //                 lstUser = user.Data.Where(c => c.WorkDate.Month > dateNow.Month ? c.WorkDate.Day > 0 : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange*2).ToList();
-    //             }
-    //             else if (selectedTimeRange < 0)
-    //             {
-    //                 lstUser = user.Data
-    //                     .Where(c => FilterBySelectedTimeRange(c))
-    //                     .OrderByDescending(c => c.WorkDate)
-    //                     .ToList();
-    //             }
-    //             else
-    //             {
-    //                 lstUser = user.Data
-    //                     .Where(c => FilterBySelectedTimeRange(c))
-    //                     .Take(7)
-    //                     .ToList();
-    //             }
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         // Xử lý ngoại lệ nếu cần
-    //         Console.WriteLine($"Lỗi không xác định: {ex.Message}");
-    //     }
-    // }
-
-    // private bool FilterBySelectedTimeRange(ScheduleView c)
-    // {
-    //     if (selectedTimeRange > 0)
-    //     {
-    //         return c.WorkDate.Month > dateNow.Month
-    //                ? c.WorkDate.Day > 0
-    //                : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year;
-    //     }
-    //     else if (selectedTimeRange < 0)
-    //     {
-    //         return c.WorkDate.Day <= dateNow.Day && c.WorkDate.Month <= dateNow.Month && c.WorkDate.Year == dateNow.Year;
-    //     }
-    //     else
-    //     {
-    //         return c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year;
-    //     }
-    // }
-
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
