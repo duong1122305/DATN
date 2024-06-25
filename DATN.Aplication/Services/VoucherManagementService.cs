@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
+using DATN.ViewModels.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,7 +119,8 @@ namespace DATN.Aplication.Services
                             MaxMoneyDiscount = discount.MaxMoneyDiscount,
                             MinMoneyApplicable = discount.MinMoneyApplicable,
                             Description = discount.Description,
-                            Quantity = discount.Quantity
+                            Quantity = discount.Quantity,
+                            Status = discount.Status
                         };
             if (query.Count() > 0)
                 return new ResponseData<List<VoucherView>>
@@ -128,6 +130,29 @@ namespace DATN.Aplication.Services
                 };
             else
                 return new ResponseData<List<VoucherView>> { IsSuccess = false, Error = "Chưa có voucher nào" };
+        }
+
+        public async Task<ResponseData<string>> ExpiresVoucher(int id)
+        {
+            var query = (from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
+                         where voucher.Id == id
+                         select voucher).FirstOrDefault();
+            if (query == null) return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy voucher có id này!!" };
+            else
+            {
+                try
+                {
+                    query.DeleteAt = DateTime.Now;
+                    query.Status = VoucherStatus.Expired;
+                    await _unitOfWork.DiscountRepository.UpdateAsync(query);
+                    await _unitOfWork.SaveChangeAsync();
+                    return new ResponseData<string> { IsSuccess = true, Data = "Xóa vé trước hạn thành công" };
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+                }
+            }
         }
     }
 }
