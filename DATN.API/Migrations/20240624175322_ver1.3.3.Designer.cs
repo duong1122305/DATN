@@ -4,6 +4,7 @@ using DATN.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    partial class DATNDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240624175322_ver1.3.3")]
+    partial class ver133
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,6 +228,9 @@ namespace DATN.API.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<double>("MaxMoneyDiscount")
                         .HasColumnType("float");
 
@@ -236,9 +242,6 @@ namespace DATN.API.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<string>("VoucherCode")
                         .IsRequired()
