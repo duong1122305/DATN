@@ -44,13 +44,13 @@
         @if (context.Status == VoucherStatus.GoingOn)
         {
             <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
-                <MudChip Color="Color.Info" title="Đang diễn ra">Đang diễn ra</MudChip>
+                <MudChip Color="Color.Success" title="Đang diễn ra">Đang diễn ra</MudChip>
             </MudTd>
         }
         else if (context.Status == VoucherStatus.Expired)
         {
             <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
-                <MudChip Color="Color.Error" title="Đã quá hạn">Đã quá hạn</MudChip>
+                <MudChip Color="Color.Error" title="Đã quá hạn">Đã kết thúc</MudChip>
             </MudTd>
         }
         else
