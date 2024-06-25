@@ -19,7 +19,7 @@
                 <MudTextField T="int" @bind-Value="Voucher.Quantity" Label="Số lượng" For="@(() => Voucher.Quantity)" />
                 <MudTextField T="decimal" @bind-Value="Voucher.DiscountPercent" Label="% Giảm" For="@(() => Voucher.DiscountPercent)" />
                 <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" MaxLength="15" />
-                <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền giảm tối thiểu" For="@(() => Voucher.MinMoneyApplicable)" />
+                <MudTextField T="double" @bind-Value="Voucher.MinMoneyApplicable" Label="Số tiền tối thiểu áp dụng voucher" For="@(() => Voucher.MinMoneyApplicable)" />
                 <MudTextField T="double" @bind-Value="Voucher.MaxMoneyDiscount" Label="Số tiền giảm tối đa" For="@(() => Voucher.MaxMoneyDiscount)" />
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
