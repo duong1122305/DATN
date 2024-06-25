@@ -92,8 +92,13 @@ namespace DATN.Aplication.Services
                                 {
                                     if (item != schedule.UserId.ToString())
                                     {
-                                        listSuccess.Add(schedule.UserId.ToString());
+                                        count++;
                                     }
+                                }
+                                if (count == listSuccess.Count)
+                                {
+                                    listSuccess.Add(schedule.UserId.ToString());
+                                    count = 0;
                                 }
                             }
                         }
@@ -159,8 +164,13 @@ namespace DATN.Aplication.Services
                                         {
                                             if (item != schedule.UserId.ToString())
                                             {
-                                                listSuccess.Add(schedule.UserId.ToString());
+                                                count++;
                                             }
+                                        }
+                                        if (count == listSuccess.Count)
+                                        {
+                                            listSuccess.Add(schedule.UserId.ToString());
+                                            count = 0;
                                         }
                                     }
                                 }
@@ -190,8 +200,13 @@ namespace DATN.Aplication.Services
                                     {
                                         if (item != schedule.UserId.ToString())
                                         {
-                                            listSuccess.Add(schedule.UserId.ToString());
+                                            count++;
                                         }
+                                    }
+                                    if (count == listSuccess.Count)
+                                    {
+                                        listSuccess.Add(schedule.UserId.ToString());
+                                        count = 0;
                                     }
                                 }
                             }
