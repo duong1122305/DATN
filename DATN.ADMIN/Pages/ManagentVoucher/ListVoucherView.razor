@@ -3,6 +3,7 @@
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.Enum
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -25,6 +26,7 @@
         <MudTh Style="text-align:center;">Ngày kết thúc</MudTh>
         <MudTh Style="text-align:center;">Số tiền tối thiểu</MudTh>
         <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
+        <MudTh Style="text-align:center;">Trạng thái</MudTh>
         <MudTh Style="text-align:center;">Hành động</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -39,9 +41,34 @@
         <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy HH:mm")</MudTd>
         <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
         <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
+        @if (context.Status == VoucherStatus.GoingOn)
+        {
+            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
+                <MudChip Color="Color.Info" title="Đang diễn ra">Đang diễn ra</MudChip>
+            </MudTd>
+        }
+        else if (context.Status == VoucherStatus.Expired)
+        {
+            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
+                <MudChip Color="Color.Error" title="Đã quá hạn">Đã quá hạn</MudChip>
+            </MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
+                <MudChip Color="Color.Surface" title="Chưa diễn ra">Chưa diễn ra</MudChip>
+            </MudTd>
+        }
         <MudTd Style="text-align:center;">
             <MudButtonGroup Variant="Variant.Filled">
-                <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa"></MudIconButton>
+                @if (context.Status == VoucherStatus.NotOccur)
+                {
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa"></MudIconButton>
+                }
+                else
+                {
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa" Disabled></MudIconButton>
+                }
                 <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
             </MudButtonGroup>
         </MudTd>
@@ -52,6 +79,7 @@
 </MudTable>
 
 @code {
+
     //button trạng thái
     private bool _disableElevation = false;
     private string searchString = "";
@@ -59,7 +87,7 @@
 
     private VoucherView voucherView = new VoucherView();
     [Inject]
-    private IVoucherServices _client{get;set;}
+    private IVoucherServices _client { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

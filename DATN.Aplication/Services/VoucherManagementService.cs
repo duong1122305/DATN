@@ -56,6 +56,14 @@ namespace DATN.Aplication.Services
                             }
                             else
                             {
+                                if (voucher.StartDate.Day > dateNow.Day)
+                                {
+                                    voucher.Status = VoucherStatus.NotOccur;
+                                }
+                                else
+                                {
+                                    voucher.Status = VoucherStatus.GoingOn;
+                                }
                                 await _unitOfWork.DiscountRepository.AddAsync(voucher);
                                 await _unitOfWork.SaveChangeAsync();
                                 return new ResponseData<string> { IsSuccess = true, Data = "Đã thêm voucher thành công!!" };
