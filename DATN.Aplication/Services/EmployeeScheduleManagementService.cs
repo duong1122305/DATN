@@ -68,7 +68,7 @@ namespace DATN.Aplication.Services
                 int count = 0;
                 foreach (var user in listUser)
                 {
-                    foreach (var workShift in query)
+                    foreach (var workShift in query.ToList())
                     {
                         var schedule = new EmployeeSchedule()
                         {
@@ -123,7 +123,7 @@ namespace DATN.Aplication.Services
                 int count = 0;
                 foreach (var user in listUser)
                 {
-                    foreach (var workShift in query)
+                    foreach (var workShift in query.ToList())
                     {
                         if (workShift.WorkDate.Day == currentDay.Day && workShift.WorkDate.Month == currentDay.Month && workShift.WorkDate.Year == currentDay.Year)
                         {
