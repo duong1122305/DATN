@@ -90,20 +90,29 @@
                     }
                     else
                     {
-                        <span>
-                            <MudChip Color="Color.Info" title="Chưa diễn ra">Chưa diễn ra</MudChip>
-                        </span>
+                        if (context.Item.WorkDate.Year == dateNow.Year && context.Item.WorkDate.Month == dateNow.Month && context.Item.WorkDate.Day < dateNow.Day)
+                        {
+                            <span>
+                                <MudChip Color="Color.Error" title="Đã kết thúc">Đã kết thúc</MudChip>
+                            </span>
+                        }
+                        else
+                        {
+                            <span>
+                                <MudChip Color="Color.Info" title="Đã kết thúc">Chưa diễn ra</MudChip>
+                            </span>
+                        }
                     }
                 </CellTemplate>
             </TemplateColumn>
 
             <PropertyColumn Property="x=>x.ShiftID" Title="Hành động" Filterable="false" Sortable="false">
                 <CellTemplate>
-                        <span>
+                    <span>
                         <MudButtonGroup Variant="Variant.Filled">
                             <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.Item.ShiftID,context.Item.WorkDate,context.Item.From.Hours,context.Item.To.Hours))"></MudIconButton>
                         </MudButtonGroup>
-                        </span>
+                    </span>
                 </CellTemplate>
             </PropertyColumn>
         </Columns>
