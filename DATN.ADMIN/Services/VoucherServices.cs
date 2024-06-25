@@ -15,9 +15,9 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> ChangeStatusVoucher(int id)
         {
-            var respone = await _client.PostAsJsonAsync("api/UserLogin/Change-Status-Voucher", id);
+            var respone = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Change-Status-Voucher?id={id}");
             //var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
-            return await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
+            return respone;
         }
 
         public async Task<ResponseData<string>> CreateVoucher(VoucherView voucherView)
@@ -35,7 +35,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView)
         {
-            var respone = await _client.PutAsJsonAsync<VoucherView>($"api/UserLogin/Update-Voucher",voucherView);
+            var respone = await _client.PutAsJsonAsync<VoucherView>($"api/UserLogin/Update-Voucher", voucherView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
         }
