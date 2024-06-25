@@ -37,8 +37,8 @@
         <MudTd DataLabel="VoucherCode" Style="text-align:center;">@context.VoucherCode</MudTd>
         <MudTd DataLabel="DiscourPercent" Style="text-align:center;">@context.DiscountPercent</MudTd>
         <MudTd DataLabel="Description" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy HH:mm")</MudTd>
-        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy HH:mm")</MudTd>
+        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
         <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
         <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
         @if (context.Status == VoucherStatus.GoingOn)
@@ -70,6 +70,7 @@
                     <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa" Disabled></MudIconButton>
                 }
                 <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Id)))"></MudIconButton>
             </MudButtonGroup>
         </MudTd>
     </RowTemplate>
@@ -84,6 +85,7 @@
     private bool _disableElevation = false;
     private string searchString = "";
     private List<VoucherView> lstVoucher = new List<VoucherView>();
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
     private VoucherView voucherView = new VoucherView();
     [Inject]
@@ -148,6 +150,42 @@
             createUpdateDialog.Close();
             await LoadData();
         }
+    }
+
+    private async Task ChangeStatus(int id)
+    {
+
+       if (await Confirm()==true)
+        {
+            //gọi api thêm
+            var result = await _client.ChangeStatusVoucher(id);
+
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+        }
+    }
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận kết thúc voucher sớm?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+        return confirm;
     }
 
 
