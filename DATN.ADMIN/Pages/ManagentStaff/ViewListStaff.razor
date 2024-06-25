@@ -15,7 +15,7 @@
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng sau">Thêm vào ca làm tháng sau</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift2())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng hiện tại">Thêm ca làm tháng hiện tại</MudButton>
-<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;" title="Chọn ca làm">
+<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="width:100px; margin-bottom: 10px;" title="Chọn ca làm">
     <MudSelectItem Value="Convert.ToInt32(null)">Chọn ca làm</MudSelectItem>
     @foreach (var item in lstShift)
     {
@@ -60,7 +60,7 @@
             <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
-            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+            <TemplateColumn Title="Giới tính" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (context.Item.Gender == "Nam")
                     {
