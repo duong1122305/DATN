@@ -85,7 +85,6 @@
     private bool _disableElevation = false;
     private string searchString = "";
     private List<VoucherView> lstVoucher = new List<VoucherView>();
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
     private VoucherView voucherView = new VoucherView();
     [Inject]
@@ -155,7 +154,7 @@
     private async Task ChangeStatus(int id)
     {
 
-       if (await Confirm()==true)
+        if (await Confirm()==true)
         {
             //gọi api thêm
             var result = await _client.ChangeStatusVoucher(id);
@@ -163,7 +162,7 @@
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
+                await LoadData();
             }
             else
             {
