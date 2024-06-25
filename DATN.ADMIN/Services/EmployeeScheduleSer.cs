@@ -14,7 +14,7 @@ namespace DATN.ADMIN.Services
             _client = client;
 
         }
-        //thêm cho tháng hiện tại
+        //thêm ca làm cho tháng hiện tại
         public async Task<ResponseData<string>> AddSchuduleToMonth()
         {
             var res = await _client.GetFromJsonAsync<ResponseData<string>>("/api/UserLogin/Create-WorkShift-For-CurrentMonth");
@@ -38,12 +38,20 @@ namespace DATN.ADMIN.Services
         {
             throw new NotImplementedException();
         }
-
+        // lấy tất cả lịch làm việc của nhân viên
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/get-all-ca-lam");
             return repon;
         }
+        //thêm ca nhân viên cho tháng hiện tại
+        public async Task<ResponseData<string>> InsertEmployeeCurrentMonth(List<string> lstStaff, int idShift)
+        {
+            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/Create-Shift-For-staff-in-CurrentMonth?shift={idShift}", lstStaff);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
+        }
+
         //nhân viên trong ca
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffOfDay(int id, DateTime workDate)
         {

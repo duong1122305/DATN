@@ -17,5 +17,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> AddShuduleMonth();
         //thêm tháng hiện tại
         Task<ResponseData<string>> AddSchuduleToMonth();
+        Task<ResponseData<string>> InsertEmployeeCurrentMonth(List<string> lstStaff, int idShift);
     }
 }

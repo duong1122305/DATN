@@ -11,7 +11,7 @@
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async()=>await CreateMonthNow())" Color="Color.Primary" title="Danh sách nhân viên">Thêm ca cho tháng hiện tại</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
 
-<MudSelect T="int" Label="Chọn khoảng thời gian" ValueChanged="Change">
+<MudSelect T="int" Label="Chọn khoảng thời gian" ValueChanged="Change" Style="width:200px">
     <MudSelectItem Value="-90">90 ngày trước</MudSelectItem>
     <MudSelectItem Value="-60">60 ngày trước</MudSelectItem>
     <MudSelectItem Value="-30">30 ngày trước</MudSelectItem>
@@ -64,32 +64,39 @@
                     {
                         @if (dateNow.Hour < context.Item.From.Hours)
                         {
-                            <span DataLabel="WorkDate" Style="text-align:center;">Chưa diễn ra</span>
+                            <span>
+                                <MudChip Color="Color.Info" title="Chưa diễn ra">Chưa diễn ra</MudChip>
+                            </span>
                         }
                         else if (dateNow.Hour > context.Item.From.Hours && dateNow.Hour < context.Item.To.Hours)
                         {
-                            <span DataLabel="WorkDate" Style="text-align:center;">Đang diễn ra</span>
+                            <span>
+                                <MudChip Color="Color.Success" title="Đang diễn ra">Đang diễn ra</MudChip>
+                            </span>
                         }
                         else if (dateNow.Hour > context.Item.To.Hours)
                         {
-                            <span DataLabel="WorkDate" Style="text-align:center;">Đã diễn ra</span>
-
+                            <span>
+                                <MudChip Color="Color.Error" title="Đã kết thúc">Đã kết thúc</MudChip>
+                            </span>
                         }
                     }
                     else
                     {
-                        <span DataLabel="WorkDate" Style="text-align:center;">Chưa diễn ra</span>
+                        <span>
+                            <MudChip Color="Color.Info" title="Chưa diễn ra">Chưa diễn ra</MudChip>
+                        </span>
                     }
                 </CellTemplate>
             </TemplateColumn>
 
             <PropertyColumn Property="x=>x.ShiftID" Title="Hành động" Filterable="false" Sortable="false">
                 <CellTemplate>
-                    <MudTd Style="text-align:center;">
+                        <span>
                         <MudButtonGroup Variant="Variant.Filled">
                             <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.Item.ShiftID,context.Item.WorkDate,context.Item.From.Hours,context.Item.To.Hours))"></MudIconButton>
                         </MudButtonGroup>
-                    </MudTd>
+                        </span>
                 </CellTemplate>
             </PropertyColumn>
         </Columns>
@@ -168,7 +175,7 @@ else
         }
     }
 
-    
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();

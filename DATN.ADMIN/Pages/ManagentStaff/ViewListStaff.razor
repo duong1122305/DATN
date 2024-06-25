@@ -13,7 +13,8 @@
 <PageTitle>Danh sách nhân viên</PageTitle>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm">Thêm vào ca làm</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng sau">Thêm vào ca làm tháng sau</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift2())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng hiện tại">Thêm ca làm tháng hiện tại</MudButton>
 <MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="!width:100px; margin-bottom: 10px;" title="Chọn ca làm">
     <MudSelectItem Value="Convert.ToInt32(null)">Chọn ca làm</MudSelectItem>
     @foreach (var item in lstShift)
@@ -55,7 +56,7 @@
                     <span>@(lstUser.IndexOf(context.Item) + 1)</span>
                 </CellTemplate>
             </TemplateColumn>
-           
+
             <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
@@ -81,11 +82,11 @@
                 <CellTemplate>
                     @if (!context.Item.IsDeleted)
                     {
-                        <span>Đang hoạt động</span>
+                            <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
                     }
                     else
                     {
-                        <span>Ngừng hoạt động</span>
+                            <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
                     }
                 </CellTemplate>
             </PropertyColumn>
@@ -130,6 +131,8 @@ else
     private bool isEditing = false;
     [Inject]
     private IUserClientSev _client { get; set; }
+    [Inject]
+    IEmployeeScheduleSer _client2 { get; set; }
     private UserUpdateView updateUserView = new UserUpdateView();
 
     private bool IsAnyUserSelected => selectedUsers.Any(selected => selected);
@@ -159,11 +162,6 @@ else
     {
         var user = await _client.GetAll();
         lstUser = user.Data;
-        // // if (selectedStatus != UserStatus.All)
-        // // {
-        // //     lstUser = lstUser.Where(u => (selectedStatus == UserStatus.Active && !u.IsDeleted) ||
-        // //                                  (selectedStatus == UserStatus.Inactive && u.IsDeleted)).ToList();
-        // // }
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
@@ -178,10 +176,6 @@ else
 
     private Func<UserInfView, bool> _quickFilter => x =>
      {
-         if (selectedStatus == UserStatus.All ||
-         (selectedStatus == UserStatus.Active && !x.IsDeleted) ||
-         (selectedStatus == UserStatus.Inactive && x.IsDeleted))
-         {
              if (string.IsNullOrWhiteSpace(searchString))
                  return true;
 
@@ -194,7 +188,6 @@ else
              if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
                  return true;
              StateHasChanged();
-         }
          return false;
      };
 
@@ -204,7 +197,7 @@ else
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
                     "Xác nhận xóa nhân viên?",
            yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true,DisableBackdropClick=true });
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();
         return confirm;
     }
@@ -292,7 +285,7 @@ else
         // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
         selectedShiftId = Convert.ToInt32(e.Value);
     }
-    //thêm nhân viên vào ca làm
+    //thêm nhân viên vào ca làm tháng tiếp theo
     private async Task AddToShift()
     {
         var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
@@ -314,6 +307,57 @@ else
                 if (selectedShiftId > 0)
                 {
                     var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
+                    if (repo.IsSuccess)
+                    {
+                        Message(repo.Data, Severity.Success);
+                        await LoadData();
+                    }
+                    else
+                    {
+                        Message(repo.Error, Severity.Error);
+                        await LoadData();
+                    }
+                }
+                else
+                {
+                    Message("Chưa chọn ca làm", Severity.Error);
+                }
+            }
+            else
+            {
+                Message("Thêm hông thành công", Severity.Error);
+            }
+        }
+        else
+        {
+            Message("Lỗi không xác định!!", Severity.Warning);
+
+        }
+
+    }
+
+    //thêm nhân viên vào ca làm tháng hiện tại
+    private async Task AddToShift2()
+    {
+        var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
+        var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
+        var selectedShiftId = this.selectedShiftId;
+
+        // Xử lý logic để thêm selectedUsers vào một ca làm
+        var listIdUser = new List<string>();
+        if (await Confirm2() == true)
+        {
+            // nứng à
+            if (selectedUser1s.Count > 0 && selectedUser1s != null)
+            {
+                foreach (var user2 in selectedUser1s)
+                {
+                    var idUser = await _client.GetById(user2.UserName);
+                    listIdUser.Add(idUser.Data);
+                }
+                if (selectedShiftId > 0)
+                {
+                    var repo = await _client2.InsertEmployeeCurrentMonth(listIdUser, selectedShiftId);
                     Message(repo.Data, Severity.Success);
                     await LoadData();
                 }
@@ -344,6 +388,7 @@ else
         StateHasChanged();
         return confirm;
     }
+  
 
     //messenge
     private void Message(string message, Severity severity)
