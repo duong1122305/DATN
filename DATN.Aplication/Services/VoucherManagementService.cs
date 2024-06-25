@@ -62,7 +62,14 @@ namespace DATN.Aplication.Services
                                 }
                                 else
                                 {
-                                    voucher.Status = VoucherStatus.GoingOn;
+                                    if (voucher.StartDate.Hour > dateNow.Hour)
+                                    {
+                                        voucher.Status = VoucherStatus.GoingOn;
+                                    }
+                                    else
+                                    {
+                                        voucher.Status = VoucherStatus.NotOccur;
+                                    }
                                 }
                                 await _unitOfWork.DiscountRepository.AddAsync(voucher);
                                 await _unitOfWork.SaveChangeAsync();
