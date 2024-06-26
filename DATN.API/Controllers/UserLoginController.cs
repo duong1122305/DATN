@@ -42,7 +42,7 @@ namespace DATN.API.Controllers
         }
 
         //api quên mật khẩu
-        [HttpPost("User-ForgotPass")]
+        [HttpGet("User-ForgotPass")]
         public async Task<ResponseMail> ForgotPassword(string mail)
         {
             var result = await _userrepo.ForgotPassword(mail);

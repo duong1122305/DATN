@@ -99,10 +99,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseMail> ForgotPassword(string mail)
         {
-            var respone = await _client.PostAsJsonAsync("api/UserLogin/User-ForgotPass", mail);
-            var result = await respone.Content.ReadFromJsonAsync<ResponseMail>();
-            return result;
-
+            var respone = _client.GetFromJsonAsync<ResponseMail>($"api/UserLogin/User-ForgotPass?mail={mail}").GetAwaiter().GetResult();
+            return respone;
         }
     }
 }

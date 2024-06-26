@@ -28,7 +28,7 @@
                             </div>
                             <div>
                                 <div class="my-4">Quên mật khẩu? Bạn hãy cố nhớ lại mật khẩu cũ của mình!.</div>
-                                <form>
+                                <form method="get">
                                     <input type="hidden">
                                     <!-- Email Address -->
                                
@@ -36,7 +36,7 @@
                                         <label class="form-label" for="email" >Email</label>
                                         <div class="d-flex">
                                             <input class="form-control" id="email" type="email" name="email" autofocus="autofocus" maxlength="255">
-                                            <a class="form-control" style="width:250px;margin-left:10px" href="/OTP">Gửi mã</a>
+                                            <button class="form-control" style="width:250px;margin-left:10px" onclick="@Model.CodeOtp()">Gửi mã</button>
                                         </div>
                                     </div >
     
