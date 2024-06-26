@@ -11,6 +11,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> GetById(string id);
         Task<ResponseData<string>> GetByIdRemove(string id);
         Task<ResponseData<string>> Login(UserLoginView user);
+        Task<ResponseMail> ForgotPassword(string mail);
         Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id);
         Task<ResponseData<string>> activeUser(string id);
         Task<ResponseData<string>> Register(UserRegisterView userRegisterView);

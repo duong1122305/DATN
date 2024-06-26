@@ -1,6 +1,8 @@
 ﻿@page "/quenMatKhau"
+@using DATN.ADMIN.Pages.Account
 @using Microsoft.AspNetCore.Components.Web
 @namespace DATN.ADMIN.Pages
+@model ForGotPassworrdModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,18 +28,18 @@
                             </div>
                             <div>
                                 <div class="my-4">Quên mật khẩu? Bạn hãy cố nhớ lại mật khẩu cũ của mình!.</div>
-                                <form>
+                                <form method="post">
                                     <input type="hidden">
                                     <!-- Email Address -->
                                     <div class="mt-2">
                                         <label class="form-label" for="email">Email</label>
-                                        <input class="form-control" id="email" type="email" name="email" required="required" autofocus="autofocus">
+                                        <input class="form-control" id="email" type="email" name="email" required="required" autofocus="autofocus" maxlength="255">
                                     </div>
                                     <div class="mt-2">
-                                        <label class="form-label" for="email">Mã OTP</label>
+                                        <label class="form-label" for="email" >Mã OTP</label>
                                         <div class="d-flex">
-                                            <input class="form-control" id="code" type="text" name="code" required="required">
-                                            <button class="form-control" style="width:250px;margin-left:10px">Gửi mã</button> 
+                                            <input class="form-control" id="code" type="text" name="code" maxlength="6">
+                                            <button class="form-control" style="width:250px;margin-left:10px" onclick="@Model.CodeOtp()">Gửi mã</button>
                                         </div>
                                     </div >
                                     <div class="mt-2">
