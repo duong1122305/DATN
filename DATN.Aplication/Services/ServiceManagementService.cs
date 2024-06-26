@@ -24,7 +24,7 @@ namespace DATN.Aplication.Services
             {
                 var newService = new Service
                 {
-                    Name = service.Name
+                    Name = service.Name.TrimStart().TrimEnd()
                 };
 
                 foreach (var i in await _unitOfWork.ServiceRepository.GetAllAsync())
@@ -48,8 +48,9 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<List<Service>>> GetAllService()
         {
             var data = await _unitOfWork.ServiceRepository.GetAllAsync();
-            if (data.Count() > 0)
-                return new ResponseData<List<Service>> { IsSuccess = true, Data = data.ToList() };
+            var result = data.OrderByDescending(x => x.Id);
+            if (result.Count() > 0)
+                return new ResponseData<List<Service>> { IsSuccess = true, Data = result.ToList() };
             else
                 return new ResponseData<List<Service>> { IsSuccess = false, Error = "Chưa có dịch vụ chính nào", Data = new List<Service>() };
         }
@@ -98,8 +99,15 @@ namespace DATN.Aplication.Services
         {
             try
             {
+                foreach(var i in await _unitOfWork.ServiceRepository.GetAllAsync())
+                {
+                    if(i.Name == service.Name.TrimStart().TrimEnd())
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại!" };
+                    }
+                }
                 var findId = await _unitOfWork.ServiceRepository.GetAsync(id);
-                findId.Name = service.Name;
+                findId.Name = service.Name.TrimStart().TrimEnd();
                 await _unitOfWork.ServiceRepository.UpdateAsync(findId);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công!" };

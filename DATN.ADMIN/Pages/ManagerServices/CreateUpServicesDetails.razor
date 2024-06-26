@@ -5,40 +5,42 @@
 @using Microsoft.JSInterop
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
-<EditForm Model="@createServiceDetailVM">
+<EditForm Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
                 @if (id == null || id == 0)
                 {
 
-                    <MudSelect Margin="Margin.Dense"
-                               T="int"
-                               @bind-Value="@createServiceDetailVM.ServiceId"
+                    <MudSelect T="int" Margin="Margin.Dense"
                                Label="Chọn dịch vụ"
-                               Variant="Variant.Text">
+                               Value="@createServiceDetailVM.ServiceId"
+                               For="@(() => createServiceDetailVM.ServiceId)">
                         @foreach (var item in lstService)
                         {
-                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                            if (!item.IsDetele)
+                            {
+                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                            }
                         }
                     </MudSelect>
-                    <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@createServiceDetailVM.Name" />
-                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" />
+                    <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@createServiceDetailVM.Name" For="@(() => createServiceDetailVM.Name)" />
+                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => createServiceDetailVM.Price)" />
                     <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                    <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" />
-                    <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" />
+                    <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
+                    <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
                 }
                 else
                 {
-                    <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@updateServiceDetailVM.ServiceDetailName" />
-                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" />
+                    <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@updateServiceDetailVM.ServiceDetailName" For="@(() => updateServiceDetailVM.ServiceDetailName)" />
+                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => updateServiceDetailVM.Price)" />
                     <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                    <MudTextField T="double" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" />
-                    <MudTextField T="string" Label="Mô tả" @bind-Value="@updateServiceDetailVM.Description" />
+                    <MudTextField T="double" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
+                    <MudTextField T="string" Label="Mô tả" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
                 }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" OnClick="@((id == null || id == 0) ? Create : Update)" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -103,7 +105,11 @@
         else
         {
             _nameButton = "Thêm mới";
-            await OnPriceChanged(createServiceDetailVM.Price);
+            if (lstService.Any(c => !c.IsDetele))
+            {
+                createServiceDetailVM.ServiceId = lstService.First(c => !c.IsDetele).Id;
+                await OnPriceChanged(createServiceDetailVM.Price);
+            }
         }
     }
 
@@ -125,6 +131,18 @@
     {
         double price = id != null && id != 0 ? (double)updateServiceDetailVM.Price : (double)createServiceDetailVM.Price;
         await JSRuntime.InvokeVoidAsync("formatCurrencyVN", price);
+    }
+
+    private async Task Submit()
+    {
+        if (id == null || id == 0)
+        {
+            await Create();
+        }
+        else
+        {
+            await Update();
+        }
     }
 
     public async Task Update()

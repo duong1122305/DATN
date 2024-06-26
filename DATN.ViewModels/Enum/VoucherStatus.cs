@@ -8,8 +8,8 @@ namespace DATN.ViewModels.Enum
 {
     public enum VoucherStatus
     {
-        Expired,
-        GoingOn,
-        NotOccur
+        Expired = 0, //hết hạn 
+        GoingOn = 1, //còn hạn
+        NotOccur = 2 //chưa bắt đầu
     }
 }

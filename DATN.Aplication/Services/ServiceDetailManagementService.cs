@@ -46,9 +46,19 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
                 }
 
-                if(CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
+                if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá nhập không đúng" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Price.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Thời gian chỉ chứa ký tự là số" };
                 }
 
                 await _unitOfWork.ServiceDetailRepository.AddAsync(newServiceDetail);
@@ -64,8 +74,9 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<List<ServiceDetail>>> GetAllService()
         {
             var query = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
-            if (query.Count() > 0)
-                return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = query.ToList() };
+            var result = query.OrderByDescending(c => c.Id).ToList();
+            if (result.Count() > 0)
+                return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = result };
             else
                 return new ResponseData<List<ServiceDetail>> { IsSuccess = false, Error = "Không có dịch vụ nào" };
         }
@@ -145,6 +156,16 @@ namespace DATN.Aplication.Services
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá nhập không đúng" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Price.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Thời gian chỉ chứa ký tự là số" };
                 }
 
                 await _unitOfWork.ServiceDetailRepository.UpdateAsync(findServiceDetailById);
