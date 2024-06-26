@@ -11,18 +11,27 @@
             <MudCardContent>
                 @if (id == null || id == 0)
                 {
-                    <MudSelect T="int" Margin="Margin.Dense"
-                               Label="Chọn dịch vụ"
-                               For="@(() => createServiceDetailVM.ServiceId)">
-                        <MudSelectItem Value="0">Chọn loại</MudSelectItem>
-                        @foreach (var item in lstService)
-                        {
-                            if (!item.IsDetele)
+                    @* <MudSelect T="int" Margin="Margin.Dense"
+                Label="Chọn dịch vụ"
+                For="@(() => createServiceDetailVM.ServiceId)">
+                <MudSelectItem Value="0">Chọn loại</MudSelectItem>
+                @foreach (var item in lstService)
+                {
+                if (!item.IsDetele)
+                {
+                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+                }
+                </MudSelect> *@
+                    <div class="mud-select">
+                        <select @bind="createServiceDetailVM.ServiceId">
+                            @foreach (var i in lstService)
                             {
-                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                                <option value="@i.Id">@i.Name</option>
                             }
-                        }
-                    </MudSelect>
+                        </select>
+                        <label class="mud-input-label">Chọn dịch vụ</label>
+                    </div>
                     <MudTextField T="string" Label="Tên dịch vụ chi tiết" @bind-Value="@createServiceDetailVM.Name" For="@(() => createServiceDetailVM.Name)" />
                     <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => createServiceDetailVM.Price)" />
                     <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
@@ -45,7 +54,71 @@
         </MudCard>
     </MudItem>
 </EditForm>
+<style>
+    /* Kiểu dáng chung của MudSelect */
+    .mud-select {
+        position: relative; /* Để định vị label */
+    }
 
+        /* Kiểu dáng cho thẻ select */
+        .mud-select select {
+            width: 100%; /* Chiếm toàn bộ chiều rộng của container */
+            padding: 10px; /* Khoảng cách bên trong */
+            border: 1px solid #ccc; /* Viền */
+            border-radius: 4px; /* Bo góc */
+            appearance: none; /* Loại bỏ kiểu dáng mặc định của trình duyệt */
+            background-color: #fff; /* Màu nền */
+            font-family: sans-serif; /* Phông chữ */
+            font-size: 16px; /* Kích thước chữ */
+        }
+
+            /* Kiểu dáng cho mũi tên dropdown */
+            .mud-select select::-ms-expand {
+                display: none; /* Ẩn mũi tên mặc định trên IE */
+            }
+
+        .mud-select::after {
+            content: '\25BC'; /* Ký tự mũi tên */
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            pointer-events: none; /* Không cho phép click vào mũi tên */
+        }
+
+    /* Kiểu dáng cho label */
+    .mud-input-label {
+        position: absolute;
+        top: 0;
+        left: 10px; /* Khoảng cách từ label đến cạnh trái */
+        transform: translateY(-50%);
+        pointer-events: none; /* Không cho phép click vào label */
+        font-family: sans-serif;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        transition: all 0.2s ease; /* Thêm hiệu ứng chuyển động */
+    }
+
+    /* Khi select được focus hoặc có giá trị */
+    .mud-select select:focus ~ .mud-input-label,
+    .mud-select select:not(:placeholder-shown) ~ .mud-input-label {
+        top: -10px; /* Di chuyển label lên trên */
+        font-size: 12px; /* Thu nhỏ label */
+        color: #5e35b1; /* Màu tím (hoặc màu bạn muốn) */
+    }
+
+    /* Các kiểu dáng khác (tùy chỉnh) */
+    .mud-select select:focus {
+        outline: none; /* Loại bỏ viền outline khi focus */
+        border-color: #5e35b1; /* Màu tím (hoặc màu bạn muốn) */
+    }
+
+    .mud-select select:hover {
+        border-color: #9575cd; /* Màu tím nhạt hơn (hoặc màu bạn muốn) */
+    }
+
+</style>
 <script>
     window.formatCurrencyVN = (number) => {
         const formattedPrice = number.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
