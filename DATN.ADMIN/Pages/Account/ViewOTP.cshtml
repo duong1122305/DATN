@@ -1,8 +1,7 @@
-﻿@page "/quenMatKhau"
+﻿@page "/OTP"
 @using DATN.ADMIN.Pages.Account
 @using Microsoft.AspNetCore.Components.Web
 @namespace DATN.ADMIN.Pages
-@model ForGotPassworrdModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,19 +30,17 @@
                                 <form>
                                     <input type="hidden">
                                     <!-- Email Address -->
-                               
+                                  
                                     <div class="mt-2">
-                                        <label class="form-label" for="email" >Email</label>
+                                        <label class="form-label" for="email">Mã OTP</label>
                                         <div class="d-flex">
-                                            <input class="form-control" id="email" type="email" name="email" autofocus="autofocus" maxlength="255">
-                                            <a class="form-control" style="width:250px;margin-left:10px" href="/OTP">Gửi mã</a>
+                                            <input class="form-control" id="code" type="text" name="code" maxlength="6">
                                         </div>
-                                    </div >
-    
-                                    <div class="d-flex align-items-center mt-4">
-                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" href="/dangnhap" style="text-decoration:none;">Quay lại trang đăng nhập</a>
                                     </div>
                                   
+                                    <div class="d-flex align-items-center justify-content-center mt-4">
+                                        <a type="submit" class="btn btn-info w-100 text-white" href="/changePass">Xác nhận</a>
+                                    </div>
                                 </form>
                             </div>
                             <div class="text-center mt-3 d-none">
