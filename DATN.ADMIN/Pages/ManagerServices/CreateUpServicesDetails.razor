@@ -105,11 +105,7 @@
         else
         {
             _nameButton = "Thêm mới";
-            if (lstService.Any(c => !c.IsDetele))
-            {
-                createServiceDetailVM.ServiceId = lstService.First(c => !c.IsDetele).Id;
-                await OnPriceChanged(createServiceDetailVM.Price);
-            }
+            await OnPriceChanged(createServiceDetailVM.Price);
         }
     }
 
