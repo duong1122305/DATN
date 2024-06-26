@@ -1,14 +1,8 @@
 ﻿using DATN.Data.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mail;
-using System.Net;
 using DATN.Aplication.System;
-using Azure;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
-using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
 
 namespace DATN.API.Controllers
@@ -227,10 +221,16 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ResetPassword(user);
         }
-        [HttpPost("Create-WorkShift-For-CurrentMonth")]
+        [HttpGet("Create-WorkShift-For-CurrentMonth")]
         public async Task<ResponseData<string>> CreateShiftForCurrentMonth()
         {
             return await _worshiftmanagement.InsertWorkShiftCurrentMonth();
+        }
+
+        [HttpPost("Create-Shift-For-staff-in-CurrentMonth")]
+        public async Task<ResponseData<string>> InsertEmployeeCurrentMonth(List<string> listUser, int shift)
+        {
+            return await _employeeSchedule.InsertEmployeeCurrentMonth(listUser, shift);
         }
 
         [HttpGet("Get-List-Staff-Work-in-Day")]
@@ -239,9 +239,9 @@ namespace DATN.API.Controllers
             return await _employeeSchedule.GetListStaffInDay(shift, workdate);
         }
         [HttpGet("Get-List-Staff-Not-Working-in-Day")]
-        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId,DateTime workDate)
+        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate)
         {
-            return await _employeeSchedule.ListStaffNotWorkingInDay(shiftId,workDate);
+            return await _employeeSchedule.ListStaffNotWorkingInDay(shiftId, workDate);
         }
         [HttpPost("Change-Shift")]
         public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)

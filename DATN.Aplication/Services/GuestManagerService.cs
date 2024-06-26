@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
+
     public class GuestManagerService : IGuestManagerService
     {
         private readonly IMapper _mapper;

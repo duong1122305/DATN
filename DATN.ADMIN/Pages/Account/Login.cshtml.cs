@@ -54,8 +54,10 @@ namespace DATN.ADMIN.Pages.Account
 
                         if (checkLogin.IsSuccess && checkLogin.Data != null)
                         {
+
                             _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
                             _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+
                         }
                         else if (!checkLogin.IsSuccess)
                         {

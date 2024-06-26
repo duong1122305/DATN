@@ -219,17 +219,34 @@ namespace DATN.Aplication.System
             if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
             else
             {
-                userIdentity.FullName = userUpdateView.FullName;
-                userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
-                userIdentity.Address = userUpdateView.Address;
-                userIdentity.Email = userUpdateView.Email;
-                userIdentity.Gender = userUpdateView.Gender;
-                userIdentity.DoB = userUpdateView.DoB;
-                var result = await _userManager.UpdateAsync(userIdentity);
-                if (result.Succeeded)
-                    return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
+                var checkuser = await CheckUser(userUpdateView.PhoneNumber);
+                if (checkuser == null)
+                {
+                    userIdentity.FullName = userUpdateView.FullName;
+                    userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
+                    var result = await _userManager.UpdateAsync(userIdentity);
+                    if (result.Succeeded)
+                        return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
+                    else
+                        return new ResponseData<string> { IsSuccess = result.Succeeded, Error = "Thông tin chưa được thay đổi" };
+                }
                 else
-                    return new ResponseData<string> { IsSuccess = result.Succeeded, Error = "Thông tin chưa được thay đổi" };
+                {
+                    if (checkuser.Id == userIdentity.Id)
+                    {
+                        userIdentity.FullName = userUpdateView.FullName;
+                        userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
+                        var result = await _userManager.UpdateAsync(userIdentity);
+                        if (result.Succeeded)
+                            return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
+                        else
+                            return new ResponseData<string> { IsSuccess = result.Succeeded, Error = "Thông tin chưa được thay đổi" };
+                    }
+                    else
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Trùng số điện thoại với 1 nhân viên khác" };
+                    }
+                }
             }
         }
 

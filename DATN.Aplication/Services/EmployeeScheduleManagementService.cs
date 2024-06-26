@@ -47,7 +47,7 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             }
-            return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year}" };
+            return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year} !" };
         }
 
         public async Task<ResponseData<string>> InsertEmployeeNextMonthCompareCurrentMonth(List<string> listUser, int shift)
@@ -61,6 +61,61 @@ namespace DATN.Aplication.Services
                 var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                             where workshift.WorkDate.Year == nextYear &&
                             workshift.WorkDate.Month == nextMonth &&
+                            workshift.ShiftId == shift
+                            select workshift;
+                List<string> listSuccess = new List<string>();
+                List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
+                int count = 0;
+                foreach (var user in listUser)
+                {
+                    foreach (var workShift in query)
+                    {
+                        var schedule = new EmployeeSchedule()
+                        {
+                            UserId = Guid.Parse(user),
+                            WorkShiftId = workShift.Id,
+                        };
+                        var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                         where scheduletable.UserId == schedule.UserId &&
+                                         scheduletable.WorkShiftId == schedule.WorkShiftId
+                                         select scheduletable;
+                        if (querycheck.ToList().Count == 0)
+                        {
+                            employeeSchedules.Add(schedule);
+                            if (listSuccess.Count == 0)
+                            {
+                                listSuccess.Add(schedule.UserId.ToString());
+                            }
+                            else
+                            {
+                                foreach (var item in listSuccess)
+                                {
+                                    if (item != schedule.UserId.ToString())
+                                    {
+                                        listSuccess.Add(schedule.UserId.ToString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
+            }
+            catch (Exception e)
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+            }
+        }
+        public async Task<ResponseData<string>> InsertEmployeeCurrentMonth(List<string> listUser, int shift)
+        {
+            try
+            {
+                var currentDay = DateTime.Now;
+                int nextMonth = currentDay.Month;
+                var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                            where workshift.WorkDate.Month == nextMonth &&
+                            workshift.WorkDate.Day >= currentDay.Day &&
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
@@ -82,17 +137,24 @@ namespace DATN.Aplication.Services
                         {
                             await _unitOfWork.EmployeeScheduleRepository.AddAsync(schedule);
                             await _unitOfWork.EmployeeScheduleRepository.SaveChangesAsync();
-                            foreach (var item in listSuccess)
+                            if (listSuccess.Count == 0)
                             {
-                                if (item != schedule.UserId.ToString())
+                                listSuccess.Add(schedule.UserId.ToString());
+                            }
+                            else
+                            {
+                                foreach (var item in listSuccess)
                                 {
-                                    listSuccess.Add(schedule.UserId.ToString());
+                                    if (item != schedule.UserId.ToString())
+                                    {
+                                        listSuccess.Add(schedule.UserId.ToString());
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count} !" };
             }
             catch (Exception e)
             {
@@ -109,6 +171,7 @@ namespace DATN.Aplication.Services
                         on workShift.Id equals schedule.WorkShiftId
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
+                        orderby workShift.WorkDate
                         group new { schedule.WorkShiftId, shifttable.Name, workShift.WorkDate }
                         by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To, shifttable.Id }
                         into view
@@ -125,7 +188,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleFromMonthToMonth(ScheduleMonthToMonthView scheduleMonthToMonthView)
@@ -152,7 +215,7 @@ namespace DATN.Aplication.Services
             if (query.Count() > 0)
                 return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+                return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleForShift(int shift)
@@ -174,7 +237,7 @@ namespace DATN.Aplication.Services
                             From = shifttable.From
                         };
             if (query.Count() > 0) return new ResponseData<List<ScheduleView>> { IsSuccess = true, Data = query.ToList() };
-            else return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Chưa có dữ liệu" };
+            else return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Chưa có dữ liệu!" };
         }
         public async Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate)
         {
@@ -241,7 +304,7 @@ namespace DATN.Aplication.Services
             if (listUser.Count > 0)
                 return new ResponseData<List<UserInfView>> { Data = listUser, IsSuccess = true };
             else
-                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu" };
+                return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
 
         public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
@@ -265,10 +328,10 @@ namespace DATN.Aplication.Services
                 user.UserId = Guid.Parse(changeShiftView.UserIdSecond);
                 await _unitOfWork.EmployeeScheduleRepository.UpdateAsync(user);
                 await _unitOfWork.SaveChangeAsync();
-                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công" };
+                return new ResponseData<string> { IsSuccess = true, Data = "Đổi ca thành công!" };
             }
             else
-                return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại!" };
         }
     }
 }

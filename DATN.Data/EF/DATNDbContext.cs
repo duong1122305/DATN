@@ -37,6 +37,8 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new TypePaymentConfig());
             builder.ApplyConfiguration(new WorkShiftConfig());
         }
+
+        public DbSet<ActionBooking> ActionBookings { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> bookingDetails { get; set; }
         public DbSet<ComboDetail> comboDetails { get; set; }
@@ -45,6 +47,7 @@ namespace DATN.Data.EF
         public DbSet<EmployeeAttendance> EmployeeAttendances { get; set; }
         public DbSet<EmployeeSchedule> EmployeeSchedules { get; set; }
         public DbSet<Guest> Guests { get; set; }
+        public DbSet<HistoryAction> HistoryActions { get; set; }
         public DbSet<Pet> Pets { get; set; }
         public DbSet<PetSpecies> PetSpecies { get; set; }
         public DbSet<PetType> PetTypes { get; set; }

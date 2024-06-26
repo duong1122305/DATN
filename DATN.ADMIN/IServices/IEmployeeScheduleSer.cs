@@ -13,5 +13,9 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<UserInfView>>> lstUsrInffor(int idUser, DateTime workDate);
 
         Task<ResponseData<string>> changgeShift(ChangeShiftView changeShiftView);
+        //thêm 1 tháng sau
+        Task<ResponseData<string>> AddShuduleMonth();
+        //thêm tháng hiện tại
+        Task<ResponseData<string>> AddSchuduleToMonth();
     }
 }

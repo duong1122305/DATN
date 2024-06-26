@@ -15,9 +15,8 @@ namespace DATN.Aplication.Extentions
     {
         public static string CutName(string name)
         {
-            string[] values = name.Split(' ');
-            string result = "";
-            var normalizedString = values[values.Length - 1].Normalize(NormalizationForm.FormD);
+            name = name.Replace("Đ","D").Replace("đ","d");
+            var normalizedString = name.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();
 
             foreach (var c in normalizedString)
@@ -28,12 +27,15 @@ namespace DATN.Aplication.Extentions
                     stringBuilder.Append(c);
                 }
             }
-            result = stringBuilder.ToString().ToLower().Normalize(NormalizationForm.FormC);
+
+            var result = stringBuilder.ToString().ToLower().Normalize(NormalizationForm.FormC);
+            string[] values = result.Split(' ');
+            var username = values[values.Length - 1];
             for (int i = 0; i < values.Length - 1; i++)
             {
-                result += values[i][0].ToString().ToLower();
+                username += values[i][0].ToString();
             }
-            return result;
+            return username;
         }
         public static string RandomPass()
         {

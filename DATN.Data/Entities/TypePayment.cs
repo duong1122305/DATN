@@ -15,6 +15,6 @@ namespace DATN.Data.Entities
 		public int Id { get; set; } // Khóa chính
 
 		public string Name { get; set; } // Tên loại thanh toán
-		public virtual Booking Booking { get; set; }
+		public virtual List<Booking> Bookings { get; set; }
 	}
 }

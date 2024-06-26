@@ -21,76 +21,94 @@
         <MudSelectItem Value="@item.Id" title="@item.Name">@item.Name</MudSelectItem>
     }
 </MudSelect>
+<MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
+    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
+    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
+    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
+</MudSelect>
+
+
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudTable Items="@lstUser" Hover="true" SortLabel="Sort By" Filter="new Func<UserInfView,bool>(FilterFunc)">
+    <MudDataGrid Items="@lstUser" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
         <ToolBarContent>
-
             <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
         </ToolBarContent>
-        <HeaderContent>
-            <MudTh>Chọn</MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.UserName)">Mã nhân viên</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.PhoneNumber)">SĐT</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Position)">Chức vụ</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UserInfView, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
-            <MudTh Style="text-align:center;">Trạng thái</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Checkbox">
-                @if (!context.IsDeleted)
-                {
-                    <MudCheckBox @bind-Checked="selectedUsers[lstUser.IndexOf(context)]" />
-                }
-                else
-                {
-                    <MudCheckBox Disabled="@true" Checked="@false" />
-                }
-            </MudTd>
-            <MudTd DataLabel="FullName">@context.FullName</MudTd>
-            <MudTd DataLabel="UserName">@context.UserName</MudTd>
-            <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
-            <MudTd DataLabel="Position">@context.Position</MudTd>
-            <MudTd DataLabel="Địa chỉ" Style="width:150px">@(_addressServive.GetAddress(context.Address))</MudTd>
-            <MudTd DataLabel="Email">@context.Email</MudTd>
-            <MudTd DataLabel="Gender">@context.Gender</MudTd>
-            @if (!context.IsDeleted)
-            {
-                <MudTd DataLabel="Email" Style="text-align:center;">
-                    <MudChip Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" title="Hoạt động"></MudChip>
-                </MudTd>
-            }
-            else
-            {
-                <MudTd DataLabel="Email" Style="text-align:center;">
-                    <MudChip Icon="@Icons.Material.Filled.Close" Color="Color.Error" title="Ngưng hoạt động"></MudChip>
-                </MudTd>
-            }
-            <MudTd Style="text-align:center">
-                <MudButtonGroup Variant="Variant.Filled">
-                    @if (context.IsDeleted)
+        <Columns>
+            <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <span>@(lstUser.IndexOf(context.Item) + 1)</span>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+                <CellTemplate>
+                        @if (!context.Item.IsDeleted)
+                        {
+                            <MudCheckBox @bind-Checked="selectedUsers[lstUser.IndexOf(context.Item)]" />
+                        }
+                        else
+                        {
+                            <MudCheckBox Disabled="@true" Checked="@false" />
+                        }
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (context.Item.Gender == "Nam")
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.UserName))"></MudIconButton>
+                        <span>Nam</span>
                     }
                     else
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.UserName))" title="Xoá"></MudIconButton>
+                        <span>Nữ</span>
                     }
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.UserName))" title="Sửa"></MudIconButton>
-                    <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Info" OnClick="@(async()=>await OpenDialogDetails(context.UserName))" title="Xem chi tiết"></MudIconButton>
-                </MudButtonGroup>
-            </MudTd>
-        </RowTemplate>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.Email" Title="Email" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Địa chỉ" SortBy="@(x => $"{x.Address}")" Style="width:400px;" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @(_addressServive.GetAddress(context.Item.Address))
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x=>x.IsDeleted" Title="Trạng thái" SortBy="@(x => $"{x.IsDeleted}")" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (!context.Item.IsDeleted)
+                    {
+                        <span>Đang hoạt động</span>
+                    }
+                    else
+                    {
+                        <span>Ngừng hoạt động</span>
+                    }
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x=>x.UserName" Title="Hành động" Filterable="false" Sortable="false">
+                <CellTemplate>
+                    <MudButtonGroup Variant="Variant.Filled">
+                        @if (context.Item.IsDeleted)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.Item.UserName))"></MudIconButton>
+                        }
+                        else
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.Item.UserName))" title="Xoá"></MudIconButton>
+                        }
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.UserName))" title="Sửa"></MudIconButton>
+                    </MudButtonGroup>
+                </CellTemplate>
+            </PropertyColumn>
+        </Columns>
         <PagerContent>
-            <MudTablePager />
+            <MudDataGridPager T="UserInfView" />
         </PagerContent>
-    </MudTable>
+    </MudDataGrid>
+
 }
 else
 {
@@ -102,11 +120,13 @@ else
     }
 </style>
 @code {
+
     //button trạng thái
     private bool _disableElevation = false;
     private string searchString = "";
     private UserInfView _userView = new UserInfView();
     private List<UserInfView> lstUser = new List<UserInfView>();
+    private bool isEditing = false;
     [Inject]
     private IUserClientSev _client { get; set; }
     private UserUpdateView updateUserView = new UserUpdateView();
@@ -118,7 +138,14 @@ else
     //lưu trạng thái của từng nhân viên khi ấn checkbox
     private List<bool> selectedUsers = new List<bool>();
     private int selectedShiftId;
+    private enum UserStatus
+    {
+        All = -1, // lấy tất cả isdeleted
+        Active = 0, // (IsDeleted = false)
+        Inactive = 1 //(IsDeleted = true)
+    }
 
+    private UserStatus selectedStatus = UserStatus.All;
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,24 +158,44 @@ else
     {
         var user = await _client.GetAll();
         lstUser = user.Data;
+        // // if (selectedStatus != UserStatus.All)
+        // // {
+        // //     lstUser = lstUser.Where(u => (selectedStatus == UserStatus.Active && !u.IsDeleted) ||
+        // //                                  (selectedStatus == UserStatus.Inactive && u.IsDeleted)).ToList();
+        // // }
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
         StateHasChanged();
-
     }
 
-
-    private bool FilterFunc(UserInfView element)
+    private async Task HandleStatusChange(ChangeEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.Position.Contains(searchString, StringComparison.OrdinalIgnoreCase) || element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
+        selectedStatus = (UserStatus)e.Value;
+        await LoadData();
     }
+
+    private Func<UserInfView, bool> _quickFilter => x =>
+     {
+         if (selectedStatus == UserStatus.All ||
+         (selectedStatus == UserStatus.Active && !x.IsDeleted) ||
+         (selectedStatus == UserStatus.Inactive && x.IsDeleted))
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+             if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+             if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
+                 return true;
+             StateHasChanged();
+         }
+         return false;
+     };
 
     //hoi truoc khi xoa
     private async Task<bool?> Confirm()
@@ -156,7 +203,7 @@ else
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
                     "Xác nhận xóa nhân viên?",
            yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true,DisableBackdropClick=true });
         StateHasChanged();
         return confirm;
     }
@@ -196,6 +243,12 @@ else
     //thêm sửa !
     private async Task OpenDialog(string username)
     {
+        if (isEditing)
+        {
+            return; // Exit if already editing
+        }
+
+        isEditing = true; // Set flag to true to indicate editing in progress
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới nhân viên";
         if (username != null)
@@ -203,12 +256,11 @@ else
             _userView = lstUser.FirstOrDefault(c => c.UserName == username);
             var updateView = new UserRegisterView()
                 {
-                    UserName = username,
                     FullName = _userView.FullName,
                     Address = _userView.Address,
                     PhoneNumber = _userView.PhoneNumber,
                     Email = _userView.Email,
-                    Gender = _userView.Gender == "Nam"?true : false
+                    Gender = _userView.Gender == "Nam" ? true : false
                 };
             parameters.Add("username", username);
             parameters.Add("user", updateView);
@@ -225,6 +277,7 @@ else
             };
         var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
+        isEditing = false;
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -232,42 +285,7 @@ else
             StateHasChanged();
         }
     }
-    //xem chi tiết
-    private async Task OpenDialogDetails(string username)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Chi tiết nhân viên";
-        if (username != null)
-        {
-            _userView = lstUser.FirstOrDefault(c => c.UserName == username);
-            var updateView = new UserRegisterView()
-                {
-                    UserName = username,
-                    FullName = _userView.FullName,
-                    Address = _userView.Address,
-                    PhoneNumber = _userView.PhoneNumber,
-                    Email = _userView.Email,
-                };
-            parameters.Add("username", username);
-            parameters.Add("user", updateView);
-        }
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
-                CloseButton = true,
-                FullWidth = true
-            };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-            StateHasChanged();
-        }
-    }
+
     private void HandleShiftChange(ChangeEventArgs e)
     {
         // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
@@ -282,7 +300,7 @@ else
 
         // Xử lý logic để thêm selectedUsers vào một ca làm
         var listIdUser = new List<string>();
-        if (await Confirm2()== true)
+        if (await Confirm2() == true)
         {
             // nứng à
             if (selectedUser1s.Count > 0 && selectedUser1s != null)
@@ -292,7 +310,7 @@ else
                     var idUser = await _client.GetById(user2.UserName);
                     listIdUser.Add(idUser.Data);
                 }
-                if (selectedShiftId>0)
+                if (selectedShiftId > 0)
                 {
                     var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
                     Message(repo.Data, Severity.Success);
@@ -321,7 +339,7 @@ else
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
                     "Xác nhận thêm ca cho nhân viên?",
            yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
         StateHasChanged();
         return confirm;
     }

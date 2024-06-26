@@ -18,11 +18,10 @@ namespace DATN.Data.Entities
         public string Address { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime DoB { get; set; } = DateTime.Now;
-        public ICollection<Booking> BookingsAsCounterStaff { get; set; }
-        public ICollection<Booking> BookingsAsConfirmStaff { get; set; }
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }
         public virtual ICollection<EmployeeSchedule> EmployeeSchedules { get; set; }
         public virtual ICollection<EmployeeAttendance> EmployeeAttendances { get; set; }
+        public virtual ICollection<HistoryAction> HistoryActions { get; set; }
     }
 
 }

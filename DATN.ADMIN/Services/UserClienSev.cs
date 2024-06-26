@@ -30,13 +30,14 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift)
         {
             var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/them-ca-one-staff?shift={idShift}", lstStaff);
-            return await lst.Content.ReadFromJsonAsync<ResponseData<string>>();
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
         }
 
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
-                return repon;
+            return repon;
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien()
@@ -46,7 +47,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> GetById(string id)
         {
-          return await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
+            return await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
         }
 
         public async Task<ResponseData<string>> GetByIdRemove(string id)
@@ -72,7 +73,7 @@ namespace DATN.ADMIN.Services
         //public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
-            var respone= await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
+            var respone = await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
         }
@@ -82,10 +83,10 @@ namespace DATN.ADMIN.Services
             throw new NotImplementedException();
         }
 
-        public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id)
+        public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView, string id)
         {
             var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
-            var respone =  await _client.PutAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
+            var respone = await _client.PutAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
         }

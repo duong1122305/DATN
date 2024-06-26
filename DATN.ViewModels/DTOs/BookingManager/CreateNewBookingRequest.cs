@@ -8,5 +8,9 @@ namespace DATN.ViewModels.DTOs.BookingManager
 {
     public class CreateNewBookingRequest
     {
+        public Guid IdStaff { get; set; }
+        public Guid IdGuest { get; set; }
+        public List<int> ListService { get; set; }
+        public int MyProperty { get; set; }
     }
 }

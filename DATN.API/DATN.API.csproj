@@ -8,6 +8,8 @@
 
   <ItemGroup>
 
+    <PackageReference Include="EFCore.BulkExtensions" Version="7.8.1" />
+
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.19" />
 
     <PackageReference Include="AutoMapper" Version="13.0.1" />
