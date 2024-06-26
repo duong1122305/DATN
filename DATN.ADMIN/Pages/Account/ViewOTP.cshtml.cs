@@ -8,5 +8,6 @@ namespace DATN.ADMIN.Pages.Account
         public void OnGet()
         {
         }
+        
     }
 }
