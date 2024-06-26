@@ -83,7 +83,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        createServiceDetailVM.ServiceId = 0;
         var result = await _serviceManagermentService.GetAll();
         if (result.IsSuccess)
         {
