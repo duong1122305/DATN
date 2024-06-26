@@ -11,11 +11,10 @@
             <MudCardContent>
                 @if (id == null || id == 0)
                 {
-
                     <MudSelect T="int" Margin="Margin.Dense"
                                Label="Chọn dịch vụ"
-                               Value="@createServiceDetailVM.ServiceId"
                                For="@(() => createServiceDetailVM.ServiceId)">
+                        <MudSelectItem Value="0">Chọn loại</MudSelectItem>
                         @foreach (var item in lstService)
                         {
                             if (!item.IsDetele)
@@ -84,6 +83,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        createServiceDetailVM.ServiceId = 0;
         var result = await _serviceManagermentService.GetAll();
         if (result.IsSuccess)
         {
