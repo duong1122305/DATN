@@ -253,5 +253,10 @@ namespace DATN.API.Controllers
         {
             return await _vouchermanagement.ExpiresVoucher(id);
         }
+        [HttpGet("Check-Otp")]
+        public async Task<ResponseData<string>> CheckCode(string username,string code)
+        {
+            return await _userrepo.CheckCodeConfirm(username,code);
+        }
     }
 }

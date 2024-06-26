@@ -102,5 +102,21 @@ namespace DATN.ADMIN.Services
             var respone = _client.GetFromJsonAsync<ResponseMail>($"api/UserLogin/User-ForgotPass?mail={mail}").GetAwaiter().GetResult();
             return respone;
         }
+        public async Task<ResponseData<string>> CheckCodeOtp(string username, string code)
+        {
+            var result = _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Check-Otp?username={username}&code={code}").GetAwaiter().GetResult();
+            return result;
+        }
+        public async Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView)
+        {
+            var response = _client.PostAsJsonAsync("api/UserLogin/Reset-Pass", userResetPassView).GetAwaiter().GetResult();
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            if (result == null)
+            {
+                return new ResponseData<string> { IsSuccess = false };
+            }
+            else
+                return result;
+        }
     }
 }

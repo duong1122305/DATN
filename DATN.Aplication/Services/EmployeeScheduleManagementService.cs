@@ -231,6 +231,7 @@ namespace DATN.Aplication.Services
                         on workShift.Id equals schedule.WorkShiftId
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
+                        where user.IsDeleted == false
                         orderby workShift.WorkDate
                         group new { schedule.WorkShiftId, shifttable.Name, workShift.WorkDate }
                         by new { shifttable.Name, workShift.WorkDate, shifttable.From, shifttable.To, shifttable.Id }
@@ -287,7 +288,8 @@ namespace DATN.Aplication.Services
                         on workShift.Id equals schedule.WorkShiftId
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
-                        where shifttable.Id == shift
+                        where shifttable.Id == shift &&
+                        user.IsDeleted == false
                         select new ScheduleView
                         {
                             Name = user.FullName,
@@ -310,6 +312,7 @@ namespace DATN.Aplication.Services
                         on schedule.UserId equals user.Id
                         where shifttable.Id == shift && workShift.WorkDate.Year == workdate.Year
                         && workShift.WorkDate.Month == workdate.Month && workShift.WorkDate.Day == workdate.Day
+                        && user.IsDeleted == false
                         select new NumberOfScheduleView
                         {
                             FullName = user.FullName,
@@ -336,6 +339,7 @@ namespace DATN.Aplication.Services
                         workShift.WorkDate.Year == workDate.Year &&
                         workShift.WorkDate.Month == workDate.Month &&
                         workShift.WorkDate.Day == workDate.Day
+                        && user.IsDeleted == false
                         select new UserInfView
                         {
                             UserName = user.UserName,

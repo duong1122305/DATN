@@ -180,7 +180,7 @@ else
                 }
                 else
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(7).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate.Month > dateNow.Month ? c.WorkDate.Day > 0 : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(7).ToList();
                 }
             }
         }

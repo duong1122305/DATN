@@ -12,7 +12,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> GetByIdRemove(string id);
         Task<ResponseData<string>> Login(UserLoginView user);
         Task<ResponseMail> ForgotPassword(string mail);
-        Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView,string id);
+        Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView, string id);
         Task<ResponseData<string>> activeUser(string id);
         Task<ResponseData<string>> Register(UserRegisterView userRegisterView);
 
@@ -23,5 +23,7 @@ namespace DATN.ADMIN.IServices
         //Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest);
         Task<ResponseData<UserInfView>> GetInfoUser(string id);
         Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView);
+        Task<ResponseData<string>> CheckCodeOtp(string username, string code);
+        Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView);
     }
 }
