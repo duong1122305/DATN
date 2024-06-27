@@ -11,18 +11,18 @@
             <MudCardContent>
                 @if (id == null || id == 0)
                 {
-                    @* <MudSelect T="int" Margin="Margin.Dense"
-                Label="Chọn dịch vụ"
-                For="@(() => createServiceDetailVM.ServiceId)">
-                <MudSelectItem Value="0">Chọn loại</MudSelectItem>
-                @foreach (var item in lstService)
-                {
-                if (!item.IsDetele)
-                {
-                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                }
-                }
-                </MudSelect> *@
+                    @* <MudSelect T="CreateServiceDetailVM" Margin="Margin.Dense"
+                               Label="Chọn dịch vụ"
+                               For="@(() => createServiceDetailVM.ServiceId)">
+                        <MudSelectItem Value="0">Chọn loại</MudSelectItem>
+                        @foreach (var item in lstService)
+                        {
+                            if (!item.IsDetele)
+                            {
+                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        }
+                    </MudSelect> *@
                     <div class="mud-select">
                         <select @bind="createServiceDetailVM.ServiceId">
                             @foreach (var i in lstService)
