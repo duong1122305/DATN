@@ -24,7 +24,7 @@
                         }
                     </MudSelect> *@
                     <div class="mud-select">
-                        <select @bind="createServiceDetailVM.ServiceId">
+                        <select @bind="createServiceDetailVM.ServiceId" required>
                             @foreach (var i in lstService)
                             {
                                 <option value="@i.Id">@i.Name</option>
