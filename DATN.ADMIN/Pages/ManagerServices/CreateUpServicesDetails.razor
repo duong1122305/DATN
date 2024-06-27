@@ -168,7 +168,6 @@
             var findServiceDetailById = await _serviceDetailService.GetById(id);
             var data = findServiceDetailById.Data;
 
-            updateServiceDetailVM.ServiceDetailName = data.Name;
             updateServiceDetailVM.Price = data.Price;
             updateServiceDetailVM.Duration = data.Duration;
             updateServiceDetailVM.Description = data.Description;

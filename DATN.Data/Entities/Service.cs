@@ -15,6 +15,7 @@ namespace DATN.Data.Entities
         public int Id { get; set; } // Khóa chính
 
         public string Name { get; set; } // Tên dịch vụ
+        public string? Desciption { get; set; }
         public bool IsDetele { get; set; } = false;
 
         // Quan hệ một-nhiều: Mỗi dịch vụ có thể được bán trong nhiều gói dịch vụ (combo)

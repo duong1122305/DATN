@@ -27,19 +27,11 @@ namespace DATN.Aplication.Services
                 var newServiceDetail = new ServiceDetail
                 {
                     ServiceId = serviceDetail.ServiceId,
-                    Name = serviceDetail.Name.TrimStart().TrimEnd(),
                     Price = serviceDetail.Price,
                     Duration = serviceDetail.Duration,
                     Description = serviceDetail.Description,
                     CreateAt = DateTime.Now
                 };
-                foreach (var i in await _unitOfWork.ServiceDetailRepository.GetAllAsync())
-                {
-                    if (i.Name == serviceDetail.Name)
-                    {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại !" };
-                    }
-                }
 
                 if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.Name) == false)
                 {
@@ -142,7 +134,6 @@ namespace DATN.Aplication.Services
             try
             {
                 var findServiceDetailById = await _unitOfWork.ServiceDetailRepository.GetAsync(id);
-                findServiceDetailById.Name = serviceDetail.ServiceDetailName.TrimStart().TrimEnd();
                 findServiceDetailById.Price = serviceDetail.Price;
                 findServiceDetailById.Duration = serviceDetail.Duration;
                 findServiceDetailById.Description = serviceDetail.Description;
@@ -188,7 +179,6 @@ namespace DATN.Aplication.Services
                          select new GetServiceNameVM
                          {
                              ServiceDetailId = sd.Id,
-                             ServiceDetailName = sd.Name,
                              ServiceName = sv.Name,
                              Price = sd.Price,
                              Duration = sd.Duration,

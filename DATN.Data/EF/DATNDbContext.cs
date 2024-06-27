@@ -36,6 +36,7 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new ShiftConfig());
             builder.ApplyConfiguration(new TypePaymentConfig());
             builder.ApplyConfiguration(new WorkShiftConfig());
+            builder.ApplyConfiguration(new ImagePetConfig());
         }
 
         public DbSet<ActionBooking> ActionBookings { get; set; }
@@ -57,5 +58,6 @@ namespace DATN.Data.EF
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<TypePayment> TypePayments { get; set; }
         public DbSet<WorkShift> WorkShifts { get; set; }
+        public DbSet<ImagePet> ImagePets { get; set; }
     }
 }
