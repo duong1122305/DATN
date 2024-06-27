@@ -144,7 +144,7 @@ namespace DATN.Aplication.Services
                     Data = query.ToList()
                 };
             else
-                return new ResponseData<List<VoucherView>> { IsSuccess = false, Error = "Chưa có voucher nào" };
+                return new ResponseData<List<VoucherView>> { IsSuccess = false, Error = "Chưa có voucher nào", Data = new List<VoucherView>() };
         }
 
         public async Task<ResponseData<string>> ExpiresVoucher(int id)

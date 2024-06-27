@@ -14,20 +14,11 @@ namespace DATN.API.Migrations
                 name: "IsDeleted",
                 table: "Discounts");
 
-            migrationBuilder.AddColumn<int>(
-                name: "Status",
-                table: "Discounts",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Status",
-                table: "Discounts");
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsDeleted",
