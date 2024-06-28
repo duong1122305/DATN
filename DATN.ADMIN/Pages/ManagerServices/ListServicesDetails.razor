@@ -30,8 +30,16 @@
         </TemplateColumn>
         <PropertyColumn Property="x => x.ServiceName" Title="Tên dịch vụ" Sortable="false" Filterable="false" />
         <PropertyColumn Property="x => x.ServiceDetailName" Title="Tên chi tiết" Sortable="false" Filterable="false" />
-        <PropertyColumn Property="x => x.Price" Title="Giá" Sortable="false" Filterable="false" />
-        <PropertyColumn Property="x => x.Description" Title="Thời gian làm" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
+                <CellTemplate>
+                <span style="text-align:center;">@CurrencyHelper.FormatCurrency(context.Item.Price)</span>
+            </CellTemplate>
+            </TemplateColumn>
+        <TemplateColumn Title="Thời gian làm" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span style="text-align:center;">@context.Item.Duration phút</span>
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
         <PropertyColumn Property="x => x.CreatedAt" Title="Ngày tạo" Sortable="false" Filterable="false" />
         <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
@@ -65,7 +73,6 @@
             </CellTemplate>
         </PropertyColumn>
     </Columns>
-    @* <MudTd DataLabel="Name" Style="text-align:center;">@CurrencyHelper.FormatCurrency(context.Price)</MudTd> *@
     <PagerContent>
         <MudDataGridPager T="GetServiceNameVM" />
     </PagerContent>
