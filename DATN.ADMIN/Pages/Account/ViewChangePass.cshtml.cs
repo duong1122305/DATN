@@ -9,14 +9,35 @@ namespace DATN.ADMIN.Pages.Account
     {
         IHttpContextAccessor _httpContextAccessor;
         IUserClientSev _userClientSev;
-        [BindProperty(SupportsGet = true)]
+        [BindProperty]
         public string password { get; set; }
-        [BindProperty(SupportsGet = true)]
+        [BindProperty]
         public string password_re { get; set; }
         public ViewChangePassModel(IUserClientSev userClientSev, IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
             _userClientSev = userClientSev;
+        }
+        public void OnGet()
+        {
+            try
+            {
+                var checkuser = _httpContextAccessor.HttpContext.Session.GetString("username");
+                var checkotp = _httpContextAccessor.HttpContext.Session.GetString("otp");
+                if (checkuser == null)
+                {
+                    _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/quenMatKhau"));
+                }
+                else if (checkotp == null)
+                {
+                    _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/OTP"));
+                }
+
+            }
+            catch (Exception)
+            {
+                _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+            }
         }
         public async Task ResetPass()
         {

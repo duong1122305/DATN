@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @namespace DATN.ADMIN.Pages
 @model ViewChangePassModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +29,7 @@
                             </div>
                             <div>
                                 <div class="my-4">Quên mật khẩu? Bạn hãy cố nhớ lại mật khẩu cũ của mình!.</div>
-                                <form method="get">
+                                <form method="post">
                                     <input type="hidden">
                                     <!-- Email Address -->
                                     <div class="mt-2">

@@ -122,6 +122,7 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<VoucherView>>> GetAllVoucher()
         {
+            var dateNow= DateTime.Now;
             var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
                         select new VoucherView
                         {
@@ -137,6 +138,18 @@ namespace DATN.Aplication.Services
                             Quantity = discount.Quantity,
                             Status = discount.Status
                         };
+            var querycheck = (from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
+                             select discount).ToList();
+            List<Discount> listcheck= new List<Discount>();
+            foreach (var item in querycheck)
+            {
+                if (item.EndDate<dateNow)
+                {
+                    item.Status = VoucherStatus.Expired;
+                    listcheck.Add(item);
+                }
+            }
+            await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
             if (query.Count() > 0)
                 return new ResponseData<List<VoucherView>>
                 {

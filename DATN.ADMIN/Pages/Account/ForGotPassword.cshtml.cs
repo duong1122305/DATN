@@ -8,10 +8,18 @@ namespace DATN.ADMIN.Pages.Account
     {
         private readonly IUserClientSev _userClienSev;
         private readonly IHttpContextAccessor _contextAccessor;
-        [BindProperty(SupportsGet = true)]
+        [BindProperty]
         public string email { get; set; }
         public void OnGet()
         {
+            if (email == null)
+            {
+                var checkSpam = _contextAccessor.HttpContext.Session.GetString("username");
+                if (checkSpam != null)
+                {
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/OTP"));
+                }
+            }
         }
         public ForGotPasswordModel(IUserClientSev userClient, IHttpContextAccessor httpContextAccessor)
         {
@@ -23,15 +31,7 @@ namespace DATN.ADMIN.Pages.Account
         {
             try
             {
-                if (email == null)
-                {
-                    var checkSpam = _contextAccessor.HttpContext.Session.GetString("username");
-                    if (checkSpam != null)
-                    {
-                        _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/OTP"));
-                    }
-                }
-                else
+                if (email != null)
                 {
                     var respone = await _userClienSev.ForgotPassword(email);
                     if (respone.IsSuccess)
