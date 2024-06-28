@@ -40,7 +40,7 @@
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
-           
+
         </ToolBarContent>
         <Columns>
             <TemplateColumn Title="Ngày thực hiện" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
@@ -172,15 +172,15 @@ else
             {
                 if (selectedTimeRange > 0)
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate.Month > dateNow.Month ? c.WorkDate.Day > 0 : c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(selectedTimeRange).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate >= dateNow.Date && c.WorkDate <= dateNow.AddDays(selectedTimeRange-1)).ToList();
                 }
                 else if (selectedTimeRange < 0)
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate.Day <= dateNow.Day && c.WorkDate.Month <= dateNow.Month && c.WorkDate.Year == dateNow.Year).OrderByDescending(c => c.WorkDate).Take(-selectedTimeRange).OrderBy(c => c.WorkDate).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate >= dateNow.AddDays(selectedTimeRange) && c.WorkDate <= dateNow).OrderBy(c => c.WorkDate).ToList();
                 }
                 else
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate.Day >= dateNow.Day && c.WorkDate.Month >= dateNow.Month && c.WorkDate.Year == dateNow.Year).Take(7).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate >= dateNow.Date && c.WorkDate <= dateNow.AddDays(6)).ToList();
                 }
             }
         }
