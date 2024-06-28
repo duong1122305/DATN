@@ -23,20 +23,21 @@
             </MudSelect>
        </div>
        <div style="margin-left:15px;display:flex">
-           <div>
-                <MudStack>
-                    <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
-                                        AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
-                        <PickerActions>
-                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
-                            <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
-                            @* <MudButton Color="Color.Primary" OnClick="@SearchByDate">Ok</MudButton> *@
-                            <MudButton OnClick="@SearchByDate">Tìm kiếm</MudButton>
-                        </PickerActions>
-                    </MudDateRangePicker>
-                </MudStack>
-           </div>
-          
+               <div>
+                    <MudStack>
+                        <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
+                                            AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
+                            <PickerActions>
+                                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
+                                <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
+                                <MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
+                            </PickerActions>
+                        </MudDateRangePicker>
+                    </MudStack>
+               </div>
+                <div style="margin-top:20px">
+                    <MudButton OnClick="@SearchByDate">Tìm kiếm</MudButton>
+                </div>
        </div>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
@@ -168,7 +169,6 @@
         {
             lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.NotOccur).ToList();
         }
-        await SearchByDate();
     }
     // lọc ngày
     private async Task SearchByDate()
@@ -176,17 +176,26 @@
         var voucher = await _client.GetAll();
         if (_dateRange != null && _dateRange.Start.HasValue && _dateRange.End.HasValue)
         {
-            lstVoucher = voucher.Data.Where(x =>
-                x.StartDate.Date >= _dateRange.Start.Value.Date &&
-                x.EndDate.Date <= _dateRange.End.Value.Date
-            ).ToList();
+            var lstFilter = voucher.Data.Where(x =>
+                 x.StartDate.Date >= _dateRange.Start.Value.Date &&
+                 x.EndDate.Date <= _dateRange.End.Value.Date
+             ).ToList();
+            if (lstFilter.Any())
+            {
+                lstVoucher = lstFilter;
+            }
+            else
+            {
+                lstVoucher = null;
+                Message("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
+                await LoadData();
+            }
         }
+      
         else
         {
             lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList(); // Không có khoảng ngày, hiển thị tất cả
         }
-        StateHasChanged();
-        _picker.Close();
     }
 
 
