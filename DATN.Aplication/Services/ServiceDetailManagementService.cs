@@ -30,8 +30,8 @@ namespace DATN.Aplication.Services
                     Price = serviceDetail.Price,
                     Duration = serviceDetail.Duration,
                     Description = serviceDetail.Description,
-                    MinWeight = serviceDetail.MinWeight,
-                    MaxWeight = serviceDetail.MaxWeight,
+                    MinWeight = Convert.ToSingle(serviceDetail.MinWeight),
+                    MaxWeight = Convert.ToSingle(serviceDetail.MaxWeight),
                     CreateAt = DateTime.Now
                 };
 
@@ -67,9 +67,9 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<List<ServiceDetail>>> GetAllService()
         {
             var query = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
-            var result = query.OrderByDescending(c => c.Id).ToList();
+            var result = query;
             if (result.Count() > 0)
-                return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = result };
+                return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = result.ToList() };
             else
                 return new ResponseData<List<ServiceDetail>> { IsSuccess = false, Error = "Không có dịch vụ nào" };
         }

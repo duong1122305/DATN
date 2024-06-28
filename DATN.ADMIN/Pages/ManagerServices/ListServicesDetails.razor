@@ -113,7 +113,7 @@
 
         if (result != null)
         {
-            lstServiceName = result;
+            lstServiceName = result.OrderByDescending(c => c.ServiceDetailId).ToList();
         }
     }
 

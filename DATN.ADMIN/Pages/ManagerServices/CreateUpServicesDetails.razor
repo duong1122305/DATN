@@ -12,13 +12,14 @@
                 @if (id == null || id == 0)
                 {
                     <div class="mud-select">
+                        <label class="mud-input-label">Chọn dịch vụ</label>
                         <select @bind="createServiceDetailVM.ServiceId" required>
+                            <option value="0">Dịch vụ</option>
                             @foreach (var i in lstService)
                             {
                                 <option value="@i.Id">@i.Name</option>
                             }
                         </select>
-                        <label class="mud-input-label">Chọn dịch vụ</label>
                     </div>
                     <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
                     <MudTextField T="float" Label="Cân nặng tối thiểu" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
