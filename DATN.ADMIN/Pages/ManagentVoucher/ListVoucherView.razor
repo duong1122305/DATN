@@ -10,35 +10,37 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách mã giảm giá</PageTitle>
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách mã giảm giá</MudText>
+<div style="display:flex">
+    <div style="width:200px">
+        <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+                   ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
+            <MudSelectItem Value="Status.GoingOn">Hoạt động</MudSelectItem>
+            <MudSelectItem Value="Status.NotOccur">Chưa bắt đầu</MudSelectItem>
+            <MudSelectItem Value="Status.Expired">Hết hạn</MudSelectItem>
+        </MudSelect>
+    </div>
+    <div style="margin-left:15px;display:flex">
+        <div>
+            <MudStack>
+                <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
+                                    AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
+                    <PickerActions>
+                        <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
+                        <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
+                    </PickerActions>
+                </MudDateRangePicker>
+            </MudStack>
+        </div>
+        <div style="margin-top:20px">
+            <MudButton OnClick="@SearchByDate">Tìm kiếm</MudButton>
+        </div>
+    </div>
+</div>
 
 <MudDataGrid Items="@lstVoucher" Hover="true" QuickFilter="@_quickFilter" Filterable="true" >
     <ToolBarContent>
-       <div>
-            <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
-                       ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
-                <MudSelectItem Value="Status.GoingOn">Hoạt động</MudSelectItem>
-                <MudSelectItem Value="Status.NotOccur">Chưa bắt đầu</MudSelectItem>
-                <MudSelectItem Value="Status.Expired">Hết hạn</MudSelectItem>
-            </MudSelect>
-       </div>
-       <div style="margin-left:15px;display:flex">
-               <div>
-                    <MudStack>
-                        <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
-                                            AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
-                            <PickerActions>
-                                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
-                                <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
-                                <MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
-                            </PickerActions>
-                        </MudDateRangePicker>
-                    </MudStack>
-               </div>
-                <div style="margin-top:20px">
-                    <MudButton OnClick="@SearchByDate">Tìm kiếm</MudButton>
-                </div>
-       </div>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
