@@ -69,6 +69,8 @@ builder.Services.AddScoped<IPetSpeciesManagerService, PetSpeciesManagerService>(
 builder.Services.AddScoped<IPetManagerService, PetManagerService>();
 builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
 builder.Services.AddScoped<IServiceDetailManagementService, ServiceDetailManagementService>();
+builder.Services.AddScoped<ICategoryManagement, CategoryManagement>();
+
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

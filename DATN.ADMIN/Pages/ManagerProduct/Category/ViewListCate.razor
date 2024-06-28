@@ -17,11 +17,11 @@
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 
 
-<MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
+@* <MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
     <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
     <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
     <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
-</MudSelect>
+</MudSelect> *@
 
 
 @if (lstCate.Count > 0 && lstCate != null)
@@ -42,7 +42,7 @@
             <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
                 <TemplateColumn Title="Trạng thái">
                 <CellTemplate>
-                    @if (context.Item.Status == true)
+                    @if (context.Item.IsDeleted == true)
                     {
                         <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
                     }
@@ -55,7 +55,7 @@
                 <TemplateColumn Title="Hành động">
                 <CellTemplate>
                     <MudButtonGroup Variant="Variant.Filled">
-                        @if (context.Item.Status == true)
+                        @if (context.Item.IsDeleted == true)
                         {
                             <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.Item.Id))"></MudIconButton>
                         }
@@ -89,6 +89,8 @@ else
     private bool _disableElevation = false;
     private string searchString = "";
     private List<CategoryView> lstCate = new List<CategoryView>();
+    [Inject]
+    private ICategoryServices _client { get; set; }
 
 
     private enum UserStatus
@@ -100,23 +102,31 @@ else
 
     private UserStatus selectedStatus = UserStatus.All;
 
+
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        // await LoadData();
 
     }
 
     // load lai du lieu
     protected async Task LoadData()
     {
-       
+        var respone = await _client.ListCategory();
+        if (respone.IsSuccess)
+        {
+            lstCate = respone.Data;
+        }else
+        {
+            lstCate = new List<CategoryView>();
+        }
     }
 
-    private async Task HandleStatusChange(ChangeEventArgs e)
-    {
-        selectedStatus = (UserStatus)e.Value;
-        await LoadData();
-    }
+    // private async Task HandleStatusChange(ChangeEventArgs e)
+    // {
+    //     selectedStatus = (UserStatus)e.Value;
+    //     await LoadData();
+    // }
 
     private Func<CategoryView, bool> _quickFilter => x =>
      {
@@ -175,49 +185,33 @@ else
     }
 
     //thêm sửa !
-    private async Task OpenDialog(int? username)
+    private async Task OpenDialog(int? id)
     {
-        // if (isEditing)
-        // {
-        //     return; // Exit if already editing
-        // }
 
-        // isEditing = true; // Set flag to true to indicate editing in progress
-        // var parameters = new DialogParameters();
-        // string nameDialog = "Thêm mới nhân viên";
-        // if (username != null)
-        // {
-        //     _userView = lstUser.FirstOrDefault(c => c.UserName == username);
-        //     var updateView = new UserRegisterView()
-        //         {
-        //             FullName = _userView.FullName,
-        //             Address = _userView.Address,
-        //             PhoneNumber = _userView.PhoneNumber,
-        //             Email = _userView.Email,
-        //             Gender = _userView.Gender == "Nam" ? true : false
-        //         };
-        //     parameters.Add("username", username);
-        //     parameters.Add("user", updateView);
-        //     nameDialog = "Cập nhật nhân viên";
-        // }
-        // DialogOptions options = new DialogOptions()
-        //     {
-        //         CloseOnEscapeKey = true,
-        //         Position = DialogPosition.Center,
-        //         MaxWidth = MaxWidth.Small,
-        //         CloseButton = true,
-        //         FullWidth = true,
-        //         DisableBackdropClick = true
-        //     };
-        // var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
-        // var result = await createUpdateDialog.Result;
-        // isEditing = false;
-        // if (!result.Canceled)
-        // {
-        //     createUpdateDialog.Close();
-        //     await LoadData();
-        //     StateHasChanged();
-        // }
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới danh mục";
+        if (id != null)
+        {
+            parameters.Add("id", id);
+            nameDialog = "Cập nhật danh mục";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateCategory>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
     }
 
     // private void HandleShiftChange(ChangeEventArgs e)

@@ -17,20 +17,20 @@ namespace DATN.API.Controllers
             _categoryManagement = categoryManagement;
         }
         [HttpPost("Create-Category")]
-        public Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
+        public async Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
         {
-            return _categoryManagement.CreateCategory(categoryView);
+            return await _categoryManagement.CreateCategory(categoryView);
         }
         [HttpPut("Update-Category")]
 
-        public Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
+        public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
         {
-            return _categoryManagement.UpdateCategory(categoryView);
+            return await _categoryManagement.UpdateCategory(categoryView);
         }
         [HttpGet("Remove-Category")]
-        public Task<ResponseData<string>> RemoveCategory(int id)
+        public async Task<ResponseData<string>> RemoveCategory(int id)
         {
-            return _categoryManagement.RemoveCategory(id);
+            return await _categoryManagement.RemoveCategory(id);
         }
         [HttpGet("List-Category")]
         public async Task<ResponseData<List<CategoryView>>> ListCategory()
@@ -38,9 +38,9 @@ namespace DATN.API.Controllers
             return await _categoryManagement.ListCategory();
         }
         [HttpGet("Active-Category")]
-        public Task<ResponseData<string>> ActiveCategory(int id)
+        public async Task<ResponseData<string>> ActiveCategory(int id)
         {
-            return _categoryManagement.Active(id);
+            return await _categoryManagement.Active(id);
         }
     }
 }
