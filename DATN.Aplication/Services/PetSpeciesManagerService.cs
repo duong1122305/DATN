@@ -21,10 +21,24 @@ namespace DATN.Aplication.Services
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
+		private async Task<bool> PetNameIsExist(string name, int id)
+		{
+			var result = await _unitOfWork.PetSpeciesRepository.FindAsync(p => p.Name.ToLower() == name.ToLower()&& p.Id!=id);
+			if (result == null|| result.Count()<1)
+            {
+                return false;
+            }
+			return true;
+
+        }
 		public async Task<ResponseData<string>> Create(PetSpeciesCreateUpdate request)
 		{
 			try
 			{
+				if(await PetNameIsExist(request.Name, request.Id))
+				{
+					return new ResponseData<string>(false, "Tên pet đã tồn tại");
+				}
 				var data = new PetSpecies()
 				{
 					Name = request.Name,
@@ -141,6 +155,11 @@ namespace DATN.Aplication.Services
 
 			try
 			{
+				request.Name= request.Name.Trim();
+				if (await PetNameIsExist(request.Name, request.Id))
+				{
+					return new ResponseData<string>(false, "Tên loài đã tồn tại");
+				}
 				var data = new PetSpecies()
 				{
 					Name = request.Name,

@@ -71,7 +71,7 @@ namespace DATN.Aplication.Services
             {
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
                 var lstPet = await _unitOfWork.PetRepository.GetAllAsync();
-                var response = result.Where(p => p.IsComfirm == true).OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
+                var response = result.OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
                 {
                     Address = p.Address,
                     Email = p.Email,
@@ -82,6 +82,7 @@ namespace DATN.Aplication.Services
                     Password = p.PasswordHash != null ? _passwordExtensitons.Decrypt(p.PasswordHash) : "",
                     PhoneNumber = p.PhoneNumber,
                     UserName = p.UserName,
+                    IsConfirm=p.IsComfirm
                 }).ToList();
                 foreach (var item in response)
                 {

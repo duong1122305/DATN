@@ -117,7 +117,8 @@ namespace DATN.ADMIN.Services
 				return null;
 			}
 			var arrAddress = addressCode.Split('!');
-			return arrAddress[1]+", "+ arrAddress[2];
+			if (!string.IsNullOrEmpty(arrAddress[1]))return arrAddress[1]+", "+ arrAddress[2];
+			return arrAddress[2];
 		}
 	}
 }

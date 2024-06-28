@@ -13,6 +13,7 @@ namespace DATN.ViewModels.DTOs.Pet
 		[Required(ErrorMessage ="Tạo thú cưng phải thêm chủ")]
 		public Guid OwnerId { get; set; } // Khóa ngoại đến ID chủ nhân
 		[Required(ErrorMessage ="Phải có loài")]
+		
 		public int SpeciesId { get; set; } // Khóa ngoại đến ID giống thú cưng
 		[Required(ErrorMessage = "Phải nhập tên thú cưng")]
 		public string Name { get; set; } // Tên thú cưng
@@ -21,6 +22,7 @@ namespace DATN.ViewModels.DTOs.Pet
 
 		public DateTime? Birthday { get; set; } // Ngày sinh
 		[Range(0.2,50,ErrorMessage ="Không con pet nào cân nặng như vậy cả")]
+		[Required(ErrorMessage ="Phải nhập trường này ")]
 		public float? Weight { get; set; } // Cân nặng
 
 		public bool? Neutered { get; set; } // Đã triệt sản chưa
