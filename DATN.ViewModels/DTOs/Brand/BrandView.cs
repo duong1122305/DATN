@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.Data.Entities
+namespace DATN.ViewModels.DTOs.Brand
 {
-    public class Brand
+    public class BrandView
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public bool Status { get; set; }
-        public virtual Product Product { get; set; }
+        public bool? Status { get; set; }
     }
 }

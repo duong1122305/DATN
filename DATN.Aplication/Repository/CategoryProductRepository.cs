@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
-    public class CategoryProductRepository : GenericRepository<CategoryProductRepository>, ICategoryProductRepository
+    public class CategoryProductRepository : GenericRepository<CategoryProduct>, ICategoryProductRepository
     {
         public CategoryProductRepository(DATNDbContext context) : base(context)
         {
