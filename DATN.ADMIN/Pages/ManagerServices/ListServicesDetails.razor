@@ -14,61 +14,62 @@
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
 
 <MudButton Variant="Variant.Filled" Href="/ListServices" Style="margin-block-end" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Danh sách dịch vụ</MudButton>
-<MudTable Items="@lstServiceName">
+
+<MudDataGrid Items="@lstServiceName" QuickFilter="@_quickFilter" Filterable="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Danh sách dịch vụ chi tiết</MudText>
         <MudSpacer />
-        <MudTextField T="string" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh Style="text-align:center;">STT</MudTh>
-        <MudTh Style="text-align:center;">Tên dịch vụ</MudTh>
-        <MudTh Style="text-align:center;">Tên chi tiết</MudTh>
-        <MudTh Style="text-align:center;">Giá</MudTh>
-        <MudTh Style="text-align:center;">Thời gian làm</MudTh>
-        <MudTh Style="text-align:center;">Mô tả</MudTh>
-        <MudTh Style="text-align:center;">Ngày tạo</MudTh>
-        <MudTh Style="text-align:center;">Trạng thái</MudTh>
-        <MudTh Style="text-align:center;">Hành động</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="STT" Style="text-align:center;">
-            @(lstServiceName.IndexOf(context) + 1)
-        </MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceName</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceDetailName</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@CurrencyHelper.FormatCurrency(context.Price)</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.Duration Phút</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.CreatedAt</MudTd>
-        @if (!context.IsDeleted)
-        {
-            <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
-            </MudTd>
-        }
-        else
-        {
-            <MudTd DataLabel="Email" Style="text-align:center;">
-                <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
-            </MudTd>
-        }
-        <MudTd Style="text-align:center;">
-            <MudButton IconSize="Size.Large"
-                       OnClick="async () => await UpdateStatusService(context.ServiceDetailId)"
-                       StartIcon="@(context.IsDeleted ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
-                       IconColor="@(context.IsDeleted ? Color.Surface : Color.Error)"
-                       title="@(context.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
+    <Columns>
+        <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span>@(lstServiceName.IndexOf(context.Item) + 1)</span>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.ServiceName" Title="Tên dịch vụ" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x => x.ServiceDetailName" Title="Tên chi tiết" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x => x.Price" Title="Giá" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x => x.Description" Title="Thời gian làm" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x => x.CreatedAt" Title="Ngày tạo" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @if (!context.Item.IsDeleted)
+                {
+                    <span>
+                        <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+                    </span>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.ServiceDetailId" Title="Hành động" Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudButton IconSize="Size.Large"
+                               OnClick="async () => await UpdateStatusService(context.Item.ServiceDetailId)"
+                               StartIcon="@(context.Item.IsDeleted ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
+                               IconColor="@(context.Item.IsDeleted ? Color.Surface : Color.Error)"
+                               title="@(context.Item.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
 
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.ServiceDetailId))"></MudButton>
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(context.ServiceDetailId))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
-        </MudTd>
-
-    </RowTemplate>
+                    <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.Item.ServiceDetailId))"></MudButton>
+                    <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => await OpenViewDetails(context.Item.ServiceDetailId))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+                </MudButtonGroup>
+            </CellTemplate>
+        </PropertyColumn>
+    </Columns>
+    @* <MudTd DataLabel="Name" Style="text-align:center;">@CurrencyHelper.FormatCurrency(context.Price)</MudTd> *@
     <PagerContent>
-        <MudTablePager />
+        <MudDataGridPager T="GetServiceNameVM" />
     </PagerContent>
-</MudTable>
+</MudDataGrid>
 <MudDrawer @bind-Open="@open" Anchor="@anchor" Elevation="2" Variant="@DrawerVariant.Temporary" Width="800px">
     <div style="margin-block-end">
         <MudText Typo="Typo.h6">CHI TIẾT DỊCH VỤ</MudText>
@@ -101,6 +102,7 @@
 </style>
 @code {
     // private List<ServiceDetail> lstServiesDetails = new List<ServiceDetail>();
+    private string searchString = "";
     private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
@@ -134,6 +136,18 @@
         this.anchor = anchor;
 
     }
+    private Func<GetServiceNameVM, bool> _quickFilter => x =>
+       {
+           if (string.IsNullOrWhiteSpace(searchString))
+               return true;
+           if (x.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+               return true;
+           // if (x.ServiceDetailName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+           //     return true; khi nào có thông tin ở trường này thì bỏ cmt 
+           if ($"{x.Description} {x.Price} {x.Duration}".Contains(searchString.Trim()))
+               return true;
+           return false;
+       };
 
     private async Task OpenDialog(int? id)
     {
