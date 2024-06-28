@@ -44,7 +44,8 @@ namespace DATN.Aplication.Services
                             Quantity = voucherView.Quantity,
                         };
                         var dateNow = DateTime.Now;
-                        if (voucher.StartDate.Year < dateNow.Year || voucher.StartDate.Month < dateNow.Month || voucher.StartDate.Day < dateNow.Day)
+                        var voucherStartDate = voucher.StartDate.Date;
+                        if (voucherStartDate.CompareTo(dateNow.Date) < 0)
                         {
                             return new ResponseData<string> { IsSuccess = false, Error = "Ngày bắt đầu phải lớn hơn ngày hiện tại" };
                         }

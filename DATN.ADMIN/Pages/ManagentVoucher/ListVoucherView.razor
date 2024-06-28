@@ -9,10 +9,35 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 <PageTitle>Danh sách mã giảm giá</PageTitle>
+<MudText Typo="Typo.h4" Style="text-align:center">Danh sách mã giảm giá</MudText>
 
 <MudDataGrid Items="@lstVoucher" Hover="true" QuickFilter="@_quickFilter" Filterable="true" >
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Danh sách mã giảm giá</MudText>
+       <div>
+            <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+                       ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
+                <MudSelectItem Value="Status.GoingOn">Hoạt động</MudSelectItem>
+                <MudSelectItem Value="Status.NotOccur">Chưa bắt đầu</MudSelectItem>
+                <MudSelectItem Value="Status.Expired">Hết hạn</MudSelectItem>
+            </MudSelect>
+       </div>
+       <div style="margin-left:15px;display:flex">
+           <div>
+                <MudStack>
+                    <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
+                                        AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
+                        <PickerActions>
+                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
+                            <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
+                            @* <MudButton Color="Color.Primary" OnClick="@SearchByDate">Ok</MudButton> *@
+                            <MudButton OnClick="@SearchByDate">Tìm kiếm</MudButton>
+                        </PickerActions>
+                    </MudDateRangePicker>
+                </MudStack>
+           </div>
+          
+       </div>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
@@ -95,6 +120,29 @@
     [Inject]
     private IVoucherServices _client { get; set; }
 
+
+    private MudDateRangePicker _picker;
+    private DateRange _dateRange;
+    private bool _autoClose;
+
+
+
+    private enum Status
+    {
+        Expired = -1,
+        All = 0, //hết hạn
+        GoingOn = 1, //còn hạn
+        NotOccur = 2 //chưa bắt đầu
+    }
+
+    private Status selectedStatus = Status.All;
+
+    private async Task Change(Status selected)
+    {
+        selectedStatus = selected;
+        await LoadData();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -104,7 +152,43 @@
     {
         var voucher = await _client.GetAll();
         lstVoucher = voucher.Data.OrderByDescending(x=>x.Id).ToList();
+        if (selectedStatus == Status.All)
+        {
+            lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList();
+        }
+        else if (selectedStatus == Status.Expired)
+        {
+            lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.Expired).ToList();
+        }
+        else if (selectedStatus == Status.GoingOn)
+        {
+            lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.GoingOn).ToList();
+        }
+        else 
+        {
+            lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.NotOccur).ToList();
+        }
+        await SearchByDate();
     }
+    // lọc ngày
+    private async Task SearchByDate()
+    {
+        var voucher = await _client.GetAll();
+        if (_dateRange != null && _dateRange.Start.HasValue && _dateRange.End.HasValue)
+        {
+            lstVoucher = voucher.Data.Where(x =>
+                x.StartDate.Date >= _dateRange.Start.Value.Date &&
+                x.EndDate.Date <= _dateRange.End.Value.Date
+            ).ToList();
+        }
+        else
+        {
+            lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList(); // Không có khoảng ngày, hiển thị tất cả
+        }
+        StateHasChanged();
+        _picker.Close();
+    }
+
 
     private Func<VoucherView, bool> _quickFilter => x =>
      {
