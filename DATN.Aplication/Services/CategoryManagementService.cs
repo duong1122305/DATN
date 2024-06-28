@@ -1,6 +1,6 @@
-﻿using DATN.Data.Entities;
+﻿using DATN.Aplication.Services.IServices;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Brand;
 using DATN.ViewModels.DTOs.Category;
 using System;
 using System.Collections.Generic;
@@ -10,55 +10,56 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class BrandManagement
+    public class CategoryManagementService:ICategoryManagementService
     {
         IUnitOfWork _unitOfWork;
-        public BrandManagement(IUnitOfWork unitOfWork)
+        public CategoryManagementService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> CreateBrand(BrandView brandView)
+        public async Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
         {
+
             try
             {
-                var checkdup = from brand in await _unitOfWork.BrandRepository.GetAllAsync()
-                               where brand.Name == brandView.Name
-                               select brand;
+                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                               where cate.Name == categoryView.Name
+                               select cate;
                 if (checkdup.Count() == 0)
                 {
-                    var brand = new Brand()
+                    var category = new Category()
                     {
-                        Name = brandView.Name,
-                        Description = brandView.Description,
-                        Status = true,
+                        Name = categoryView.Name,
+                        Description = categoryView.Description,
                     };
-                    await _unitOfWork.BrandRepository.AddAsync(brand);
+                    await _unitOfWork.CategoryRepository.AddAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên hãng trùng với hãng đã có đã có" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
             }
             catch (Exception)
             {
                 return new ResponseData<string> { IsSuccess = false, Error = "Thêm không thành công " };
             }
         }
-        public async Task<ResponseData<string>> UpdateCategory(BrandView brandView)
+        public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
         {
+
             try
             {
-                var brand = (from cate in await _unitOfWork.BrandRepository.GetAllAsync()
-                                where cate.Id == brandView.Id
+                var category = (from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                                where cate.Id == categoryView.Id
                                 select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.BrandRepository.GetAllAsync()
-                               where cate.Name == brandView.Name
+                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                               where cate.Name == categoryView.Name
                                select cate;
-                if (brand.Id == checkdup.FirstOrDefault().Id)
+                if (category.Id == checkdup.FirstOrDefault().Id)
                 {
-                    brand.Name = brandView.Name;
-                    brand.Description = brandView.Description;
-                    await _unitOfWork.BrandRepository.UpdateAsync(brand);
+                    category.Name = categoryView.Name;
+                    category.Description = categoryView.Description;
+                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
@@ -76,14 +77,14 @@ namespace DATN.Aplication.Services
 
             try
             {
-                var brand = (from cate in await _unitOfWork.BrandRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
                                 where cate.Id == id
                                 select cate).FirstOrDefault();
-                if (brand != null)
+                if (category != null)
                 {
 
-                    brand.Status = false;
-                    await _unitOfWork.BrandRepository.UpdateAsync(brand);
+                    category.IsDeleted = true;
+                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
@@ -100,14 +101,14 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var brand = (from cate in await _unitOfWork.BrandRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
                                 where cate.Id == id
                                 select cate).FirstOrDefault();
-                if (brand != null)
+                if (category != null)
                 {
 
-                    brand.Status = false;
-                    await _unitOfWork.BrandRepository.UpdateAsync(brand);
+                    category.IsDeleted = false;
+                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
                 }
@@ -120,20 +121,21 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Active không thành công " };
             }
         }
-        public async Task<ResponseData<List<BrandView>>> ListBrand()
+        public async Task<ResponseData<List<CategoryView>>> ListCategory()
         {
-            var list = from cate in await _unitOfWork.BrandRepository.GetAllAsync()
-                       select new BrandView
+            var list = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                       select new CategoryView
                        {
                            Id = cate.Id,
                            Name = cate.Name,
                            Description = cate.Description,
-                           Status = cate.Status
+                           IsDeleted = cate.IsDeleted
                        };
             if (list.Count() > 0)
-                return new ResponseData<List<BrandView>> { IsSuccess = true, Data = list.ToList() };
+                return new ResponseData<List<CategoryView>> { IsSuccess = true, Data = list.ToList() };
             else
-                return new ResponseData<List<BrandView>> { IsSuccess = false, Data = new List<BrandView>(), Error = "Chưa có dữ liệu" };
+                return new ResponseData<List<CategoryView>> { IsSuccess = false, Data = new List<CategoryView>(), Error = "Chưa có dữ liệu" };
         }
     }
 }
+

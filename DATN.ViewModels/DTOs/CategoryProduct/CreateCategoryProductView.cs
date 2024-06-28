@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.CategoryProduct
 {
-    public class CategoryProductView
+    public class CreateCategoryProductView
     {
         public int? Id { get; set; }
         public string Name { get; set; }
-        public string Category { get; set; }
+        public int IdCategory { get; set; }
         public bool? IsDeleted { get; set; }
     }
 }
