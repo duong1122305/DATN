@@ -18,14 +18,14 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh Style="text-align:center;">STT</MudTh>
-        <MudTh Style="text-align:center;">VoucherName</MudTh>
-        <MudTh Style="text-align:center;">Voucher Code</MudTh>
-        <MudTh Style="text-align:center;">% Giảm giá</MudTh>
+        <MudTh Style="text-align:center;">Tên phiếu giảm giá</MudTh>
+        <MudTh Style="text-align:center;">Mã giảm giá</MudTh>
+        <MudTh Style="text-align:center;">% Giảm</MudTh>
         <MudTh Style="text-align:center;">Mô tả</MudTh>
-        <MudTh Style="text-align:center;">Ngày bắt đầu</MudTh>
-        <MudTh Style="text-align:center;">Ngày kết thúc</MudTh>
+        <MudTh Style="text-align:center;">Thời gian bắt đầu</MudTh>
+        <MudTh Style="text-align:center;">Thời gian kết thúc</MudTh>
         <MudTh Style="text-align:center;">Số tiền tối thiểu</MudTh>
-        <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
+        <MudTh Style="text-align:center;">Giảm tối đa</MudTh>
         <MudTh Style="text-align:center;">Trạng thái</MudTh>
         <MudTh Style="text-align:center;">Hành động</MudTh>
     </HeaderContent>
@@ -37,8 +37,8 @@
         <MudTd DataLabel="VoucherCode" Style="text-align:center;">@context.VoucherCode</MudTd>
         <MudTd DataLabel="DiscourPercent" Style="text-align:center;">@context.DiscountPercent</MudTd>
         <MudTd DataLabel="Description" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy")</MudTd>
-        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate</MudTd>
+        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate</MudTd>
         <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
         <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
         @if (context.Status == VoucherStatus.GoingOn)
