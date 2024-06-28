@@ -43,7 +43,6 @@ namespace DATN.API.Controllers
         [HttpPost("createServiceDetail")]
         public async Task<IActionResult> CreateServiceDetail(CreateServiceDetailVM serviceDetail)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var result = await _serviceDetailManagementService.CreateNewService(serviceDetail);
 

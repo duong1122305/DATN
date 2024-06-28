@@ -15,6 +15,7 @@ namespace DATN.ViewModels.DTOs.ServiceDetail
         [Range(1000, 9999999, ErrorMessage = "Giá không được nhỏ hơn 100 hoặc lớn hơn 9999999")]
         public float Price { get; set; } // Giá tiền
 
+        [Required(ErrorMessage = "Phải nhập thời gian ước tính")]
         [Range(1, 9999, ErrorMessage = "Thời gian phải lớn hơn 1 và ít hơn 9999")]
         public double Duration { get; set; } // Khoảng thời gian
 

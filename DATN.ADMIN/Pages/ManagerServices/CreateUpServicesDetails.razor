@@ -180,7 +180,15 @@
         {
             return;
         }
-        var result = await _serviceDetailService.Create(createServiceDetailVM);
+        var result = await _serviceDetailService.Create(new CreateServiceDetailVM
+            {
+                ServiceId = createServiceDetailVM.ServiceId,
+                Duration = createServiceDetailVM.Duration,
+                MinWeight = createServiceDetailVM.MinWeight,
+                MaxWeight = createServiceDetailVM.MaxWeight,
+                Price = createServiceDetailVM.Price,
+                Description = createServiceDetailVM.Description
+            });
         if (result.IsSuccess)
         {
             Message("Thành công", Severity.Success);

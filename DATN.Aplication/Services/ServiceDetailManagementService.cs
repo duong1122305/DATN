@@ -24,6 +24,11 @@ namespace DATN.Aplication.Services
         {
             try
             {
+                if(serviceDetail.Duration == 0 && serviceDetail.Price == 0 && serviceDetail.MinWeight == 0 && serviceDetail.MaxWeight == 0
+                    && string.IsNullOrEmpty(serviceDetail.Description) && serviceDetail.ServiceId == 0)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Bạn chưa nhập dữ liệu" };
+                }
                 var newServiceDetail = new ServiceDetail
                 {
                     ServiceId = serviceDetail.ServiceId,
