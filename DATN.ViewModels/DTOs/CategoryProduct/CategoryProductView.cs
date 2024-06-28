@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.ViewModels.DTOs.Category
+namespace DATN.ViewModels.DTOs.CategoryProduct
 {
-    public class CategoryView
+    public class CategoryProductView
     {
         public int? Id { get; set; }
         public string Name { get; set; }
-        public string? Description { get; set; }
+        public int IdCategory { get; set; }
         public bool? IsDeleted { get; set; }
     }
 }
