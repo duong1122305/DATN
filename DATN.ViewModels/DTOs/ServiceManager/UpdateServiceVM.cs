@@ -13,5 +13,7 @@ namespace DATN.ViewModels.DTOs.ServiceManager
         [MaxLength(50, ErrorMessage = "Tên dịch vụ không được quá 50 ký tự")]
         [MinLength(2, ErrorMessage = "Tên dịch vụ ít nhất 2 ký tự")]
         public string Name { get; set; }
+
+        public string? Description { get; set; }
     }
 }

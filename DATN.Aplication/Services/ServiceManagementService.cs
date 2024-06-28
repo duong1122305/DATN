@@ -24,7 +24,8 @@ namespace DATN.Aplication.Services
             {
                 var newService = new Service
                 {
-                    Name = service.Name.TrimStart().TrimEnd()
+                    Name = service.Name.TrimStart().TrimEnd(),
+                    Desciption = service.Description.TrimStart().TrimEnd(),
                 };
 
                 foreach (var i in await _unitOfWork.ServiceRepository.GetAllAsync())
@@ -108,6 +109,7 @@ namespace DATN.Aplication.Services
                 }
                 var findId = await _unitOfWork.ServiceRepository.GetAsync(id);
                 findId.Name = service.Name.TrimStart().TrimEnd();
+                findId.Desciption = service.Description.TrimStart().TrimEnd();
                 await _unitOfWork.ServiceRepository.UpdateAsync(findId);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công!" };

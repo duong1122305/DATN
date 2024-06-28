@@ -14,6 +14,12 @@ namespace DATN.Utilites.Check
             {
                 return true;
             }
+
+            if(float.TryParse(number, out _))
+            {
+                return true;
+            }
+
             return false;
         }
     }

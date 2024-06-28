@@ -26,6 +26,14 @@ namespace DATN.ViewModels.DTOs.ServiceDetail
         [Required(ErrorMessage = "Mô tả không được để trống")]
         public string Description { get; set; } // Mô tả
 
+        [Required(ErrorMessage = "Bắt buộc nhập cân nặng tối thiểu")]
+        [Range(1, 100, ErrorMessage = "Cân nặng không được nhỏ hơn 1 hoặc lớn hơn 100")]
+        public float MinWeight { get; set; }
+
+        [Required(ErrorMessage = "Bắt buộc nhập cân nặng tối đa")]
+        [Range(1, 100, ErrorMessage = "Cân nặng không được nhỏ hơn 1 hoặc lớn hơn 100")]
+        public float MaxWeight { get; set; }
+
         public bool IsDeleted { get; set; } = false; // Mô tả
 
         public DateTime CreateAt { get; set; } // Thời gian tạo

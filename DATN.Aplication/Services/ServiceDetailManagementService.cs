@@ -30,13 +30,10 @@ namespace DATN.Aplication.Services
                     Price = serviceDetail.Price,
                     Duration = serviceDetail.Duration,
                     Description = serviceDetail.Description,
+                    MinWeight = serviceDetail.MinWeight,
+                    MaxWeight = serviceDetail.MaxWeight,
                     CreateAt = DateTime.Now
                 };
-
-                if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.Name) == false)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
-                }
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
@@ -46,6 +43,10 @@ namespace DATN.Aplication.Services
                 if (CheckIsNumber.Check(serviceDetail.Price.ToString()) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
+                }
+
+                if(CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false){
+                    return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
                 }
 
                 if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
@@ -137,12 +138,9 @@ namespace DATN.Aplication.Services
                 findServiceDetailById.Price = serviceDetail.Price;
                 findServiceDetailById.Duration = serviceDetail.Duration;
                 findServiceDetailById.Description = serviceDetail.Description;
+                findServiceDetailById.MinWeight = serviceDetail.MinWeight;
+                findServiceDetailById.MaxWeight = serviceDetail.MaxWeight;
                 findServiceDetailById.UpdateAt = DateTime.Now;
-
-                if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.ServiceDetailName) == false)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
-                }
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
@@ -152,6 +150,11 @@ namespace DATN.Aplication.Services
                 if (CheckIsNumber.Check(serviceDetail.Price.ToString()) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
                 }
 
                 if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
