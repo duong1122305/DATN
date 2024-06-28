@@ -211,3 +211,42 @@
         Snackbar.Add(message, severity);
     }
 }
+<style>
+    .mud-select {
+        display: inline-block;
+        position: relative;
+        margin-bottom: 1rem; 
+        width:100%;
+    }
+
+    .mud-input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #495057; /* màu chữ */
+    }
+
+    .mud-select select {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+        /* hiệu ứng khi hover */
+        .mud-select select:hover {
+            border-color: #b3b3b3;
+        }
+
+        .mud-select select:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+</style>
