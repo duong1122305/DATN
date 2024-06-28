@@ -29,6 +29,13 @@ namespace DATN.Aplication
         IShiftRepository ShiftRepository { get; }
         ITypePaymentRepository TypePaymentRepository { get; }
         IWorkShiftRepository WorkShiftRepository { get; }
+        IBrandRepository BrandRepository { get; }
+        ICategoryProductRepository CategoryProductRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
+        IImageProductRepository ImageProductRepository { get; }
+        IOrderDetailRepository OrderDetailRepository { get; }
+        IProductRepository ProductRepository { get; }
+        IProductDetailRepository ProductDetailRepository { get; }
         Task<int> SaveChangeAsync();
     }
 }

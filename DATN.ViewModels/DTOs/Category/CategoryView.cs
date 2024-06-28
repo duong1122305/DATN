@@ -4,15 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.Data.Entities
+namespace DATN.ViewModels.DTOs.Category
 {
-    public class Category
+    public class CategoryView
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public bool IsDeleted { get; set; }
-
-        public virtual ICollection<CategoryProduct> CategoryProducts { get; set; }
     }
 }
