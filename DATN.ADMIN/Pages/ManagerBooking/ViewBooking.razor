@@ -6,127 +6,141 @@
 @using System.Globalization
 <style>
 	.e-date-header, .weather-text, .date-text {
-		
 		text-align: center !important;
-		font-weight:500;
-		font-size:17px;	
+		font-weight: 500;
+		font-size: 14px;
+	}
+
+	.weather-text {
+		font-size: 17px;
+		color: cornflowerblue;
 	}
 </style>
 <MudGrid>
 
 	<MudItem xs="12" lg="2" Class="d-flex  mud-width-full py-8" Style="margin-top: -60px!important;  ">
-		<HeadContent>Bộ lọc</HeadContent>
-		
-		<MudCard Style=" width:100%; padding: 20px; text-align: center; "  >
-			<MudDatePicker Variant="Variant.Filled" Style="margin-bottom: 10px" Label="Tuần xem" @bind-Date="date" />
-			<MudLayout Class="align-start d-flex"  >
-				<MudButton Variant="Variant.Filled" Style="text-align: center" StartIcon="@Icons.Material.Filled.NavigateBefore" Color="Color.Primary">   </MudButton>
-				<MudSpacer />
-				<MudButton Variant="Variant.Filled"  Style="text-align: center" StartIcon="@Icons.Material.Filled.NavigateNext" Color="Color.Primary">  </MudButton>
-			</MudLayout>
-			
-			
+	
+
+		<MudCard Style=" width:100%; padding: 20px; text-align: center; " Outlined=true>
+	
+			<MudText >Bộ lọc</MudText>
+			<MudGrid>
+				<MudItem xs="2" lg="12" >
+					<MudDatePicker Variant="Variant.Filled" Style="margin-bottom: 10px" Label="Tuần xem" @bind-Date="date" />
+					<MudLayout Class="align-start d-flex" Style="">
+						<MudButton Variant="Variant.Filled" Style="text-align: center" StartIcon="@Icons.Material.Filled.NavigateBefore" Color="Color.Primary">   </MudButton>
+						<MudSpacer />
+						<MudButton Variant="Variant.Filled" Style="text-align: center" StartIcon="@Icons.Material.Filled.NavigateNext" Color="Color.Primary">  </MudButton>
+					</MudLayout>
+				</MudItem>
+				<MudItem xs="2" lg="12">
+				</MudItem>
+			</MudGrid>
+
+
 		</MudCard>
 	</MudItem>
 
-	<MudItem xs="12" lg="10" Class="d-flex mud-width-full py-8">
+	<MudItem xs="12" lg="10" Class="d-flex mud-width-full py-8" Style="width:100%">
 
-		<MudDynamicTabs @ref="@DynamicTabs" @bind-ActivePanelIndex="@UserIndex"
-						AddTab="@AddTabCallback" CloseTab="@CloseTabCallback"
-						AddIconToolTip="Click to add a new tab" CloseIconToolTip="Đóng hoá đơn hoá đơn sẽ bị huỷ"
-						PanelClass="px-4 py-6" Style="margin-top: -60px!important;" Elevation="4" Rounded ApplyEffectsToContainer>
+		<MudPaper MaxWidth="100%" MinWidth="100%">
+			<MudDynamicTabs @ref="@DynamicTabs" @bind-ActivePanelIndex="@UserIndex"
+							AddTab="@AddTabCallback" CloseTab="@CloseTabCallback"
+							AddIconToolTip="Click to add a new tab" CloseIconToolTip="Đóng hoá đơn hoá đơn sẽ bị huỷ"
+							PanelClass="px-4 py-6" Style="margin-top: -60px!important;" Elevation="4" Rounded ApplyEffectsToContainer>
 
-			<MudTabPanel  Text="Lịch dịch vụ" ShowCloseIcon="false">
+				<MudTabPanel Text="Lịch dịch vụ" ShowCloseIcon="false">
 
-				<div>
-					<SfSchedule TValue="AppointmentData" Width="100%" Height="650px" SelectedDate="CurrentDate" CurrentView="@CurrentView" StartHour="07:00" EndHour="22:00"
-								TimeFormat="HH:mm" DateFormat="dd/MM/yyyy" EnableAdaptiveUI="true">
-						<ScheduleEvents OnPopupOpen="OnPopupOpen" TValue="AppointmentData" EventRendered="OnEventRendered" OnDragStart="OnScheduleDag" OnResizeStart="OnScheduleResize">
-
-						</ScheduleEvents>
-						<ScheduleEventSettings DataSource="@dataSource">
-							@* 	<ScheduleField>
-							<FieldSubject Name="Subject" Validation="@validationRules"></FieldSubject>
-							</ScheduleField> *@
-						</ScheduleEventSettings>
-						<ScheduleTemplates>
-
-							<DateHeaderTemplate>
-								<div class="date-text">
-									@(getDateHeaderText((context as TemplateContext).Date))
-									@{
-										@switch ((int)(context as TemplateContext).Date.DayOfWeek)
-										{
-											case 0:
-												<div class="weather-text">Chủ nhật</div>
-												break;
-											case 1:
-												<div class="weather-text">Thứ Hai</div>
-												break;
-											case 2:
-												<div class="weather-text">Thứ Ba</div>
-												break;
-											case 3:
-												<div class="weather-text">Thứ Tư</div>
-												break;
-											case 4:
-												<div class="weather-text">Thứ Năm</div>
-												break;
-											case 5:
-												<div class="weather-text">Thứ Sáu</div>
-												break;
-											case 6:
-												<div class="weather-text">Thứ Bảy</div>
-												break;
-										}
-									}
-								</div>
-							</DateHeaderTemplate>
-						</ScheduleTemplates>
-						<ScheduleViews>
-							<ScheduleView Option="View.Day" DisplayName="Ngày"></ScheduleView>
-							<ScheduleView Option="View.Week" DisplayName="Tuần"></ScheduleView>
-							<ScheduleView Option="View.Month" DisplayName="Tháng"></ScheduleView>
-							<ScheduleView Option="View.Agenda" DisplayName="Các lịch gần"></ScheduleView>
-						</ScheduleViews>
-					</SfSchedule>
-				</div>
-
-				<SfDialog @bind-Visible="@IsPopupVisible" Width="300px" ShowCloseIcon="true" Header="Thông tin lịch đặt" AllowDragging="true">
 					<div>
-						<div class="form-group">
-							<label>Tên khách hàng:</label>
-							<p>@CurrentAppointment?.Subject</p>
-						</div>
-						<div class="form-group">
-							<label>Start Time:</label>
-							<p>@CurrentAppointment?.StartTime</p>
-						</div>
-						<div class="form-group">
-							<label>End Time:</label>
-							<p>@CurrentAppointment?.EndTime</p>
-						</div>
-						<div class="form-group">
-							<label>Status Color:</label>
-							<div style="background-color:@CurrentAppointment?.Status; width:100%; height:20px;"></div>
-						</div>
+						<SfSchedule TValue="AppointmentData" Width="100%" Height="650px" SelectedDate="CurrentDate" CurrentView="@CurrentView" StartHour="07:00" EndHour="22:00"
+									TimeFormat="HH:mm" DateFormat="dd/MM/yyyy" EnableAdaptiveUI="true">
+							<ScheduleEvents OnPopupOpen="OnPopupOpen" TValue="AppointmentData" EventRendered="OnEventRendered" OnDragStart="OnScheduleDag" OnResizeStart="OnScheduleResize">
+
+							</ScheduleEvents>
+							<ScheduleEventSettings DataSource="@dataSource">
+								@* 	<ScheduleField>
+								<FieldSubject Name="Subject" Validation="@validationRules"></FieldSubject>
+								</ScheduleField> *@
+							</ScheduleEventSettings>
+							<ScheduleTemplates>
+
+								<DateHeaderTemplate>
+									<div class="date-text">
+										@(getDateHeaderText((context as TemplateContext).Date))
+										@{
+											@switch ((int)(context as TemplateContext).Date.DayOfWeek)
+											{
+												case 0:
+													<div class="weather-text">Chủ nhật</div>
+													break;
+												case 1:
+													<div class="weather-text">Thứ Hai</div>
+													break;
+												case 2:
+													<div class="weather-text">Thứ Ba</div>
+													break;
+												case 3:
+													<div class="weather-text">Thứ Tư</div>
+													break;
+												case 4:
+													<div class="weather-text">Thứ Năm</div>
+													break;
+												case 5:
+													<div class="weather-text">Thứ Sáu</div>
+													break;
+												case 6:
+													<div class="weather-text">Thứ Bảy</div>
+													break;
+											}
+										}
+									</div>
+								</DateHeaderTemplate>
+							</ScheduleTemplates>
+							<ScheduleViews>
+								<ScheduleView Option="View.Day" DisplayName="Ngày"></ScheduleView>
+								<ScheduleView Option="View.Week" DisplayName="Tuần"></ScheduleView>
+								<ScheduleView Option="View.Month" DisplayName="Tháng"></ScheduleView>
+								<ScheduleView Option="View.Agenda" DisplayName="Các lịch gần"></ScheduleView>
+							</ScheduleViews>
+						</SfSchedule>
 					</div>
-				</SfDialog>
 
-			</MudTabPanel>
+					<SfDialog @bind-Visible="@IsPopupVisible" Width="300px" ShowCloseIcon="true" Header="Thông tin lịch đặt" AllowDragging="true">
+						<div>
+							<div class="form-group">
+								<label>Tên khách hàng:</label>
+								<p>@CurrentAppointment?.Subject</p>
+							</div>
+							<div class="form-group">
+								<label>Start Time:</label>
+								<p>@CurrentAppointment?.StartTime</p>
+							</div>
+							<div class="form-group">
+								<label>End Time:</label>
+								<p>@CurrentAppointment?.EndTime</p>
+							</div>
+							<div class="form-group">
+								<label>Status Color:</label>
+								<div style="background-color:@CurrentAppointment?.Status; width:100%; height:20px;"></div>
+							</div>
+						</div>
+					</SfDialog>
 
-
-			@foreach (var tab in UserTabs)
-			{
-				<MudTabPanel  ID="@tab.Id" Text="@tab.Label">
-					<MudPaper Width="100%" Height="650px">
-						Demiauhdygaduygaduyhgaudauihdaijhdkadkjhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaans
-						ádasdddddddddddddddddđsssssssssssssssssssssssssssssss
-					</MudPaper>
-				
 				</MudTabPanel>
-			}
-		</MudDynamicTabs>
+
+
+				@foreach (var tab in UserTabs)
+				{
+					<MudTabPanel ID="@tab.Id" Text="@tab.Label">
+						<MudPaper Width="100%"  Height="650px">
+
+						</MudPaper>
+
+					</MudTabPanel>
+				}
+			</MudDynamicTabs>
+		</MudPaper>
+		
 
 
 	</MudItem>

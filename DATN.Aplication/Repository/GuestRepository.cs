@@ -20,7 +20,7 @@ namespace DATN.Aplication.Repository
 
         public async Task<bool> CheckEmailExist(string email)
         {
-            var result = await _context.Guests.FirstOrDefaultAsync(x => x.Email == email && x.IsComfirm == true);
+            var result = await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == true);
             return result != null;
         }
 

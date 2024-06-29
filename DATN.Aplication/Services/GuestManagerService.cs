@@ -368,6 +368,32 @@ namespace DATN.Aplication.Services
             }
         }
 
+        public async Task<ResponseData<string>> SendForgotMail( string mail)
+        {
+            try
+            {
+
+                var isExist = await _unitOfWork.GuestRepository.CheckEmailExist(mail.Trim());
+                if (isExist)
+                {
+                    _mailExtension.
+                }
+
+                return new ResponseData<string>
+                {
+                    IsSuccess = true,
+                    Error = "Tin nhắn đã gửi vào mail của quý khách"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Có lỗi xảy ra: "+ex.Message
+                };
+            }
+        }
         public async Task<ResponseData<string>> VerififyUser(string verifyConstring, string mail)
         {
             try
