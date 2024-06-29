@@ -122,7 +122,7 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<VoucherView>>> GetAllVoucher()
         {
-            var dateNow= DateTime.Now;
+            var dateNow = DateTime.Now;
             var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
                         select new VoucherView
                         {
@@ -139,13 +139,26 @@ namespace DATN.Aplication.Services
                             Status = discount.Status
                         };
             var querycheck = (from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
-                             select discount).ToList();
-            List<Discount> listcheck= new List<Discount>();
+                              select discount).ToList();
+            List<Discount> listcheck = new List<Discount>();
             foreach (var item in querycheck)
             {
-                if (item.EndDate<dateNow)
+                if (item.EndDate < dateNow)
                 {
                     item.Status = VoucherStatus.Expired;
+                    listcheck.Add(item);
+                }
+                else if (item.StartDate.CompareTo(dateNow) <= 0 && item.EndDate.CompareTo(dateNow) > 0)
+                {
+                    if (item.DeleteAt == null)
+                    {
+                        item.Status = VoucherStatus.GoingOn;
+                        listcheck.Add(item);
+                    }
+                }
+                else
+                {
+                    item.Status=VoucherStatus.NotOccur;
                     listcheck.Add(item);
                 }
             }
@@ -157,7 +170,7 @@ namespace DATN.Aplication.Services
                     Data = query.ToList()
                 };
             else
-                return new ResponseData<List<VoucherView>> { IsSuccess = false,Data=new List<VoucherView>(), Error = "Chưa có voucher nào" };
+                return new ResponseData<List<VoucherView>> { IsSuccess = false, Data = new List<VoucherView>(), Error = "Chưa có voucher nào" };
         }
 
         public async Task<ResponseData<string>> ExpiresVoucher(int id)
