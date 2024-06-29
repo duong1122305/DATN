@@ -39,10 +39,10 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.FindGuestByID(id);
         }  
-        [HttpGet("verify-user")]
-        public async Task<ResponseData<string>> FindByID(string verifyConstring, string mail)
+        [HttpGet("verify-cus")]
+        public async Task<ResponseData<string>> VerifyCode(string verifyCode)
         {
-            return await _guestManagerService.VerififyUser(verifyConstring, mail);
+            return await _guestManagerService.VerififyUser(verifyCode);
         }
         [HttpPost("update-guest")]
         public async Task<ResponseData<string>> UpdateGuest(GuestUpdateRequest request)
@@ -53,6 +53,16 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> ChangStatus(DeleteRequest<Guid> request)
         {
              return await _guestManagerService.SoftDelete(request);
+        }  
+        [HttpPost("update-pass-by-verifyCode")]
+        public async Task<ResponseData<string>> UpdatePassByCode(string verifyCode, string newPass)
+        {
+             return await _guestManagerService.ChangPassWithVerifyCode(verifyCode,newPass);
+        }  
+        [HttpPost("forgot-pass")]
+        public async Task<ResponseData<string>> SendForgotMail(string email)
+        {
+             return await _guestManagerService.SendForgotMail(email);
         }
     }
 }

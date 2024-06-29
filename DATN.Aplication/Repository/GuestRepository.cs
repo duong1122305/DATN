@@ -35,7 +35,13 @@ namespace DATN.Aplication.Repository
             var result = await _context.Guests.FirstOrDefaultAsync(x => x.UserName == user);
           
             return result!=null;
-        }  
+        }
+
+        public Task<Guest> FindByEmail(string email)
+        {
+            return _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == true);
+        }
+
         public async Task RemoveGuestByEmail(string email)
         {
             var result =  _context.Guests.Where(x => x.Email == email && x.IsComfirm == false);
