@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class CategoryProductManagementService: ICategoryProductManagementService
+    public class CategoryProductManagementService : ICategoryProductManagementService
     {
         IUnitOfWork _unitOfWork;
         public CategoryProductManagementService(IUnitOfWork unitOfWork)
@@ -57,7 +57,20 @@ namespace DATN.Aplication.Services
                 var checkdup = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
                                where cate.Name == categoryView.Name
                                select cate;
-                if (category.Id == checkdup.FirstOrDefault().Id)
+                if (checkdup.Count() != 0)
+                {
+                    if (category.Id == checkdup.FirstOrDefault().Id)
+                    {
+                        category.Name = categoryView.Name;
+                        category.IdCategory = categoryView.IdCategory;
+                        await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
+                    }
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                }
+                else
                 {
                     category.Name = categoryView.Name;
                     category.IdCategory = categoryView.IdCategory;
@@ -65,8 +78,6 @@ namespace DATN.Aplication.Services
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
-                else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
 
             }
             catch (Exception)
@@ -132,8 +143,8 @@ namespace DATN.Aplication.Services
                        {
                            Id = cate.Id,
                            Name = cate.Name,
-                           Category=catepro.Name,
-                           IsDeleted=cate.IsDeleted,
+                           Category = catepro.Name,
+                           IsDeleted = cate.IsDeleted,
                        };
             if (list.Count() > 0)
                 return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.ToList() };

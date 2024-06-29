@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class CategoryManagementService:ICategoryManagementService
+    public class CategoryManagementService : ICategoryManagementService
     {
         IUnitOfWork _unitOfWork;
         public CategoryManagementService(IUnitOfWork unitOfWork)
@@ -31,7 +31,7 @@ namespace DATN.Aplication.Services
                     {
                         Name = categoryView.Name,
                         Description = categoryView.Description,
-                        IsDeleted=false
+                        IsDeleted = false
                     };
                     await _unitOfWork.CategoryRepository.AddAsync(category);
                     await _unitOfWork.SaveChangeAsync();
@@ -56,7 +56,20 @@ namespace DATN.Aplication.Services
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
                                where cate.Name == categoryView.Name
                                select cate;
-                if (category.Id == checkdup.FirstOrDefault().Id)
+                if (checkdup.Count() != 0)
+                {
+                    if (category.Id == checkdup.FirstOrDefault().Id)
+                    {
+                        category.Name = categoryView.Name;
+                        category.Description = categoryView.Description;
+                        await _unitOfWork.CategoryRepository.UpdateAsync(category);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
+                    }
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                }
+                else
                 {
                     category.Name = categoryView.Name;
                     category.Description = categoryView.Description;
@@ -64,8 +77,6 @@ namespace DATN.Aplication.Services
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
-                else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
 
             }
             catch (Exception)

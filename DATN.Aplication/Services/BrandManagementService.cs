@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class BrandManagementService: IBrandManagementService
+    public class BrandManagementService : IBrandManagementService
     {
         IUnitOfWork _unitOfWork;
         public BrandManagementService(IUnitOfWork unitOfWork)
@@ -50,12 +50,12 @@ namespace DATN.Aplication.Services
             try
             {
                 var brand = (from cate in await _unitOfWork.BrandRepository.GetAllAsync()
-                                where cate.Id == brandView.Id
-                                select cate).FirstOrDefault();
+                             where cate.Id == brandView.Id
+                             select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.BrandRepository.GetAllAsync()
                                where cate.Name == brandView.Name
                                select cate;
-                if (brand.Id == checkdup.FirstOrDefault().Id)
+                if (checkdup.Count() == 0)
                 {
                     brand.Name = brandView.Name;
                     brand.Description = brandView.Description;
@@ -64,7 +64,18 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                {
+                    if (brand.Id == checkdup.FirstOrDefault().Id)
+                    {
+                        brand.Name = brandView.Name;
+                        brand.Description = brandView.Description;
+                        await _unitOfWork.BrandRepository.UpdateAsync(brand);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
+                    }
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                }
 
             }
             catch (Exception)
@@ -78,8 +89,8 @@ namespace DATN.Aplication.Services
             try
             {
                 var brand = (from cate in await _unitOfWork.BrandRepository.GetAllAsync()
-                                where cate.Id == id
-                                select cate).FirstOrDefault();
+                             where cate.Id == id
+                             select cate).FirstOrDefault();
                 if (brand != null)
                 {
 
@@ -102,8 +113,8 @@ namespace DATN.Aplication.Services
             try
             {
                 var brand = (from cate in await _unitOfWork.BrandRepository.GetAllAsync()
-                                where cate.Id == id
-                                select cate).FirstOrDefault();
+                             where cate.Id == id
+                             select cate).FirstOrDefault();
                 if (brand != null)
                 {
 

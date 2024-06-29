@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class ProductDetaiManagementService: IProductDetaiManagementService
+    public class ProductDetaiManagementService : IProductDetaiManagementService
     {
         IUnitOfWork _unitOfWork;
         public ProductDetaiManagementService(IUnitOfWork unitOfWork)
@@ -56,7 +56,22 @@ namespace DATN.Aplication.Services
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
                                where cate.Name == productView.Name
                                select cate;
-                if (product.Id == checkdup.FirstOrDefault().Id)
+                if (checkdup.Count() > 0)
+                {
+                    if (product.Id == checkdup.FirstOrDefault().Id)
+                    {
+                        product.Name = productView.Name;
+                        product.Description = productView.Description;
+                        product.IdBrand = productView.IdBrand;
+                        product.IdCategoryProduct = productView.IdCategoryProduct;
+                        await _unitOfWork.ProductRepository.UpdateAsync(product);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
+                    }
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                }
+                else
                 {
                     product.Name = productView.Name;
                     product.Description = productView.Description;
@@ -66,8 +81,6 @@ namespace DATN.Aplication.Services
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
-                else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
 
             }
             catch (Exception)
