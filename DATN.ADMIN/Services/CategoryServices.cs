@@ -14,32 +14,36 @@ namespace DATN.ADMIN.Services
         {
                 _httpClient = client;
         }
-        public Task<ResponseData<string>> ActiveCategory(int id)
+        public async Task<ResponseData<string>> ActiveCategory(int id)
         {
-            throw new NotImplementedException();
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/Cate/Active-Category?id={id}");
+            return respone;
         }
 
         public async Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
         {
-            var respone = await _httpClient.PostAsJsonAsync("api/UserLogin/Create-Category", categoryView);
+            var respone = await _httpClient.PostAsJsonAsync("api/cate/Create-Category", categoryView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data!;
         }
 
         public async Task<ResponseData<List<CategoryView>>> ListCategory()
         {
-            var respone = await _httpClient.GetFromJsonAsync<ResponseData<List<CategoryView>>>("api/UserLogin/List-Category");
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<List<CategoryView>>>("api/cate/List-Category");
             return respone;
         }
 
-        public Task<ResponseData<string>> RemoveCategory(int id)
+        public async Task<ResponseData<string>> RemoveCategory(int id)
         {
-            throw new NotImplementedException();
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/cate/Remove-Category?id={id}");
+            return respone;
         }
 
-        public Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
+        public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
         {
-            throw new NotImplementedException();
+            var respone = await _httpClient.PutAsJsonAsync("api/cate/Update-Category", categoryView);
+            var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
+            return data;
         }
     }
 }

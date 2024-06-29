@@ -19,8 +19,8 @@
                 }
                 else
                 {
-                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@category.Name" For="@(() => category.Name)" />
-                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@category.Description" For="@(() => category.Description)" />
+                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" />
+                    <MudTextField T="string" Label="Mô tả" @bind-Value="@category.Description" For="@(() => category.Description)" />
                 }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
@@ -50,16 +50,12 @@
         if (id != null && id != 0)
         {
             _nameButton = "Cập nhật";
-            // var findServiceById = await _serviceManagerment.GetById(id);
-            // serviceUpdate.Name = findServiceById.Data.Name;
-            // serviceUpdate.Description = findServiceById.Data.Desciption;
         }
         else
         {
             _nameButton = "Thêm mới";
         }
     }
-
     public async Task Create()
     {
         if (await Confirm("thêm mới") == true)
@@ -84,30 +80,30 @@
 
     public async Task Update()
     {
-        // var confirm = await Confirm("cập nhật");
-        // if (!confirm)
-        // {
-        //     return;
-        // }
+        var confirm = await Confirm("cập nhật");
+        if (!confirm)
+        {
+            return;
+        }
 
-        // if (serviceUpdate != null)
-        // {
-        //     var result = await _serviceManagerment.Update(id, serviceUpdate);
-        //     if (result.IsSuccess)
-        //     {
-        //         Message(result.Data, Severity.Success);
+        if (category != null)
+        {
+            var result = await _client.UpdateCategory(category);
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
 
-        //         _dialogBox.Close(DialogResult.Ok(true));
-        //     }
-        //     else
-        //     {
-        //         Message(result.Error, Severity.Error);
-        //     }
-        // }
-        // else
-        // {
-        //     Message("Có lỗi trong quá trình cập nhật", Severity.Error);
-        // }
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+        }
+        else
+        {
+            Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+        }
 
     }
 
@@ -117,10 +113,10 @@
         {
             await Create();
         }
-        // else
-        // {
-        //     await Update();
-        // }
+        else
+        {
+            await Update();
+        }
     }
 
     private async Task<bool>

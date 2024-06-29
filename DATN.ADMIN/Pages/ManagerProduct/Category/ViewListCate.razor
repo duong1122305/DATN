@@ -12,7 +12,7 @@
 @inject IDialogService _dialogservice;
 
 <PageTitle>Danh sách loại sản phẩm</PageTitle>
-<MudText Typo="Typo.h6">Danh sách loại sản phẩm</MudText>
+<MudText Typo="Typo.h6">Danh mục sản phẩm</MudText>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 
@@ -40,33 +40,37 @@
             </TemplateColumn>
             <PropertyColumn Property="x => x.Name" Title="Tên danh mục" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
-                <TemplateColumn Title="Trạng thái">
+            <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (context.Item.IsDeleted == true)
                     {
-                        <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
+                        
                     }
                     else
                     {
-                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
+                        <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
+
                     }
                 </CellTemplate>
-                </TemplateColumn>
-                <TemplateColumn Title="Hành động">
+            </TemplateColumn>
+            <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                 <CellTemplate>
                     <MudButtonGroup Variant="Variant.Filled">
-                        @if (context.Item.IsDeleted == true)
+                        @if (context.Item.IsDeleted != true)
                         {
-                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await activeAc(context.Item.Id))"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await DeleteCate(context.Item.Id))" title="Xoá"></MudIconButton>
+
                         }
                         else
                         {
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await deleteStaff(context.Item.Id))" title="Xoá"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveCate(context.Item.Id))"></MudIconButton>
+                            
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
-                </TemplateColumn>
+            </TemplateColumn>
         </Columns>
         <PagerContent>
             <MudDataGridPager T="CategoryView" />
@@ -105,7 +109,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // await LoadData();
+        await LoadData();
 
     }
 
@@ -115,8 +119,9 @@ else
         var respone = await _client.ListCategory();
         if (respone.IsSuccess)
         {
-            lstCate = respone.Data;
-        }else
+            lstCate = respone.Data.OrderByDescending(x => x.Id).ToList();
+        }
+        else
         {
             lstCate = new List<CategoryView>();
         }
@@ -130,14 +135,14 @@ else
 
     private Func<CategoryView, bool> _quickFilter => x =>
      {
-             if (string.IsNullOrWhiteSpace(searchString))
-                 return true;
+         if (string.IsNullOrWhiteSpace(searchString))
+             return true;
 
-             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
+         if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             return true;
 
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
+         if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             return true;
          return false;
      };
 
@@ -153,35 +158,35 @@ else
     }
 
     //Thông báo hỏi khi xoá
-    private async Task deleteStaff(int? userName)
+    private async Task DeleteCate(int? id)
     {
-        // if (await Confirm() == true)
-        // {
-        //     var response2 = await _client.GetByIdRemove(userName);
-        //     if (response2.IsSuccess)
-        //     {
-        //         Message($"Đã xoá nhân viên {userName}", Severity.Success);
-        //         await LoadData();
-        //     }
-        //     else
-        //     {
-        //         Message("Không tìm thấy nhân viên", Severity.Error);
-        //     }
-        // }
+        if (await Confirm() == true)
+        {
+            var response2 = await _client.RemoveCategory(Convert.ToInt32(id));
+            if (response2.IsSuccess)
+            {
+                Message(response2.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(response2.Error, Severity.Error);
+            }
+        }
     }
 
-    private async Task activeAc(int? username)
+    private async Task ActiveCate(int? id)
     {
-        // var repon = await _client.activeUser(username);
-        // if (repon.IsSuccess)
-        // {
-        //     Message("Đã kích hoạt trạng thái", Severity.Success);
-        //     await LoadData();
-        // }
-        // else
-        // {
-        //     Message("Chưa kích hoạt", Severity.Success);
-        // }
+        var repon = await _client.ActiveCategory(Convert.ToInt32(id));
+        if (repon.IsSuccess)
+        {
+            Message(repon.Data, Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            Message(repon.Error, Severity.Success);
+        }
     }
 
     //thêm sửa !
@@ -192,7 +197,9 @@ else
         string nameDialog = "Thêm mới danh mục";
         if (id != null)
         {
+            var cate = lstCate.FirstOrDefault(x => x.Id == id);
             parameters.Add("id", id);
+            parameters.Add("category", cate);
             nameDialog = "Cập nhật danh mục";
         }
         DialogOptions options = new DialogOptions()
@@ -214,27 +221,7 @@ else
         }
     }
 
-    // private void HandleShiftChange(ChangeEventArgs e)
-    // {
-    //     // Cập nhật giá trị của biến shiftId khi có sự thay đổi trong dropdown
-    //     selectedShiftId = Convert.ToInt32(e.Value);
-    // }
-   
-
-   
-    //hỏi trước khi thêm
-    private async Task<bool?> Confirm2()
-    {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận thêm ca cho nhân viên?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
-        StateHasChanged();
-        return confirm;
-    }
-  
-
-    //messenge
+     //messenge
     private void Message(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
