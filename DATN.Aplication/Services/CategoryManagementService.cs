@@ -31,6 +31,7 @@ namespace DATN.Aplication.Services
                     {
                         Name = categoryView.Name,
                         Description = categoryView.Description,
+                        IsDeleted=false
                     };
                     await _unitOfWork.CategoryRepository.AddAsync(category);
                     await _unitOfWork.SaveChangeAsync();

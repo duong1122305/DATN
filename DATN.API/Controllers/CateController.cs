@@ -2,6 +2,7 @@
 using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
+using DATN.ViewModels.DTOs.CategoryProduct;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,12 @@ namespace DATN.API.Controllers
     [ApiController]
     public class CateController : Controller
     {
-        ICategoryManagement _categoryManagement;
-        public CateController(ICategoryManagement categoryManagement)
+        ICategoryManagementService _categoryManagement;
+        ICategoryProductManagementService _categoryProductManagement;
+        public CateController(ICategoryManagementService categoryManagement, ICategoryProductManagementService categoryProductManagement)
         {
             _categoryManagement = categoryManagement;
+            _categoryProductManagement = categoryProductManagement;
         }
         [HttpPost("Create-Category")]
         public Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
@@ -41,6 +44,32 @@ namespace DATN.API.Controllers
         public Task<ResponseData<string>> ActiveCategory(int id)
         {
             return _categoryManagement.Active(id);
+        }
+        [HttpPost("Create-Category-Product")]
+        public Task<ResponseData<string>> CreateCategoryProduct(CreateCategoryProductView categoryView)
+        {
+            return _categoryProductManagement.CreateCategory(categoryView);
+        }
+        [HttpPut("Update-Category-Product")]
+
+        public Task<ResponseData<string>> UpdateCategoryProduct(CreateCategoryProductView categoryView)
+        {
+            return _categoryProductManagement.UpdateCategory(categoryView);
+        }
+        [HttpGet("Remove-Category-Product")]
+        public Task<ResponseData<string>> RemoveCategoryProduct(int id)
+        {
+            return _categoryProductManagement.RemoveCategory(id);
+        }
+        [HttpGet("List-Category-Product")]
+        public async Task<ResponseData<List<CategoryProductView>>> ListCategoryProduct()
+        {
+            return await _categoryProductManagement.ListCategory();
+        }
+        [HttpGet("Active-Category-Product")]
+        public Task<ResponseData<string>> ActiveCategoryProduct(int id)
+        {
+            return _categoryProductManagement.Active(id);
         }
     }
 }
