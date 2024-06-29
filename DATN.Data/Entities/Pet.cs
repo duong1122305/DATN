@@ -35,7 +35,8 @@ namespace DATN.Data.Entities
 
 		public string? Note { get; set; } // Ghi chú
 
-		public virtual Guest? Guest { get; set; } // Chủ nhân
+        public virtual ICollection<ImagePet>? ImagePets { get; set; }
+        public virtual Guest? Guest { get; set; } // Chủ nhân
 
 		public virtual PetSpecies Species { get; set; } // Giống thú cưng
 	}

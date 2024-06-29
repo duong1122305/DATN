@@ -8,6 +8,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<VoucherView>>> GetAll();
         Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView);
         Task<ResponseData<string>> CreateVoucher(VoucherView voucherView);
+        Task<ResponseData<string>> ChangeStatusVoucher(int id);
 
     }
 }

@@ -248,5 +248,10 @@ namespace DATN.API.Controllers
         {
             return await _employeeSchedule.ChangeShiftStaffToStaff(changeShiftView);
         }
+        [HttpGet("Change-Status-Voucher")]
+        public async Task<ResponseData<string>> ChangeStatusVoucher(int id)
+        {
+            return await _vouchermanagement.ExpiresVoucher(id);
+        }
     }
 }

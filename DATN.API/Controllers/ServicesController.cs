@@ -22,7 +22,7 @@ namespace DATN.API.Controllers
         {
             var result = await _serviceManager.GetAllService();
 
-            if (result.Data == null && result.IsSuccess == false) return NotFound(result.Error);
+            if (result.Data == null && result.IsSuccess == false) return NotFound(result);
 
             return Ok(result);
         }
@@ -34,7 +34,7 @@ namespace DATN.API.Controllers
 
             var result = await _serviceManager.GetServiceById(id);
 
-            if (result.Data == null && result.IsSuccess == false) return NotFound(result.Error);
+            if (result.Data == null && result.IsSuccess == false) return NotFound(result);
 
             return Ok(result);
         }
@@ -58,7 +58,7 @@ namespace DATN.API.Controllers
 
             var result = await _serviceManager.UpdateService(id, service);
 
-            if (result.IsSuccess == false) return BadRequest(result.Error);
+            if (result.IsSuccess == false) return BadRequest(result);
 
             return Ok(result);
         }
@@ -70,7 +70,7 @@ namespace DATN.API.Controllers
 
             var result = await _serviceManager.RemoveService(id);
 
-            if (result.IsSuccess == false) return Content(result.Error);
+            if (result.IsSuccess == false) return BadRequest(result);
 
             return Ok(result);
         }

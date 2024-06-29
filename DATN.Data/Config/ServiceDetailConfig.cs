@@ -20,9 +20,6 @@ namespace DATN.Data.Config
                 .WithMany(c => c.ServiceDetails)
                 .HasForeignKey(c => c.ServiceId);
 
-            builder.Property(x => x.Name)
-                .IsRequired();
-
             builder.Property(x => x.Price)
                 .IsRequired();
 
@@ -32,7 +29,10 @@ namespace DATN.Data.Config
             builder.Property(x => x.CreateAt)
                 .IsRequired();
 
-            builder.Property(x => x.Deleted)
+            builder.Property(c => c.MinWeight)
+                .IsRequired();
+
+            builder.Property(c => c.MaxWeight)
                 .IsRequired();
         }
     }

@@ -2,37 +2,29 @@
 
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
-
 @using DATN.ViewModels.DTOs.ServiceManager
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
-<EditForm Model="@service">
+<EditForm Model="@service" OnValidSubmit="@(async () => await Submit())">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
 
                 @if (id == 0 || id == null)
                 {
-                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" />
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" For="@(() => service.Name)"/>
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Description" For="@(() => service.Description)"/>
                 }
                 else
                 {
-                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Name" />
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Name" For="@(() => serviceUpdate.Name)"/>
+                    <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Description" For="@(() => serviceUpdate.Description)"/>
                 }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    @if (id == null || id == 0)
-                    {
-                        <MudButton ButtonType="ButtonType.Submit" OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
-                            @_nameButton
-                        </MudButton>
-                    }
-                    else
-                    {
-                        <MudButton ButtonType="ButtonType.Submit" OnClick="@Update" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
-                            @_nameButton
-                        </MudButton>
-                    }
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                        @_nameButton
+                    </MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -63,6 +55,7 @@
             _nameButton = "Cập nhật";
             var findServiceById = await _serviceManagerment.GetById(id);
             serviceUpdate.Name = findServiceById.Data.Name;
+            serviceUpdate.Description = findServiceById.Data.Desciption;
         }
         else
         {
@@ -70,7 +63,7 @@
         }
     }
 
-    public async Task Submit()
+    public async Task Create()
     {
         if (await Confirm("thêm mới") == true)
 
@@ -83,7 +76,7 @@
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
-                Message("Thêm dịch vụ mới không thành công", Severity.Error);
+                Message(result.Error, Severity.Error);
         }
         else
         {
@@ -111,7 +104,6 @@
             }
             else
             {
-
                 Message(result.Error, Severity.Error);
             }
         }
@@ -120,6 +112,18 @@
             Message("Có lỗi trong quá trình cập nhật", Severity.Error);
         }
 
+    }
+
+    public async Task Submit()
+    {
+        if(id == null || id == 0)
+        {
+            await Create();
+        }
+        else
+        {
+            await Update();
+        }
     }
 
     private async Task<bool> Confirm(string text)

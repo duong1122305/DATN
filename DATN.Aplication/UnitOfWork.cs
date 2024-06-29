@@ -31,6 +31,13 @@ namespace DATN.Aplication
         private IShiftRepository _shiftRepository;
         private ITypePaymentRepository _typePaymentRepository;
         private IWorkShiftRepository _workShiftRepository;
+        IBrandRepository _brandRepository;
+        ICategoryProductRepository _categoryProductRepository;
+        ICategoryRepository _categoryRepository;
+        IImageProductRepository _imageProductRepository;
+        IOrderDetailRepository _orderDetailRepository;
+        IProductRepository _productRepository;
+        IProductDetailRepository _productDetailRepository;
 
         public UnitOfWork(DATNDbContext context)
         {
@@ -241,7 +248,88 @@ namespace DATN.Aplication
             }
         }
 
+        public IBrandRepository BrandRepository
+        {
+            get
+            {
+                if (_brandRepository==null)
+                {
+                    _brandRepository = new BrandRepository(_context);
+                }
+                return _brandRepository;
+            }
+        }
 
+        public ICategoryProductRepository CategoryProductRepository
+        {
+            get
+            {
+                if (_categoryProductRepository == null)
+                {
+                    _categoryProductRepository = new CategoryProductRepository(_context);
+                }
+                return _categoryProductRepository;
+            }
+        }
+
+        public ICategoryRepository CategoryRepository
+        {
+            get
+            {
+                if (_categoryRepository == null)
+                {
+                    _categoryRepository = new CategoryRepository(_context);
+                }
+                return _categoryRepository;
+            }
+        }
+
+        public IImageProductRepository ImageProductRepository
+        {
+            get
+            {
+                if (_imageProductRepository == null)
+                {
+                    _imageProductRepository = new ImageProductRepository(_context);
+                }
+                return _imageProductRepository;
+            }
+        }
+        public IOrderDetailRepository OrderDetailRepository
+        {
+            get
+            {
+                if (_orderDetailRepository == null)
+                {
+                    _orderDetailRepository = new OrderDetailRepository(_context);
+                }
+                return _orderDetailRepository;
+            }
+        }
+
+        public IProductRepository ProductRepository
+        {
+            get
+            {
+                if (_productRepository == null)
+                {
+                    _productRepository = new ProductRepository(_context);
+                }
+                return _productRepository;
+            }
+        }
+
+        public IProductDetailRepository ProductDetailRepository
+        {
+            get
+            {
+                if (_productDetailRepository == null)
+                {
+                    _productDetailRepository = new ProductDetailRepository(_context);
+                }
+                return _productDetailRepository;
+            }
+        }
 
         public async Task<int> SaveChangeAsync()
         {

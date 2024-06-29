@@ -18,5 +18,6 @@ namespace DATN.Data.Entities
 
 		// Quan hệ một-nhiều: Mỗi loại thú cưng có thể có nhiều giống thú cưng
 		public virtual ICollection<PetSpecies> Species { get; set; }
+		public virtual ICollection<ProductDetail> ProductDetails { get; set; }
 	}
 }

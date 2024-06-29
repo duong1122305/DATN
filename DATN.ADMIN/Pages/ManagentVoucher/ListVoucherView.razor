@@ -3,6 +3,7 @@
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.Enum
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -25,6 +26,7 @@
         <MudTh Style="text-align:center;">Ngày kết thúc</MudTh>
         <MudTh Style="text-align:center;">Số tiền tối thiểu</MudTh>
         <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
+        <MudTh Style="text-align:center;">Trạng thái</MudTh>
         <MudTh Style="text-align:center;">Hành động</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -35,14 +37,40 @@
         <MudTd DataLabel="VoucherCode" Style="text-align:center;">@context.VoucherCode</MudTd>
         <MudTd DataLabel="DiscourPercent" Style="text-align:center;">@context.DiscountPercent</MudTd>
         <MudTd DataLabel="Description" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy HH:mm")</MudTd>
-        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy HH:mm")</MudTd>
+        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("dd/MM/yyyy")</MudTd>
         <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
         <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
+        @if (context.Status == VoucherStatus.GoingOn)
+        {
+            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
+                <MudChip Color="Color.Success" title="Đang diễn ra">Đang diễn ra</MudChip>
+            </MudTd>
+        }
+        else if (context.Status == VoucherStatus.Expired)
+        {
+            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
+                <MudChip Color="Color.Error" title="Đã quá hạn">Đã kết thúc</MudChip>
+            </MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
+                <MudChip Color="Color.Surface" title="Chưa diễn ra">Chưa diễn ra</MudChip>
+            </MudTd>
+        }
         <MudTd Style="text-align:center;">
             <MudButtonGroup Variant="Variant.Filled">
-                <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa"></MudIconButton>
+                @if (context.Status == VoucherStatus.NotOccur)
+                {
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa"></MudIconButton>
+                }
+                else
+                {
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa" Disabled></MudIconButton>
+                }
                 <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Id)))"></MudIconButton>
             </MudButtonGroup>
         </MudTd>
     </RowTemplate>
@@ -52,6 +80,7 @@
 </MudTable>
 
 @code {
+
     //button trạng thái
     private bool _disableElevation = false;
     private string searchString = "";
@@ -59,7 +88,7 @@
 
     private VoucherView voucherView = new VoucherView();
     [Inject]
-    private IVoucherServices _client{get;set;}
+    private IVoucherServices _client { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,6 +149,42 @@
             createUpdateDialog.Close();
             await LoadData();
         }
+    }
+
+    private async Task ChangeStatus(int id)
+    {
+
+        if (await Confirm()==true)
+        {
+            //gọi api thêm
+            var result = await _client.ChangeStatusVoucher(id);
+
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+        }
+    }
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận kết thúc voucher sớm?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+        return confirm;
     }
 
 

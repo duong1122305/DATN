@@ -36,6 +36,12 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new ShiftConfig());
             builder.ApplyConfiguration(new TypePaymentConfig());
             builder.ApplyConfiguration(new WorkShiftConfig());
+            builder.ApplyConfiguration(new ImagePetConfig());
+            builder.ApplyConfiguration(new CategoryProductConfig());
+            builder.ApplyConfiguration(new ImageProductConfig());
+            builder.ApplyConfiguration(new OrderDetailConfig());
+            builder.ApplyConfiguration(new ProductConfig());
+            builder.ApplyConfiguration(new ProductDetailConfig());
         }
 
         public DbSet<ActionBooking> ActionBookings { get; set; }
@@ -57,5 +63,13 @@ namespace DATN.Data.EF
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<TypePayment> TypePayments { get; set; }
         public DbSet<WorkShift> WorkShifts { get; set; }
+        public DbSet<ImagePet> ImagePets { get; set; }
+        public DbSet<Brand> Brands { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<CategoryProduct> CategoryProducts { get; set; }
+        public DbSet<ImageProduct> ImageProducts { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductDetail> ProductDetails { get; set; }
     }
 }

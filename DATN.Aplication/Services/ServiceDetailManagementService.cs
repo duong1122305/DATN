@@ -27,28 +27,31 @@ namespace DATN.Aplication.Services
                 var newServiceDetail = new ServiceDetail
                 {
                     ServiceId = serviceDetail.ServiceId,
-                    Name = serviceDetail.Name.TrimStart().TrimEnd(),
                     Price = serviceDetail.Price,
                     Duration = serviceDetail.Duration,
                     Description = serviceDetail.Description,
+                    MinWeight = serviceDetail.MinWeight,
+                    MaxWeight = serviceDetail.MaxWeight,
                     CreateAt = DateTime.Now
                 };
-                foreach (var i in await _unitOfWork.ServiceDetailRepository.GetAllAsync())
-                {
-                    if (i.Name == serviceDetail.Name)
-                    {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại !" };
-                    }
-                }
 
-                if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.Name) == false)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
-                }
-
-                if(CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
+                if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá nhập không đúng" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Price.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
+                }
+
+                if(CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false){
+                    return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Thời gian chỉ chứa ký tự là số" };
                 }
 
                 await _unitOfWork.ServiceDetailRepository.AddAsync(newServiceDetail);
@@ -64,8 +67,9 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<List<ServiceDetail>>> GetAllService()
         {
             var query = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
-            if (query.Count() > 0)
-                return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = query.ToList() };
+            var result = query.OrderByDescending(c => c.Id).ToList();
+            if (result.Count() > 0)
+                return new ResponseData<List<ServiceDetail>> { IsSuccess = true, Data = result };
             else
                 return new ResponseData<List<ServiceDetail>> { IsSuccess = false, Error = "Không có dịch vụ nào" };
         }
@@ -131,20 +135,31 @@ namespace DATN.Aplication.Services
             try
             {
                 var findServiceDetailById = await _unitOfWork.ServiceDetailRepository.GetAsync(id);
-                findServiceDetailById.Name = serviceDetail.ServiceDetailName.TrimStart().TrimEnd();
                 findServiceDetailById.Price = serviceDetail.Price;
                 findServiceDetailById.Duration = serviceDetail.Duration;
                 findServiceDetailById.Description = serviceDetail.Description;
+                findServiceDetailById.MinWeight = serviceDetail.MinWeight;
+                findServiceDetailById.MaxWeight = serviceDetail.MaxWeight;
                 findServiceDetailById.UpdateAt = DateTime.Now;
-
-                if (CheckServiceDetail.CheckLengthServiceName(serviceDetail.ServiceDetailName) == false)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên không được để trống hoặc quá 100 ký tự" };
-                }
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá nhập không đúng" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Price.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
+                }
+
+                if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Thời gian chỉ chứa ký tự là số" };
                 }
 
                 await _unitOfWork.ServiceDetailRepository.UpdateAsync(findServiceDetailById);
@@ -167,7 +182,6 @@ namespace DATN.Aplication.Services
                          select new GetServiceNameVM
                          {
                              ServiceDetailId = sd.Id,
-                             ServiceDetailName = sd.Name,
                              ServiceName = sv.Name,
                              Price = sd.Price,
                              Duration = sd.Duration,
