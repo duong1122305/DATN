@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
+using DATN.ViewModels.DTOs.CategoryProduct;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,29 +11,30 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class CategoryManagement:ICategoryManagement
+    public class CategoryProductManagementService : ICategoryProductManagementService
     {
         IUnitOfWork _unitOfWork;
-        public CategoryManagement(IUnitOfWork unitOfWork)
+        public CategoryProductManagementService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
+        public async Task<ResponseData<string>> CreateCategory(CreateCategoryProductView categoryView)
         {
 
             try
             {
-                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
-                               select cate;
-                if (checkdup.Count() == 0)
+                var check = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
+                            where cate.Name == categoryView.Name
+                            select cate;
+                if (check.Count() == 0)
                 {
-                    var category = new Category()
+                    var category = new Data.Entities.CategoryProduct()
                     {
                         Name = categoryView.Name,
-                        Description = categoryView.Description,
+                        IdCategory = categoryView.IdCategory,
+                        IsDeleted = false,
                     };
-                    await _unitOfWork.CategoryRepository.AddAsync(category);
+                    await _unitOfWork.CategoryProductRepository.AddAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công " };
                 }
@@ -44,27 +46,38 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Thêm không thành công " };
             }
         }
-        public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
+        public async Task<ResponseData<string>> UpdateCategory(CreateCategoryProductView categoryView)
         {
 
             try
             {
-                var category = (from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
                                 where cate.Id == categoryView.Id
                                 select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                var checkdup = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
                                where cate.Name == categoryView.Name
                                select cate;
-                if (category.Id == checkdup.FirstOrDefault().Id)
+                if (checkdup.Count() != 0)
+                {
+                    if (category.Id == checkdup.FirstOrDefault().Id)
+                    {
+                        category.Name = categoryView.Name;
+                        category.IdCategory = categoryView.IdCategory;
+                        await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
+                    }
+                    else
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                }
+                else
                 {
                     category.Name = categoryView.Name;
-                    category.Description = categoryView.Description;
-                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
+                    category.IdCategory = categoryView.IdCategory;
+                    await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
-                else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
 
             }
             catch (Exception)
@@ -77,14 +90,14 @@ namespace DATN.Aplication.Services
 
             try
             {
-                var category = (from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
                                 where cate.Id == id
                                 select cate).FirstOrDefault();
                 if (category != null)
                 {
 
                     category.IsDeleted = true;
-                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
+                    await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
@@ -101,14 +114,14 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var category = (from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
                                 where cate.Id == id
                                 select cate).FirstOrDefault();
                 if (category != null)
                 {
 
                     category.IsDeleted = false;
-                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
+                    await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
                 }
@@ -121,21 +134,22 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Active không thành công " };
             }
         }
-        public async Task<ResponseData<List<CategoryView>>> ListCategory()
+        public async Task<ResponseData<List<CategoryProductView>>> ListCategory()
         {
-            var list = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                       select new CategoryView
+            var list = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
+                       join catepro in await _unitOfWork.CategoryRepository.GetAllAsync()
+                       on cate.IdCategory equals catepro.Id
+                       select new CategoryProductView()
                        {
                            Id = cate.Id,
                            Name = cate.Name,
-                           Description = cate.Description,
-                           IsDeleted = cate.IsDeleted
+                           Category = catepro.Name,
+                           IsDeleted = cate.IsDeleted,
                        };
             if (list.Count() > 0)
-                return new ResponseData<List<CategoryView>> { IsSuccess = true, Data = list.ToList() };
+                return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.ToList() };
             else
-                return new ResponseData<List<CategoryView>> { IsSuccess = false, Data = new List<CategoryView>(), Error = "Chưa có dữ liệu" };
+                return new ResponseData<List<CategoryProductView>> { IsSuccess = false, Data = new List<CategoryProductView>(), Error = "Chưa có dữ liệu" };
         }
     }
 }
-

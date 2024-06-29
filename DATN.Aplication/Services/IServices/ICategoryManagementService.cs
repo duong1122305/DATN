@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services.IServices
 {
-    public interface ICategoryManagement
+    public interface ICategoryManagementService
     {
         public Task<ResponseData<string>> CreateCategory(CategoryView categoryView);
         public Task<ResponseData<string>> UpdateCategory(CategoryView categoryView);

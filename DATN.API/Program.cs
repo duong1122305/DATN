@@ -69,7 +69,11 @@ builder.Services.AddScoped<IPetSpeciesManagerService, PetSpeciesManagerService>(
 builder.Services.AddScoped<IPetManagerService, PetManagerService>();
 builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
 builder.Services.AddScoped<IServiceDetailManagementService, ServiceDetailManagementService>();
-builder.Services.AddScoped<ICategoryManagement, CategoryManagement>();
+builder.Services.AddScoped<ICategoryManagementService, CategoryManagementService>();
+builder.Services.AddScoped<ICategoryProductManagementService, CategoryProductManagementService>();
+builder.Services.AddScoped<IBrandManagementService, BrandManagementService>();
+builder.Services.AddScoped<IProductManagementService, ProductManagementService>();
+builder.Services.AddScoped<IProductDetaiManagementService, ProductDetaiManagementService>();
 
 
 // Add auto mapper
