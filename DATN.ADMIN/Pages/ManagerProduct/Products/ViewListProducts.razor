@@ -12,13 +12,8 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 
-<PageTitle>Danh sách loại sản phẩm</PageTitle>
-<MudText Typo="Typo.h6">Danh mục sản phẩm</MudText>
-
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
-
-
-
+<PageTitle>Danh sách sản phẩm</PageTitle>
+<MudText Typo="Typo.h3" Style="text-align:center;margin-bottom:10px">Danh mục sản phẩm</MudText>
 @if (lstProduct.Count > 0 && lstProduct != null)
 {
     <MudDataGrid Items="@lstProduct" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
@@ -34,6 +29,8 @@
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+                          <MudSpacer/>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
         </ToolBarContent>
         <Columns>
             <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -100,8 +97,8 @@ else
 
     private enum ProductStatus
     {
-        All = -1, // lấy tất cả isdeleted
-        Active = 0, // (IsDeleted = false)
+        All = 0, // lấy tất cả isdeleted
+        Active = -1, // (IsDeleted = false)
         Inactive = 1 //(IsDeleted = true)
     }
 

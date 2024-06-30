@@ -19,7 +19,7 @@
                     <div class="mud-select">
                         <label class="mud-input-label">Chọn danh mục</label>
                         <select @bind="_product.IdCategoryProduct" required>
-                            @foreach (var i in lstBrand)
+                            @foreach (var i in lstCate)
                             {
                                 <option value="@i.Id">@i.Name</option>
                             }
@@ -28,7 +28,7 @@
                     <div class="mud-select">
                         <label class="mud-input-label">Chọn thương hiệu</label>
                         <select @bind="_product.IdBrand" required>
-                            @foreach (var i in lstCate)
+                            @foreach (var i in lstBrand)
                             {
                                 <option value="@i.Id">@i.Name</option>
                             }
