@@ -145,6 +145,7 @@ namespace DATN.Aplication.Services
                            Name = cate.Name,
                            Category = catepro.Name,
                            IsDeleted = cate.IsDeleted,
+                           CategoryId=catepro.Id,
                        };
             if (list.Count() > 0)
                 return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.ToList() };

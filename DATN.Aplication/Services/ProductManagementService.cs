@@ -150,6 +150,7 @@ namespace DATN.Aplication.Services
                             CategoryProduct = cate.Name,
                             Description = product.Description,
                             Status = product.Status,
+                            CategoryProductId=cate.Id,
                         };
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
