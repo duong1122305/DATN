@@ -4,6 +4,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.DTOs.Brand
 @using DATN.ViewModels.DTOs.Category
+@using DATN.ViewModels.DTOs.CategoryProduct
 @using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ServiceManager
 @using MudBlazor
@@ -93,14 +94,14 @@
 
     [Inject]
     private ICategoryServices _cateClient { get; set; }
-    private List<CategoryView> lstCate = new List<CategoryView>();
+    private List<CategoryProductView> lstCate = new List<CategoryProductView>();
 
 
 
     protected async override Task OnInitializedAsync()
     {
         var brand = await _brandClient.ListBrand();
-        var cate = await _cateClient.ListCategory();
+        var cate = await _cateClient.ListCategoryProduct();
         if (brand.IsSuccess && cate.IsSuccess)
         {
             lstBrand = brand.Data;

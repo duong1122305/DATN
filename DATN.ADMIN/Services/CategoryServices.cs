@@ -2,6 +2,7 @@
 using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
+using DATN.ViewModels.DTOs.CategoryProduct;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 
@@ -30,6 +31,13 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<List<CategoryView>>> ListCategory()
         {
             var respone = await _httpClient.GetFromJsonAsync<ResponseData<List<CategoryView>>>("api/cate/List-Category");
+            return respone;
+        }
+
+        public async Task<ResponseData<List<CategoryProductView>>> ListCategoryProduct()
+        {
+
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<List<CategoryProductView>>>("api/cate/List-Category-Product");
             return respone;
         }
 
