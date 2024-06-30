@@ -17,15 +17,6 @@
                 @if (id == 0 || id == null)
                 {
                     <div class="mud-select">
-                        <label class="mud-input-label">Chọn danh mục</label>
-                        <select @bind="_product.IdCategoryProduct" required>
-                            @foreach (var i in lstCate)
-                            {
-                                <option value="@i.Id">@i.Name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mud-select">
                         <label class="mud-input-label">Chọn thương hiệu</label>
                         <select @bind="_product.IdBrand" required>
                             @foreach (var i in lstBrand)
@@ -34,6 +25,16 @@
                             }
                         </select>
                     </div>
+                    <div class="mud-select">
+                        <label class="mud-input-label">Chọn danh mục</label>
+                        <select @bind="_product.IdCategoryProduct" required>
+                            @foreach (var i in lstCate)
+                            {
+                                <option value="@i.Id">@i.Name</option>
+                            }
+                        </select>
+                    </div>
+                    
                     <MudTextField T="string" Label="Tên" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
                 }
@@ -42,7 +43,7 @@
                     <MudTextField T="string" Label="Tên danh mục" @bind-Value="@product.Name" For="@(() => product.Name)" />
                     <MudTextField T="string" Label="Mô tả" @bind-Value="@product.Description" For="@(() => product.Description)" />
                     <div class="mud-select">
-                            <label class="mud-input-label">Chọn danh mục</label>
+                        <label class="mud-input-label">Chọn danh mục</label>
                         <select @bind="product.CategoryProduct" required>
                             @foreach (var i in lstBrand)
                             {
@@ -85,11 +86,11 @@
     [Inject]
     private IProductServices _client { get; set; }
     [Inject]
-    private IBrandServices _brandClient{ get; set; }
+    private IBrandServices _brandClient { get; set; }
     private List<BrandView> lstBrand = new List<BrandView>();
 
     [Inject]
-    private ICategoryServices _cateClient{ get; set; }
+    private ICategoryServices _cateClient { get; set; }
     private List<CategoryView> lstCate = new List<CategoryView>();
 
 
@@ -111,22 +112,33 @@
                 _nameButton = "Thêm mới";
             }
         }
-        
+
     }
     public async Task Create()
     {
         if (await Confirm("thêm mới") == true)
 
         {
-            var result = await _client.CreateProduct(_product);
-            if (result.IsSuccess)
+            if (_product.IdCategoryProduct == 0 || _product.IdCategoryProduct == null)
             {
-
-                Message(result.Data, Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
+                Message("Vui lòng chọn danh mục", Severity.Warning);
+                if (_product.IdBrand == 0 || _product.IdBrand == null)
+                {
+                    Message("Vui lòng chọn thương hiệu", Severity.Warning);
+                }
             }
             else
-                Message(result.Error, Severity.Error);
+            {
+                var result = await _client.CreateProduct(_product);
+                if (result.IsSuccess)
+                {
+
+                    Message(result.Data, Severity.Success);
+                    _dialogBox.Close(DialogResult.Ok(true));
+                }
+                else
+                    Message(result.Error, Severity.Error);
+            }
         }
         else
         {
@@ -145,7 +157,7 @@
 
         if (product != null)
         {
-            
+
 
             var result = await _client.UpdateProduct(_product);
             if (result.IsSuccess)
