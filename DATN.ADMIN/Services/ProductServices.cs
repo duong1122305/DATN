@@ -23,7 +23,7 @@ namespace DATN.ADMIN.Services
         {
             var respone = await _httpClient.PostAsJsonAsync("api/Product/Create-Product", productView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
-            return data!;
+            return data;
         }
 
         public async Task<ResponseData<List<ProductView>>> ListProduct()
