@@ -90,17 +90,13 @@
                     }
                     else
                     {
-                        if (context.Item.WorkDate.Year == dateNow.Year && context.Item.WorkDate.Month == dateNow.Month && context.Item.WorkDate.Day < dateNow.Day)
+                        if (context.Item.WorkDate.CompareTo(dateNow) > 0)
                         {
-                            <span>
-                                <MudChip Color="Color.Error" title="Đã kết thúc">Đã kết thúc</MudChip>
-                            </span>
+                            <MudChip Color="Color.Info" title="Chưa diễn ra">Chưa diễn ra</MudChip>
                         }
                         else
                         {
-                            <span>
-                                <MudChip Color="Color.Info" title="Đã kết thúc">Chưa diễn ra</MudChip>
-                            </span>
+                            <MudChip Color="Color.Error" title="Đã kết thúc">Đã kết thúc</MudChip>
                         }
                     }
                 </CellTemplate>
@@ -172,7 +168,7 @@ else
             {
                 if (selectedTimeRange > 0)
                 {
-                    lstUser = user.Data.Where(c => c.WorkDate >= dateNow.Date && c.WorkDate <= dateNow.AddDays(selectedTimeRange-1)).ToList();
+                    lstUser = user.Data.Where(c => c.WorkDate >= dateNow.Date && c.WorkDate <= dateNow.AddDays(selectedTimeRange - 1)).ToList();
                 }
                 else if (selectedTimeRange < 0)
                 {
