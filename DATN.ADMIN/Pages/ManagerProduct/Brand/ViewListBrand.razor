@@ -12,24 +12,28 @@
 @inject IDialogService _dialogservice;
 
 <PageTitle>Danh sách thương hiệu</PageTitle>
-<MudText Typo="Typo.h3">Danh sách thương hiệu</MudText>
+<MudText Typo="Typo.h3" Style="text-align:center">Danh sách thương hiệu</MudText>
 
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
-<MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
-    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
-    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
-    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
-</MudSelect>
+
 
 
 @if (lstBrand.Count > 0 && lstBrand != null)
 {
     <MudDataGrid Items="@lstBrand" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
         <ToolBarContent>
+            <div style="width:200px">
+                <MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
+                    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
+                    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
+                    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
+                </MudSelect>
+            </div>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+
         </ToolBarContent>
         <Columns>
             <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -42,7 +46,7 @@
             <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    @if (context.Item.Status.HasValue)
+                    @if (context.Item.Status != true)
                     {
                         <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
                     }
@@ -56,7 +60,7 @@
             <PropertyColumn Property="x=>x.Id" Title="Hành động" Filterable="false" Sortable="false">
                 <CellTemplate>
                     <MudButtonGroup Variant="Variant.Filled">
-                        @if (context.Item.Status.HasValue)
+                        @if (context.Item.Status !=true)
                         {
                             <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveBrand(context.Item.Id.Value))"></MudIconButton>
                         }
@@ -196,16 +200,8 @@ else
         parameters.Add("id", id);
         if (id != null)
         {
-            // var updateView = new UserRegisterView()
-            //     {
-            //         FullName = _userView.FullName,
-            //         Address = _userView.Address,
-            //         PhoneNumber = _userView.PhoneNumber,
-            //         Email = _userView.Email,
-            //         Gender = _userView.Gender == "Nam" ? true : false
-            //     };
-            parameters.Add("id", id);
-            // parameters.Add("user", updateView);
+            var brand = lstBrand.FirstOrDefault(x => x.Id == id);
+            parameters.Add("brand", brand);
             nameDialog = "Cập nhật thương hiệu sản phẩm";
         }
         DialogOptions options = new DialogOptions()
