@@ -62,7 +62,7 @@ namespace DATN.Aplication.Services
                                 }
                                 else
                                 {
-                                    if (voucher.StartDate.Hour > dateNow.Hour)
+                                    if (voucher.StartDate.CompareTo(dateNow) <= 0 && voucher.EndDate.CompareTo(dateNow) > 0)
                                     {
                                         voucher.Status = VoucherStatus.GoingOn;
                                     }
