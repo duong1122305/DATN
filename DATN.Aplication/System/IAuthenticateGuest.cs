@@ -11,7 +11,7 @@ namespace DATN.Aplication.System
 	public interface IAuthenticateGuest
 	{
 		Task<ResponseData<string>> Login(UserLoginView request);
-		Task<ResponseData<string>> Logout(string UserName);
+	
 		
 	}
 }
