@@ -44,19 +44,19 @@ namespace DATN.Aplication.Services
                             Quantity = voucherView.Quantity,
                         };
                         var dateNow = DateTime.Now;
-                        if (voucher.StartDate.Year < dateNow.Year || voucher.StartDate.Month < dateNow.Month || voucher.StartDate.Day < dateNow.Day)
+                        if (voucher.StartDate.CompareTo(dateNow.Date) < 0)
                         {
                             return new ResponseData<string> { IsSuccess = false, Error = "Ngày bắt đầu phải lớn hơn ngày hiện tại" };
                         }
                         else
                         {
-                            if (voucher.StartDate.Year > voucher.EndDate.Year || voucher.StartDate.Month > voucher.EndDate.Month || voucher.StartDate.Day > voucher.EndDate.Day)
+                            if (voucher.StartDate.CompareTo(voucher.EndDate) > 0)
                             {
                                 return new ResponseData<string> { IsSuccess = false, Error = "Ngày bắt đầu phải nhỏ hơn ngày kết thúc" };
                             }
                             else
                             {
-                                if (voucher.StartDate.Day > dateNow.Day)
+                                if (voucher.StartDate.CompareTo(dateNow.Date) > 0)
                                 {
                                     voucher.Status = VoucherStatus.NotOccur;
                                 }
