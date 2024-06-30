@@ -42,7 +42,7 @@ namespace DATN.API.Controllers
         }
 
         //api quên mật khẩu
-        [HttpPost("User-ForgotPass")]
+        [HttpGet("User-ForgotPass")]
         public async Task<ResponseMail> ForgotPassword(string mail)
         {
             var result = await _userrepo.ForgotPassword(mail);
@@ -252,6 +252,11 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> ChangeStatusVoucher(int id)
         {
             return await _vouchermanagement.ExpiresVoucher(id);
+        }
+        [HttpGet("Check-Otp")]
+        public async Task<ResponseData<string>> CheckCode(string username,string code)
+        {
+            return await _userrepo.CheckCodeConfirm(username,code);
         }
     }
 }
