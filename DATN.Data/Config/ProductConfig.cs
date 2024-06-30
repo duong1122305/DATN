@@ -22,7 +22,7 @@ namespace DATN.Data.Config
 
             builder.HasOne(c => c.CategoryProduct)
                 .WithMany(c => c.Products)
-                .HasPrincipalKey(c => c.IdCategory)
+                .HasForeignKey(c => c.IdCategoryProduct)
                 .IsRequired();
         }
     }
