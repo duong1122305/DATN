@@ -124,29 +124,17 @@ namespace DATN.Aplication.Services
         {
             var dateNow = DateTime.Now;
             var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
-                        select new VoucherView
-                        {
-                            Id = discount.Id,
-                            VoucherName = discount.VoucherName,
-                            VoucherCode = discount.VoucherCode,
-                            StartDate = discount.StartDate,
-                            EndDate = discount.EndDate,
-                            DiscountPercent = discount.DiscountPercent,
-                            MaxMoneyDiscount = discount.MaxMoneyDiscount,
-                            MinMoneyApplicable = discount.MinMoneyApplicable,
-                            Description = discount.Description,
-                            Quantity = discount.Quantity,
-                            Status = discount.Status
-                        };
-            var querycheck = (from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
-                              select discount).ToList();
+                        select discount;
             List<Discount> listcheck = new List<Discount>();
-            foreach (var item in querycheck)
+            foreach (var item in query.ToList())
             {
                 if (item.EndDate < dateNow)
                 {
-                    item.Status = VoucherStatus.Expired;
-                    listcheck.Add(item);
+                    if (item.Status != VoucherStatus.Expired)
+                    {
+                        item.Status = VoucherStatus.Expired;
+                        listcheck.Add(item);
+                    }
                 }
                 else if (item.StartDate.CompareTo(dateNow) <= 0 && item.EndDate.CompareTo(dateNow) > 0)
                 {
@@ -166,12 +154,30 @@ namespace DATN.Aplication.Services
                 }
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
+
             if (query.Count() > 0)
+            {
+                var list = from discount in query
+                           select new VoucherView
+                           {
+                               Id = discount.Id,
+                               VoucherName = discount.VoucherName,
+                               VoucherCode = discount.VoucherCode,
+                               StartDate = discount.StartDate,
+                               EndDate = discount.EndDate,
+                               DiscountPercent = discount.DiscountPercent,
+                               MaxMoneyDiscount = discount.MaxMoneyDiscount,
+                               MinMoneyApplicable = discount.MinMoneyApplicable,
+                               Description = discount.Description,
+                               Quantity = discount.Quantity,
+                               Status = discount.Status
+                           };
                 return new ResponseData<List<VoucherView>>
                 {
                     IsSuccess = true,
-                    Data = query.ToList()
+                    Data = list.ToList()
                 };
+            }
             else
                 return new ResponseData<List<VoucherView>> { IsSuccess = false, Data = new List<VoucherView>(), Error = "Chưa có voucher nào" };
         }
