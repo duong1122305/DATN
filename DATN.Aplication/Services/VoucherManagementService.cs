@@ -158,8 +158,11 @@ namespace DATN.Aplication.Services
                 }
                 else
                 {
-                    item.Status=VoucherStatus.NotOccur;
-                    listcheck.Add(item);
+                    if (item.DeleteAt == null)
+                    {
+                        item.Status = VoucherStatus.NotOccur;
+                        listcheck.Add(item);
+                    }
                 }
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
