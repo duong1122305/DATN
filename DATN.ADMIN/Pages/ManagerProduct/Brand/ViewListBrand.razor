@@ -14,19 +14,15 @@
 <PageTitle>Danh sách thương hiệu</PageTitle>
 <MudText Typo="Typo.h3" Style="text-align:center">Danh sách thương hiệu</MudText>
 
-
-
-
-
 @if (lstBrand.Count > 0 && lstBrand != null)
 {
     <MudDataGrid Items="@lstBrand" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
         <ToolBarContent>
             <div style="width:200px">
-                <MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
-                    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
-                    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
-                    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
+                <MudSelect T="BrandStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
+                    <MudSelectItem Value="BrandStatus.All">Tất cả</MudSelectItem>
+                    <MudSelectItem Value="BrandStatus.Active">Đang hoạt động</MudSelectItem>
+                    <MudSelectItem Value="BrandStatus.Inactive">Ngừng hoạt động</MudSelectItem>
                 </MudSelect>
             </div>
             <MudSpacer />
@@ -100,14 +96,14 @@ else
 
 
 
-    private enum UserStatus
+    private enum BrandStatus
     {
         All = -1, // lấy tất cả isdeleted
         Active = 0, // (IsDeleted = false)
         Inactive = 1 //(IsDeleted = true)
     }
 
-    private UserStatus selectedStatus = UserStatus.All;
+    private BrandStatus selectedStatus = BrandStatus.All;
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,11 +124,24 @@ else
             lstBrand = new List<BrandView>();
         }
         StateHasChanged();
+        switch (selectedStatus)
+        {
+            case BrandStatus.Active:
+                lstBrand = lstBrand.Where(x => x.Status == true).ToList();
+                break;
+            case BrandStatus.Inactive:
+                lstBrand = lstBrand.Where(x => x.Status != true).ToList();
+                break;
+            case BrandStatus.All:
+            default:
+                lstBrand = brand.Data.OrderByDescending(x => x.Id).ToList();
+                break;
+        }
     }
 
     private async Task HandleStatusChange(ChangeEventArgs e)
     {
-        selectedStatus = (UserStatus)e.Value;
+        selectedStatus = (BrandStatus)e.Value;
         await LoadData();
     }
 
