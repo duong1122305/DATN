@@ -19,7 +19,7 @@
     <MudDataGrid Items="@lstBrand" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
         <ToolBarContent>
             <div style="width:200px">
-                <MudSelect T="BrandStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
+                <MudSelect T="BrandStatus" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="HandleStatusChange">
                     <MudSelectItem Value="BrandStatus.All">Tất cả</MudSelectItem>
                     <MudSelectItem Value="BrandStatus.Active">Đang hoạt động</MudSelectItem>
                     <MudSelectItem Value="BrandStatus.Inactive">Ngừng hoạt động</MudSelectItem>
@@ -56,7 +56,7 @@
             <PropertyColumn Property="x=>x.Id" Title="Hành động" Filterable="false" Sortable="false">
                 <CellTemplate>
                     <MudButtonGroup Variant="Variant.Filled">
-                        @if (context.Item.Status !=true)
+                        @if (context.Item.Status != true)
                         {
                             <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveBrand(context.Item.Id.Value))"></MudIconButton>
                         }
@@ -118,43 +118,79 @@ else
         if (brand.IsSuccess)
         {
             lstBrand = brand.Data.OrderByDescending(x => x.Id).ToList();
+            if (selectedStatus == BrandStatus.All)
+            {
+                lstBrand = brand.Data.OrderByDescending(x => x.Id).ToList();
+            }
+            else if (selectedStatus == BrandStatus.Active)
+            {
+                lstBrand = brand.Data.Where(x => x.Status == true).ToList();
+            }
+            else if (selectedStatus == BrandStatus.Inactive)
+            {
+                lstBrand = brand.Data.Where(x => x.Status != true).ToList();
+                if (lstBrand.Count == null || lstBrand.Count ==0)
+                {
+                    lstBrand = brand.Data.OrderByDescending(x => x.Id).ToList();
+                    Message("Danh sách lọc bị trống", Severity.Warning);
+                }
+                else
+                {
+                lstBrand = brand.Data.Where(x => x.Status != true).ToList();
+                }
+            }
+
         }
         else
         {
             lstBrand = new List<BrandView>();
         }
         StateHasChanged();
-        switch (selectedStatus)
-        {
-            case BrandStatus.Active:
-                lstBrand = lstBrand.Where(x => x.Status == true).ToList();
-                break;
-            case BrandStatus.Inactive:
-                lstBrand = lstBrand.Where(x => x.Status != true).ToList();
-                break;
-            case BrandStatus.All:
-            default:
-                lstBrand = brand.Data.OrderByDescending(x => x.Id).ToList();
-                break;
-        }
+
+
     }
 
-    private async Task HandleStatusChange(ChangeEventArgs e)
+    private async Task HandleStatusChange(BrandStatus stautss)
     {
-        selectedStatus = (BrandStatus)e.Value;
+        selectedStatus = stautss;
         await LoadData();
     }
 
     private Func<BrandView, bool> _quickFilter => x =>
      {
-         if (string.IsNullOrWhiteSpace(searchString))
-             return true;
+         if (selectedStatus == BrandStatus.All && x.Status == true || selectedStatus == BrandStatus.All && x.Status == false)
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
 
-         if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-             return true;
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
 
-         if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-             return true;
+             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+         }
+         else if (selectedStatus == BrandStatus.Active && x.Status == true)
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+         }
+         else
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+         }
          return false;
      };
 
