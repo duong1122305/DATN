@@ -22,11 +22,7 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.RegisterWithUser(request);
         }  
-        [HttpPost("register-guest-no-user")]
-        public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request)
-        {
-            return await _guestManagerService.RegisterNoUser(request);
-        }
+        
   
         [HttpGet("GetGuest")]
         public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging( )

@@ -57,10 +57,6 @@ namespace DATN.Aplication.System
 		}
 
 
-		public Task<ResponseData<string>> Logout(string UserName)
-		{
-			throw new NotImplementedException();
-		}
 		private async Task<string> GenerateTokenString(Guest guest)
 		{
 			
