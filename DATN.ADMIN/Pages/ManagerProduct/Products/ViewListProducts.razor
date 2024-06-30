@@ -18,17 +18,21 @@
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 
 
-@* <MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
-    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
-    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
-    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
-</MudSelect> *@
 
 
-@if (lstCate.Count > 0 && lstCate != null)
+
+@if (lstProduct.Count > 0 && lstProduct != null)
 {
-    <MudDataGrid Items="@lstCate" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
+    <MudDataGrid Items="@lstProduct" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
+        
         <ToolBarContent>
+            <div style="width:200px">
+                <MudSelect T="ProductStatus" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" @ValueChanged="HandleStatusChange">
+                    <MudSelectItem Value="ProductStatus.All">Tất cả</MudSelectItem>
+                    <MudSelectItem Value="ProductStatus.Active">Đang hoạt động</MudSelectItem>
+                    <MudSelectItem Value="ProductStatus.Inactive">Ngừng hoạt động</MudSelectItem>
+                </MudSelect>
+            </div>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
@@ -36,7 +40,7 @@
         <Columns>
             <TemplateColumn Title="STT" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <span>@(lstCate.IndexOf(context.Item) + 1)</span>
+                    <span>@(lstProduct.IndexOf(context.Item) + 1)</span>
                 </CellTemplate>
             </TemplateColumn>
             <PropertyColumn Property="x => x.CategoryProduct" Title="Danh mục sản phẩm" Sortable="false" Filterable="false" />
@@ -47,11 +51,12 @@
                 <CellTemplate>
                     @if (!context.Item.Status)
                     {
-                        <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
+                        <MudChip Color="Color.Error" title="Ngưng hoạt động">Ngưng hoạt động</MudChip>
                     }
                     else
                     {
-                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
+                        <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
+
                     }
                 </CellTemplate>
             </TemplateColumn>
@@ -60,11 +65,12 @@
                     <MudButtonGroup Variant="Variant.Filled">
                         @if (!context.Item.Status)
                         {
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await DeleteProduct(context.Item.Id))" title="Xoá"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveProduct(context.Item.Id.Value))"></MudIconButton>
                         }
                         else
                         {
-                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveProduct(context.Item.Id))"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await DeleteProduct(context.Item.Id.Value))" title="Xoá"></MudIconButton>
+
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
                     </MudButtonGroup>
@@ -72,7 +78,7 @@
             </TemplateColumn>
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="CategoryView" />
+            <MudDataGridPager T="ProductView" />
         </PagerContent>
     </MudDataGrid>
 
@@ -87,28 +93,20 @@ else
     }
 </style>
 @code {
-    // public int? Id { get; set; }
-    // public int IdCategoryProduct { get; set; }
-    // public string Name { get; set; }
-    // public string? Description { get; set; }
-    // public bool Status { get; set; }
-    // public int IdBrand { get; set; }
-    //button trạng thái
-    private bool _disableElevation = false;
     private string searchString = "";
-    private List<ProductView> lstCate = new List<ProductView>();
+    private List<ProductView> lstProduct = new List<ProductView>();
     [Inject]
     private IProductServices _client { get; set; }
 
 
-    private enum UserStatus
+    private enum ProductStatus
     {
         All = -1, // lấy tất cả isdeleted
         Active = 0, // (IsDeleted = false)
         Inactive = 1 //(IsDeleted = true)
     }
 
-    private UserStatus selectedStatus = UserStatus.All;
+    private ProductStatus selectedStatus = ProductStatus.All;
 
 
     protected override async Task OnInitializedAsync()
@@ -123,19 +121,19 @@ else
         var respone = await _client.ListProduct();
         if (respone.IsSuccess)
         {
-            lstCate = respone.Data.OrderByDescending(x => x.Id).ToList();
+            lstProduct = respone.Data.OrderByDescending(x => x.Id).ToList();
         }
         else
         {
-            lstCate = new List<ProductView>();
+            lstProduct = new List<ProductView>();
         }
     }
 
-    // private async Task HandleStatusChange(ChangeEventArgs e)
-    // {
-    //     selectedStatus = (UserStatus)e.Value;
-    //     await LoadData();
-    // }
+    private async Task HandleStatusChange(ProductStatus e)
+    {
+        selectedStatus = e;
+        await LoadData();
+    }
 
     private Func<ProductView, bool> _quickFilter => x =>
      {
@@ -162,11 +160,11 @@ else
     }
 
     //Thông báo hỏi khi xoá
-    private async Task DeleteProduct(int? id)
+    private async Task DeleteProduct(int id)
     {
         if (await Confirm() == true)
         {
-            var response2 = await _client.RemoveProduct(Convert.ToInt32(id));
+            var response2 = await _client.RemoveProduct(id);
             if (response2.IsSuccess)
             {
                 Message(response2.Data, Severity.Success);
@@ -179,9 +177,9 @@ else
         }
     }
 
-    private async Task ActiveProduct(int? id)
+    private async Task ActiveProduct(int id)
     {
-        var repon = await _client.ActiveProduct(Convert.ToInt32(id));
+        var repon = await _client.ActiveProduct(id);
         if (repon.IsSuccess)
         {
             Message(repon.Data, Severity.Success);
@@ -202,7 +200,8 @@ else
         parameters.Add("id", id);
         if (id != null)
         {
-            parameters.Add("id", id);
+            var productUpda = lstProduct.FirstOrDefault(x => x.Id == id);
+            parameters.Add("", productUpda);
             nameDialog = "Cập nhật sản phẩm";
         }
         DialogOptions options = new DialogOptions()

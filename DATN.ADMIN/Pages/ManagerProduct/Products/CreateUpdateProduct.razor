@@ -1,4 +1,4 @@
-﻿@* @page "/CreateUpdateProdcut"
+﻿@page "/CreateUpdateProdcut"
 
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
@@ -8,22 +8,20 @@
 @using MudBlazor
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
-<EditForm Model="@_product" OnValidSubmit="@(async () => await Submit())">
+<EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
 
                 @if (id == 0 || id == null)
                 {
-                    <MudTextField T="string" Label="Tên danh mục sản phẩm" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
+                    <MudTextField T="string" Label="Tên danh mục sản phẩm" @bind-Value="@product.Name" For="@(() => _product.Name)" />
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
-                    <MudTextField T="string" Label="Nhãn hàng" @bind-Value="@_product.Brand" For="@(() => _product.Brand)" />
                 }
                 else
                 {
                     <MudTextField T="string" Label="Tên danh mục" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
                     <MudTextField T="string" Label="Mô tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
-                    <MudTextField T="string" Label="Nhãn hàng" @bind-Value="@_product.Brand" For="@(() => _product.Brand)" />
                 }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
@@ -152,4 +150,3 @@
         Snackbar.Add(message, severity);
     }
 }
- *@
