@@ -17,7 +17,7 @@
 
 	<MudDrawerContainer Class="mud-height-full" Style="padding:20px">
 
-		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="650px" Height="100%" Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
+		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Never" Fixed=true Width="650px" Height="100%" Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent">
 			<MudDrawerHeader style="display: flex; justify-content: space-between; align-items: center;">
 				<MudText Typo="Typo.h6">Thông tin khách hàng</MudText>
 				<MudIconButton Icon="@Icons.Material.Filled.Close" @onclick="() => ChangDetailPopup()" />

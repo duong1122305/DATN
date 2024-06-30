@@ -15,6 +15,10 @@ namespace DATN.Utilites
         public const int Cancel = 14;
         public const int Complete = 15;
         public const int Payment = 16;
+        //
+        //gán ID của khách lẻ
+        public static readonly Guid GuestsID = Guid.Parse("CF9FA787-B64C-462A-A3BA-08DC8D178FC0");
 
-	}
+
+    }
 }
