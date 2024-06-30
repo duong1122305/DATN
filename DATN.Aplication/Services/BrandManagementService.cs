@@ -118,7 +118,7 @@ namespace DATN.Aplication.Services
                 if (brand != null)
                 {
 
-                    brand.Status = false;
+                    brand.Status = true;
                     await _unitOfWork.BrandRepository.UpdateAsync(brand);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
