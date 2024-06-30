@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
+using DATN.ViewModels.DTOs.ProductDetail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,25 +135,29 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
             }
         }
-        public async Task<ResponseData<List<ProductView>>> ListProduct()
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProduct()
         {
-            var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
-                        join brand in await _unitOfWork.BrandRepository.GetAllAsync()
-                        on product.IdBrand equals brand.Id
-                        join cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
-                        on product.IdCategoryProduct equals cate.Id
-                        select new ProductView()
+            var query = from productde in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                        join product in await _unitOfWork.ProductRepository.GetAllAsync()
+                        on productde.IdProduct equals product.Id
+                        join pettype in await _unitOfWork.PetTypeRepository.GetAllAsync()
+                        on productde.IdPetType equals pettype.Id
+                        select new ProductDetaiView()
                         {
                             Id = product.Id,
-                            Brand = brand.Name,
-                            CategoryProduct = cate.Name,
-                            Description = product.Description,
-                            Status = product.Status,
+                            Amount = productde.Amount,
+                            IsDeleted = productde.IsDeleted,
+                            Name = productde.Name,
+                            PetType = pettype.Name,
+                            PetTypeId = pettype.Id,
+                            Price = productde.Price,
+                            Product = product.Name,
+                            ProductId = product.Id,
                         };
             if (query.Count() > 0)
-                return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
+                return new ResponseData<List<ProductDetaiView>> { IsSuccess = true, Data = query.ToList() };
             else
-                return new ResponseData<List<ProductView>> { IsSuccess = false, Error = "Chưa có dữ liệu", Data = new List<ProductView>() };
+                return new ResponseData<List<ProductDetaiView>> { IsSuccess = false, Error = "Chưa có dữ liệu", Data = new List<ProductDetaiView>() };
         }
     }
 }
