@@ -146,6 +146,7 @@ namespace DATN.Aplication.Services
                         {
                             Id = product.Id,
                             Brand = brand.Name,
+                            Name = product.Name,
                             CategoryProduct = cate.Name,
                             Description = product.Description,
                             Status = product.Status,
