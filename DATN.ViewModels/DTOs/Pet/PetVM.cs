@@ -29,6 +29,6 @@ namespace DATN.ViewModels.DTOs.Pet
 
 		public string? Note { get; set; } // Ghi chú
 		public string? Address {  get; set; }	
-		public string? IsDelete {  get; set; }	
+		public bool IsDelete {  get; set; }	
 	}
 }

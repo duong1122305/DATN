@@ -11,159 +11,175 @@
 @using DATN.ViewModels.DTOs.PetSpecies
 
 <EditForm Model="@pet" OnValidSubmit="@(async()=>await Submit())">
-    <DataAnnotationsValidator />
-    <MudItem xs="12" sm="12">
-        <MudCard>
-            <MudCardContent>
-                <MudTextField @bind-Value="@pet.Name" Label="Tên Pet" For="@(() => pet.Name)" Required=true HelperText="Hãy điền tên pet" />
-                <MudTextField @bind-Value="@pet.Weight" Label="Cân Nặng" For="@(() => pet.Weight)" />
-                <ValidationMessage For="@(() => pet.Weight)" />
-                <MudDatePicker Label="Ngày sinh" Color="Color.Primary" @bind-Date="pet.Birthday" />
-                <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
-                    <MudRadioGroup @bind-Value="@pet.Gender" Name="Giới tính" Required=true HelperText="Hãy chọn giới tính">
-                        <MudRadio Value="@(true)" Color="Color.Primary">Đực</MudRadio>
-                        <MudRadio Value="@(false)" Color="Color.Secondary">Cái</MudRadio>
-                    </MudRadioGroup>
-                </MudField>
+	<DataAnnotationsValidator />
+	<MudItem xs="12" sm="12">
+		<MudCard>
+			<MudCardContent>
+				<MudTextField @bind-Value="@pet.Name" Label="Tên Pet" For="@(() => pet.Name)" Required=true HelperText="Hãy điền tên pet" />
+				<MudNumericField  Required=true @bind-Value="@pet.Weight" Label="Cân Nặng" For="@(() => pet.Weight)" />
+				<ValidationMessage For="@(() => pet.Weight)" />
+				<MudDatePicker Label="Ngày sinh" Color="Color.Primary" @bind-Date="pet.Birthday" />
+				<MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
+					<MudRadioGroup @bind-Value="@pet.Gender" Name="Giới tính" Required=true HelperText="Hãy chọn giới tính">
+						<MudRadio Value="@(true)" Color="Color.Primary">Đực</MudRadio>
+						<MudRadio Value="@(false)" Color="Color.Secondary">Cái</MudRadio>
+					</MudRadioGroup>
+				</MudField>
+	
 
-                <MudSelect Class="mud-mb-2" T="PetSpeciesVM" @bind-Value="@selectedSpecies" Label="Loài" Width="200px">
-                    @foreach (var item in lstPetSpecies)
-                    {
-                        <MudSelectItem Value="@item">@item.Name</MudSelectItem>
-                    }
-                </MudSelect>
-              
+				<MudAutocomplete Required="true" T="PetSpeciesVM" Label="Loài" @bind-Value="selectedSpecies" SearchFunc="@SearchSpecies"
+				    ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+								 ResetValueOnEmptyText="false" Text="@selectedSpecies.Name"
+								 CoerceText="true" CoerceValue="false"/>
 
-                <MudSwitch @bind-Value="pet.Vaccinated" Color="Color.Primary" Label=": Tiêm phòng" />
-                <MudSwitch @bind-Value="pet.Neutered" Color="Color.Primary" Label=": Triệt sản" />
-                <MudTextField @ref="multilineReference" T="string" Label="Ghi chú" Lines="3" Variant="Variant.Outlined" @bind-Value="pet.Note" Adornment="Adornment.End" OnAdornmentClick="@(() => multilineReference.SelectRangeAsync(5, 10))" />
-                <hr class="hr" />
-                <div class="mt-5 me-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
+
+				<MudChipSet @bind-SelectedChip=selected Filter="true" Mandatory="true">
+					<MudText>Triệt sản: </MudText>
+					<MudChip Value="null" Default="pet.Neutered==null" Variant="Variant.Text">Không rõ</MudChip>
+					<MudChip Value="true" Default="pet.Neutered==true" Text="purple" Variant="Variant.Text" Color="Color.Primary">Đã triệt sản</MudChip>
+					<MudChip Value="false" Default="pet.Neutered==false" Text="green" Variant="Variant.Text" Color="Color.Primary">Chưa triệt sản</MudChip>
+				</MudChipSet>
+
+				<MudTextField @ref="multilineReference" T="string" Label="Ghi chú" Lines="3" Variant="Variant.Outlined" @bind-Value="pet.Note" Adornment="Adornment.End" OnAdornmentClick="@(() => multilineReference.SelectRangeAsync(5, 10))" />
+				<hr class="hr" />
+				<div class="mt-5 me-5" style="text-align: end;">
+					<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+				</div>
+			</MudCardContent>
+		</MudCard>
+	</MudItem>
 </EditForm>
 
 @code {
-    [Inject]
-    private IPetServiceClient _client { get; set; }
-    [Inject]
-    private IPetSpeciesServiceClient _petClient { get; set; }
-    [Inject]
-    private ISnackbar snackbar { get; set; }
+	[Inject]
+	private IPetServiceClient _client { get; set; }
+	[Inject]
+	private IPetSpeciesServiceClient _petClient { get; set; }
+	[Inject]
+	private ISnackbar snackbar { get; set; }
 
-    [CascadingParameter]
-    MudDialogInstance _dialogBox { get; set; }
-    private string _nameButton = "Thêm mới";
+	[CascadingParameter]
+	MudDialogInstance _dialogBox { get; set; }
+	private string _nameButton = "Thêm mới";
 
-    [Parameter]
-    public PetCreateUpdate pet { get; set; } = new PetCreateUpdate()
-        {
-            Gender = false,
-            Vaccinated = false,
-            Neutered = false,
-        };
+	[Parameter]
+	public PetCreateUpdate pet { get; set; } = new PetCreateUpdate()
+		{
+			Gender = false,
+		};
 
-    [Parameter]
-    public Guid guestID { get; set; }
+	[Parameter]
+	public Guid guestID { get; set; }
 
 
-    private bool coerceValue{ get; set; }
-    private MudTextField<string> multilineReference;
-    public PetSpeciesVM selectedSpecies = new PetSpeciesVM();
-    public List<PetSpeciesVM> lstPetSpecies = new List<PetSpeciesVM>();
-    private bool IsNew = true;
-    private string AddressCode = "";
+	MudChip selected;
+	MudChip selectedVaccinated;
+	private bool coerceValue { get; set; }
+	private MudTextField<string> multilineReference;
+	public PetSpeciesVM selectedSpecies = new PetSpeciesVM();
+	public PetSpeciesVM selectedSpecies2 = new PetSpeciesVM();
+	public List<PetSpeciesVM> lstPetSpecies = new List<PetSpeciesVM>();
+	private bool IsNew = true;
+	private string AddressCode = "";
 
-    protected override async Task OnInitializedAsync()
-    {
-        var dataSpecies = await _petClient.GetAll();
-        lstPetSpecies = dataSpecies.Data!;
-        selectedSpecies = lstPetSpecies.First();
-        if (!string.IsNullOrEmpty(pet.Name))
-        {
-            _nameButton = "Cập nhật";
-            IsNew = false;
-            selectedSpecies = lstPetSpecies.FirstOrDefault(s => s.Id == pet.SpeciesId);
-        }
-    }
-    private async Task<IEnumerable<PetSpeciesVM>> SearchAsync(string value)
-    {
-        // In real life use an asynchronous function for fetching data from an api.
-        await Task.Delay(5);
+	protected override async Task OnInitializedAsync()
+	{
+		var dataSpecies = await _petClient.GetAll();
+		lstPetSpecies = dataSpecies.Data!;
+		selectedSpecies = lstPetSpecies.First();
+		if (!string.IsNullOrEmpty(pet.Name))
+		{
+			_nameButton = "Cập nhật";
+			IsNew = false;
+			selectedSpecies = lstPetSpecies.FirstOrDefault(s => s.Id == pet.SpeciesId)!;
 
-        // if text is null or empty, show complete list
-        if (string.IsNullOrEmpty(value))
-        {
-            return lstPetSpecies;
-        }
+		}
+	}
+	private async Task<IEnumerable<PetSpeciesVM>> SearchSpecies(string value)
+	{
 
-        return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-    }
-    protected async Task Create()
-    {
-        var confirm = await Confirm("tạo mới");
-        if (!confirm)
-        {
-            return;
-        }
-        var result = await _client.CreatePet(pet);
-        if (result.IsSuccess)
-        {
-            Snackbar.Add(result.Data, Severity.Success);
-            _dialogBox.Close();
-        }
-        else
-        {
-            Snackbar.Add(result.Error, Severity.Error);
-        }
-    }
+		if (string.IsNullOrEmpty(value))
+			return lstPetSpecies;
 
-    private async Task<bool> Confirm(string text)
-    {
-        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} thú cưng?",
-        yesText: "Xác nhận",
-        cancelText: "Hủy", noText: null,
-        options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-        StateHasChanged();
-        if (!confirm.HasValue) return false;
-        return confirm.Value;
-    }
+		return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+	}
+	private async Task<IEnumerable<PetSpeciesVM>> SearchAsync(string value)
+	{
+		// In real life use an asynchronous function for fetching data from an api.
+		await Task.Delay(5);
 
-    public async Task Update()
-    {
-        var confirm = await Confirm("cập nhật");
-        if (!confirm)
-        {
-            return;
-        }
-        var result = await _client.UpdatePet(pet);
-        if (result.IsSuccess)
-        {
-            Snackbar.Add(result.Data, Severity.Success);
-            _dialogBox.Close();
-        }
-        else
-        {
-            Snackbar.Add(result.Error, Severity.Error);
-        }
-    }
+		// if text is null or empty, show complete list
+		if (string.IsNullOrEmpty(value))
+		{
+			return lstPetSpecies;
+		}
 
-    private async Task Submit()
-    {
-        pet.SpeciesId = selectedSpecies.Id;
-        pet.OwnerId = guestID;
+		return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+	}
+	protected async Task Create()
+	{
+		var confirm = await Confirm("tạo mới");
+		if (!confirm)
+		{
+			return;
+		}
+		var result = await _client.CreatePet(pet);
+		if (result.IsSuccess)
+		{
+			Snackbar.Add(result.Data, Severity.Success);
+			_dialogBox.Close();
+		}
+		else
+		{
+			Snackbar.Add(result.Error, Severity.Error);
+		}
+	}
 
-        if (IsNew)
-        {
-            await Create();
-        }
-        else
-        {
-            await Update();
-        }
-        StateHasChanged();
-    }
+	private async Task<bool> Confirm(string text)
+	{
+		var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} thú cưng?",
+		yesText: "Xác nhận",
+		cancelText: "Hủy", noText: null,
+		options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+		StateHasChanged();
+		if (!confirm.HasValue) return false;
+		return confirm.Value;
+	}
+
+	public async Task Update()
+	{
+
+		var confirm = await Confirm("cập nhật");
+		if (!confirm)
+		{
+			return;
+		}
+		var result = await _client.UpdatePet(pet);
+		if (result.IsSuccess)
+		{
+			Snackbar.Add(result.Data, Severity.Success);
+			_dialogBox.Close();
+		}
+		else
+		{
+			Snackbar.Add(result.Error, Severity.Error);
+		}
+	}
+
+	private async Task Submit()
+	{
+		pet.SpeciesId = selectedSpecies.Id;
+		pet.OwnerId = guestID;
+		if (selected.Value != null) pet.Neutered = (bool)selected.Value;
+
+		if (IsNew)
+		{
+			await Create();
+		}
+		else
+		{
+			await Update();
+		}
+		StateHasChanged();
+	}
 }

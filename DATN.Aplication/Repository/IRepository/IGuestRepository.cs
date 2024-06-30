@@ -11,5 +11,6 @@ namespace DATN.Aplication.Repository.IRepository
         Task<bool> CheckUserExist(string user);
         Task<bool> CheckPhoneNumberExist(string phoneNumber);
         Task<bool> SoftDelete(DeleteRequest<Guid> request);
+        Task<Guest> FindByEmail(string email);
     }
 }

@@ -71,7 +71,7 @@ namespace DATN.Aplication.Services
             {
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
                 var lstPet = await _unitOfWork.PetRepository.GetAllAsync();
-                var response = result.Where(p => p.IsComfirm == true).OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
+                var response = result.OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
                 {
                     Address = p.Address,
                     Email = p.Email,
@@ -82,6 +82,7 @@ namespace DATN.Aplication.Services
                     Password = p.PasswordHash != null ? _passwordExtensitons.Decrypt(p.PasswordHash) : "",
                     PhoneNumber = p.PhoneNumber,
                     UserName = p.UserName,
+                    IsConfirm = p.IsComfirm
                 }).ToList();
                 foreach (var item in response)
                 {
@@ -163,8 +164,10 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var checkMail= _unitOfWork.GuestRepository.CheckEmailExist(request.Email);
-                if (checkMail != null)
+                bool checkMail = true;
+                if (request.Email != null)
+                    checkMail = await _unitOfWork.GuestRepository.CheckEmailExist(request.Email);
+                if (!checkMail)
                 {
                     return new ResponseData<string>(false, "Tài khoản email đã được đăng ký trước đó");
                 }
@@ -172,7 +175,7 @@ namespace DATN.Aplication.Services
                 bool createUser = !string.IsNullOrEmpty(request.Email);
                 if (createUser)
                 {
-                    randomPass = GeneratePassword();
+                    randomPass = _passwordExtensitons.GeneratePassword();
                 }
                 var guest = new Guest()
                 {
@@ -256,13 +259,15 @@ namespace DATN.Aplication.Services
                     RegisteredAt = DateTime.Now,
                     UserName = request.UserName,
                     PasswordHash = _passwordExtensitons.HashPassword(request.Password),
-                    IsComfirm = false,
+                    IsComfirm = false
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
+
+                var verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
+                guest.VerifyCode = verifyCode;
+
                 var result = await _unitOfWork.SaveChangeAsync();
-
-
-                await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, request.Password, guest.Id.ToString());
+                await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, request.Password, verifyCode);
                 if (result > 0)
                 {
                     return new ResponseData<string>
@@ -365,14 +370,67 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<string>> VerififyUser(string verifyConstring, string mail)
+        public async Task<ResponseData<string>> SendForgotMail(string mail)
         {
             try
             {
 
-                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(verifyConstring));
-                if (guest != null && guest.Email == mail)
+                var guest = await _unitOfWork.GuestRepository.FindByEmail(mail.Trim());
+
+                if (guest != null)
                 {
+
+                    string verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());
+                    guest.VerifyCode = verifyCode;
+                    await _unitOfWork.GuestRepository.UpdateAsync(guest);
+                    var result = await _unitOfWork.SaveChangeAsync();
+                    if (result == 0)
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Error = "Có gì đó sai sai"
+                        };
+                    }
+                    await _mailExtension.SendMailCodeForgot(guest.Email, guest.VerifyCode);
+
+                }
+                return new ResponseData<string>
+                {
+                    IsSuccess = true,
+                    Error = "Tin nhắn đã gửi vào mail của quý khách"
+                };
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Có lỗi xảy ra: " + ex.Message
+                };
+            }
+        }
+        public async Task<ResponseData<string>> VerififyUser(string verifyCode)
+        {
+            try
+            {
+                string verifyString = _passwordExtensitons.DeCode(verifyCode);// giải mã thông tin xác minh
+                string[] dataVerify = verifyString.Split('|');// [0] id khách // [1] mã thời hạn
+
+                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
+                if (guest != null && guest.VerifyCode == verifyCode)
+                {
+                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Error = "Thông tin xác minh của bạn đã quá hạn"
+                        };
+                    }
                     guest.IsComfirm = true;
                     var result = await _unitOfWork.SaveChangeAsync();
 
@@ -389,7 +447,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string>
                 {
                     IsSuccess = false,
-                    Error = "Xác minh thất bại thất bại"
+                    Error = "Tài khoản đã được xác minh hoặc mã xác minh sai"
                 };
             }
             catch (Exception ex)
@@ -397,54 +455,64 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string>
                 {
                     IsSuccess = false,
-                    Error = ex.Message
+                    Error = "Có lỗi trong quá trình xác minh"
                 };
             }
         }
 
-        private string GeneratePassword()
+
+        public async Task<ResponseData<string>> ChangPassWithVerifyCode(string verifyCode, string newPass)
         {
-            int passLength = 8;
-            const string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
-            const string digits = "0123456789";
-            const string specialChars = "!@#$%^&*()_+<>?";
-
-            string allChars = upperCase + lowerCase + digits + specialChars;
-            Random random = new Random();
-
-            StringBuilder password = new StringBuilder();
-
-            // Add one random character from each category to ensure the password contains at least one of each
-            password.Append(upperCase[random.Next(upperCase.Length)]);
-            password.Append(lowerCase[random.Next(lowerCase.Length)]);
-            password.Append(digits[random.Next(digits.Length)]);
-            password.Append(specialChars[random.Next(specialChars.Length)]);
-
-            // Fill the rest of the password length with random characters
-            for (int i = 4; i < passLength; i++)
+            try
             {
-                password.Append(allChars[random.Next(allChars.Length)]);
-            }
+                var checkPass= _passwordExtensitons.ValidatePassword(newPass);
+                if (!checkPass.IsSuccess)
+                {
+                    return checkPass;
+                }
+                string verifyString = _passwordExtensitons.DeCode(verifyCode);// giải mã thông tin xác minh
+                string[] dataVerify = verifyString.Split('|');// [0] id khách // [1] mã thời hạn
 
-            // Shuffle the password to remove any predictable pattern
-            return ShuffleString(password.ToString());
+                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
+                if (guest != null)
+                {
+                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Error = "Thông tin xác minh của bạn đã quá hạn"
+                        };
+                    }
+                    guest.PasswordHash = _passwordExtensitons.HashPassword(newPass);
+                    var result = await _unitOfWork.SaveChangeAsync();
+
+                    if (result > 0)
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Data = " Thay đổi mật khẩu thành công"
+                        };
+                    }
+                }
+
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Thay đôi mật khẩu thất bại"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Có lỗi trong quá trình thay đổi mật khẩu"
+                };
+            }
         }
 
-        private string ShuffleString(string input)
-        {
-            char[] array = input.ToCharArray();
-            Random random = new Random();
-            int n = array.Length;
-            for (int i = n - 1; i > 0; i--)
-            {
-                int j = random.Next(i + 1);
-                char temp = array[i];
-                array[i] = array[j];
-                array[j] = temp;
-            }
-            return new string(array);
-        }
 
     }
 }

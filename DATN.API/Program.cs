@@ -12,6 +12,8 @@ using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
 using System.Net;
 using DATN.Aplication.Mapping;
+using Microsoft.AspNetCore.Mvc;
+using DATN.ViewModels.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +61,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
+builder.Services.AddScoped<IAuthenticateGuest, AuthenticateGuest>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
 builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
@@ -74,6 +77,22 @@ builder.Services.AddScoped<IServiceDetailManagementService, ServiceDetailManagem
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
+
+builder.Services.AddMvcCore().ConfigureApiBehaviorOptions(options => {
+	options.InvalidModelStateResponseFactory = (errorContext) =>
+	{
+		var errors = errorContext.ModelState.Values.SelectMany(e => e.Errors.Select(m => new
+		{
+			ErrorMessage = m.ErrorMessage
+		})).ToList();
+		var result = new ResponseData<string>()
+		{
+				IsSuccess = false,
+				Error = errors.Select(e => e.ErrorMessage).First()
+		};
+		return new BadRequestObjectResult(result);
+	};
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

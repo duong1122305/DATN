@@ -15,9 +15,9 @@
 @if (lstGuest != null && lstGuest.Count > 0)
 {
 
-	<MudDrawerContainer Class="mud-height-full" Style="padding:20px">
+	<MudDrawerContainer Class="mud-height-full" Style="padding:20px; width:100%" >
 
-		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Always" Fixed=true Width="650px" Height="100%" Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
+		<MudDrawer @bind-Open="@cusDetailOpen" ClipMode="DrawerClipMode.Never" Fixed=true Width="650px" Height="100%" Color="Color.Info" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Temporary">
 			<MudDrawerHeader style="display: flex; justify-content: space-between; align-items: center;">
 				<MudText Typo="Typo.h6">Thông tin khách hàng</MudText>
 				<MudIconButton Icon="@Icons.Material.Filled.Close" @onclick="() => ChangDetailPopup()" />
@@ -61,8 +61,9 @@
 				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.CountPet)">Thú cưng</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.IsConfirm)">Xác minh</MudTableSortLabel></MudTh>
 				<MudTh Class="text-center">Trạng thái</MudTh>
-				<MudTh Class="justify-center">Thao tác</MudTh>
+				<MudTh Class="justify-center">Hành động</MudTh>
 			</HeaderContent>
 			<RowTemplate>
 				@{
@@ -79,15 +80,30 @@
 					}
 				}
 				<MudTd DataLabel="Giới tính">@gender</MudTd>
-				<MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Address) ?? "Không có địa chỉ")</MudTd>
-				<MudTd DataLabel="Email">@context.Email</MudTd>
+				<MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Address!) ?? "Không có địa chỉ")</MudTd>
+				<MudTd DataLabel="Email">@(context.Email??"Không có email")</MudTd>
 				<MudTd @onclick="@(async()=>await OpeListPetDialog(context.Id))" DataLabel="Thú cưng">
 					<div style="display: flex; align-items: center;">
 						<span>@context.CountPet</span>
 						<MudIcon Color="Color.Primary" Icon="@Icons.Material.Filled.AddBox" style="margin-left: 8px;" />
 					</div>
 				</MudTd>
+				@if (context.IsConfirm??false)
+				{
+					<MudTd DataLabel="Email" Style="text-align:center;">
 
+						<MudChip Style="width:120px!important;" Color="Color.Success" >Đã xác minh</MudChip>
+
+					</MudTd>
+				}
+				else
+				{
+					<MudTd DataLabel="Email" Style="text-align:center;">
+
+						<MudChip Style="width:120px!important;" Color="Color.Error">Chưa xác minh</MudChip>
+
+					</MudTd>
+				}
 
 				<MudTd>
 					<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
@@ -192,11 +208,11 @@ else
 
 	private bool FilterFunc(GuestViewModel element)// lọc data
 	{
-		if (string.IsNullOrWhiteSpace(searchString))
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
 			return true;
-		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+		if (element.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
 			return true;
-		if (element.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+		if (element.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
 			return true;
 		return false;
 	}
@@ -257,6 +273,7 @@ else
 				CloseButton = true,
 				FullWidth = true,
 				DisableBackdropClick = true,
+				
 			};
 		var createUpdateDialog = await _dialogservice.ShowAsync<ViewPetOfGuest>(nameDialog, parameters, options);
 		var result = await createUpdateDialog.Result;

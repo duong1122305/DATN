@@ -14,8 +14,8 @@
 		<MudCard>
 			<MudCardContent>
 				<MudTextField @bind-Value="@petSpecies.Name" Label="Tên loài" For="@(() => petSpecies.Name)" />
-				<MudSelect Class="mud-mb-2" Value=@petSpecies.PetTypeId Label="Loại thú cưng" For="@(() => petSpecies.PetTypeId)">
-					<MudSelectItem Value="1">Chó</MudSelectItem>
+				<MudSelect Class="mud-mb-2" @bind-Value=@petSpecies.PetTypeId Label="Loại thú cưng" For="@(() => petSpecies.PetTypeId)">
+					<MudSelectItem  Value="1">Chó</MudSelectItem>
 					<MudSelectItem Value="2">Mèo</MudSelectItem>
 				</MudSelect>
 				<hr class="hr" />
