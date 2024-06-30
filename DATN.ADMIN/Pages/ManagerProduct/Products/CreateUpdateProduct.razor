@@ -2,26 +2,63 @@
 
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.Brand
 @using DATN.ViewModels.DTOs.Category
 @using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ServiceManager
 @using MudBlazor
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
-<EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
+<EditForm Model="@_product" OnValidSubmit="@(async () => await Submit())">
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
 
                 @if (id == 0 || id == null)
                 {
-                    <MudTextField T="string" Label="Tên danh mục sản phẩm" @bind-Value="@product.Name" For="@(() => _product.Name)" />
+                    <div class="mud-select">
+                        <label class="mud-input-label">Chọn danh mục</label>
+                        <select @bind="_product.IdCategoryProduct" required>
+                            @foreach (var i in lstBrand)
+                            {
+                                <option value="@i.Id">@i.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mud-select">
+                        <label class="mud-input-label">Chọn thương hiệu</label>
+                        <select @bind="_product.IdBrand" required>
+                            @foreach (var i in lstCate)
+                            {
+                                <option value="@i.Id">@i.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <MudTextField T="string" Label="Tên" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
                 }
                 else
                 {
-                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
-                    <MudTextField T="string" Label="Mô tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
+                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@product.Name" For="@(() => product.Name)" />
+                    <MudTextField T="string" Label="Mô tả" @bind-Value="@product.Description" For="@(() => product.Description)" />
+                    <div class="mud-select">
+                            <label class="mud-input-label">Chọn danh mục</label>
+                        <select @bind="product.CategoryProduct" required>
+                            @foreach (var i in lstBrand)
+                            {
+                                <option value="@i.Id">@i.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mud-select">
+                        <label class="mud-input-label">Chọn thương hiệu</label>
+                        <select @bind="product.Brand" required>
+                            @foreach (var i in lstCate)
+                            {
+                                <option value="@i.Id">@i.Name</option>
+                            }
+                        </select>
+                    </div>
                 }
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
@@ -35,11 +72,6 @@
 </EditForm>
 
 @code {
-    // public string CategoryProduct { get; set; }
-    // public string Name { get; set; }
-    // public string? Description { get; set; }
-    // public bool Status { get; set; }
-    // public string Brand { get; set; }
     [Parameter]
     public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
@@ -52,17 +84,34 @@
     string _nameButton = "";
     [Inject]
     private IProductServices _client { get; set; }
+    [Inject]
+    private IBrandServices _brandClient{ get; set; }
+    private List<BrandView> lstBrand = new List<BrandView>();
+
+    [Inject]
+    private ICategoryServices _cateClient{ get; set; }
+    private List<CategoryView> lstCate = new List<CategoryView>();
+
+
 
     protected async override Task OnInitializedAsync()
     {
-        if (id != null && id != 0)
+        var brand = await _brandClient.ListBrand();
+        var cate = await _cateClient.ListCategory();
+        if (brand.IsSuccess && cate.IsSuccess)
         {
-            _nameButton = "Cập nhật";
+            lstBrand = brand.Data;
+            lstCate = cate.Data;
+            if (id != null && id != 0)
+            {
+                _nameButton = "Cập nhật";
+            }
+            else
+            {
+                _nameButton = "Thêm mới";
+            }
         }
-        else
-        {
-            _nameButton = "Thêm mới";
-        }
+        
     }
     public async Task Create()
     {
@@ -96,6 +145,8 @@
 
         if (product != null)
         {
+            
+
             var result = await _client.UpdateProduct(_product);
             if (result.IsSuccess)
             {
@@ -150,3 +201,42 @@
         Snackbar.Add(message, severity);
     }
 }
+<style>
+    .mud-select {
+        display: inline-block;
+        position: relative;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .mud-input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #495057; /* màu chữ */
+    }
+
+    .mud-select select {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+        /* hiệu ứng khi hover */
+        .mud-select select:hover {
+            border-color: #b3b3b3;
+        }
+
+        .mud-select select:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+</style>
