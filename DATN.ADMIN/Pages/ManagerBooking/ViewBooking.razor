@@ -1,63 +1,161 @@
 ﻿@page "/booking"
-@page "/"
+@using DATN.Data.Enum
+@using DATN.ViewModels.DTOs.Booking
 @using Syncfusion.Blazor.Schedule
 @using Syncfusion.Blazor.Popups
 @using System.Collections.Generic
-<MudDynamicTabs @ref="@DynamicTabs" @bind-ActivePanelIndex="@UserIndex"
-				AddTab="@AddTabCallback" CloseTab="@CloseTabCallback"
-				AddIconToolTip="Click to add a new tab" CloseIconToolTip="Close tab. All data will be lost"
-				PanelClass="px-4 py-6" Elevation="4" Rounded ApplyEffectsToContainer>
-
-	<MudTabPanel Text="Lịch dịch vụ" ShowCloseIcon="false">
-
-		<div class="col-lg-12 control-section">
-			<SfSchedule TValue="AppointmentData" Width="100%" Height="650px" @bind-SelectedDate="@CurrentDate" @bind-CurrentView="@CurrentView" StartHour="07:00" EndHour="22:00" TimeFormat="T">
-				<ScheduleEvents OnPopupOpen="OnPopupOpen" TValue="AppointmentData" EventRendered="OnEventRendered"></ScheduleEvents>
-				<ScheduleEventSettings DataSource="@dataSource">
-					<ScheduleField>
-						<FieldSubject Name="Subject" Validation="@validationRules"></FieldSubject>
-					</ScheduleField>
-				</ScheduleEventSettings>
-				<ScheduleViews>
-					<ScheduleView Option="View.Day" DisplayName="Ngày"></ScheduleView>
-					<ScheduleView Option="View.Week" DisplayName="Tuần"></ScheduleView>
-					<ScheduleView Option="View.Month"></ScheduleView>
-					<ScheduleView Option="View.Agenda"></ScheduleView>
-				</ScheduleViews>
-			</SfSchedule>
-		</div>
-
-		<SfDialog @bind-Visible="@IsPopupVisible" Width="300px" ShowCloseIcon="true" Header="Thông tin lịch đặt" AllowDragging="true">
-			<div>
-				<div class="form-group">
-					<label>Tên khách hàng:</label>
-					<p>@CurrentAppointment?.Subject</p>
-				</div>
-				<div class="form-group">
-					<label>Start Time:</label>
-					<p>@CurrentAppointment?.StartTime</p>
-				</div>
-				<div class="form-group">
-					<label>End Time:</label>
-					<p>@CurrentAppointment?.EndTime</p>
-				</div>
-				<div class="form-group">
-					<label>Status Color:</label>
-					<div style="background-color:@CurrentAppointment?.Status; width:100%; height:20px;"></div>
-				</div>
-			</div>
-		</SfDialog>
-
-	</MudTabPanel>
-
-
-	@foreach (var tab in UserTabs)
-	{
-		<MudTabPanel ID="@tab.Id" Text="@tab.Label">@tab.Content</MudTabPanel>
+@using System.Globalization
+<style>
+	.e-date-header, .weather-text, .date-text {
+		text-align: center !important;
+		font-weight: 500;
+		font-size: 14px;
 	}
-</MudDynamicTabs>
-<MudButton OnClick="@RestoreUserTabs">Restore</MudButton>
 
+	.weather-text {
+		font-size: 17px;
+		color: cornflowerblue;
+	}
+
+	.chip-status .mud-chip-content{
+		font-size:10px!important;
+		font-weight:100!important;
+	}
+
+	.e-agenda-cells {
+		max-width:300px!important;
+		width:300px;
+		
+	}
+
+	</style>
+<MudGrid>
+
+	<MudItem xs="12" lg="2" Class="d-flex  mud-width-full py-8" Style="margin-top: -30px!important;  ">
+	
+
+		<MudCard Style=" width:100%; padding: 20px; text-align: center; " Outlined=true>
+
+			<MudGrid>
+				<MudItem xs="2" lg="12" Class="chip-status">
+				
+					<MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="OpenBookingCreated">Thêm lịch đặt mới</MudButton>
+					<MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.EditCalendar" Color="Color.Primary">Xem lịch online</MudButton>
+				</MudItem>
+				<MudItem xs="2" lg="12">
+				</MudItem>
+			</MudGrid>
+
+
+		</MudCard>
+	</MudItem>
+
+	<MudItem xs="12" lg="10" Class="d-flex mud-width-full py-8" Style="width:100%">
+
+		<MudPaper MaxWidth="100%" MinWidth="100%">
+			<MudDynamicTabs @ref="@DynamicTabs" @bind-ActivePanelIndex="@UserIndex"
+							AddTab="@AddTabCallback" CloseTab="@CloseTabCallback"
+							AddIconToolTip="Click để tạo hoá đơn mới" CloseIconToolTip="Đóng hoá đơn hoá đơn sẽ bị huỷ"
+							PanelClass="px-4 py-6" Style="margin-top: -30px!important;" Elevation="4" Rounded ApplyEffectsToContainer>
+
+				<MudTabPanel Text="Lịch dịch vụ" ShowCloseIcon="false">
+
+					<div>
+						<SfSchedule @ref="ScheduleRef" TValue="AppointmentData" Width="100%" Height="650px" SelectedDate="CurrentDate!.Value"  @bind-CurrentView=CurrentView StartHour="07:00" EndHour="22:00"
+									TimeFormat="HH:mm" DateFormat="dd/MM/yyyy" EnableAdaptiveUI="true">
+							<ScheduleEvents OnPopupOpen="OnPopupOpen" TValue="AppointmentData" EventRendered="OnEventRendered" OnDragStart="OnScheduleDag" OnResizeStart="OnScheduleResize">
+
+							</ScheduleEvents>
+							<ScheduleEventSettings DataSource="@dataSource">
+								@* 	<ScheduleField>
+								<FieldSubject Name="Subject" Validation="@validationRules"></FieldSubject>
+								</ScheduleField> *@
+							</ScheduleEventSettings>
+							<ScheduleTemplates>
+
+								<DateHeaderTemplate>
+									<div class="date-text">
+										@(getDateHeaderText((context as TemplateContext).Date))
+										@{
+											@switch ((int)(context as TemplateContext).Date.DayOfWeek)
+											{
+												case 0:
+													<div class="weather-text">Chủ nhật</div>
+													break;
+												case 1:
+													<div class="weather-text">Thứ Hai</div>
+													break;
+												case 2:
+													<div class="weather-text">Thứ Ba</div>
+													break;
+												case 3:
+													<div class="weather-text">Thứ Tư</div>
+													break;
+												case 4:
+													<div class="weather-text">Thứ Năm</div>
+													break;
+												case 5:
+													<div class="weather-text">Thứ Sáu</div>
+													break;
+												case 6:
+													<div class="weather-text">Thứ Bảy</div>
+													break;
+											}
+										}
+									</div>
+								</DateHeaderTemplate>
+							</ScheduleTemplates>
+							<ScheduleViews>
+								<ScheduleView Option="View.Day" DisplayName="Ngày"></ScheduleView>
+								<ScheduleView Option="View.Week" DisplayName="Tuần"></ScheduleView>
+								<ScheduleView Option="View.Month" DisplayName="Tháng"></ScheduleView>
+								<ScheduleView Option="View.Agenda" DisplayName="Các lịch gần"></ScheduleView>
+							</ScheduleViews>
+						</SfSchedule>
+					</div>
+
+					<SfDialog @bind-Visible="@IsPopupVisible" Width="500px" ShowCloseIcon="true" Header="Thông tin lịch đặt" AllowDragging="true">
+						<div>
+							<div class="form-group">
+								<label>Tên khách hàng: @CurrentAppointment?.Subject</label>
+							</div>
+							<div class="form-group">
+								<label>Thời gian:Ngày @CurrentAppointment?.StartTime.ToString("dd/MM/yyyy")     @CurrentAppointment?.StartTime.ToString("HH:mm") - @CurrentAppointment?.EndTime.ToString("HH:mm")</label>
+							</div>
+							
+							<div class="form-group">
+								<label>Trạng thái:</label>
+								<MudChipSet T="BookingStatus" SelectedChip="statusChip" SelectedChipChanged="OnStatusChanged" Style="color:white; display: flex; gap: 8px;font-size:8px!important" Class="chip-status">
+									<MudChip Size="Size.Small" Text="Chờ xác nhận" Style="@(CurrentAppointment.Status==BookingStatus.PendingConfirmation? "background: #7e7e7e;color:white;":"")" Value="BookingStatus.PendingConfirmation">Chờ xác nhận</MudChip>
+									<MudChip Size="Size.Small" Text="Đã xác nhận" Style="@(CurrentAppointment.Status==BookingStatus.Confirmed? "background: #e0e0e0;color : black;border: 1px solid #7e7e7e;":"")" Value="BookingStatus.Confirmed">Đã xác nhận</MudChip>
+									<MudChip Size="Size.Small" Text="Đã đến nơi" Style="@(CurrentAppointment.Status==BookingStatus.Arrived? "background: #fbc192;  color : black;":"")" Value="BookingStatus.Arrived">Khách đang chờ</MudChip>
+									<MudChip Size="Size.Small" Text="Đang thực hiện" Style="@(CurrentAppointment.Status==BookingStatus.InProgress? "background: #179e74; color:white":"")" Value="BookingStatus.InProgress">Đang thực hiện</MudChip>
+									<MudChip Size="Size.Small" Text="Đã hoàn thành" Style="@(CurrentAppointment.Status==BookingStatus.Completed? "background: #92bbe6; color : #213762":"")" Value="BookingStatus.Completed">Đã hoàn thành</MudChip>
+								</MudChipSet>
+				
+							</div>
+						</div>
+					</SfDialog>
+
+				</MudTabPanel>
+
+
+				@foreach (var tab in UserTabs)
+				{
+					<MudTabPanel ID="@tab.Id" Text="@tab.Label">
+						<MudPaper Width="100%"  Height="650px">
+
+						</MudPaper>
+
+					</MudTabPanel>
+				}
+			</MudDynamicTabs>
+		</MudPaper>
+		
+
+
+	</MudItem>
+</MudGrid>
 @code {
 
 
@@ -68,27 +166,27 @@
 		public Guid Id { get; set; }
 		public int Index { get; set; }
 	}
-
+	DateTime? date = DateTime.Today;
 	public MudDynamicTabs DynamicTabs;
 	public List<TabView> UserTabs = new();
 	public int UserIndex;
 	bool _stateHasChanged;
 	bool _showCloseIcon = false;
+	private BookingStatus CurrentStatus { get; set; }
 
 	void RestoreUserTabs()
 	{
 		UserTabs.Clear();
 		UserTabs.Add(new TabView { Id = Guid.NewGuid(), Label = "Hoá đơn 1", Index = 1 });
-		UserIndex = 1;
+		UserIndex = 0;
 		_stateHasChanged = true;
 	}
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
-		base.OnInitialized();
 		RestoreUserTabs();
 		CurrentDate = new DateTime(2024, 6, 18, 10, 0, 0);
-		dataSource = GetScheduleData();
+		GetScheduleData();
 	}
 
 	protected override void OnAfterRender(bool firstRender)
@@ -104,7 +202,8 @@
 
 	public void AddTab(Guid id)
 	{
-		UserTabs.Add(new TabView { Id = id, Label = $"Hoá đơn {UserTabs.Last().Index + 1} ", Content = $"Tab ID: {id}", Index = UserTabs.Last().Index + 1 });
+		int NewTabIndex = UserTabs.Count() == 0 ? 1 : UserTabs.Last().Index + 1;
+		UserTabs.Add(new TabView { Id = id, Label = $"Hoá đơn {NewTabIndex} ", Content = $"Tab ID: {id}", Index = NewTabIndex });
 		UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
 		_stateHasChanged = true;
 	}
@@ -125,11 +224,13 @@
 	/// <summary>
 	/// lịch
 	/// </summary>
+	SfSchedule<AppointmentData> ScheduleRef;	/// 
 	public View CurrentView { get; set; } = View.Week;    ///
-	private DateTime CurrentDate { get; set; }
+	private DateTime? CurrentDate { get; set; }
 	private List<AppointmentData> dataSource = new List<AppointmentData>();
 	private bool IsPopupVisible { get; set; } = false;
 	private AppointmentData CurrentAppointment { get; set; }
+	private MudChip statusChip= new MudChip();
 	ValidationRules validationRules = new ValidationRules
 		{
 			Required = true,
@@ -144,18 +245,21 @@
 			args.Cancel = true; // Hủy bỏ popup mặc định
 			CurrentAppointment = args.Data; // Lấy dữ liệu cuộc hẹn hiện tại
 			IsPopupVisible = true; // Hiển thị popup tùy chỉnh
+			statusChip.Value = CurrentAppointment.Status;
 		}
 	}
 
-	public List<AppointmentData> GetScheduleData()
+	public async Task GetScheduleData(NavigatingEventArgs args = null)
 	{
-		return new List<AppointmentData>
+		dataSource = new List<AppointmentData>
 		{
-			new AppointmentData { Id = 1 , Subject = "Chờ xác nhận", StartTime = new DateTime(2024, 6, 18, 10, 0, 0) , EndTime = new DateTime(2024, 6, 18, 12, 0, 0), Status=BookingStatus.PendingConfirmation },
-			new AppointmentData { Id =2, Subject = "Chờ khách đến",  StartTime = new DateTime(2024, 6, 19, 10, 0, 0) , EndTime = new DateTime(2024, 6, 19, 12, 0, 0),Status=BookingStatus.Confirmed},
-			new AppointmentData { Id = 3, Subject = "Đang Chờ",  StartTime = new DateTime(2024, 6, 20, 10, 0, 0) , EndTime = new DateTime(2024, 6, 20, 12, 0, 0),Status=BookingStatus.Arrived },
-			new AppointmentData { Id =4, Subject = "Đang làm",  StartTime = new DateTime(2024, 6, 21, 10, 0, 0) , EndTime = new DateTime(2024, 6, 21, 12, 0, 0),Status=BookingStatus.InProgress },
-			new AppointmentData { Id = 5, Subject = "Làm xong",  StartTime = new DateTime(2024, 6, 22, 10, 0, 0) , EndTime = new DateTime(2024, 6, 22, 12, 0, 0),Status=BookingStatus.Completed }
+			new AppointmentData { Id = 1 ,BookingId=1, Subject = "Khách hàng 1", StartTime = new DateTime(2024, 6, 18, 10, 0, 0) , EndTime = new DateTime(2024, 6, 18, 12, 0, 0), Status=BookingStatus.PendingConfirmation },
+			new AppointmentData { Id = 2 ,BookingId=1, Subject = "Khách hàng 1", StartTime = new DateTime(2024, 6, 18, 10, 0, 0) , EndTime = new DateTime(2024, 6, 18, 12, 0, 0), Status=BookingStatus.PendingConfirmation },
+			new AppointmentData { Id =3,BookingId=2, Subject = "Khách hàng 2",  StartTime = new DateTime(2024, 6, 19, 10, 0, 0) , EndTime = new DateTime(2024, 6, 19, 12, 0, 0),Status=BookingStatus.Confirmed},
+			new AppointmentData { Id = 4,BookingId=3, Subject = "Khách hàng 3",  StartTime = new DateTime(2024, 6, 20, 10, 0, 0) , EndTime = new DateTime(2024, 6, 20, 12, 0, 0),Status=BookingStatus.Arrived },
+			new AppointmentData { Id = 5,BookingId=3, Subject = "Khách hàng 3",  StartTime = new DateTime(2024, 6, 20, 10, 0, 0) , EndTime = new DateTime(2024, 6, 20, 12, 0, 0),Status=BookingStatus.Arrived },
+			new AppointmentData { Id =6,BookingId=4, Subject = "Khách hàng 4",  StartTime = new DateTime(2024, 6, 21, 10, 0, 0) , EndTime = new DateTime(2024, 6, 21, 12, 0, 0),Status=BookingStatus.InProgress },
+			new AppointmentData { Id = 7,BookingId=5, Subject = "Khách hàng 5",  StartTime = new DateTime(2024, 6, 22, 10, 0, 0) , EndTime = new DateTime(2024, 6, 22, 12, 0, 0),Status=BookingStatus.Completed }
 		};
 	}
 
@@ -164,26 +268,31 @@
 		Dictionary<string, object> attributes = new Dictionary<string, object>();
 		if (CurrentView == View.Agenda)
 		{
-			attributes.Add("style", "border-left-color: ");
+			attributes.Add("style", " border-left-color:red; ");
 		}
 		else
 		{
 			switch (args.Data.Status)
 			{
 				case BookingStatus.PendingConfirmation:
-					attributes.Add("style", $"background: #e0e0e0; color : black; padding: 10px;  border-radius: 10px;");
+					attributes.Add("style", $"background: #7e7e7e;   padding: 10px;  border-radius: 10px;");
+					args.Data.StatusName = "Chờ xác nhận";
 					break;
 				case BookingStatus.Confirmed:
-					attributes.Add("style", $"background: #7e7e7e;  padding: 10px;  border-radius: 10px;");
+					attributes.Add("style", $"background: #e0e0e0;color : black; padding: 10px;  border-radius: 10px;");
+					args.Data.StatusName = "Chờ khách đến";
 					break;
 				case BookingStatus.Arrived:
 					attributes.Add("style", $"background: #fbc192;  color : black; padding: 10px;  border-radius: 10px;");
+					args.Data.StatusName = "Khách đang đợi";
 					break;
 				case BookingStatus.InProgress:
 					attributes.Add("style", $"background: #179e74;  padding: 10px;  border-radius: 10px;");
+					args.Data.StatusName = "Đang thực hiện";
 					break;
 				case BookingStatus.Completed:
 					attributes.Add("style", $"background: #92bbe6; color : #213762; padding: 10px;  border-radius: 10px;");
+					args.Data.StatusName = "Đã hoàn thành";
 					break;
 			}
 
@@ -192,28 +301,43 @@
 	}
 
 
-	public class AppointmentData
+
+	public async Task OnScheduleResize(ResizeEventArgs<AppointmentData> args)
 	{
-		public int Id { get; set; }
-		public string Subject { get; set; }
-		public string Description { get; set; }
-		public int BookingId { get; set; }
-		public int BookingServiceID { get; set; }
-		public DateTime StartTime { get; set; }
-		public DateTime EndTime { get; set; }
-		public BookingStatus Status { get; set; }
+		args.Interval = 5;
+
+	}
+	public async Task OnScheduleDag(DragEventArgs<AppointmentData> args)
+	{
+		args.Interval = 5;
+	}
+	public static string getDateHeaderText(DateTime date)
+	{
+		return "Ngày: " + date.ToString("dd-MM");
+	}
+	private async Task OnStatusChanged( MudChip chip)
+	{
+		if (chip!=null)
+		{
+			var change = chip.Value;
+			statusChip = chip;
+			var result = CurrentAppointment.BookingId;
+
+
+			var dataUpdate = dataSource.Where(a => a.BookingId == CurrentAppointment.BookingId)
+						.ToList();
+			CurrentAppointment.Status = (BookingStatus)change;
+			foreach (var item in dataUpdate)
+			{
+				item.Status = (BookingStatus)change;
+				await ScheduleRef.SaveEventAsync(item);
+			}
+		}
+
+	}
+	protected void OpenBookingCreated()
+	{
+		
 	}
 
-	public enum BookingStatus
-	{
-		PendingConfirmation, // Chờ xác nhận
-		Confirmed,           // Đã xác nhận
-		Arrived,             // Đã đến nơi
-		InProgress,          // Đang thực hiện
-		Completed,           // Đã hoàn thành
-		NoShow,              // Khách không đến
-		CustomerCancelled,   // Khách huỷ
-		StaffCancelled,      // Nhân viên huỷ
-		AdminCancelled       // Admin huỷ
-	}
 }

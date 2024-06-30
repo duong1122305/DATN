@@ -14,6 +14,8 @@ namespace DATN.Aplication.Extentions
 {
     public class MailExtention
     {
+
+        private string _hosting = $@"https://localhost:7039/api/GuestManager/";
         public async Task<string> SendMailAccountStaffAsync(string userMail, UserLoginView userLogin)
         {
             try
@@ -48,8 +50,19 @@ namespace DATN.Aplication.Extentions
                 MailAddress mailFrom = new MailAddress("shoppet79@gmail.com", "MewShop");
                 MailAddress mailTo = new MailAddress(userMail);
                 MailMessage message = new MailMessage(mailFrom, mailTo);
-                message.Subject = "Mã xác nhận của bạn";
-                message.Body = $"<body style=\"font-family: Arial, sans-serif;\">\r\n\r\n    <h2>Đây là mail cung cấp mã xác nhận khi người dùng quên mật khẩu</h2>\r\n\r\n    <p>Cuộc sống vốn có rất nhiều lựa chọn, cảm ơn bạn vì đã chọn luôn tin tưởng chúng tôi.<br> Cảm ơn bạn đã đồng hành trong suốt thời gian qua. Dưới đây là mã xác nhận của bạn:</p>\r\n\r\n    <p style=\"font-size: 20px; font-weight: bold; color: #007BFF;\">[{code}]</p><b>Chỉ có hiệu lực trong vòng 5 phút</b>\r\n\r\n <br>   <b>Vui lòng không chia sẻ mã xác nhận này với người khác</b>\r\n    <p>Nếu bạn có bất kỳ thắc mắc hãy liên hệ qua: <b>shoppet79@gmail.com</b>, <br>\r\n    Hoặc liên hệ qua fanpage của chúng tôi [Địa chỉ fanpage]</p>\r\n    <p>Trân trọng,<br>\r\n    MeowShop</p>\r\n</body>";
+                string verificationLink = @$"{_hosting}?verifyCode={code}";
+                message.Subject = "Yêu cầu đặt lại mật khẩu";
+                message.Body = $@"
+                        <body style=""font-family: Arial, sans-serif;"">
+                            <h2>Yêu cầu đặt lại mật khẩu</h2>
+                            <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại MewShop.<br>
+                               Nếu bạn đã yêu cầu đặt lại mật khẩu, vui lòng <a href=""{HttpUtility.HtmlEncode(verificationLink)}"" style=""color: #007BFF; text-decoration: none;"">nhấn vào đây</a> để thay đổi mật khẩu của bạn.</p>
+                            <p>Nếu bạn không phải là người yêu cầu, hãy bỏ qua email này và mật khẩu của bạn sẽ không thay đổi.</p>
+                            <p>Nếu bạn có bất kỳ thắc mắc nào, hãy liên hệ qua: <b>shoppet79@gmail.com</b>,<br>
+                               hoặc liên hệ qua sđt của chúng tôi 0975825324</p>
+                            <p>Trân trọng,<br> MewShop</p>
+                        </body>";
+
                 message.IsBodyHtml = true;
                 message.Priority = MailPriority.High;
                 SmtpClient client = new SmtpClient();
@@ -68,15 +81,16 @@ namespace DATN.Aplication.Extentions
                 return new ResponseMail { IsSuccess = true, Notifications = "Mã xác nhận chưa được gửi đi!!", Error = e.Message };
             }
         }
-        public async Task<string> SendMailVerificationAsync(string userMail,string user, string pass, string Verification)
+        public async Task<string> SendMailVerificationAsync(string userMail, string user, string pass, string verifyCode)
         {
             try
             {
+
                 MailAddress mailFrom = new MailAddress("shoppet79@gmail.com", "MewShop");
                 MailAddress mailTo = new MailAddress(userMail);
                 MailMessage message = new MailMessage(mailFrom, mailTo);
                 message.Subject = "Tài khoản đăng nhập của bạn";
-                string verificationLink = $"https://localhost:7039/api/GuestManager/verify-user?verifyConstring={Verification}&mail={userMail}";
+                string verificationLink = @$"{_hosting}?verifyCode={verifyCode}";
                 message.Body = $@"
                 <body style=""font-family: Arial, sans-serif;"">
                     <h2>Tài khoản đăng nhập cá nhân vui lòng không để lộ!!</h2>
@@ -106,6 +120,14 @@ namespace DATN.Aplication.Extentions
 
                 return e.Message;
             }
+        }
+        public string GennarateVerifyCode(string ID)
+        {
+
+            string verifyString = ID + "|" + DateTime.Now.AddHours(1).ToString();
+            PasswordExtensitons hasCode = new PasswordExtensitons();
+            string verifyCode = hasCode.HasCode(verifyString);
+            return verifyCode;
         }
     }
 }

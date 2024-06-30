@@ -4,6 +4,7 @@ using DATN.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    partial class DATNDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240629102206_ver1.4.1")]
+    partial class ver141
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,8 +201,6 @@ namespace DATN.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdCategory");
 
                     b.ToTable("CategoryProducts");
                 });
@@ -416,9 +417,6 @@ namespace DATN.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VerifyCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -646,6 +644,9 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryProductIdCategory")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -665,9 +666,10 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdBrand");
+                    b.HasIndex("CategoryProductIdCategory");
 
-                    b.HasIndex("IdCategoryProduct");
+                    b.HasIndex("IdBrand")
+                        .IsUnique();
 
                     b.ToTable("Products");
                 });
@@ -1321,15 +1323,16 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Product", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.Brand", "Brands")
+                    b.HasOne("DATN.Data.Entities.CategoryProduct", "CategoryProduct")
                         .WithMany("Products")
-                        .HasForeignKey("IdBrand")
+                        .HasForeignKey("CategoryProductIdCategory")
+                        .HasPrincipalKey("IdCategory")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.CategoryProduct", "CategoryProduct")
-                        .WithMany("Products")
-                        .HasForeignKey("IdCategoryProduct")
+                    b.HasOne("DATN.Data.Entities.Brand", "Brands")
+                        .WithOne("Product")
+                        .HasForeignKey("DATN.Data.Entities.Product", "IdBrand")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1466,7 +1469,8 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Brand", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("Product")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Category", b =>
