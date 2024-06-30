@@ -21,13 +21,13 @@ namespace DATN.API.Controllers
         }
 
         [HttpPut("Update-Brand")]
-        public async Task<ResponseData<string>> UpdateCategory(BrandView brandView)
+        public async Task<ResponseData<string>> UpdateBrand(BrandView brandView)
         {
             return await _brandManagementService.UpdateCategory(brandView);
         }
 
         [HttpGet("Remove-Brand")]
-        public async Task<ResponseData<string>> RemoveCategory(int id)
+        public async Task<ResponseData<string>> RemoveBrand(int id)
         {
             return await _brandManagementService.RemoveCategory(id);
         }

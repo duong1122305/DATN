@@ -79,6 +79,7 @@ builder.Services.AddScoped<IPetSpeciesServiceClient,PetSpeciesServiceClient>();
 builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddScoped<ICategoryServices,CategoryServices>();
 builder.Services.AddScoped<IProductServices,ProductServices>();
+builder.Services.AddScoped<IBrandServices,BrandServices>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 
 builder.Services.AddMudServices(config =>
