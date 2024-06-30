@@ -39,7 +39,7 @@ namespace DATN.ADMIN.Pages.Account
                 _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
             }
         }
-        public async Task ResetPass()
+        public async Task<IActionResult> ResetPass()
         {
             var resetpassview = new UserResetPassView()
             {
@@ -50,10 +50,17 @@ namespace DATN.ADMIN.Pages.Account
             var result = await _userClientSev.ResetPass(resetpassview);
             if (result.IsSuccess)
             {
+                TempData["e3r"] = null;
                 _httpContextAccessor.HttpContext.Session.Remove("username");
                 _httpContextAccessor.HttpContext.Session.Remove("otp");
                 _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
             }
+            else
+            {
+                TempData["e3r"] = result.Error;
+            }
+            return Page();
+
         }
     }
 }

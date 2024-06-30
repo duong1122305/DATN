@@ -1,4 +1,5 @@
-﻿using DATN.ADMIN.IServices;
+﻿using Azure;
+using DATN.ADMIN.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -27,7 +28,7 @@ namespace DATN.ADMIN.Pages.Account
             _contextAccessor = httpContextAccessor;
         }
 
-        public async Task CodeOtp()
+        public async Task<IActionResult> CodeOtp()
         {
             try
             {
@@ -41,15 +42,15 @@ namespace DATN.ADMIN.Pages.Account
                     }
                     else
                     {
-                        ///báo là tài khoản nhập không có
+                        ModelState.AddModelError("Email", respone.Notifications);
                     }
                 }
             }
             catch (Exception e)
             {
-
+                ModelState.AddModelError("Email", $"Đã xảy ra lỗi: {e.Message}");
             }
-
+            return Page();
         }
     }
 }
