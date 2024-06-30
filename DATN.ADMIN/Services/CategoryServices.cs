@@ -23,7 +23,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> ActiveCategoryProduct(int id)
         {
-            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"Active-Category-Product?id={id}");
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/cate/Active-Category-Product?id={id}");
             return respone;
         }
 
@@ -36,7 +36,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> CreateCategoryProduct(CreateCategoryProductView categoryView)
         {
-            var respone = await _httpClient.PostAsJsonAsync("Create-Category-Product", categoryView);
+            var respone = await _httpClient.PostAsJsonAsync("api/cate/Create-Category-Product", categoryView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }
@@ -62,7 +62,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> RemoveCategoryProduct(int id)
         {
-            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/cateRemove-Category-Product?id={id}");
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/cate/Remove-Category-Product?id={id}");
             return respone;
         }
 
