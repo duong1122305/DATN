@@ -71,6 +71,7 @@
                             
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDetails(context.Item.Id))" title="Xem chi tiết"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
             </TemplateColumn>
@@ -92,8 +93,6 @@ else
 </style>
 @code {
 
-    //button trạng thái
-    private bool _disableElevation = false;
     private string searchString = "";
     private List<CategoryView> lstCate = new List<CategoryView>();
     [Inject]
@@ -115,7 +114,6 @@ else
         await LoadData();
 
     }
-
     // load lai du lieu
     protected async Task LoadData()
     {
@@ -240,6 +238,37 @@ else
 
     //thêm sửa !
     private async Task OpenDialog(int? id)
+    {
+
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới danh mục";
+        if (id != null)
+        {
+            var cate = lstCate.FirstOrDefault(x => x.Id == id);
+            parameters.Add("id", id);
+            parameters.Add("category", cate);
+            nameDialog = "Cập nhật danh mục";
+        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsCateProduct>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenDetails(int? id)
     {
 
         var parameters = new DialogParameters();

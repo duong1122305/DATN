@@ -1,0 +1,136 @@
+﻿@page "/CreateUpdateCate"
+
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.Category
+@using DATN.ViewModels.DTOs.CategoryProduct
+@using DATN.ViewModels.DTOs.ServiceManager
+@using MudBlazor
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
+<EditForm Model="@category" OnValidSubmit="@(async () => await Submit())">
+    <MudItem xs="12" sm="12">
+        <MudCard>
+            <MudCardContent>
+                    <MudTextField T="string" Label="Tên danh mục chi tiết" @bind-Value="@category.Name" For="@(() => category.Name)" />
+                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Category" For="@(() => category.Category)" />
+                <hr class="hr" />
+                <div class="mt-5" style="text-align: end;">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                        @_nameButton
+                    </MudButton>
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+
+    [Parameter]
+    public CategoryProductView category { get; set; } = new CategoryProductView();
+    string _nameButton = "";
+    [Inject]
+    private ICategoryServices _client { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id != null && id != 0)
+        {
+            _nameButton = "Cập nhật";
+        }
+        else
+        {
+            _nameButton = "Thêm mới";
+        }
+    }
+    public async Task Create()
+    {
+        // if (await Confirm("thêm mới") == true)
+
+        // {
+        //     var result = await _client.CreateCategory(category);
+        //     if (result.IsSuccess)
+        //     {
+
+        //         Message(result.Data, Severity.Success);
+        //         _dialogBox.Close(DialogResult.Ok(true));
+        //     }
+        //     else
+        //         Message(result.Error, Severity.Error);
+        // }
+        // else
+        // {
+        //     return;
+        // }
+    }
+
+
+    public async Task Update()
+    {
+        // var confirm = await Confirm("cập nhật");
+        // if (!confirm)
+        // {
+        //     return;
+        // }
+
+        // if (category != null)
+        // {
+        //     var result = await _client.UpdateCategory(category);
+        //     if (result.IsSuccess)
+        //     {
+        //         Message(result.Data, Severity.Success);
+
+        //         _dialogBox.Close(DialogResult.Ok(true));
+        //     }
+        //     else
+        //     {
+        //         Message(result.Error, Severity.Error);
+        //     }
+        // }
+        // else
+        // {
+        //     Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+        // }
+
+    }
+
+    public async Task Submit()
+    {
+        if (id == null || id == 0)
+        {
+            await Create();
+        }
+        else
+        {
+            await Update();
+        }
+    }
+
+    private async Task<bool>
+    Confirm(string text)
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+        yesText: "Xác nhận",
+        cancelText: "Hủy", noText: null,
+        options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+
+    }
+
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+        Snackbar.Add(message, severity);
+    }
+}

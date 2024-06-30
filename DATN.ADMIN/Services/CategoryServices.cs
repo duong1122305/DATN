@@ -21,11 +21,24 @@ namespace DATN.ADMIN.Services
             return respone;
         }
 
+        public async Task<ResponseData<string>> ActiveCategoryProduct(int id)
+        {
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"Active-Category-Product?id={id}");
+            return respone;
+        }
+
         public async Task<ResponseData<string>> CreateCategory(CategoryView categoryView)
         {
             var respone = await _httpClient.PostAsJsonAsync("api/cate/Create-Category", categoryView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
-            return data!;
+            return data;
+        }
+
+        public async Task<ResponseData<string>> CreateCategoryProduct(CreateCategoryProductView categoryView)
+        {
+            var respone = await _httpClient.PostAsJsonAsync("Create-Category-Product", categoryView);
+            var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
+            return data;
         }
 
         public async Task<ResponseData<List<CategoryView>>> ListCategory()
@@ -47,9 +60,22 @@ namespace DATN.ADMIN.Services
             return respone;
         }
 
+        public async Task<ResponseData<string>> RemoveCategoryProduct(int id)
+        {
+            var respone = await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/cateRemove-Category-Product?id={id}");
+            return respone;
+        }
+
         public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
         {
             var respone = await _httpClient.PutAsJsonAsync("api/cate/Update-Category", categoryView);
+            var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
+            return data;
+        }
+
+        public async Task<ResponseData<string>> UpdateCategoryProduct(CreateCategoryProductView categoryView)
+        {
+            var respone = await _httpClient.PutAsJsonAsync("api/cate/Update-Category-Product", categoryView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }
