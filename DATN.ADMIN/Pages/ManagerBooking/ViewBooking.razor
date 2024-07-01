@@ -5,6 +5,7 @@
 @using Syncfusion.Blazor.Popups
 @using System.Collections.Generic
 @using System.Globalization
+
 <style>
 	.e-date-header, .weather-text, .date-text {
 		text-align: center !important;
@@ -39,7 +40,7 @@
 			<MudGrid>
 				<MudItem xs="2" lg="12" Class="chip-status">
 				
-					<MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="OpenBookingCreated">Thêm lịch đặt mới</MudButton>
+					<MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="async()=> await OpenBookingCreated()">Thêm lịch đặt mới</MudButton>
 					<MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.EditCalendar" Color="Color.Primary">Xem lịch online</MudButton>
 				</MudItem>
 				<MudItem xs="2" lg="12">
@@ -61,7 +62,7 @@
 				<MudTabPanel Text="Lịch dịch vụ" ShowCloseIcon="false">
 
 					<div>
-						<SfSchedule @ref="ScheduleRef" TValue="AppointmentData" Width="100%" Height="650px" SelectedDate="CurrentDate!.Value"  @bind-CurrentView=CurrentView StartHour="07:00" EndHour="22:00"
+						<SfSchedule @ref="ScheduleRef" TValue="AppointmentData" Width="100%" Height="650px" SelectedDateChanged="OnChangeDate" @bind-CurrentView=CurrentView StartHour="07:00" EndHour="22:00"
 									TimeFormat="HH:mm" DateFormat="dd/MM/yyyy" EnableAdaptiveUI="true">
 							<ScheduleEvents OnPopupOpen="OnPopupOpen" TValue="AppointmentData" EventRendered="OnEventRendered" OnDragStart="OnScheduleDag" OnResizeStart="OnScheduleResize">
 
@@ -166,6 +167,8 @@
 		public Guid Id { get; set; }
 		public int Index { get; set; }
 	}
+	[Inject]
+	protected IDialogService _dialogService{ get; set; }
 	DateTime? date = DateTime.Today;
 	public MudDynamicTabs DynamicTabs;
 	public List<TabView> UserTabs = new();
@@ -299,7 +302,10 @@
 		}
 		args.Attributes = attributes;
 	}
+	public async Task OnChangeDate(DateTime value)
+	{
 
+	}
 
 
 	public async Task OnScheduleResize(ResizeEventArgs<AppointmentData> args)
@@ -335,9 +341,33 @@
 		}
 
 	}
-	protected void OpenBookingCreated()
+	protected async Task OpenBookingCreated(int bookingID=0)
 	{
 		
+		var parameters = new DialogParameters();
+		if(bookingID!=0)
+		{
+			parameters.Add("bookingID", bookingID);
+		}
+
+        string nameDialog = "Danh sách thú cưng";
+		MudBlazor.DialogOptions options = new MudBlazor.DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<CreateBooking>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (result.Canceled)
+		{
+			createUpdateDialog.Close();
+			StateHasChanged();
+		}
 	}
 
 }

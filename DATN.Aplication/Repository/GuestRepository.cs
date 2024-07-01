@@ -21,10 +21,16 @@ namespace DATN.Aplication.Repository
         public async Task<bool> CheckEmailExist(string email)
         {
             var result = await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == true);
+
             return result != null;
         }
 
-        public async Task<bool> CheckPhoneNumberExist(string phoneNumber)
+		public Task<bool> CheckEmailExist(string email, Guid id)
+		{
+			throw new NotImplementedException();
+		}
+
+		public async Task<bool> CheckPhoneNumberExist(string phoneNumber)
         {
             var result = await _context.Guests.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
             return result != null;
@@ -42,9 +48,11 @@ namespace DATN.Aplication.Repository
             return _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == true);
         }
 
-        public async Task RemoveGuestByEmail(string email)
+	
+
+		public async Task RemoveGuestByEmail(string email, Guid id)
         {
-            var result =  _context.Guests.Where(x => x.Email == email && x.IsComfirm == false);
+            var result =  _context.Guests.Where(x => x.Email == email && x.IsComfirm == false&& x.Id!=id);
             if (result != null)
             {
                 _context.Guests.RemoveRange(result);
@@ -54,7 +62,9 @@ namespace DATN.Aplication.Repository
            
         }
 
-        public async Task<bool> SoftDelete(DeleteRequest<Guid> request)
+
+
+		public async Task<bool> SoftDelete(DeleteRequest<Guid> request)
         {
             try
             {

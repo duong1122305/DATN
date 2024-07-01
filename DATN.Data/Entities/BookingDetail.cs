@@ -18,7 +18,7 @@ namespace DATN.Data.Entities
 
 		public int BookingId { get; set; } // Khóa ngoại đến ID đặt lịch
 		
-		public Guid StaffId { get; set; } // Khóa ngoại đến ID đặt lịch
+		public Guid? StaffId { get; set; } // Khóa ngoại đến ID đặt lịch
 
         public int? ComboId { get; set; }
 
@@ -30,7 +30,8 @@ namespace DATN.Data.Entities
 
 		public BookingDetailStatus Status { get; set; } // Trạng thái đặt lịch
 
-		public string Price { get; set; } // Giá tiền
+		public double Price { get; set; } // Giá tiền
+		public int Quantity { get; set; } // Số lượng
 
 		public virtual Booking Booking { get; set; } // Đặt lịch
 		public virtual ComboService ComboService { get; set; } // Đặt lịch
