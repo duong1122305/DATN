@@ -45,64 +45,68 @@
         <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh Style="text-align:center;">STT</MudTh>
-        <MudTh Style="text-align:center;">VoucherName</MudTh>
-        <MudTh Style="text-align:center;">Voucher Code</MudTh>
-        <MudTh Style="text-align:center;">% Giảm giá</MudTh>
-        <MudTh Style="text-align:center;">Mô tả</MudTh>
-        <MudTh Style="text-align:center;">Ngày bắt đầu</MudTh>
-        <MudTh Style="text-align:center;">Ngày kết thúc</MudTh>
-        <MudTh Style="text-align:center;">Số tiền tối thiểu</MudTh>
-        <MudTh Style="text-align:center;">Số tiền giảm tối đa</MudTh>
-        <MudTh Style="text-align:center;">Trạng thái</MudTh>
-        <MudTh Style="text-align:center;">Hành động</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="STT" Style="text-align:center;">
-            @(lstVoucher.IndexOf(context) + 1)
-        </MudTd>
-        <MudTd DataLabel="VoucherName" Style="text-align:center;">@context.VoucherName</MudTd>
-        <MudTd DataLabel="VoucherCode" Style="text-align:center;">@context.VoucherCode</MudTd>
-        <MudTd DataLabel="DiscourPercent" Style="text-align:center;">@context.DiscountPercent</MudTd>
-        <MudTd DataLabel="Description" Style="text-align:center;">@context.Description</MudTd>
-        <MudTd DataLabel="StartDate" Style="text-align:center;">@context.StartDate.ToString("HH:mm:ss dd/MM/yyyy")</MudTd>
-        <MudTd DataLabel="EndDate" Style="text-align:center;">@context.EndDate.ToString("HH:mm:ss dd/MM/yyyy")</MudTd>
-        <MudTd DataLabel="MinMoneyApplicable" Style="text-align:center;">@context.MinMoneyApplicable</MudTd>
-        <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">@context.MaxMoneyDiscount</MudTd>
-        @if (context.Status == VoucherStatus.GoingOn)
-        {
-            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
-                <MudChip Color="Color.Success" title="Đang diễn ra">Đang diễn ra</MudChip>
-            </MudTd>
-        }
-        else if (context.Status == VoucherStatus.Expired)
-        {
-            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
-                <MudChip Color="Color.Error" title="Đã quá hạn">Đã kết thúc</MudChip>
-            </MudTd>
-        }
-        else
-        {
-            <MudTd DataLabel="MaxMoneyDiscount" Style="text-align:center;">
-                <MudChip Color="Color.Surface" title="Chưa diễn ra">Chưa diễn ra</MudChip>
-            </MudTd>
-        }
-        <MudTd Style="text-align:center;">
-            <MudButtonGroup Variant="Variant.Filled">
-                @if (context.Status == VoucherStatus.NotOccur)
+    <Columns>
+        <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span>
+                    @(lstVoucher.IndexOf(context.Item) + 1)
+                </span>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.VoucherName" Title="Tên" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.VoucherCode" Title="Mã" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Giảm" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span>@context.Item.DiscountPercent %</span>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Quantity" Title="Số lượng" Sortable="false" Filterable="false" style="text-align:center;" />
+        <PropertyColumn Property="x=>x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.StartDate" Title="Bắt đầu" Sortable="false" Filterable="false" Style="width:50px" />
+        <PropertyColumn Property="x=>x.EndDate" Title="Kết thúc" Sortable="false" Filterable="false" Style="width:50px" />
+        <PropertyColumn Property="x=>x.MinMoneyApplicable" Title="Giá áp dụng" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.MaxMoneyDiscount" Title="Giảm tối đa" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @if (context.Item.Status == VoucherStatus.GoingOn)
                 {
-                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa"></MudIconButton>
+                    <span>
+                        <MudChip Color="Color.Success" title="Đang diễn ra">Đang diễn ra</MudChip>
+                    </span>
+                }
+                else if (context.Item.Status == VoucherStatus.Expired)
+                {
+                    <span>
+                        <MudChip Color="Color.Error" title="Đã quá hạn">Đã kết thúc</MudChip>
+                    </span>
                 }
                 else
                 {
-                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa" Disabled></MudIconButton>
+                    <span>
+                        <MudChip Color="Color.Surface" title="Chưa diễn ra">Chưa diễn ra</MudChip>
+                    </span>
                 }
-                <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Id)))"></MudIconButton>
-            </MudButtonGroup>
-        </MudTd>
-    </RowTemplate>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Id" Title="Hành động" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudButtonGroup Variant="Variant.Filled">
+
+                    @if (context.Item.Status == VoucherStatus.NotOccur)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
+                        <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa"></MudIconButton>
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))" Disabled></MudIconButton>
+                        <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa" Disabled></MudIconButton>
+                    }
+                    <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
+                </MudButtonGroup>
+            </CellTemplate>
+        </PropertyColumn>
+    </Columns>
     <PagerContent>
         <MudDataGridPager T="VoucherView" />
     </PagerContent>
