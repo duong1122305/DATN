@@ -381,8 +381,15 @@ else
                 if (selectedShiftId > 0)
                 {
                     var repo = await _client2.InsertEmployeeCurrentMonth(listIdUser, selectedShiftId);
-                    Message(repo.Data, Severity.Success);
-                    await LoadData();
+                    if (repo.IsSuccess)
+                    {
+                        Message(repo.Data, Severity.Success);
+                        await LoadData();
+                    }
+                    else
+                    {
+                        Message(repo.Error, Severity.Error);
+                    }
                 }
                 else
                 {

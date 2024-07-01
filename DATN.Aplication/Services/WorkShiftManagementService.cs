@@ -31,6 +31,7 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+                    List<WorkShift> listSuccess = new List<WorkShift>();
                     if (currentDay.Month == 12)
                     {
                         var dayInMonth = DateTime.DaysInMonth(currentDay.Year + 1, 1);
@@ -43,10 +44,10 @@ namespace DATN.Aplication.Services
                                     ShiftId = day.Id,
                                     WorkDate = new DateTime(currentDay.Year + 1, 1, i)
                                 };
-                                await _unitOfWork.WorkShiftRepository.AddAsync(workshift);
-                                await _unitOfWork.WorkShiftRepository.SaveChangesAsync();
+                                listSuccess.Add(workshift);
                             }
                         }
+                        await _unitOfWork.WorkShiftRepository.AddRangeAsync(listSuccess);
                     }
                     else
                     {
@@ -60,10 +61,10 @@ namespace DATN.Aplication.Services
                                     ShiftId = day.Id,
                                     WorkDate = new DateTime(currentDay.Year, currentDay.Month + 1, i)
                                 };
-                                await _unitOfWork.WorkShiftRepository.AddAsync(workshift);
-                                await _unitOfWork.WorkShiftRepository.SaveChangesAsync();
+                                listSuccess.Add(workshift);
                             }
                         }
+                        await _unitOfWork.WorkShiftRepository.AddRangeAsync(listSuccess);
                     }
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm xong lịch 30 ngày" };
                 }
@@ -88,6 +89,7 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+                    List<WorkShift> listSuccess = new List<WorkShift>();
                     var dayInMonth = DateTime.DaysInMonth(currentDay.Year, currentDay.Month);
                     for (var i = 1; i <= dayInMonth; i++)
                     {
@@ -98,10 +100,10 @@ namespace DATN.Aplication.Services
                                 ShiftId = day.Id,
                                 WorkDate = new DateTime(currentDay.Year, currentDay.Month, i)
                             };
-                            await _unitOfWork.WorkShiftRepository.AddAsync(workshift);
-                            await _unitOfWork.WorkShiftRepository.SaveChangesAsync();
+                            listSuccess.Add(workshift);
                         }
                     }
+                    await _unitOfWork.WorkShiftRepository.AddRangeAsync(listSuccess);
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm xong lịch 30 ngày" };
                 }
                 catch (Exception e)
