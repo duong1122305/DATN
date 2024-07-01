@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<MudDataGrid Items="@lstVoucher" Hover="true" QuickFilter="@_quickFilter" Filterable="true" >
+<MudDataGrid Items="@lstVoucher" Hover="true" QuickFilter="@_quickFilter" Filterable="true">
     <ToolBarContent>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
@@ -150,7 +150,7 @@
     private async Task LoadData()
     {
         var voucher = await _client.GetAll();
-        lstVoucher = voucher.Data.OrderByDescending(x=>x.Id).ToList();
+        lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList();
         if (selectedStatus == Status.All)
         {
             lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList();
@@ -163,7 +163,7 @@
         {
             lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.GoingOn).ToList();
         }
-        else 
+        else
         {
             lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.NotOccur).ToList();
         }
@@ -189,7 +189,7 @@
                 await LoadData();
             }
         }
-      
+
         else
         {
             lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList(); // Không có khoảng ngày, hiển thị tất cả
@@ -253,7 +253,7 @@
     private async Task ChangeStatus(int id)
     {
 
-        if (await Confirm()==true)
+        if (await Confirm() == true)
         {
             //gọi api thêm
             var result = await _client.ChangeStatusVoucher(id);
