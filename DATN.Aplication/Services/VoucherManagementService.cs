@@ -126,7 +126,7 @@ namespace DATN.Aplication.Services
             var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
                         select discount;
             List<Discount> listcheck = new List<Discount>();
-            foreach (var item in query.ToList())
+            foreach (var item in query)
             {
                 if (item.EndDate < dateNow)
                 {
@@ -155,27 +155,26 @@ namespace DATN.Aplication.Services
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
 
-            if (query.Count() > 0)
+            if (query != null)
             {
-                var list = from discount in query
-                           select new VoucherView
-                           {
-                               Id = discount.Id,
-                               VoucherName = discount.VoucherName,
-                               VoucherCode = discount.VoucherCode,
-                               StartDate = discount.StartDate,
-                               EndDate = discount.EndDate,
-                               DiscountPercent = discount.DiscountPercent,
-                               MaxMoneyDiscount = discount.MaxMoneyDiscount,
-                               MinMoneyApplicable = discount.MinMoneyApplicable,
-                               Description = discount.Description,
-                               Quantity = discount.Quantity,
-                               Status = discount.Status
-                           };
+                var list = query.Select(c => new VoucherView
+                {
+                    Id = c.Id,
+                    VoucherName = c.VoucherName,
+                    VoucherCode = c.VoucherCode,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    DiscountPercent = c.DiscountPercent,
+                    MaxMoneyDiscount = c.MaxMoneyDiscount,
+                    MinMoneyApplicable = c.MinMoneyApplicable,
+                    Description = c.Description,
+                    Quantity = c.Quantity,
+                    Status = c.Status
+                });
                 return new ResponseData<List<VoucherView>>
                 {
                     IsSuccess = true,
-                    Data = list.ToList()
+                    Data = list.ToList(),
                 };
             }
             else
