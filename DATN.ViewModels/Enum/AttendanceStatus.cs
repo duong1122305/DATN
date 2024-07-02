@@ -10,6 +10,7 @@ namespace DATN.ViewModels.Enum
 	{
 		Present, // Đã có mặt
 		Absent,  // Vắng mặt
-		Late     // Đến muộn
+		Late,     // Đến muộn
+
 	}
 }

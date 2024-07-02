@@ -20,6 +20,10 @@ namespace DATN.Aplication.Repository
 
         public async Task<bool> CheckEmailExist(string email)
         {
+            if (string.IsNullOrEmpty(email.Trim()))
+            {
+                return false;
+            }
             var result = await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == true);
 
             return result != null;
@@ -43,9 +47,9 @@ namespace DATN.Aplication.Repository
             return result!=null;
         }
 
-        public Task<Guest> FindByEmail(string email)
+        public async Task<Guest> FindByEmail(string email)
         {
-            return _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == true);
+            return await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == false);
         }
 
 	

@@ -118,7 +118,8 @@ namespace DATN.Aplication.Extentions
 
                 return e.Message;
             }
-        }public async Task<string> SendMailVerificationAsync(string userMail, string user, string pass, string verifyCode)
+        }
+        public async Task<string> SendMailVerificationAsync(string userMail, string user, string pass, string verifyCode)
         {
             try
             {

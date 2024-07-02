@@ -60,12 +60,8 @@ namespace DATN.API.Controllers
         {
              return await _guestManagerService.SendForgotMail(email);
         }
-		[HttpPost("verify-register-by-guest")]
-	    public async Task<ResponseData<string>> CheckAndSendMail(string email)
-        {
-            return await _guestManagerService.CheckAndSendMail(email);
-        }
-        [HttpPost("register-by-guest")]
+	
+        [HttpPost("register-by-guest")]///////////////// đây là đăng ký mới
 		public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterByGuestRequest request)
 		{
             return await _guestManagerService.RegisterByCustomer(request);

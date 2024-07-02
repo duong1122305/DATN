@@ -1,0 +1,137 @@
+﻿@page "/AttendanceView"
+@using System.Net.Http.Json
+@using DATN.ADMIN.IServices
+@using DATN.ADMIN.Services
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Attendace
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:10px;">Điểm danh ngày: @DateTime.Now.ToString("dd/ MM/ yyyy")</MudText>
+@if (lstAtendance != null && lstAtendance.Count > 0)
+{
+
+    <MudTable Items="@lstAtendance" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<AttendanceViewModel,bool>(FilterFunc)">
+        <ToolBarContent>
+            <div style="width:200px;margin-bottom:10px">
+                <MudSelect T="Shift" Label="Ca làm trong ngày" ValueChanged="Change" Style="width:200px">
+                    <MudSelectItem Value="new Shift()">Chọn ca làm</MudSelectItem>
+                    @foreach (var item in lstShift)
+                    {
+                        <MudSelectItem Value="@item.Id">Ca @item.Name</MudSelectItem>
+                    }
+               </MudSelect>
+            </div>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>STT</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.StaffName)">Tên nhân viên</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.DateAttendace)">Ngày làm</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckInTime)">Thời gian điểm danh</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckOutTime)">Thời gian check out</MudTableSortLabel></MudTh>
+            <MudTh>Hành động</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+
+            <MudTd>@(lstAtendance.IndexOf(context) + 1)</MudTd>
+            <MudTd>@context.StaffName</MudTd>
+            <MudTd>@context.DateAttendace</MudTd>
+  
+            <MudTd >@context.CheckInTime</MudTd>
+            <MudTd >@context.CheckOutTime</MudTd>
+         
+            <MudTd>
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit"  Title="Sửa thông tin cá nhân"></MudIconButton>
+                    <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
+
+                </MudButtonGroup>
+            </MudTd>
+        </RowTemplate>
+       
+    </MudTable>
+}
+else
+{
+    <div style="justify-content:center; justify-items:center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    </div>
+}
+@code {
+    private DateTime dateNow = DateTime.Now;
+    private string searchString = "";
+
+    private List<Shift> lstShift = new List<Shift>();
+    private List<AttendanceViewModel> lstAtendance = new List<AttendanceViewModel>();
+    [Inject]
+    IAttendanceServiceClient _ser { get; set; }
+
+    protected async Task LoadData()
+    {
+        var dataShift = await _ser.GetShiftNow();
+        if (dataShift.IsSuccess)
+        {
+
+            var dataAttendance= await _ser.ListAttendanceToday(0);
+        }
+        else
+        {
+            Snackbar.Add(dataShift.Error, Severity.Warning);
+        }
+    }
+
+    protected async Task Change()
+    {
+        
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+
+    private bool FilterFunc(AttendanceViewModel element)// lọc data
+    {
+        if (string.IsNullOrWhiteSpace(searchString.Trim()))
+            return true;
+        if (element.StaffName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+
+
+    private async Task OpenDialog(int id, DateTime workDate, int from, int to)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Xem thông tin chi tiết ca làm";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("id", id);
+        parameters.Add("workDate", workDate);
+        parameters.Add("from", from);
+        parameters.Add("to", to);
+        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+
+}
