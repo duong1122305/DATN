@@ -33,7 +33,7 @@ namespace DATN.Aplication.Services
                         var voucher = new Discount()
                         {
                             VoucherName = voucherView.VoucherName,
-                            VoucherCode = voucherView.VoucherCode.ToUpper(),
+                            VoucherCode = Guid.NewGuid().ToString().ToUpper(),
                             Created = DateTime.Now,
                             StartDate = voucherView.StartDate,
                             EndDate = voucherView.EndDate,
@@ -99,7 +99,6 @@ namespace DATN.Aplication.Services
                     {
                         var voucher = query.FirstOrDefault();
                         voucher.VoucherName = voucherView.VoucherName;
-                        voucher.VoucherCode = voucherView.VoucherCode;
                         voucher.StartDate = voucherView.StartDate;
                         voucher.EndDate = voucherView.EndDate;
                         voucher.DiscountPercent = voucherView.DiscountPercent;
