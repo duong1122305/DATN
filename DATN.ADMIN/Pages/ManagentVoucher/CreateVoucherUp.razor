@@ -11,9 +11,11 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="Voucher.VoucherName" Label="VoucherName" For="@(() => Voucher.VoucherName)" MaxLength="255" />
-                @if (_nameButton == "Thêm mới")
+                @if (Id == 0 || Id==null)
                 {
-                    <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" MaxLength="15" hidden />
+                    <div hidden>
+                        <MudTextField T="string" @bind-Value="Voucher.VoucherCode" Label="VoucherCode" For="@(() => Voucher.VoucherCode)" MaxLength="15" />
+                    </div>
                 }
                 else
                 {
