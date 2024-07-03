@@ -16,7 +16,7 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-           <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
+            <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
@@ -33,18 +33,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var key = httpContextAccessor.HttpContext.Session.GetString("Key");
-        if (key != null)
+        if (httpContextAccessor.HttpContext.Request.Path != "/qrcode")
         {
-            var authenState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (!authenState.User.Identity.IsAuthenticated)
+            var key = httpContextAccessor.HttpContext.Session.GetString("Key");
+            if (key != null)
+            {
+                var authenState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                if (!authenState.User.Identity.IsAuthenticated)
+                {
+                    navigationManager.NavigateTo("/dangnhap");
+                }
+            }
+            else
             {
                 navigationManager.NavigateTo("/dangnhap");
             }
-        }
-        else
-        {
-            navigationManager.NavigateTo("/dangnhap");
         }
     }
 }

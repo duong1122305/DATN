@@ -12,6 +12,6 @@ namespace DATN.Data.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Status { get; set; }
-        public virtual Product Product { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

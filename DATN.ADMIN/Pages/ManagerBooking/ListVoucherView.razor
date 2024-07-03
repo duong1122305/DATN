@@ -1,4 +1,4 @@
-﻿@page "/ListVoucher"
+﻿@* @page "/ListVoucher"
 @using System.Net.Http.Json
 @using DATN.ADMIN.IServices
 @using DATN.Utilites
@@ -108,16 +108,12 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
                         <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa"></MudIconButton>
                     }
-                    else if (context.Item.Status==VoucherStatus.GoingOn)
-                    {
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
-                        <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa" Disabled></MudIconButton>
-                    }
                     else
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))" Disabled></MudIconButton>
                         <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa" Disabled></MudIconButton>
                     }
+                    <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Tertiary" title="Xem chi tiết"></MudIconButton>
                 </MudButtonGroup>
             </CellTemplate>
         </PropertyColumn>
@@ -306,4 +302,4 @@
     }
 
 
-}
+} *@

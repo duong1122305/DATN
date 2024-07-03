@@ -58,6 +58,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(otp =>
+{
+    otp.AddPolicy("cor", options =>
+    options.AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    );
+});
+
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
@@ -79,20 +88,21 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
 
-builder.Services.AddMvcCore().ConfigureApiBehaviorOptions(options => {
-	options.InvalidModelStateResponseFactory = (errorContext) =>
-	{
-		var errors = errorContext.ModelState.Values.SelectMany(e => e.Errors.Select(m => new
-		{
-			ErrorMessage = m.ErrorMessage
-		})).ToList();
-		var result = new ResponseData<string>()
-		{
-				IsSuccess = false,
-				Error = errors.Select(e => e.ErrorMessage).First()
-		};
-		return new BadRequestObjectResult(result);
-	};
+builder.Services.AddMvcCore().ConfigureApiBehaviorOptions(options =>
+{
+    options.InvalidModelStateResponseFactory = (errorContext) =>
+    {
+        var errors = errorContext.ModelState.Values.SelectMany(e => e.Errors.Select(m => new
+        {
+            ErrorMessage = m.ErrorMessage
+        })).ToList();
+        var result = new ResponseData<string>()
+        {
+            IsSuccess = false,
+            Error = errors.Select(e => e.ErrorMessage).First()
+        };
+        return new BadRequestObjectResult(result);
+    };
 });
 var app = builder.Build();
 
@@ -104,7 +114,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("cor");
 app.UseAuthentication();
 app.UseAuthorization();
 
