@@ -20,7 +20,6 @@ namespace DATN.Data.Entities
         public DateTime DoB { get; set; } = DateTime.Now;
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }
         public virtual ICollection<EmployeeSchedule> EmployeeSchedules { get; set; }
-        public virtual ICollection<EmployeeAttendance> EmployeeAttendances { get; set; }
         public virtual ICollection<HistoryAction> HistoryActions { get; set; }
     }
 
