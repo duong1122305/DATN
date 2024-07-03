@@ -24,12 +24,8 @@ namespace DATN.Data.Config
             builder.HasOne(c => c.User)
                 .WithMany(c=>c.EmployeeAttendances)
                 .HasForeignKey(c=>c.UserId);
-            //
-            builder.Property(c => c.Status)
-                .IsRequired();
-
-            builder.Property(c => c.CheckInTime)
-                .IsRequired();
+           
+  
         }
     }
 }

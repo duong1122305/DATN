@@ -23,7 +23,6 @@ namespace DATN.Data.Entities
 
 		public DateTime? CheckOutTime { get; set; } // Thời gian ra
 
-		public AttendanceStatus Status { get; set; } // Trạng thái
 
 		public string? OtherNotes { get; set; } // Ghi chú khác
 
