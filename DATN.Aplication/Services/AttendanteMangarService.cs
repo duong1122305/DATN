@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Attendace;
+using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -39,12 +40,11 @@ namespace DATN.Aplication.Services
                              {
                                  UserName = user.UserName,
                                  DateAttendace = DateTime.Today.ToString("dd/MM/yyyy"),
-                                 CheckInTime = at != null ? at.CheckInTime.ToString("hh:mm") : "0",
+                                 CheckInTime = at != null  && at.CheckInTime.HasValue ? at.CheckInTime.Value.ToString("hh:mm") : "0",
                                  CheckOutTime = at != null && at.CheckOutTime.HasValue ? at.CheckOutTime.Value.ToString("hh:mm") : "0",
                                  ID = at != null ? at.Id : 0,
                                  StaffName = user.FullName,
                                  ScheduleID = st.Id,
-
                              };
                 var data = result.ToList();
                 if (result== null|| result.Count()==0)
@@ -79,10 +79,23 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> CheckIn(int scheduleId, int attendanceID, bool isCheckin)
         {
-            if (attendanceID!=0)
+            if (isCheckin)
             {
-                
+                var attendance = new EmployeeAttendance();
+                if (attendanceID==0)
+                {
+                    attendance = new EmployeeAttendance() 
+                    { 
+                        CheckInTime = DateTime.Now,
+                        EmployeeScheduleId = scheduleId,
+                        
+                    };
+
+                }
+
             }
+
+            return null;
         }
     }
 }

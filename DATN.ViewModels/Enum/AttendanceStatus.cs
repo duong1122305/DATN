@@ -8,9 +8,7 @@ namespace DATN.ViewModels.Enum
 {
 	public enum AttendanceStatus
 	{
-		Present, // Đã có mặt
-		Absent,  // Vắng mặt
 		Late,     // Đến muộn
-
+		Pres
 	}
 }

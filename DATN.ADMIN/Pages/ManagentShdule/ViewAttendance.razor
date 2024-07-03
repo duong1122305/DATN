@@ -16,7 +16,7 @@
     <MudTable Items="@lstAtendance" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<AttendanceViewModel,bool>(FilterFunc)">
         <ToolBarContent>
             <div style="width:200px;margin-bottom:10px">
-                <MudSelect T="Shift" Value="selectedShift" Label="Ca làm trong ngày" ValueChanged="Change" Style="width:200px">
+                <MudSelect T="Shift" Value="selectedShift" Label="Ca làm trong ngày" ValueChanged="ChangeShift" Style="width:200px">
                     @foreach (var item in lstShift)
                     {
                         <MudSelectItem Value="@item">Ca @item.Name</MudSelectItem>
@@ -131,6 +131,10 @@ else
         
     } 
     protected async Task CheckOut(int scheduleId, int attendanceID, bool isCheckOut)
+    {
+        
+    } 
+    protected async Task ChangeShift(Shift value)
     {
         
     }

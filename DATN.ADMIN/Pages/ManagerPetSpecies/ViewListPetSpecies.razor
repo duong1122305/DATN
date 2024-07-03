@@ -93,23 +93,7 @@ else
 	}
 
 	bool isShowPass = false;
-	InputType PasswordInput = InputType.Password;
-	void ButtonShowclick()
-	{
-		@if (isShowPass)
-		{
-			isShowPass = false;
-			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-			PasswordInput = InputType.Password;
-		}
-		else
-		{
-			isShowPass = true;
-			PasswordInputIcon = Icons.Material.Filled.Visibility;
-			PasswordInput = InputType.Text;
-		}
-	}
-
+	
 	/// <summary>
 	/// Sự kiện thay đổi trạng thái
 	/// </summary>
