@@ -33,7 +33,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (httpContextAccessor.HttpContext.Request.Path != "/qrcode")
+        if (httpContextAccessor.HttpContext.Request.Path == "/_blazor") return;
+        if (httpContextAccessor.HttpContext.Request.Path != "/qrCheck")
         {
             var key = httpContextAccessor.HttpContext.Session.GetString("Key");
             if (key != null)

@@ -42,7 +42,19 @@
             <MudTd>@context.StaffName</MudTd>
             <MudTd>@context.DateAttendace</MudTd>
   
-            <MudTd >@context.CheckInTime</MudTd>
+            <MudTd >
+                @{
+                    bool checkIn = @context.CheckInTime!="0";
+                    
+                    <MudText> @checkIn?@context.CheckInTime:"Chưa điểm danh" </MudText>
+                    if (checkIn)
+                    {
+                        
+                    }
+
+                }
+
+            </MudTd>
             <MudTd >@context.CheckOutTime</MudTd>
          
             <MudTd>
