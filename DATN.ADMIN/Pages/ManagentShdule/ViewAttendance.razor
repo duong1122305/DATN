@@ -16,11 +16,10 @@
     <MudTable Items="@lstAtendance" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<AttendanceViewModel,bool>(FilterFunc)">
         <ToolBarContent>
             <div style="width:200px;margin-bottom:10px">
-                <MudSelect T="Shift" Label="Ca làm trong ngày" ValueChanged="Change" Style="width:200px">
-                    <MudSelectItem Value="new Shift()">Chọn ca làm</MudSelectItem>
+                <MudSelect T="Shift" Value="selectedShift" Label="Ca làm trong ngày" ValueChanged="Change" Style="width:200px">
                     @foreach (var item in lstShift)
                     {
-                        <MudSelectItem Value="@item.Id">Ca @item.Name</MudSelectItem>
+                        <MudSelectItem Value="@item">Ca @item.Name</MudSelectItem>
                     }
                </MudSelect>
             </div>
@@ -68,6 +67,7 @@ else
     private string searchString = "";
 
     private List<Shift> lstShift = new List<Shift>();
+    private Shift selectedShift = new Shift();
     private List<AttendanceViewModel> lstAtendance = new List<AttendanceViewModel>();
     [Inject]
     IAttendanceServiceClient _ser { get; set; }
@@ -75,10 +75,19 @@ else
     protected async Task LoadData()
     {
         var dataShift = await _ser.GetShiftNow();
-        if (dataShift.IsSuccess)
+        if (dataShift.IsSuccess && dataShift.Data!=null && dataShift.Data.Count() > 0)
         {
-
-            var dataAttendance= await _ser.ListAttendanceToday(0);
+            lstShift = dataShift.Data;
+            selectedShift = lstShift.First();
+            var dataAttendance= await _ser.ListAttendanceToday(selectedShift.Id);
+            if (dataAttendance.IsSuccess)
+            {
+                lstAtendance = dataAttendance.Data!;
+            }
+            else
+            {
+                Snackbar.Add(dataAttendance.Error, Severity.Warning);
+            }
         }
         else
         {

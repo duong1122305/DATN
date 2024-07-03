@@ -34,19 +34,20 @@ namespace DATN.Aplication.Services
                              join ws in lstWorkShiftToday on st.WorkShiftId equals ws.Id
                              join at in lstAttendance on ws.Id equals at.EmployeeScheduleId into attendanceData
                              from at in attendanceData.DefaultIfEmpty()
-                             where ws.ShiftId == shiftID|| shiftID==0
+                             where ws.ShiftId == shiftID || shiftID == 0
                              select new AttendanceViewModel
                              {
+                                 UserName = user.UserName,
                                  DateAttendace = DateTime.Today.ToString("dd/MM/yyyy"),
-                                 CheckInTime = at != null ? at.CheckInTime.ToString("hh:mm") : "Chưa đến",
-                                 CheckOutTime = at != null && at.CheckOutTime.HasValue ? at.CheckOutTime.Value.ToString("hh:mm") : "Chưa check out",
+                                 CheckInTime = at != null ? at.CheckInTime.ToString("hh:mm") : "0",
+                                 CheckOutTime = at != null && at.CheckOutTime.HasValue ? at.CheckOutTime.Value.ToString("hh:mm") : "0",
                                  ID = at != null ? at.Id : 0,
                                  StaffName = user.FullName
                              };
                 var data = result.ToList();
                 if (result== null|| result.Count()==0)
                 {
-                    return new ResponseData<List<AttendanceViewModel>>(false, "Chưa có lịch làm việc hôm nay");
+                    return new ResponseData<List<AttendanceViewModel>>(false, "Không có lịch làm việc lúc này");
                 }
                 return new ResponseData<List<AttendanceViewModel>>(result.ToList());
             }
@@ -62,7 +63,7 @@ namespace DATN.Aplication.Services
             {
                 var now = DateTime.Now.TimeOfDay;
                 var lstShift= await _unitOfWork.ShiftRepository.GetAllAsync();
-                lstShift = lstShift.Where(p => p.From.Add(TimeSpan.FromMinutes(-15)) < now && p.To.Add(TimeSpan.FromMinutes(-15))>now);
+                lstShift = lstShift.Where(p => p.From.Add(TimeSpan.FromMinutes(-15)) < now && p.To>now);
                 if (lstShift == null || lstShift.Count()==0)
                 {
                     return new ResponseData<List<Shift>>(false, "Hiện tại không trong ca làm");
