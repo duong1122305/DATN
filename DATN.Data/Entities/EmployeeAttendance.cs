@@ -17,8 +17,6 @@ namespace DATN.Data.Entities
 
 		public int EmployeeScheduleId { get; set; } // Khóa ngoại đến ID lịch làm việc
 
-		public Guid UserId { get; set; } // Khóa ngoại đến ID nhân viên
-
 		public DateTime? CheckInTime { get; set; } // Thời gian vào
 
 		public DateTime? CheckOutTime { get; set; } // Thời gian ra
@@ -26,8 +24,6 @@ namespace DATN.Data.Entities
 
 		public string? OtherNotes { get; set; } // Ghi chú khác
 
-		public virtual EmployeeSchedule EmployeeSchedule { get; set; } // Lịch làm việc
-
-		public virtual User User { get; set; } // Nhân viên
+		public virtual EmployeeSchedule EmployeeSchedule { get; set; } // Lịch làm việcB
 	}
 }
