@@ -42,7 +42,9 @@ namespace DATN.Aplication.Services
                                  CheckInTime = at != null ? at.CheckInTime.ToString("hh:mm") : "0",
                                  CheckOutTime = at != null && at.CheckOutTime.HasValue ? at.CheckOutTime.Value.ToString("hh:mm") : "0",
                                  ID = at != null ? at.Id : 0,
-                                 StaffName = user.FullName
+                                 StaffName = user.FullName,
+                                 ScheduleID = st.Id,
+
                              };
                 var data = result.ToList();
                 if (result== null|| result.Count()==0)
@@ -73,6 +75,13 @@ namespace DATN.Aplication.Services
             catch (Exception)
             {
                 return new ResponseData<List<Shift>>(false, "Có lỗi khi lấy dữ liệu danh sách ca");
+            }
+        }
+        public async Task<ResponseData<string>> CheckIn(int scheduleId, int attendanceID, bool isCheckin)
+        {
+            if (attendanceID!=0)
+            {
+                
             }
         }
     }

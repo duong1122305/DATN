@@ -34,7 +34,7 @@
             <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.DateAttendace)">Ngày làm</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckInTime)">Thời gian điểm danh</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckOutTime)">Thời gian check out</MudTableSortLabel></MudTh>
-            <MudTh>Hành động</MudTh>
+           
         </HeaderContent>
         <RowTemplate>
 
@@ -46,24 +46,43 @@
                 @{
                     bool checkIn = @context.CheckInTime!="0";
                     
-                    <MudText> @checkIn?@context.CheckInTime:"Chưa điểm danh" </MudText>
+                    <MudText> @(checkIn?context.CheckInTime:"Chưa điểm danh") </MudText>
                     if (checkIn)
                     {
-                        
+                        <MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,false)" Variant="Variant.Filled">Huỷ</MudButton>
+
                     }
+                    else
+                    {
+
+                        <MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,true)" Variant="Variant.Filled" Color="Color.Secondary">Điểm danh</MudButton>
+                    }
+
 
                 }
 
             </MudTd>
-            <MudTd >@context.CheckOutTime</MudTd>
-         
             <MudTd>
-                <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit"  Title="Sửa thông tin cá nhân"></MudIconButton>
-                    <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
+                @{
+                    bool checkOut = @context.CheckInTime != "0";
 
-                </MudButtonGroup>
+                    <MudText> @(checkOut ? context.CheckOutTime : "Chưa Check out") </MudText>
+                    if (checkOut)
+                    {
+                        <MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,false) "Variant="Variant.Filled">Huỷ</MudButton>
+
+                    }
+                    else
+                    {
+
+                        <MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,true)"  Variant=" Variant.Filled" Color="Color.Secondary">Check out</MudButton>
+                    }
+
+
+                }
             </MudTd>
+         
+           
         </RowTemplate>
        
     </MudTable>
@@ -107,7 +126,11 @@ else
         }
     }
 
-    protected async Task Change()
+    protected async Task CheckIn(int scheduleId, int attendanceID, bool isCheckin)
+    {
+        
+    } 
+    protected async Task CheckOut(int scheduleId, int attendanceID, bool isCheckOut)
     {
         
     }
