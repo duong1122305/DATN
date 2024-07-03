@@ -19,11 +19,10 @@ namespace DATN.Data.Entities
 
 		public Guid UserId { get; set; } // Khóa ngoại đến ID nhân viên
 
-		public DateTime CheckInTime { get; set; } // Thời gian vào
+		public DateTime? CheckInTime { get; set; } // Thời gian vào
 
 		public DateTime? CheckOutTime { get; set; } // Thời gian ra
 
-		public AttendanceStatus Status { get; set; } // Trạng thái
 
 		public string? OtherNotes { get; set; } // Ghi chú khác
 
