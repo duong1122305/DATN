@@ -41,7 +41,7 @@
             <CellTemplate>
                 <span>
                     <MudButtonGroup Variant="Variant.Filled">
-                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết"></MudIconButton>
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.Id.Value,context.Item.BookingTime))"></MudIconButton>
                     </MudButtonGroup>
                 </span>
             </CellTemplate>
@@ -104,7 +104,7 @@
                 DisableBackdropClick = true
             };
         parameters.Add("id", id);
-        parameters.Add("", dateBooking);
+        parameters.Add("dateBooking", dateBooking);
         var createUpdateDialog = await _dialogservice.ShowAsync<DetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
