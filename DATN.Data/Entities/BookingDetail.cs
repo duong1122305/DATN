@@ -20,7 +20,7 @@ namespace DATN.Data.Entities
 
         public Guid? StaffId { get; set; } // Khóa ngoại đến ID đặt lịch
 
-        public int PetId { get; set; }
+        public int? PetId { get; set; } = 1;
 
         public int? ComboId { get; set; }
 
