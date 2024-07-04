@@ -230,7 +230,7 @@ namespace DATN.Aplication.Services
                         PhoneNumber = request.PhoneNumber,
                         RegisteredAt = DateTime.Now,
                         UserName = request.UserName,
-                        PasswordHash = hasEmail ? null : _passwordExtensitons.HashPassword(request.Password),
+                        PasswordHash = !hasEmail ? null : _passwordExtensitons.HashPassword(request.Password),
                         IsComfirm = !hasEmail,
                     };
                    await _unitOfWork.GuestRepository.AddAsync(guest);

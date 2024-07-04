@@ -90,7 +90,11 @@ namespace DATN.Aplication.Services
                         EmployeeScheduleId = scheduleId,
                         
                     };
-
+                    await _unitOfWork.EmployeeAttendanceRepository.AddAsync(attendance);
+                }
+                else
+                {
+                    attendance =await _unitOfWork.EmployeeAttendanceRepository.GetAsync(attendanceID);
                 }
 
             }
