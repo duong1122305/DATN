@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DATN.Aplication.Services
+namespace DATN.ViewModels.DTOs.Booking
 {
     public class BookingView
     {

@@ -23,6 +23,7 @@ namespace DATN.Data.Entities
         public int? ComboId { get; set; }
 
         public int? ServiceDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
+        public int PetId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
 
 		public DateTime StartDateTime { get; set; } // Thời gian bắt đầu
 
