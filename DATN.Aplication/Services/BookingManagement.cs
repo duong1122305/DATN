@@ -26,7 +26,7 @@ namespace DATN.Aplication.Services
         {
             var query = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
                         join bookingdetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                        on booking.Id equals bookingdetail.Id
+                        on booking.Id equals bookingdetail.BookingId
                         join guest in await _unitOfWork.GuestRepository.GetAllAsync()
                         on booking.GuestId equals guest.Id
                         join user in await _userManager.Users.ToListAsync()
