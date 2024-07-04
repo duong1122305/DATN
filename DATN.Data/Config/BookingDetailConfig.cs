@@ -33,7 +33,7 @@ namespace DATN.Data.Config
             builder.HasOne(c => c.Pet)
                 .WithMany(c => c.BookingDetails)
                 .HasForeignKey(c => c.PetId)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
             //
             builder.HasOne(c => c.Staff)
                  .WithMany(c => c.BookingDetails)
