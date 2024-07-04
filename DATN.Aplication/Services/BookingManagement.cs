@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class BookingManagement: IBookingManagement
+    public class BookingManagement : IBookingManagement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
@@ -29,6 +29,28 @@ namespace DATN.Aplication.Services
                         on booking.Id equals bookingdetail.BookingId
                         join guest in await _unitOfWork.GuestRepository.GetAllAsync()
                         on booking.GuestId equals guest.Id
+                        group new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
+                        by new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime, booking.Status }
+                        into view
+                        select new BookingView
+                        {
+                            Id = view.Key.Id,
+                            Address = view.Key.Address,
+                            BookingTime = view.Key.BookingTime,
+                            Email = view.Key.Email,
+                            NameGuest = view.Key.Name,
+                            PhoneNumber = view.Key.PhoneNumber,
+                            Status = view.Key.Status
+                        };
+            return new ResponseData<List<BookingView>>() { IsSuccess = true, Data = query.ToList() };
+        }
+        public async Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(string idGuest, DateTime date)
+        {
+            var query = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                        join bookingdetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                        on booking.Id equals bookingdetail.BookingId
+                        join guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                        on booking.GuestId equals guest.Id
                         join user in await _userManager.Users.ToListAsync()
                         on bookingdetail.StaffId equals user.Id
                         join servicedetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
@@ -37,20 +59,22 @@ namespace DATN.Aplication.Services
                         on servicedetail.ServiceId equals service.Id
                         join pet in await _unitOfWork.PetRepository.GetAllAsync()
                         on bookingdetail.PetId equals pet.Id
-                        group new {guest.Id, guest.Name,guest.Email,guest.Address,guest.PhoneNumber,booking.BookingTime}
-                        by new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
+                        where guest.Id == Guid.Parse(idGuest) && booking.BookingTime.Date.CompareTo(date.Date) == 0
+                        group new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
+                        by new { user.FullName, servicedetail.Price, pet.Name, servicedetail.Description, bookingdetail.Status, bookingdetail.StartDateTime, bookingdetail.EndDateTime, booking.BookingTime }
                         into view
-                        select new BookingView
+                        select new ListBokingDetailInDay
                         {
-                            Id=view.Key.Id,
-                            Address= view.Key.Address,
-                            BookingTime= view.Key.BookingTime,
-                            Email= view.Key.Email,
-                            NameGuest=view.Key.Name,
-                            PhoneNumber = view.Key.PhoneNumber
+                            NameStaffService = view.Key.FullName,
+                            ServiceDetaiName = view.Key.Description,
+                            PetName = view.Key.Name,
+                            BookingTime = view.Key.BookingTime,
+                            Price = view.Key.Price,
+                            Status = view.Key.Status,
+                            EndDate = view.Key.EndDateTime,
+                            StartDate=view.Key.StartDateTime,
                         };
-            return new ResponseData<List<BookingView>>() { IsSuccess = true ,Data=query.ToList()};
+            return new ResponseData<List<ListBokingDetailInDay>> { IsSuccess = true, Data = query.ToList() };
         }
-        public Task<ResponseData<List<>>>
     }
 }
