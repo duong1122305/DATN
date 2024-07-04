@@ -19,8 +19,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id, DateTime date)
         {
-            var respone =  _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}&date={date}").GetAwaiter().GetResult();
-            return respone;
+            return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}&date={date}").GetAwaiter().GetResult();
         }
     }
 }
