@@ -1,4 +1,5 @@
-﻿@using DATN.Aplication.CustomProvider
+﻿@using DATN.ADMIN.Pages.qr
+@using DATN.Aplication.CustomProvider
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Security.Claims
@@ -6,14 +7,21 @@
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
-                <Authorizing>
-                    <h3>Authorizing...</h3>
-                </Authorizing>
-                <NotAuthorized>
-                    <h3>Not authorized</h3>
-                </NotAuthorized>
-            </AuthorizeRouteView>
+            @if (routeData.PageType == typeof(Qrocdetesstcheck))
+            {
+                <RouteView RouteData="routeData" DefaultLayout="typeof(LayoutNoAuth)"></RouteView>
+            }
+            else
+            {
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
+                    <Authorizing>
+                        <h3>Authorizing...</h3>
+                    </Authorizing>
+                    <NotAuthorized>
+                        <h3>Not authorized</h3>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+            }
         </Found>
         <NotFound>
             <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
@@ -33,8 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (httpContextAccessor.HttpContext.Request.Path == "/_blazor") return;
-        if (httpContextAccessor.HttpContext.Request.Path != "/qrCheck")
+        if (httpContextAccessor.HttpContext.Request.Path!="/qrcode")
         {
             var key = httpContextAccessor.HttpContext.Session.GetString("Key");
             if (key != null)
