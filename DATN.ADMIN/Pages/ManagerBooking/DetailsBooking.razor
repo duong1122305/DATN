@@ -5,27 +5,28 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
+@using DATN.ViewModels.Enum
 @inject IDialogService _dialogservice;
 @if (lstBooking.Count > 0 && lstBooking != null)
 {
     <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
-                 Hideable="true" Groupable="true" GroupExpanded="false" >
+                 Hideable="true" Groupable="true" GroupExpanded="false">
         <ToolBarContent>
             <MudSpacer />
-           @*  <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField> *@
+            @*  <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
+        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField> *@
         </ToolBarContent>
         <Columns>
             <PropertyColumn Property="x => x.NameStaffService" Title="Nhân viên làm" Filterable="false" Groupable="false" />
             <PropertyColumn Property="x => x.ServiceDetaiName" Title="Dịch vụ làm" Filterable="false" Groupable="false" />
             <TemplateColumn Title="Giờ bắt đầu" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <span style="text-align:center;">@context.Item.StartDate.Value.ToString(@"hh\:mm")</span>
+                    <span style="text-align:center;">@context.Item.StartDate</span>
                 </CellTemplate>
             </TemplateColumn>
             <TemplateColumn Title="Giờ kết thúc" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <span style="text-align:center;">@context.Item.EndDate.Value.ToString(@"hh\:mm")</span>
+                    <span style="text-align:center;">@context.Item.EndDate</span>
                 </CellTemplate>
             </TemplateColumn>
             <TemplateColumn Title="Thời gian đặt" Sortable="false" Filterable="false">
@@ -40,8 +41,8 @@
             </TemplateColumn>
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
-                   @if (context.Item.Status==0)
-                {
+                    @if (context.Item.Status == BookingDetailStatus.IsActive)
+                    {
                         <span>Đã hoàn thành</span>
                     }
                     else
@@ -51,15 +52,15 @@
                 </CellTemplate>
             </TemplateColumn>
 
-           @*  <PropertyColumn Property="x=>x." Title="Hành động" Filterable="false" Sortable="false">
-                <CellTemplate>
-                    <span>
-                        <MudButtonGroup Variant="Variant.Filled">
-                            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.Item.ShiftID,context.Item.WorkDate,context.Item.From.Hours,context.Item.To.Hours))"></MudIconButton>
-                        </MudButtonGroup>
-                    </span>
-                </CellTemplate>
-            </PropertyColumn> *@
+            @*  <PropertyColumn Property="x=>x." Title="Hành động" Filterable="false" Sortable="false">
+        <CellTemplate>
+        <span>
+        <MudButtonGroup Variant="Variant.Filled">
+        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.Item.ShiftID,context.Item.WorkDate,context.Item.From.Hours,context.Item.To.Hours))"></MudIconButton>
+        </MudButtonGroup>
+        </span>
+        </CellTemplate>
+        </PropertyColumn> *@
         </Columns>
         <PagerContent>
             <MudDataGridPager T="ListBokingDetailInDay" />
@@ -74,22 +75,29 @@ else
 }
 @code {
     [Parameter]
-    public Guid id { get; set; }
+    public string id { get; set; }
     [Parameter]
     public DateTime dateBooking { get; set; }
     [Inject]
     IBookingViewServices _client { get; set; }
     [Parameter]
     public List<ListBokingDetailInDay> lstBooking { get; set; } = new List<ListBokingDetailInDay>();
-    protected async Task LoadData()
-    {
-        var respone = await _client.ListBookingDetailInDay(id.ToString(), dateBooking);
-        lstBooking = respone.Data;
-    }
+
     protected async override Task OnInitializedAsync()
     {
         await LoadData();
     }
 
-
+    protected async Task LoadData()
+    {
+        var respone = await _client.ListBookingDetailInDay(id, dateBooking);
+        if (respone.IsSuccess)
+        {
+            lstBooking = respone.Data;
+        }
+        else
+        {
+            lstBooking = new List<ListBokingDetailInDay>();
+        }
+    }
 }
