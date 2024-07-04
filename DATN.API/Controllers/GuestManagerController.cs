@@ -35,7 +35,7 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.FindGuestByID(id);
         }  
-        [HttpGet("verify-cus")]
+        [HttpPost("verify-cus")]
         public async Task<ResponseData<string>> VerifyCode(string verifyCode)
         {
             return await _guestManagerService.VerififyUser(verifyCode);
