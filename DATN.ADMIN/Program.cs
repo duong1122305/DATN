@@ -81,6 +81,7 @@ builder.Services.AddScoped<IPetSpeciesServiceClient,PetSpeciesServiceClient>();
 builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
+builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
 builder.Services.AddMudServices(config =>
 {
 	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;

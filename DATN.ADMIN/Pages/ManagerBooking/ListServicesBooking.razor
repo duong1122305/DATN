@@ -4,38 +4,63 @@
 @using DATN.Utilites
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.Enum
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
+@inject IAddressService _addressServive;
 <PageTitle>Danh sách đặt dịch vụ</PageTitle>
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
-<MudDataGrid Items="@lstVoucher" Hover="true" Filterable="true">
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+<MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" @ref="dataGrid" Hideable="true" Groupable="true" GroupExpanded="false" MultiSelection="true">
     <ToolBarContent>
         <MudSpacer />
     </ToolBarContent>
     <Columns>
-        <TemplateColumn Title="Ngày">
-            <CellTemplate title="Ngaỳ">
-                @if (DateTime.Today.Date >= time)
-                {
-                    <span>Thứ 20</span>
-                }
+        <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+            <GroupTemplate>
+                <span style="font-weight:bold">@context.Grouping.Key</span>
+            </GroupTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.NameGuest" Title="Tên khách hàng" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Địa chỉ" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Item.Address!) ?? "Không có địa chỉ")</span>
             </CellTemplate>
         </TemplateColumn>
+        <TemplateColumn Title="Thời gian đặt" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span>
+                    @context.Item.BookingTime.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Id" Title="Hành động" Filterable="false" Sortable="false">
+            <CellTemplate>
+                <span>
+                    <MudButtonGroup Variant="Variant.Filled">
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết"></MudIconButton>
+                    </MudButtonGroup>
+                </span>
+            </CellTemplate>
+        </PropertyColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="VoucherView" />
+        <MudDataGridPager T="BookingView" />
     </PagerContent>
 </MudDataGrid>
 
 @code {
-    DateTime time = DateTime.Today;
 
-    private List<VoucherView> lstVoucher = new List<VoucherView>();
+    private List<BookingView> lstBookingServices = new List<BookingView>();
+    bool _customizeGroupTemplate;
+    static bool _customizeGroupBy;
+    MudDataGrid<BookingView> dataGrid;
 
     [Inject]
-    private IVoucherServices _client { get; set; }
+    private IBookingViewServices _client { get; set; }
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -43,8 +68,50 @@
 
     private async Task LoadData()
     {
-        var voucher = await _client.GetAll();
-        lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList();
-
+        var respone = await _client.GetAll();
+        lstBookingServices = respone.Data;
     }
+
+    //group ngày
+    private Func<BookingView, string> _groupBy = x =>
+    {
+          if (_customizeGroupBy)
+          {
+              return x.NameGuest;
+          }
+          else
+          {
+              return x.BookingTime.ToString("dd/MM/yyyy");
+          }
+    };
+    void ExpandAllGroups()
+    {
+        dataGrid?.ExpandAllGroups();
+    }
+
+
+    private async Task OpenDialog(Guid id, DateTime dateBooking)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Xem thông tin chi tiết ca làm";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("id", id);
+        parameters.Add("", dateBooking);
+        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsBooking>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+
 }

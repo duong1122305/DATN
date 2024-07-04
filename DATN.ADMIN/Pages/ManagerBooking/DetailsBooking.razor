@@ -1,0 +1,28 @@
+﻿@inject ISnackbar Snackbar
+@inject IDialogService _diagService;
+@inject HttpClient httpClient
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@inject IDialogService _dialogservice;
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+    [Parameter]
+    public DateTime dateBooking { get; set; }
+
+    //lấy các nhân viên làm việc trong ca ngày hôm ấy
+
+    public DateTime dateNow { get; set; } = DateTime.Now;
+    protected async Task LoadData()
+    {
+       
+    }
+    protected async override Task OnInitializedAsync()
+    {
+       
+    }
+
+
+}
