@@ -37,14 +37,17 @@ namespace DATN.Aplication.Services
                         on servicedetail.ServiceId equals service.Id
                         join pet in await _unitOfWork.PetRepository.GetAllAsync()
                         on bookingdetail.PetId equals pet.Id
+                        group new {guest.Id, guest.Name,guest.Email,guest.Address,guest.PhoneNumber,booking.BookingTime}
+                        by new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
+                        into view
                         select new BookingView
                         {
-                            Id=guest.Id,
-                            Address=guest.Address,
-                            BookingTime=booking.BookingTime,
-                            Email=guest.Email,
-                            NameGuest=guest.Name,
-                            PhoneNumber = guest.PhoneNumber
+                            Id=view.Key.Id,
+                            Address= view.Key.Address,
+                            BookingTime= view.Key.BookingTime,
+                            Email= view.Key.Email,
+                            NameGuest=view.Key.Name,
+                            PhoneNumber = view.Key.PhoneNumber
                         };
             return new ResponseData<List<BookingView>>() { IsSuccess = true ,Data=query.ToList()};
         }
