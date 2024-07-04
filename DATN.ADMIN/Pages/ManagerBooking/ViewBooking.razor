@@ -29,31 +29,21 @@
 
 </style>
 <MudGrid>
-    <MudItem xs="12" lg="2" Class="d-flex  mud-width-full py-8" Style="margin-top: -30px!important;  ">
-        <MudCard Style=" width:100%; padding: 20px; text-align: center; " Outlined=true>
-            <MudGrid>
-                <MudItem xs="2" lg="12" Class="chip-status">
-
-                    <MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="OpenBookingCreated">Thêm lịch đặt mới</MudButton>
-                    <MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.EditCalendar" Color="Color.Primary">Xem lịch online</MudButton>
-                </MudItem>
-                <MudItem xs="2" lg="12">
-                </MudItem>
-            </MudGrid>
-        </MudCard>
-    </MudItem>
     <MudItem xs="12" lg="10" Class="d-flex mud-width-full py-8" Style="width:100%">
         <MudPaper MaxWidth="100%" MinWidth="100%">
+
             <MudDynamicTabs @ref="@DynamicTabs" @bind-ActivePanelIndex="@UserIndex"
                             AddTab="@AddTabCallback" CloseTab="@CloseTabCallback"
                             AddIconToolTip="Click để tạo hoá đơn mới" CloseIconToolTip="Đóng hoá đơn hoá đơn sẽ bị huỷ"
                             PanelClass="px-4 py-6" Style="margin-top: -30px!important;" Elevation="4" Rounded ApplyEffectsToContainer>
+                <MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="OpenBookingCreated">Thêm lịch đặt mới</MudButton>
+                <MudButton Size="Size.Small" Style="margin-bottom:20px; width:80%" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.EditCalendar" Color="Color.Primary">Xem lịch online</MudButton>
                 <MudTabPanel Text="Lịch dịch vụ" ShowCloseIcon="false">
                     <div>
                         <SfSchedule @ref="ScheduleRef" TValue="AppointmentData" Width="100%" Height="650px" SelectedDate="CurrentDate!.Value" @bind-CurrentView=CurrentView StartHour="07:00" EndHour="22:00"
                                     TimeFormat="HH:mm" DateFormat="dd/MM/yyyy" EnableAdaptiveUI="true">
                             <ScheduleEvents OnPopupOpen="OnPopupOpen" TValue="AppointmentData" EventRendered="OnEventRendered" OnDragStart="OnScheduleDag" OnResizeStart="OnScheduleResize">
-
+                              
                             </ScheduleEvents>
                             <ScheduleEventSettings DataSource="@dataSource">
                                 @* 	<ScheduleField>

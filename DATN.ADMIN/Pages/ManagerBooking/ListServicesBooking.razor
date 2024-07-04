@@ -1,0 +1,50 @@
+﻿@page "/ListServicesBooking"
+@using System.Net.Http.Json
+@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.Enum
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<PageTitle>Danh sách đặt dịch vụ</PageTitle>
+<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
+<MudDataGrid Items="@lstVoucher" Hover="true" Filterable="true">
+    <ToolBarContent>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Title="Ngày">
+            <CellTemplate title="Ngaỳ">
+                @if (DateTime.Today.Date >= time)
+                {
+                    <span>Thứ 20</span>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="VoucherView" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    DateTime time = DateTime.Today;
+
+    private List<VoucherView> lstVoucher = new List<VoucherView>();
+
+    [Inject]
+    private IVoucherServices _client { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var voucher = await _client.GetAll();
+        lstVoucher = voucher.Data.OrderByDescending(x => x.Id).ToList();
+
+    }
+}
