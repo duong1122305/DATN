@@ -33,12 +33,12 @@ namespace DATN.ADMIN.Services
                 };
             }
         }
-        public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request)
+        public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterByGuestRequest request)
         {
             try
             {
 
-                var reponse = _client.PostAsJsonAsync("api/GuestManager/register-guest-no-user", request).GetAwaiter().GetResult();
+                var reponse = _client.PostAsJsonAsync("api/GuestManager/register-guest-with-user", request).GetAwaiter().GetResult();
                 if (reponse.IsSuccessStatusCode)
                 {
                     return JsonConvert.DeserializeObject<ResponseData<string>>(await reponse.Content.ReadAsStringAsync())!;
@@ -59,32 +59,7 @@ namespace DATN.ADMIN.Services
                 };
             }
         }
-        public async Task<ResponseData<string>> RegisterHasUser(GuestRegisterUserRequest request)
-        {
-            try
-            {
-
-                var reponse = _client.PostAsJsonAsync("api/GuestManager/register-guest-with-user", request).GetAwaiter().GetResult();
-                if (reponse.IsSuccessStatusCode)
-                {
-                    return JsonConvert.DeserializeObject<ResponseData<string>>(await reponse.Content.ReadAsStringAsync());
-                }
-                return new ResponseData<string>()
-                {
-                    IsSuccess = false,
-                    Error = $"Phát sinh lỗi không rõ khi gửi dữ liệu!"
-                };
-            }
-            catch (Exception ex)
-            {
-
-                return new ResponseData<string>()
-                {
-                    IsSuccess = false,
-                    Error = $"Có lỗi khi gửi dữ liệu: {ex.Message}"
-                };
-            }
-        }
+ 
         public async Task<ResponseData<string>> ChangStatus(bool value, Guid Id)
         {
             try
@@ -98,7 +73,7 @@ namespace DATN.ADMIN.Services
                 if (reponse.IsSuccessStatusCode)
                 {
                     var data = JsonConvert.DeserializeObject<ResponseData<string>>(await reponse.Content.ReadAsStringAsync());
-                    return data;
+                    return data!;
                 }
                 return new ResponseData<string>()
                 {
