@@ -22,29 +22,34 @@ namespace DATN.Data.Config
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
             //
-            builder.HasOne(c=>c.ServiceDetail)
-                .WithMany(c=>c.BookingDetails)
-                .HasForeignKey(c=>c.ServiceDetailId);
+            builder.HasOne(c => c.ServiceDetail)
+                .WithMany(c => c.BookingDetails)
+                .HasForeignKey(c => c.ServiceDetailId);
             //
             builder.HasOne(c => c.ComboService)
                 .WithMany(c => c.BookingDetails)
                 .HasForeignKey(c => c.ComboId);
+
+            builder.HasOne(c => c.Pet)
+                .WithMany(c => c.BookingDetails)
+                .HasForeignKey(c => c.PetId)
+                .IsRequired();
             //
             builder.HasOne(c => c.Staff)
                  .WithMany(c => c.BookingDetails)
                  .HasForeignKey(c => c.StaffId)
                  .IsRequired();
             //
-            builder.Property(c=>c.Price)
+            builder.Property(c => c.Price)
                 .IsRequired();
             //
-            builder.Property(c=>c.Status)
+            builder.Property(c => c.Status)
                 .IsRequired();
             //
-            builder.Property(c=>c.StartDateTime)
+            builder.Property(c => c.StartDateTime)
                 .IsRequired();
             //
-            builder.Property(c=>c.EndDateTime)
+            builder.Property(c => c.EndDateTime)
                 .IsRequired();
         }
     }

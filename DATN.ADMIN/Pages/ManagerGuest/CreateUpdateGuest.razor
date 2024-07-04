@@ -70,7 +70,7 @@
 		{
 			return;
 		}
-		var response = await _client.RegisterNoUser(new GuestRegisterNoUserRequest()
+		var response = await _client.RegisterNoUser(new GuestRegisterByGuestRequest()
 				{
 					Name = guest.Name,
 					Address = guest.Address,

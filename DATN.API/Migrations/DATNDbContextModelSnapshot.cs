@@ -326,7 +326,7 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CheckInTime")
+                    b.Property<DateTime?>("CheckInTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("CheckOutTime")
@@ -338,17 +338,9 @@ namespace DATN.API.Migrations
                     b.Property<string>("OtherNotes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeScheduleId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("EmployeeAttendances");
                 });
@@ -1193,15 +1185,7 @@ namespace DATN.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.User", "User")
-                        .WithMany("EmployeeAttendances")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("EmployeeSchedule");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeSchedule", b =>
@@ -1562,8 +1546,6 @@ namespace DATN.API.Migrations
             modelBuilder.Entity("DATN.Data.Entities.User", b =>
                 {
                     b.Navigation("BookingDetails");
-
-                    b.Navigation("EmployeeAttendances");
 
                     b.Navigation("EmployeeSchedules");
 
