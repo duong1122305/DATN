@@ -7,5 +7,6 @@ namespace DATN.Aplication.Services.IServices
     {
         public Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek();
         public Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(string idGuest, DateTime date);
+        public Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest);
     }
 }

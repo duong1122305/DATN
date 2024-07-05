@@ -22,9 +22,14 @@ namespace DATN.API.Controllers
             return _bookingManagement.GetListBookingInOneWeek();
         }
         [HttpGet("List-Booking-Detail-In-Day")]
-        public Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id,DateTime date)
+        public Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id, DateTime date)
         {
-            return _bookingManagement.GetListBookingDetailInDay(id,date);
+            return _bookingManagement.GetListBookingDetailInDay(id, date);
+        }
+        [HttpPost("Create-Booking")]
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest)
+        {
+            return await _bookingManagement.CreateBookingStore(createBookingRequest);
         }
     }
 }

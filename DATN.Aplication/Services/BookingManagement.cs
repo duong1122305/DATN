@@ -1,7 +1,9 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
+using DATN.Data.Enum;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -42,13 +44,13 @@ namespace DATN.Aplication.Services
                             PhoneNumber = view.Key.PhoneNumber,
                             Status = view.Key.Status
                         };
-            if (query.Count()>0)
+            if (query.Count() > 0)
             {
                 return new ResponseData<List<BookingView>>() { IsSuccess = true, Data = query.ToList() };
             }
             else
             {
-                return new ResponseData<List<BookingView>> { IsSuccess = false, Data = new List<BookingView>() , Error="Chưa có dữ liệu"};
+                return new ResponseData<List<BookingView>> { IsSuccess = false, Data = new List<BookingView>(), Error = "Chưa có dữ liệu" };
             }
         }
         public async Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(string idGuest, DateTime date)
@@ -79,7 +81,7 @@ namespace DATN.Aplication.Services
                             Price = view.Key.Price,
                             Status = view.Key.Status,
                             EndDate = view.Key.EndDateTime,
-                            StartDate=view.Key.StartDateTime,
+                            StartDate = view.Key.StartDateTime,
                         };
             if (query.Count() > 0)
             {
@@ -90,9 +92,103 @@ namespace DATN.Aplication.Services
                 return new ResponseData<List<ListBokingDetailInDay>> { IsSuccess = false, Data = new List<ListBokingDetailInDay>(), Error = "Chưa có dữ liệu" };
             }
         }
-        public async Task<ResponseData<string>> CreateBookingStore()
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest)
         {
+            if (createBookingRequest.ListIdServiceDetail.Count > 0)
+            {
+                double totalPrice = 0;
+                foreach (var item in createBookingRequest.ListIdServiceDetail)
+                {
+                    var queryGetTotalPrice = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                             where serviceDetail.Id == item.ServiceDetailId
+                                             select serviceDetail;
+                    totalPrice += queryGetTotalPrice.FirstOrDefault().Price;
+                }
+                var queryCheckVoucherCanApply = from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                                where totalPrice >= voucher.MinMoneyApplicable
+                                                && voucher.AmountUsed < voucher.Quantity
+                                                && voucher.Status == VoucherStatus.GoingOn
+                                                select voucher;
+                int voucherWillUse = 0;
+                if (queryCheckVoucherCanApply.Count() > 1)
+                {
+                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                    foreach (var item in queryCheckVoucherCanApply)
+                    {
+                        var reducedAmount1 = totalPrice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalPrice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
+                        foreach (var item2 in queryCheckVoucherCanApply)
+                        {
+                            if (item.Id == item.Id)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                var reducedAmount2 = totalPrice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalPrice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
+                                if (reducedAmount1 < reducedAmount2)
+                                {
+                                    voucherWillUse = item2.Id;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (queryCheckVoucherCanApply.Count() == 1)
+                    {
+                        voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                    }
+                }
 
+                try
+                {
+                    var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
+                    var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
+                    var booking = new Booking()
+                    {
+                        GuestId = createBookingRequest.GuestId,
+                        BookingTime = DateTime.Now,
+                        PaymentTypeId = createBookingRequest.PaymentTypeId,
+                        VoucherId = voucherWillUse != 0 ? voucherWillUse : null,
+                        TotalPrice = totalPrice,
+                        ReducedAmount = voucherWillUse != 0 ? totalPrice * (double)discount < maxMoney ? totalPrice * (double)discount : maxMoney : 0,
+                        Status = BookingStatus.Confirmed,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(booking);
+                    await _unitOfWork.SaveChangeAsync();
+                    var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
+                                       where bookingTable.GuestId == createBookingRequest.GuestId
+                                       && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
+                                       select bookingTable;
+                    List<BookingDetail> list = new List<BookingDetail>();
+                    foreach (var item in createBookingRequest.ListIdServiceDetail)
+                    {
+                        var bookingDetail = new BookingDetail()
+                        {
+                            BookingId = queryBooking.FirstOrDefault().Id,
+                            PetId = item.PetId,
+                            Price = item.Price,
+                            StaffId = item.StaffId,
+                            EndDateTime = item.EndDateTime,
+                            StartDateTime = item.StartDateTime,
+                            Status = BookingDetailStatus.Unfulfilled,
+                            ServiceDetailId = item.ServiceDetailId,
+                        };
+                        list.Add(bookingDetail);
+                    }
+                    await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
+                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
+            }
         }
     }
 }
