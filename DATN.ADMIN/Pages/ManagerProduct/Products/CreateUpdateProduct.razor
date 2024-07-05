@@ -14,9 +14,11 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-
                 @if (id == 0 || id == null)
                 {
+                    <div style="margin:5px">
+                        <UploadFileImage></UploadFileImage>
+                    </div>
                     <div class="mud-select">
                         <label class="mud-input-label">Chọn thương hiệu</label>
                         <select @bind="_product.IdBrand" required>
@@ -37,7 +39,6 @@
                             }
                         </select>
                     </div>
-                    
                     <MudTextField T="string" Label="Tên" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
                 }
@@ -76,6 +77,13 @@
 </EditForm>
 
 @code {
+    //test updload iamge
+    public class FileModel
+    {
+        public string Name { get; set; }
+        public IBrowserFile File { get; set; }
+    }
+
     [Parameter]
     public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
@@ -96,6 +104,12 @@
     private ICategoryServices _cateClient { get; set; }
     private List<CategoryProductView> lstCate = new List<CategoryProductView>();
 
+    IList<IBrowserFile> _files = new List<IBrowserFile>();
+    private void UploadFiles(IBrowserFile file)
+    {
+        _files.Add(file);
+        //TODO upload the files to the server
+    }
 
 
     protected async override Task OnInitializedAsync()
