@@ -15,7 +15,7 @@ namespace DATN.Aplication.Extentions
     public class MailExtention
     {
 
-        private string _hosting = $@"https://localhost:7039/api/GuestManager/";
+        private string _hosting = $@"http://localhost:5173/redirect";
         public async Task<string> SendMailAccountStaffAsync(string userMail, UserLoginView userLogin)
         {
             try
@@ -161,6 +161,7 @@ namespace DATN.Aplication.Extentions
         }
         public string GennarateVerifyCode(string ID)
         {
+
             string verifyString = ID + "|" + DateTime.Now.AddMinutes(3).ToString();
             PasswordExtensitons hasCode = new PasswordExtensitons();
             string verifyCode = hasCode.HasCode(verifyString.Replace(" ", "+"));
