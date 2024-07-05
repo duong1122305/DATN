@@ -42,7 +42,14 @@ namespace DATN.Aplication.Services
                             PhoneNumber = view.Key.PhoneNumber,
                             Status = view.Key.Status
                         };
-            return new ResponseData<List<BookingView>>() { IsSuccess = true, Data = query.ToList() };
+            if (query.Count()>0)
+            {
+                return new ResponseData<List<BookingView>>() { IsSuccess = true, Data = query.ToList() };
+            }
+            else
+            {
+                return new ResponseData<List<BookingView>> { IsSuccess = false, Data = new List<BookingView>() , Error="Chưa có dữ liệu"};
+            }
         }
         public async Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(string idGuest, DateTime date)
         {
@@ -74,7 +81,18 @@ namespace DATN.Aplication.Services
                             EndDate = view.Key.EndDateTime,
                             StartDate=view.Key.StartDateTime,
                         };
-            return new ResponseData<List<ListBokingDetailInDay>> { IsSuccess = true, Data = query.ToList() };
+            if (query.Count() > 0)
+            {
+                return new ResponseData<List<ListBokingDetailInDay>>() { IsSuccess = true, Data = query.ToList() };
+            }
+            else
+            {
+                return new ResponseData<List<ListBokingDetailInDay>> { IsSuccess = false, Data = new List<ListBokingDetailInDay>(), Error = "Chưa có dữ liệu" };
+            }
+        }
+        public async Task<ResponseData<string>> CreateBookingStore()
+        {
+
         }
     }
 }
