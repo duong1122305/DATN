@@ -77,13 +77,6 @@
 </EditForm>
 
 @code {
-    //test updload iamge
-    public class FileModel
-    {
-        public string Name { get; set; }
-        public IBrowserFile File { get; set; }
-    }
-
     [Parameter]
     public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
@@ -103,13 +96,6 @@
     [Inject]
     private ICategoryServices _cateClient { get; set; }
     private List<CategoryProductView> lstCate = new List<CategoryProductView>();
-
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private void UploadFiles(IBrowserFile file)
-    {
-        _files.Add(file);
-        //TODO upload the files to the server
-    }
 
 
     protected async override Task OnInitializedAsync()
