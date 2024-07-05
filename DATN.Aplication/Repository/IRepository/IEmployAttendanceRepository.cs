@@ -5,5 +5,6 @@ namespace DATN.Aplication.Repository.IRepository
 {
     public interface IEmployAttendanceRepository : IGenericRepository<EmployeeAttendance>
     {
+        Task<bool> RemoveAttendance(EmployeeAttendance employeeAttendance);
     }
 }

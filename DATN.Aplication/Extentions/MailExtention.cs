@@ -161,10 +161,10 @@ namespace DATN.Aplication.Extentions
         }
         public string GennarateVerifyCode(string ID)
         {
-
-            string verifyString = ID + "|" + DateTime.Now.AddHours(1).ToString();
+            Guid randomGuid = Guid.NewGuid();
+            string verifyString = ID + "|" + DateTime.Now.AddHours(1).ToString()+"|"+randomGuid.ToString();
             PasswordExtensitons hasCode = new PasswordExtensitons();
-            string verifyCode = hasCode.HasCode(verifyString);
+            string verifyCode = hasCode.HashCode(verifyString);
             return verifyCode;
         }
     }

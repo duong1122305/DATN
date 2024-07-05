@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
-    public class AttendanteMangarService: IAttendanteMangarService
+    public class AttendanteMangarService : IAttendanteMangarService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
@@ -26,9 +26,9 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var lstWorkShiftToday = await _unitOfWork.WorkShiftRepository.FindAsync(p=>p.WorkDate.Date==DateTime.Today.Date);
-                var lstSchedule = await  _unitOfWork.EmployeeScheduleRepository.GetAllAsync();
-                var lstAttendance = await  _unitOfWork.EmployeeAttendanceRepository.GetAllAsync();
+                var lstWorkShiftToday = await _unitOfWork.WorkShiftRepository.FindAsync(p => p.WorkDate.Date == DateTime.Today.Date);
+                var lstSchedule = await _unitOfWork.EmployeeScheduleRepository.GetAllAsync();
+                var lstAttendance = await _unitOfWork.EmployeeAttendanceRepository.GetAllAsync();
                 var lstUser = _userManager.Users.ToList();
                 var result = from user in lstUser
                              join st in lstSchedule on user.Id equals st.UserId
@@ -40,14 +40,14 @@ namespace DATN.Aplication.Services
                              {
                                  UserName = user.UserName,
                                  DateAttendace = DateTime.Today.ToString("dd/MM/yyyy"),
-                                 CheckInTime = at != null  && at.CheckInTime.HasValue ? at.CheckInTime.Value.ToString("hh:mm") : "0",
+                                 CheckInTime = at != null && at.CheckInTime.HasValue ? at.CheckInTime.Value.ToString("hh:mm") : "0",
                                  CheckOutTime = at != null && at.CheckOutTime.HasValue ? at.CheckOutTime.Value.ToString("hh:mm") : "0",
                                  ID = at != null ? at.Id : 0,
                                  StaffName = user.FullName,
                                  ScheduleID = st.Id,
                              };
                 var data = result.ToList();
-                if (result== null|| result.Count()==0)
+                if (result == null || result.Count() == 0)
                 {
                     return new ResponseData<List<AttendanceViewModel>>(false, "Không có lịch làm việc lúc này");
                 }
@@ -64,9 +64,9 @@ namespace DATN.Aplication.Services
             try
             {
                 var now = DateTime.Now.TimeOfDay;
-                var lstShift= await _unitOfWork.ShiftRepository.GetAllAsync();
-                lstShift = lstShift.Where(p => p.From.Add(TimeSpan.FromMinutes(-15)) < now && p.To>now);
-                if (lstShift == null || lstShift.Count()==0)
+                var lstShift = await _unitOfWork.ShiftRepository.GetAllAsync();
+                lstShift = lstShift.Where(p => p.From.Add(TimeSpan.FromMinutes(-15)) < now && p.To > now);
+                if (lstShift == null || lstShift.Count() == 0)
                 {
                     return new ResponseData<List<Shift>>(false, "Hiện tại không trong ca làm");
                 }
@@ -79,27 +79,110 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> CheckIn(int scheduleId, int attendanceID, bool isCheckin)
         {
-            if (isCheckin)
+            try
             {
                 var attendance = new EmployeeAttendance();
-                if (attendanceID==0)
+                if (isCheckin)// kiểm tra diểm danh hay huỷ điểm danh
                 {
-                    attendance = new EmployeeAttendance() 
-                    { 
-                        CheckInTime = DateTime.Now,
-                        EmployeeScheduleId = scheduleId,
-                        
-                    };
-                    await _unitOfWork.EmployeeAttendanceRepository.AddAsync(attendance);
-                }
-                else
-                {
-                    attendance =await _unitOfWork.EmployeeAttendanceRepository.GetAsync(attendanceID);
-                }
+                    if (attendanceID == 0)// nếu điểm danh ms thì tạo ms
+                    {
+                        attendance = new EmployeeAttendance()
+                        {
+                            CheckInTime = DateTime.Now,
+                            EmployeeScheduleId = scheduleId,
 
+                        };
+                        await _unitOfWork.EmployeeAttendanceRepository.AddAsync(attendance);
+                    }
+                    else// điểm danh trên data có sẵn
+                    {
+                        attendance = await _unitOfWork.EmployeeAttendanceRepository.GetAsync(attendanceID);
+                        attendance.CheckInTime = DateTime.Now;
+                        await _unitOfWork.EmployeeAttendanceRepository.UpdateAsync(attendance);
+                    }
+
+                }
+                else// nếu là huỷ điểm danh
+                {
+                    attendance = await _unitOfWork.EmployeeAttendanceRepository.GetAsync(attendanceID);
+                    var timeDitance = attendance.CheckInTime - DateTime.Now;
+                    if (timeDitance > TimeSpan.FromMinutes(2))//////// kiểm tra thời gian điểm danh cách 2p thì ko thể huỷ
+                    {
+                        return new ResponseData<string>(false, "Chỉ có thể huỷ điểm danh trong 2 phút ");
+                    }
+
+                    await _unitOfWork.EmployeeAttendanceRepository.RemoveAttendance(attendance);
+
+                }
+                var result = await _unitOfWork.SaveChangeAsync();
+                if (result > 0)
+                {
+                    if (isCheckin)
+                    {
+                        return new ResponseData<string>("Điểm danh thành công");
+                    }
+                    else
+                    {
+                        return new ResponseData<string>("Huỷ điểm danh thành công");
+                    }
+                }
+                return new ResponseData<string>(false, "Thao tác không thành công");
             }
 
-            return null;
+            catch (Exception)
+            {
+                return new ResponseData<string>(false, "Có lỗi khi kết nối máy chủ");
+            }
+        } 
+        public async Task<ResponseData<string>> CheckOut( int attendanceID, bool isCheckout)
+        {
+            try
+            {
+                var attendance = new EmployeeAttendance();
+                if (isCheckout)// kiểm tra check out hay huỷ check out
+                {
+                     attendance = await _unitOfWork.EmployeeAttendanceRepository.GetAsync(attendanceID);
+                    if (attendance.CheckInTime ==null)
+                    {
+						return new ResponseData<string>(false, "Bạn phải điểm danh trước khi check out");
+					}
+
+                    attendance.CheckInTime = DateTime.Now;
+                        await _unitOfWork.EmployeeAttendanceRepository.UpdateAsync(attendance);
+                    
+
+                }
+                else// nếu là huỷ điểm danh
+                {
+                    attendance = await _unitOfWork.EmployeeAttendanceRepository.GetAsync(attendanceID);
+                    var timeDitance = attendance.CheckInTime - DateTime.Now;
+                    if (timeDitance > TimeSpan.FromMinutes(2))//////// kiểm tra thời gian điểm danh cách 2p thì ko thể huỷ
+                    {
+                        return new ResponseData<string>(false, "Chỉ có thể huỷ điểm danh trong 2 phút ");
+                    }
+
+                    await _unitOfWork.EmployeeAttendanceRepository.RemoveAttendance(attendance);
+
+                }
+                var result = await _unitOfWork.SaveChangeAsync();
+                if (result > 0)
+                {
+                    if (isCheckout)
+                    {
+                        return new ResponseData<string>("Điểm danh thành công");
+                    }
+                    else
+                    {
+                        return new ResponseData<string>("Huỷ điểm danh thành công");
+                    }
+                }
+                return new ResponseData<string>(false, "Thao tác không thành công");
+            }
+
+            catch (Exception)
+            {
+                return new ResponseData<string>(false, "Có lỗi khi kết nối máy chủ");
+            }
         }
     }
 }

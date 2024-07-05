@@ -473,15 +473,16 @@ namespace DATN.Aplication.Services
                 var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
                 if (guest != null && guest.VerifyCode == verifyCode)
                 {
-                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
-                    {
-                        return new ResponseData<string>
-                        {
-                            IsSuccess = false,
-                            Error = "Thông tin xác minh của bạn đã quá hạn"
-                        };
-                    }
+                    //if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    //{
+                    //    return new ResponseData<string>
+                    //    {
+                    //        IsSuccess = false,
+                    //        Error = "Thông tin xác minh của bạn đã quá hạn"
+                    //    };
+                    //}
                     guest.IsComfirm = true;
+                    guest.VerifyCode = null;
                     var result = await _unitOfWork.SaveChangeAsync();
 
                     if (result > 0)
