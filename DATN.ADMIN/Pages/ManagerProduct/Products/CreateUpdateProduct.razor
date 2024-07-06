@@ -14,9 +14,11 @@
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
-
                 @if (id == 0 || id == null)
                 {
+                    <div style="margin:5px">
+                        <UploadFileImage></UploadFileImage>
+                    </div>
                     <div class="mud-select">
                         <label class="mud-input-label">Chọn thương hiệu</label>
                         <select @bind="_product.IdBrand" required>
@@ -37,7 +39,6 @@
                             }
                         </select>
                     </div>
-                    
                     <MudTextField T="string" Label="Tên" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
                 }
@@ -95,7 +96,6 @@
     [Inject]
     private ICategoryServices _cateClient { get; set; }
     private List<CategoryProductView> lstCate = new List<CategoryProductView>();
-
 
 
     protected async override Task OnInitializedAsync()

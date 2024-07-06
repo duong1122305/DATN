@@ -13,7 +13,7 @@
 @inject IDialogService _dialogservice;
 
 <PageTitle>Danh sách sản phẩm</PageTitle>
-<MudText Typo="Typo.h3" Style="text-align:center;margin-bottom:10px">Danh mục sản phẩm</MudText>
+<MudText Typo="Typo.h3" Style="text-align:center;margin-bottom:10px">Danh sách sản phẩm</MudText>
 @if (lstProduct.Count > 0 && lstProduct != null)
 {
     <MudDataGrid Items="@lstProduct" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
@@ -38,8 +38,8 @@
                     <span>@(lstProduct.IndexOf(context.Item) + 1)</span>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.CategoryProduct" Title="Danh mục sản phẩm" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.Name" Title="Tên" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.CategoryProduct" Title="Tên danh mục" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Brand" Title="Thương hiệu" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
