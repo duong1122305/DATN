@@ -7,6 +7,7 @@
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.Enum
+@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -40,7 +41,7 @@
         </TemplateColumn>
         <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
             <CellTemplate>
-               @context.Item.Status
+                @context.Item.Status
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x=>x.Id" Title="Hành động" Filterable="false" Sortable="false">
@@ -67,9 +68,41 @@
 
     [Inject]
     private IBookingViewServices _client { get; set; }
+
+    private HubConnection hubConnection;
+    private NavigationManager navigation { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(navigation.ToAbsoluteUri("/notificationHub"))
+            .Build();
+
+            hubConnection.On<string>("ReceiveMessage", (msg) =>
+            {
+                Message("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
     }
 
     private async Task LoadData()

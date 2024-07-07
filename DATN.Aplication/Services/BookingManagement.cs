@@ -5,6 +5,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,13 @@ namespace DATN.Aplication.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
+        private readonly NotificationHub _notificationHub;
 
-        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager)
+        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _notificationHub = notificationHub;
         }
         public async Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek()
         {
@@ -46,6 +49,7 @@ namespace DATN.Aplication.Services
                         };
             if (query.Count() > 0)
             {
+                await _notificationHub.Notification("Có khách đặt lịch confirm đi");
                 return new ResponseData<List<BookingView>>() { IsSuccess = true, Data = query.ToList() };
             }
             else
@@ -178,6 +182,7 @@ namespace DATN.Aplication.Services
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
+                    await _notificationHub.Notification("Có khách đặt lịch confirm đi");
                     return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
                 }
                 catch (Exception e)
