@@ -74,7 +74,7 @@ builder.Services.AddScoped<ICategoryProductManagementService, CategoryProductMan
 builder.Services.AddScoped<IBrandManagementService, BrandManagementService>();
 builder.Services.AddScoped<IProductManagementService, ProductManagementService>();
 builder.Services.AddScoped<IProductDetaiManagementService, ProductDetaiManagementService>();
-
+builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
