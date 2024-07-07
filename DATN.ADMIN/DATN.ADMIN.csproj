@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="Pages\ManagerBooking\ScheduleView.razor" />
     <Content Remove="wwwroot\LoadingIndicator.razor" />
   </ItemGroup>
 
@@ -48,23 +47,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="Pages\ManagerBooking\ScheduleView.razor" />
     <_ContentIncludedByDefault Remove="wwwroot\LoadingIndicator.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Components\LoadingIndicator.razor" />
-    <None Include="Pages\ManagerBooking\ScheduleView.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DATN.Aplication\DATN.Aplication.csproj" />
     <ProjectReference Include="..\DATN.Data\DATN.Data.csproj" />
     <ProjectReference Include="..\DATN.ViewModels\DATN.ViewModels.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Pages\ManagerBooking\ScheduleView.razor" />
   </ItemGroup>
 
 </Project>
