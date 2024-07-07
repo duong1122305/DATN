@@ -14,6 +14,7 @@
 <PageTitle>Danh sách đặt dịch vụ</PageTitle>
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" @ref="dataGrid" Hideable="true" Groupable="true" GroupExpanded="false" MultiSelection="true">
     <ToolBarContent>
         <MudSpacer />
@@ -120,5 +121,28 @@
             await LoadData();
         }
     }
+
+        
+
+        private async Task OpenDialogCreateBooking()
+        {
+        string nameDialog = "Đặt lịch tại quầy";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+        }
 
 }
