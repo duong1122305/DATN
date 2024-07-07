@@ -14,6 +14,7 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<List<NumberOfScheduleView>>> GetListStaffInDay(int shift, DateTime workdate);
         public Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId,DateTime workDate);
         public Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView);
+        public Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from1, TimeSpan to);
 
 
     }

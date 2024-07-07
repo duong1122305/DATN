@@ -229,7 +229,7 @@ namespace DATN.Aplication.Services
                         }
                         else
                         {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định!!"};
+                            return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định!!" };
                         }
                     }
                 }
@@ -335,6 +335,7 @@ namespace DATN.Aplication.Services
                         && user.IsDeleted == false
                         select new NumberOfScheduleView
                         {
+                            IdStaff = user.Id,
                             FullName = user.FullName,
                             UserName = user.UserName,
                             Date = workShift.WorkDate,
@@ -345,6 +346,48 @@ namespace DATN.Aplication.Services
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = query.ToList() };
             else
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = $"Không có dữ liệu về nhân viên trong ca" };
+        }
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from1, TimeSpan to)
+        {
+            if (from1.CompareTo(to) > 0)
+            {
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu lớn hơn giờ kết thúc" };
+            }
+            else
+            {
+                var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                  where shift.From.CompareTo(from1) >= 0 && shift.To.CompareTo(to) <= 0
+                                  select shift).FirstOrDefault();
+                var response = await GetListStaffInDay(queryShift.Id, DateTime.Now);
+                List<Guid> staffFree = new List<Guid>();
+                foreach (var item in response.Data)
+                {
+
+                    var queryCheckUser = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                         where bookingDetail.StaffId == item.IdStaff &&
+                                         bookingDetail.StartDateTime.TimeOfDay.CompareTo(from1) >= 0 && bookingDetail.EndDateTime.TimeOfDay.CompareTo(to) <= 0
+                                         select bookingDetail;
+                    if (queryCheckUser.Count() == 0)
+                    {
+                        staffFree.Add(item.IdStaff.Value);
+                    }
+                }
+                List<NumberOfScheduleView> listStaff = new List<NumberOfScheduleView>();
+                foreach (var item in staffFree)
+                {
+                    var query = await _usermanager.FindByIdAsync(item.ToString());
+                    if (query != null)
+                    {
+                        listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName });
+                    }
+                }
+                if (listStaff.Count > 0)
+                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
+                else
+                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không có nhân viên rảnh để làm r bảo khách phắn" };
+            }
+
+
         }
         public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate)
         {
@@ -390,7 +433,6 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<List<UserInfView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
-
         public async Task<ResponseData<string>> ChangeShiftStaffToStaff(ChangeShiftView changeShiftView)
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
