@@ -2,6 +2,7 @@
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
 @using DATN.ADMIN.IServices
+@using DATN.Utilites
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
@@ -34,7 +35,7 @@
             </TemplateColumn>
             <TemplateColumn Title="Giá dịch vụ" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <span style="text-align:center;">@context.Item.Price</span>
+                    <span style="text-align:center;">@CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
                 </CellTemplate>
             </TemplateColumn>
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">

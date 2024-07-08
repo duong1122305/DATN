@@ -118,24 +118,6 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
-        // try
-        // {
-        //     hubConnection = new HubConnectionBuilder()
-        //     .WithUrl(navigation.ToAbsoluteUri("/notificationHub"))
-        //     .Build();
-
-        //     hubConnection.On<string>("ReceiveMessage", (msg) =>
-        //     {
-        //         Message("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
-        //         InvokeAsync(StateHasChanged);
-        //     });
-
-        //     await hubConnection.StartAsync();
-        // }
-        // catch (Exception)
-        // {
-
-        // }
     }
     private void Message(string message, Severity severity)
     {
@@ -143,10 +125,7 @@
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
-    // public async ValueTask DisposeAsync()
-    // {
-    //     await hubConnection.DisposeAsync();
-    // }
+
 
     private async Task LoadData()
     {
@@ -198,11 +177,11 @@
         }
     }
     //bill
-    private async Task OpenDialogBill(Guid id, DateTime date)
+    private async Task OpenDialogBill(Guid? id, DateTime date)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Hoá đơn thanh toán";
-        string id2 = Convert.ToString(id);
+        
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -212,9 +191,9 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("guid", id2);
+        parameters.Add("guid", id);
         parameters.Add("date", date);
-        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog,parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {

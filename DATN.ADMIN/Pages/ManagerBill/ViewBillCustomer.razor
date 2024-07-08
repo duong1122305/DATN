@@ -1,45 +1,50 @@
 ﻿@page "/viewbill"
 @using DATN.ADMIN.IServices
+@using DATN.Utilites
 @using DATN.ViewModels.DTOs.Booking
+@inject IAddressService _addressServive;
 
 <MudContainer Class="invoice-container">
     <MudPaper Elevation="3" Class="invoice-paper">
-        <div class="invoice-header">
-            <h2 class="invoice-title">HÓA ĐƠN THANH TOÁN</h2>
-        </div>
         <div class="invoice-body">
             @if (bill != null)
             {
-                <MudText Typo="Typo.h6" Class="invoice-label">Thông tin hóa đơn</MudText>
-                <MudText Typo="Typo.body2" Class="invoice-info">
-                    <span><b>Mã hóa đơn:</b> HD-001</span><br />
+               <div style="text-align:center">
+                    <MudText Typo="Typo.h3" Class="invoice-label">Thông tin hóa đơn</MudText>
+               </div>
+                <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
                     <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
                     <span><b>Khách hàng:</b> @bill.GuestName</span><br />
                     <span><b>Số điện thoại:</b> @bill.PhoneNumber</span><br />
-                    <span><b>Địa chỉ:</b> @bill.Address</span><br />
+                    <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
                 </MudText>
 
-                <MudText Typo="Typo.h6" Class="invoice-label">Danh sách dịch vụ</MudText>
+                <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
                 <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Dịch vụ sử dụng</MudTh>
                         <MudTh>Tên thú cưng</MudTh>
                         <MudTh>Nhân viên làm dịch vụ</MudTh>
                         <MudTh>Đơn giá</MudTh>
-                        <MudTh>Tổng tiền</MudTh>
-                        <MudTh>Giảm giá</MudTh>
-                        <MudTh>Số tiền cần thanh toán</MudTh>
+
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@context.ServiceDetailName</MudTd>
                         <MudTd>@context.PetName</MudTd>
                         <MudTd>@context.NameStaff</MudTd>
-                        <MudTd>@context.Price</MudTd>
-                        <MudTd>@bill.TotalPrice</MudTd>
-                        <MudTd>@bill.ReducePrice</MudTd>
-                        <MudTd>@bill.TotalPayment</MudTd>
+                        <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <MudText>
+                   <div style="text-align:right">
+                        <br />
+                        <span><b>Tổng tiền: </b>@CurrencyHelper.FormatCurrency((float)@bill.TotalPrice) </span><br />
+                        <br />
+                        <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
+                        <br />
+                        <span><b>Số tiền cần thanh toán:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span>
+                   </div>
+                </MudText>
 
               @*   <div class="invoice-total">
                     <span><b>Tổng tiền:</b> @selectedBooking.TotalAmount.ToString("C0")</span>
@@ -70,7 +75,7 @@
 
 @code {
     [Parameter]
-    public Guid guid { get; set; }
+    public Guid? guid { get; set; }
     [Parameter]
     public DateTime date{ get; set; }
     [Inject]
@@ -78,7 +83,7 @@
     private Bill bill = new Bill();
     private async Task LoadData()
     {
-        var respone = await _client.GetBillOfGuest(guid, date);
+        var respone = await _client.GetBillOfGuest(guid.Value, date);
         bill = respone.Data;
     }
     protected override async Task OnInitializedAsync()
