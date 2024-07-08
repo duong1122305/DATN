@@ -10,5 +10,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id, DateTime date);
         Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to);
         Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest);
+        Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking);
     }
 }
