@@ -1,7 +1,9 @@
 ﻿using DATN.ADMIN.IServices;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace DATN.ADMIN.Services
@@ -14,9 +16,11 @@ namespace DATN.ADMIN.Services
             _httpClient = httpClient;
         }
 
-        public Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest)
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest)
         {
-            throw new NotImplementedException();
+            var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>("/api/Booking/Create-Booking", createBookingRequest);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
         }
 
         public async Task<ResponseData<List<BookingView>>> GetAll()
