@@ -351,7 +351,7 @@ namespace DATN.Aplication.Services
         {
             if (from1.CompareTo(DateTime.Now.TimeOfDay) < 0)
             {
-                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess=false,Error="Giờ bắt đầu làm dịch vụ đang nhỏ hơn giờ hiện tại"};
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu làm dịch vụ đang nhỏ hơn giờ hiện tại" };
             }
             else
             {
@@ -368,10 +368,16 @@ namespace DATN.Aplication.Services
                     if (queryShift == null)
                     {
                         queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                      where shift.From > from1
-                                      select shift).FirstOrDefault() == null ? (await _unitOfWork.ShiftRepository.GetAllAsync()).FirstOrDefault() : queryShift;
+                                      where shift.From.CompareTo(from1) >= 0
+                                      select shift).FirstOrDefault();
                         if (to > new TimeSpan(23, 30, 00))
+                        {
                             dateNow = dateNow.AddDays(1);
+                            queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                          where shift.From.CompareTo(new TimeSpan(0, 0, 0)) >= 0
+                                          select shift).FirstOrDefault();
+                        }
+
                     }
                     var response = await GetListStaffInDay(queryShift.Id, dateNow);
                     List<Guid> staffFree = new List<Guid>();
