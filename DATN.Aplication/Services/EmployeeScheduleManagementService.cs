@@ -349,53 +349,60 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from1, TimeSpan to)
         {
-            if (from1.CompareTo(to) >= 0)
+            if (from1.CompareTo(DateTime.Now.TimeOfDay) < 0)
             {
-                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu lớn hơn giờ kết thúc" };
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess=false,Error="Giờ bắt đầu làm dịch vụ đang nhỏ hơn giờ hiện tại"};
             }
             else
             {
-                var dateNow = DateTime.Now;
-                var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                  where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To) <= 0
-                                  select shift).FirstOrDefault();
-                if (queryShift == null)
+                if (from1.CompareTo(to) >= 0)
                 {
-                    queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                  where shift.From > from1
-                                  select shift).FirstOrDefault() == null ? (await _unitOfWork.ShiftRepository.GetAllAsync()).FirstOrDefault() : queryShift;
-                    if (to > new TimeSpan(23, 30, 00))
-                        dateNow = dateNow.AddDays(1);
+                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu lớn hơn giờ kết thúc" };
                 }
-                var response = await GetListStaffInDay(queryShift.Id, dateNow);
-                List<Guid> staffFree = new List<Guid>();
-                foreach (var item in response.Data)
-                {
-
-                    var queryCheckUser = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                                         where bookingDetail.StaffId == item.IdStaff &&
-                                         bookingDetail.StartDateTime.TimeOfDay.CompareTo(from1) >= 0 && bookingDetail.EndDateTime.TimeOfDay.CompareTo(to) <= 0
-                                         select bookingDetail;
-                    if (queryCheckUser.Count() == 0)
-                    {
-                        staffFree.Add(item.IdStaff.Value);
-                    }
-                }
-                List<NumberOfScheduleView> listStaff = new List<NumberOfScheduleView>();
-                foreach (var item in staffFree)
-                {
-                    var query = await _usermanager.FindByIdAsync(item.ToString());
-                    if (query != null)
-                    {
-                        listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName, IdStaff = query.Id });
-                    }
-                }
-                if (listStaff.Count > 0)
-                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                 else
-                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không có nhân viên rảnh để làm r bảo khách phắn" };
-            }
+                {
+                    var dateNow = DateTime.Now;
+                    var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                      where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To) <= 0
+                                      select shift).FirstOrDefault();
+                    if (queryShift == null)
+                    {
+                        queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                      where shift.From > from1
+                                      select shift).FirstOrDefault() == null ? (await _unitOfWork.ShiftRepository.GetAllAsync()).FirstOrDefault() : queryShift;
+                        if (to > new TimeSpan(23, 30, 00))
+                            dateNow = dateNow.AddDays(1);
+                    }
+                    var response = await GetListStaffInDay(queryShift.Id, dateNow);
+                    List<Guid> staffFree = new List<Guid>();
+                    foreach (var item in response.Data)
+                    {
 
+                        var queryCheckUser = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                             where bookingDetail.StaffId == item.IdStaff &&
+                                             bookingDetail.StartDateTime.TimeOfDay.CompareTo(from1) >= 0 && bookingDetail.EndDateTime.TimeOfDay.CompareTo(to) <= 0
+                                             select bookingDetail;
+                        if (queryCheckUser.Count() == 0)
+                        {
+                            staffFree.Add(item.IdStaff.Value);
+                        }
+                    }
+                    List<NumberOfScheduleView> listStaff = new List<NumberOfScheduleView>();
+                    foreach (var item in staffFree)
+                    {
+                        var query = await _usermanager.FindByIdAsync(item.ToString());
+                        if (query != null)
+                        {
+                            listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName, IdStaff = query.Id });
+                        }
+                    }
+                    if (listStaff.Count > 0)
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
+                    else
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không có nhân viên rảnh để làm r bảo khách phắn" };
+                }
+
+            }
 
         }
         public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate)
