@@ -9,8 +9,8 @@
     private IBookingViewServices _iBooking {get;set;}
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    TimeSpan timeStart;
-    TimeSpan timeEnd;
+    string timeStart;
+    string timeEnd;
 
     protected async Task Create()
     {

@@ -29,9 +29,9 @@ namespace DATN.ADMIN.Services
             return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}&date={date.Year}-{date.Month}-{date.Day}").GetAwaiter().GetResult();
         }
 
-        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from, TimeSpan to)
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"api/Booking/List-Staff-Free-In-Time?from={from.ToString("HH:mm")}&to={to.ToString("HH:mm")}");
+            return await _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"api/Booking/List-Staff-Free-In-Time?from={from}&to={to}");
         }
     }
 }
