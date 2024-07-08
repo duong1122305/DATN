@@ -68,6 +68,8 @@
     private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
 
     private string searchString = "";
 
@@ -109,9 +111,10 @@
                 FullWidth = true,
                 DisableBackdropClick = true,
             };
+        _dialogBox.Close();
         var createUpdateDialog = await _dialogservice.ShowAsync<SelectBookingTimeAndStaff>(nameDialog,parameters, options);
         var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
+        if (!result.Cancelled)
         {
             createUpdateDialog.Close();
             StateHasChanged();

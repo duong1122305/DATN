@@ -1,10 +1,12 @@
-﻿@using DATN.ADMIN.IServices
+﻿@page "/selectBooking"
+@using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Pet
 @inject IDialogService _diagService;
 @inject ISnackbar Snackbar
+@inject NavigationManager navigation;
 
 <div style="display:flex;width:500px">
     <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
@@ -68,7 +70,6 @@ else
 
     public List<PetVM> lstPet = new List<PetVM>();
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-
     private string searchString = "";
 
     private PetVM value2;
@@ -181,26 +182,30 @@ else
             StateHasChanged();
         }
     }
+    public event Action<CreateBookingDetailRequest> OnBookingCreated;
     protected async Task CreateBooking(Guid? id)
     {
-        var ids = id;
-        try
-        {
-            CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
+        CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
                 {
                     PetId = value2.Id,
-                    StaffId = ids,
+                    StaffId = id,
                     ServiceDetailId = idDetailsServices,
                     Price = (double)priceServicesDetails,
-                    // StartDateTime = timeStart,
-                    // EndDateTime = timeEnd
+                    StartDateTime = timeStart.Value,
+                    EndDateTime = timeEnd.Value
                 };
-        }
-        catch (Exception)
-        {
-            
-            throw;
-        }
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Medium,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var parameters = new DialogParameters();
+        parameters.Add("lstBooking", bookingCreate);
+        OnBookingCreated?.Invoke(bookingCreate);
     }
 
     //thông báo
