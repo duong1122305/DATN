@@ -182,7 +182,6 @@ namespace DATN.Aplication.Services
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
-                    await _notificationHub.Notification("Có khách đặt lịch confirm đi");
                     return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
                 }
                 catch (Exception e)
