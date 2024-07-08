@@ -1,5 +1,55 @@
-﻿
+﻿@using DATN.ADMIN.IServices
+@inject IDialogService _diagService;
+@inject ISnackbar Snackbar
+
 <MudTimePicker Label="Chọn thời gian" />
 
 @code {
+    [Inject]
+    private IBookingViewServices _iBooking {get;set;}
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    TimeSpan timeStart;
+    TimeSpan timeEnd;
+
+    protected async Task Create()
+    {
+        var confirm = await Confirm("thêm mới");
+        if (!confirm)
+        {
+            return;
+        }
+      
+
+        //gọi api thêm
+        var result = await _iBooking.ListStaffFreeInTime(timeStart, timeEnd);
+
+        if (result.IsSuccess)
+        {
+            Message("Tìm thành công", Severity.Success);
+            _dialogBox.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Message(result.Error, Severity.Error);
+        }
+    }
+    //thông báo xác nhận
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} voucher?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+    }
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
 }       
