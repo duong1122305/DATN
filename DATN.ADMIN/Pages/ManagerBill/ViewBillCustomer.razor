@@ -1,4 +1,6 @@
 ﻿@page "/viewbill"
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.Booking
 
 <MudContainer Class="invoice-container">
     <MudPaper Elevation="3" Class="invoice-paper">
@@ -6,27 +8,25 @@
             <h2 class="invoice-title">HÓA ĐƠN THANH TOÁN</h2>
         </div>
         <div class="invoice-body">
-            @if (selectedBooking != null)
+            @if (bill != null)
             {
                 <MudText Typo="Typo.h6" Class="invoice-label">Thông tin hóa đơn</MudText>
                 <MudText Typo="Typo.body2" Class="invoice-info">
                     <span><b>Mã hóa đơn:</b> HD-001</span><br />
                     <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
-                    <span><b>Khách hàng:</b> @selectedBooking.NameCustomer</span><br />
-                    <span><b>Số điện thoại:</b> @selectedBooking.PhoneNumber</span><br />
-                    <span><b>Địa chỉ:</b> @selectedBooking.Address</span><br />
+                    <span><b>Khách hàng:</b> @bill.GuestName</span><br />
+                    <span><b>Số điện thoại:</b> @bill.PhoneNumber</span><br />
+                    <span><b>Địa chỉ:</b> @bill.Address</span><br />
                 </MudText>
 
                 <MudText Typo="Typo.h6" Class="invoice-label">Danh sách dịch vụ</MudText>
-                <MudTable Items="@selectedBooking.Services" Class="invoice-table">
+                <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Tên dịch vụ</MudTh>
                         <MudTh>Đơn giá</MudTh>
-                        <MudTh>Số lượng</MudTh>
-                        <MudTh>Tổng cộng</MudTh>
                     </HeaderContent>
-                    <RowTemplate Context="service">
-                        <MudTd>@service.ServiceName</MudTd>
+                    <RowTemplate>
+                        <MudTd>@context.s</MudTd>
                         <MudTd>@service.UnitPrice.ToString("C0")</MudTd>
                         <MudTd>@service.Quantity</MudTd>
                         <MudTd>@(service.UnitPrice * service.Quantity).ToString("C0")</MudTd>
@@ -61,42 +61,21 @@
 </MudContainer>
 
 @code {
-    private List<InvoiceItem> services = new List<InvoiceItem>
+    [Parameter]
+    public Guid guid { get; set; }
+    [Parameter]
+    public DateTime date{ get; set; }
+    [Inject]
+    private IBookingViewServices _client { get; set; }
+    private Bill bill = new Bill();
+    private async Task LoadData()
     {
-        new InvoiceItem { ServiceName = "Dịch vụ A", UnitPrice = 100000, Quantity = 2 },
-        new InvoiceItem { ServiceName = "Dịch vụ B", UnitPrice = 150000, Quantity = 1 },
-        new InvoiceItem { ServiceName = "Dịch vụ C", UnitPrice = 80000, Quantity = 3 }
-    };
-
-    private Bill selectedBooking;
-    
-
-    private async Task ConfirmPayment()
-    {
-        // Xử lý xác nhận thanh toán ở đây
-        // Sau khi xác nhận, có thể gọi API hoặc lưu dữ liệu
-        Console.WriteLine("Confirmed payment");
+        var respone = await _client.GetBillOfGuest(guid, date);
+        bill = respone.Data;
     }
-
-    private void Close()
+    protected override async Task OnInitializedAsync()
     {
-        // Đóng dialog thanh toán
-        Console.WriteLine("Closed payment dialog");
-    }
-    public class InvoiceItem
-    {
-        public string ServiceName { get; set; }
-        public decimal UnitPrice { get; set; }
-        public int Quantity { get; set; }
-    }
-
-    public class Bill
-    {
-        public string NameCustomer { get; set; } = "Nguyễn Văn A";
-        public string PhoneNumber { get; set; } = "0123456789";
-        public string Address { get; set; } = "123 Đường ABC, Quận XYZ, TP HCM";
-        public List<InvoiceItem> Services { get; set; }
-        public decimal TotalAmount => Services.Sum(s => s.UnitPrice * s.Quantity);
+        await LoadData();
     }
 }
 

@@ -89,7 +89,7 @@
                 <span>
                     <MudButtonGroup Variant="Variant.Filled">
                         <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.Id.Value,context.Item.BookingTime))"></MudIconButton>
-                        <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill())">Thanh toán</MudIconButton>
+                        <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.Id.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
                     </MudButtonGroup>
                 </span>
             </CellTemplate>
@@ -200,11 +200,11 @@
         }
     }
     //bill
-    private async Task OpenDialogBill()
+    private async Task OpenDialogBill(Guid id, DateTime date)
     {
-        // var parameters = new DialogParameters();
+        var parameters = new DialogParameters();
         string nameDialog = "Hoá đơn thanh toán";
-        // string id2 = Convert.ToString(id);
+        string id2 = Convert.ToString(id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -214,8 +214,8 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        // parameters.Add("id", id2);
-        // parameters.Add("dateBooking", dateBooking);
+        parameters.Add("guid", id2);
+        parameters.Add("date", date);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
