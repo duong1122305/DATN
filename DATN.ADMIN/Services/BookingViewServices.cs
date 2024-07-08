@@ -26,7 +26,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<List<BookingView>>> GetAll()
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<List<BookingView>>>("/api/Booking/List");
+            return _httpClient.GetFromJsonAsync<ResponseData<List<BookingView>>>("/api/Booking/List").GetAwaiter().GetResult();
         }
 
         public async Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking)

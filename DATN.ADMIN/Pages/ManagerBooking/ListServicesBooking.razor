@@ -88,8 +88,8 @@
             <CellTemplate>
                 <span>
                     <MudButtonGroup Variant="Variant.Filled">
-                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.Id.Value,context.Item.BookingTime))"></MudIconButton>
-                        <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.Id.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))"></MudIconButton>
+                        <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
                     </MudButtonGroup>
                 </span>
             </CellTemplate>

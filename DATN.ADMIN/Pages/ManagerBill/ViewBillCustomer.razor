@@ -22,21 +22,29 @@
                 <MudText Typo="Typo.h6" Class="invoice-label">Danh sách dịch vụ</MudText>
                 <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
                     <HeaderContent>
-                        <MudTh>Tên dịch vụ</MudTh>
+                        <MudTh>Dịch vụ sử dụng</MudTh>
+                        <MudTh>Tên thú cưng</MudTh>
+                        <MudTh>Nhân viên làm dịch vụ</MudTh>
                         <MudTh>Đơn giá</MudTh>
+                        <MudTh>Tổng tiền</MudTh>
+                        <MudTh>Giảm giá</MudTh>
+                        <MudTh>Số tiền cần thanh toán</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd>@context.s</MudTd>
-                        <MudTd>@service.UnitPrice.ToString("C0")</MudTd>
-                        <MudTd>@service.Quantity</MudTd>
-                        <MudTd>@(service.UnitPrice * service.Quantity).ToString("C0")</MudTd>
+                        <MudTd>@context.ServiceDetailName</MudTd>
+                        <MudTd>@context.PetName</MudTd>
+                        <MudTd>@context.NameStaff</MudTd>
+                        <MudTd>@context.Price</MudTd>
+                        <MudTd>@bill.TotalPrice</MudTd>
+                        <MudTd>@bill.ReducePrice</MudTd>
+                        <MudTd>@bill.TotalPayment</MudTd>
                     </RowTemplate>
                 </MudTable>
 
-                <div class="invoice-total">
+              @*   <div class="invoice-total">
                     <span><b>Tổng tiền:</b> @selectedBooking.TotalAmount.ToString("C0")</span>
                 </div>
-
+ *@
                 <MudDivider />
 
           @*       <MudText Typo="Typo.h6" Class="invoice-label">Thông tin thanh toán</MudText>
@@ -45,10 +53,10 @@
                 <MudDatePicker Label="Ngày thanh toán" @bind-Date="paymentInfo.PaymentDate" Required="true" />
                 <MudTextField Label="Ghi chú" @bind-Value="paymentInfo.Notes" Multiline="true" /> *@
 
-                <div class="invoice-actions">
+               @*  <div class="invoice-actions">
                     <MudButton Color="Color.Primary" @onclick="ConfirmPayment">Xác nhận thanh toán</MudButton>
                     <MudButton Color="Color.Secondary" @onclick="Close">Hủy bỏ</MudButton>
-                </div>
+                </div> *@
             }
             else
             {
