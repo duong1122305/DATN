@@ -158,7 +158,7 @@ namespace DATN.Aplication.Services
                                join guest in await _unitOfWork.GuestRepository.GetAllAsync()
                                on booking.GuestId equals guest.Id
                                join pet in await _unitOfWork.PetRepository.GetAllAsync()
-                               on user.Id equals pet.OwnerId
+                               on guest.Id equals pet.OwnerId
                                join serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                on bookingDetail.ServiceDetailId equals serviceDetail.Id
                                where booking.BookingTime.Date.CompareTo(dateBooking.Date) == 0 && booking.GuestId == IdGuest
@@ -216,8 +216,8 @@ namespace DATN.Aplication.Services
                     voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
                 }
             }
-            var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse).MaxMoneyDiscount;
-            var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse).DiscountPercent;
+            var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
+            var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
             var reduce = voucherWillUse != 0 ? (double)discount * totalPrice / 100 >= maxMoney ? maxMoney : (double)discount * totalPrice / 100 : 0;
             var bill = new Bill()
             {
@@ -227,8 +227,8 @@ namespace DATN.Aplication.Services
                 ListServiceBooked = queryBooking.ToList(),
                 PhoneNumber = infoGuest.PhoneNumber,
                 TotalPrice = totalPrice,
-                ReducePrice = reduce,
-                TotalPayment = totalPrice - reduce,
+                ReducePrice = reduce.Value,
+                TotalPayment = totalPrice - reduce.Value,
                 IdVoucher = voucherWillUse,
             };
             if (bill != null)
