@@ -3,6 +3,7 @@ using DATN.Data.Entities;
 using DATN.Data.Enum;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.ServiceDetail;
 using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
@@ -100,63 +101,16 @@ namespace DATN.Aplication.Services
         {
             if (createBookingRequest.ListIdServiceDetail.Count > 0)
             {
-                double totalPrice = 0;
-                foreach (var item in createBookingRequest.ListIdServiceDetail)
-                {
-                    var queryGetTotalPrice = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
-                                             where serviceDetail.Id == item.ServiceDetailId
-                                             select serviceDetail;
-                    totalPrice += queryGetTotalPrice.FirstOrDefault().Price;
-                }
-                var queryCheckVoucherCanApply = from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                where totalPrice >= voucher.MinMoneyApplicable
-                                                && voucher.AmountUsed < voucher.Quantity
-                                                && voucher.Status == VoucherStatus.GoingOn
-                                                select voucher;
-                int voucherWillUse = 0;
-                if (queryCheckVoucherCanApply.Count() > 1)
-                {
-                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
-                    foreach (var item in queryCheckVoucherCanApply)
-                    {
-                        var reducedAmount1 = totalPrice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalPrice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
-                        foreach (var item2 in queryCheckVoucherCanApply)
-                        {
-                            if (item.Id == item.Id)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                var reducedAmount2 = totalPrice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalPrice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
-                                if (reducedAmount1 < reducedAmount2)
-                                {
-                                    voucherWillUse = item2.Id;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (queryCheckVoucherCanApply.Count() == 1)
-                    {
-                        voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
-                    }
-                }
-
                 try
                 {
-                    var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
-                    var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
                     var booking = new Booking()
                     {
                         GuestId = createBookingRequest.GuestId,
                         BookingTime = DateTime.Now,
                         PaymentTypeId = createBookingRequest.PaymentTypeId,
-                        VoucherId = voucherWillUse != 0 ? voucherWillUse : null,
-                        TotalPrice = totalPrice,
-                        ReducedAmount = voucherWillUse != 0 ? totalPrice * (double)discount < maxMoney ? totalPrice * (double)discount : maxMoney : 0,
+                        VoucherId = null,
+                        TotalPrice = 0,
+                        ReducedAmount = 0,
                         Status = BookingStatus.Confirmed,
                     };
                     await _unitOfWork.BookingRepository.AddAsync(booking);
@@ -174,8 +128,8 @@ namespace DATN.Aplication.Services
                             PetId = item.PetId,
                             Price = item.Price,
                             StaffId = item.StaffId,
-                            EndDateTime=item.EndDateTime.CompareTo(new TimeSpan(23,30,00))>0?DateTime.Now.AddDays(1).Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes):DateTime.Now.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
-                            StartDateTime=item.EndDateTime.CompareTo(new TimeSpan(23,30,00))>0?DateTime.Now.AddDays(1).Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes):DateTime.Now.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
+                            EndDateTime = item.EndDateTime.CompareTo(new TimeSpan(23, 30, 00)) > 0 ? DateTime.Now.AddDays(1).Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes) : DateTime.Now.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
+                            StartDateTime = item.EndDateTime.CompareTo(new TimeSpan(23, 30, 00)) > 0 ? DateTime.Now.AddDays(1).Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes) : DateTime.Now.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
                         };
@@ -193,6 +147,94 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
             }
+        }
+        public async Task<ResponseData<Bill>> GetBill(Guid IdGuest, DateTime dateBooking)
+        {
+            var queryBooking = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                               join bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                               on booking.Id equals bookingDetail.BookingId
+                               join user in await _userManager.Users.ToListAsync()
+                               on bookingDetail.StaffId equals user.Id
+                               join guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                               on booking.GuestId equals guest.Id
+                               join pet in await _unitOfWork.PetRepository.GetAllAsync()
+                               on user.Id equals pet.OwnerId
+                               join serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                               on bookingDetail.ServiceDetailId equals serviceDetail.Id
+                               where booking.BookingTime.Date.CompareTo(dateBooking.Date) == 0 && booking.GuestId == IdGuest
+                               select new ServiceDetailView
+                               {
+                                   IdServiceDetail = serviceDetail.Id,
+                                   PetName = pet.Name,
+                                   Price = serviceDetail.Price,
+                                   NameStaff = user.FullName,
+                               };
+            var infoGuest = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                             where guest.Id == IdGuest
+                             select guest).FirstOrDefault();
+            double totalPrice = 0;
+            foreach (var item in queryBooking)
+            {
+                var queryGetTotalPrice = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                         where serviceDetail.Id == item.IdServiceDetail
+                                         select serviceDetail;
+                totalPrice += queryGetTotalPrice.FirstOrDefault().Price;
+            }
+            var queryCheckVoucherCanApply = from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                            where totalPrice >= voucher.MinMoneyApplicable
+                                            && voucher.AmountUsed < voucher.Quantity
+                                            && voucher.Status == VoucherStatus.GoingOn
+                                            select voucher;
+            int voucherWillUse = 0;
+            if (queryCheckVoucherCanApply.Count() > 1)
+            {
+                voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                foreach (var item in queryCheckVoucherCanApply)
+                {
+                    var reducedAmount1 = totalPrice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalPrice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
+                    foreach (var item2 in queryCheckVoucherCanApply)
+                    {
+                        if (item.Id == item.Id)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            var reducedAmount2 = totalPrice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalPrice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
+                            if (reducedAmount1 < reducedAmount2)
+                            {
+                                voucherWillUse = item2.Id;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (queryCheckVoucherCanApply.Count() == 1)
+                {
+                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                }
+            }
+            var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse).MaxMoneyDiscount;
+            var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse).DiscountPercent;
+            var reduce = voucherWillUse != 0 ? (double)discount * totalPrice / 100 >= maxMoney ? maxMoney : (double)discount * totalPrice / 100 : 0;
+            var bill = new Bill()
+            {
+                Address = infoGuest.Address,
+                GuestName = infoGuest.Name,
+                DateBooking = DateTime.Now,
+                ListServiceBooked = queryBooking.ToList(),
+                PhoneNumber = infoGuest.PhoneNumber,
+                TotalPrice = totalPrice,
+                ReducePrice = reduce,
+                TotalPayment = totalPrice - reduce,
+                IdVoucher = voucherWillUse,
+            };
+            if (bill != null)
+                return new ResponseData<Bill> { IsSuccess = true, Data = bill };
+            else 
+                return new ResponseData<Bill> {IsSuccess = false, Error = "Không tìm thấy bill" };
         }
     }
 }

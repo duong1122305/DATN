@@ -403,7 +403,6 @@ namespace DATN.Aplication.Services
                 }
 
             }
-
         }
         public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate)
         {

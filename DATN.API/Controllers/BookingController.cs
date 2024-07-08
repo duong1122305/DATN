@@ -39,5 +39,10 @@ namespace DATN.API.Controllers
         {
             return await _employeeScheduleManagementService.ListStaffFreeInTime(TimeSpan.Parse(from), TimeSpan.Parse(to));
         }
+        [HttpGet("Get-Bill-Of-Guest")]
+        public async Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest,DateTime dateBooking)
+        {
+            return await _bookingManagement.GetBill(idguest, dateBooking);
+        }
     }
 }
