@@ -18,9 +18,9 @@ namespace DATN.ViewModels.DTOs.Booking
         public int? ComboId { get; set; }
 
         public int ServiceDetailId { get; set; } 
-        public DateTime StartDateTime { get; set; } 
+        public TimeSpan StartDateTime { get; set; } 
 
-        public DateTime EndDateTime { get; set; }
+        public TimeSpan EndDateTime { get; set; }
 
         public BookingDetailStatus Status { get; set; } 
 
