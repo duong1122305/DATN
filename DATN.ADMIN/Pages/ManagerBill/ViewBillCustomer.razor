@@ -9,9 +9,9 @@
         <div class="invoice-body">
             @if (bill != null)
             {
-               <div style="text-align:center">
+                <div style="text-align:center">
                     <MudText Typo="Typo.h3" Class="invoice-label">Thông tin hóa đơn</MudText>
-               </div>
+                </div>
                 <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
                     <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
                     <span><b>Khách hàng:</b> @bill.GuestName</span><br />
@@ -35,33 +35,44 @@
                         <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
                     </RowTemplate>
                 </MudTable>
-                <MudText>
-                   <div style="text-align:right">
+                <style>
+                    .outer-div {
+                        display: flex;
+                        justify-content: flex-end; /* Đẩy div ngoài về bên phải */
+                        width: 100%;
+                    }
+
+                    .inner-div {
+                        text-align: left; /* Căn trái nội dung trong div */
+                    }
+                </style>
+                <div class="outer-div">
+                    <div class="inner-div">
                         <br />
-                        <span><b>Tổng tiền: </b>@CurrencyHelper.FormatCurrency((float)@bill.TotalPrice) </span><br />
+                        <span><b>Tạm tính: </b>@CurrencyHelper.FormatCurrency((float)@bill.TotalPrice)</span><br />
                         <br />
                         <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
                         <br />
-                        <span><b>Số tiền cần thanh toán:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span>
-                   </div>
-                </MudText>
-
-              @*   <div class="invoice-total">
-                    <span><b>Tổng tiền:</b> @selectedBooking.TotalAmount.ToString("C0")</span>
+                        <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span>
+                    </div>
                 </div>
- *@
+
+                @*   <div class="invoice-total">
+            <span><b>Tổng tiền:</b> @selectedBooking.TotalAmount.ToString("C0")</span>
+            </div>
+            *@
                 <MudDivider />
 
-          @*       <MudText Typo="Typo.h6" Class="invoice-label">Thông tin thanh toán</MudText>
-                <MudTextField Label="Phương thức thanh toán" @bind-Value="paymentInfo.PaymentMethod" Required="true" />
-                <MudNumericField Label="Số tiền thanh toán" @bind-Value="paymentInfo.AmountPaid" Required="true" />
-                <MudDatePicker Label="Ngày thanh toán" @bind-Date="paymentInfo.PaymentDate" Required="true" />
-                <MudTextField Label="Ghi chú" @bind-Value="paymentInfo.Notes" Multiline="true" /> *@
+                @*       <MudText Typo="Typo.h6" Class="invoice-label">Thông tin thanh toán</MudText>
+            <MudTextField Label="Phương thức thanh toán" @bind-Value="paymentInfo.PaymentMethod" Required="true" />
+            <MudNumericField Label="Số tiền thanh toán" @bind-Value="paymentInfo.AmountPaid" Required="true" />
+            <MudDatePicker Label="Ngày thanh toán" @bind-Date="paymentInfo.PaymentDate" Required="true" />
+            <MudTextField Label="Ghi chú" @bind-Value="paymentInfo.Notes" Multiline="true" /> *@
 
-               @*  <div class="invoice-actions">
-                    <MudButton Color="Color.Primary" @onclick="ConfirmPayment">Xác nhận thanh toán</MudButton>
-                    <MudButton Color="Color.Secondary" @onclick="Close">Hủy bỏ</MudButton>
-                </div> *@
+                @*  <div class="invoice-actions">
+            <MudButton Color="Color.Primary" @onclick="ConfirmPayment">Xác nhận thanh toán</MudButton>
+            <MudButton Color="Color.Secondary" @onclick="Close">Hủy bỏ</MudButton>
+            </div> *@
             }
             else
             {
@@ -77,7 +88,7 @@
     [Parameter]
     public Guid? guid { get; set; }
     [Parameter]
-    public DateTime date{ get; set; }
+    public DateTime date { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
