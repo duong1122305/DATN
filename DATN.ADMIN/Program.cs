@@ -16,6 +16,7 @@ using System.Net;
 using Syncfusion.Blazor;
 using DATN.Aplication.Services.IServices;
 using DATN.Aplication.Services;
+using DATN.ViewModels.DTOs.Booking;
 var builder = WebApplication.CreateBuilder(args);
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
@@ -82,6 +83,7 @@ builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
 builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
+builder.Services.AddSingleton<BookingService>();
 builder.Services.AddMudServices(config =>
 {
 	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;

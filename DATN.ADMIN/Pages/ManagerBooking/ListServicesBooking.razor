@@ -49,7 +49,8 @@
             <CellTemplate>
                 <span>
                     <MudButtonGroup Variant="Variant.Filled">
-                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.Id.Value,context.Item.BookingTime.ToUniversalTime()))"></MudIconButton>
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.Id.Value,context.Item.BookingTime))"></MudIconButton>
+                        <MudIconButton Color="Color.Primary" Title="Thanh toán" >Thanh toán</MudIconButton>
                     </MudButtonGroup>
                 </span>
             </CellTemplate>
@@ -65,7 +66,11 @@
     private List<BookingView> lstBookingServices = new List<BookingView>();
     bool _customizeGroupTemplate;
     static bool _customizeGroupBy;
+    static bool _customizeGroupByCus;
+
     MudDataGrid<BookingView> dataGrid;
+    [Inject] private BookingService bookingService { get; set; }
+
 
     [Inject]
     private IBookingViewServices _client { get; set; }
@@ -76,24 +81,24 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
-        try
-        {
-            hubConnection = new HubConnectionBuilder()
-            .WithUrl(navigation.ToAbsoluteUri("/notificationHub"))
-            .Build();
+        // try
+        // {
+        //     hubConnection = new HubConnectionBuilder()
+        //     .WithUrl(navigation.ToAbsoluteUri("/notificationHub"))
+        //     .Build();
 
-            hubConnection.On<string>("ReceiveMessage", (msg) =>
-            {
-                Message("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
-                InvokeAsync(StateHasChanged);
-            });
+        //     hubConnection.On<string>("ReceiveMessage", (msg) =>
+        //     {
+        //         Message("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
+        //         InvokeAsync(StateHasChanged);
+        //     });
 
-            await hubConnection.StartAsync();
-        }
-        catch (Exception)
-        {
+        //     await hubConnection.StartAsync();
+        // }
+        // catch (Exception)
+        // {
 
-        }
+        // }
     }
     private void Message(string message, Severity severity)
     {
@@ -101,15 +106,16 @@
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
-    public async ValueTask DisposeAsync()
-    {
-        await hubConnection.DisposeAsync();
-    }
+    // public async ValueTask DisposeAsync()
+    // {
+    //     await hubConnection.DisposeAsync();
+    // }
 
     private async Task LoadData()
     {
         var respone = await _client.GetAll();
         lstBookingServices = respone.Data;
+        StateHasChanged();
     }
 
     //group ngày
@@ -155,27 +161,31 @@
         }
     }
 
-        
+    private void ClearBookingRequests()
+    {
+        bookingService.lstBooking.Clear();
+    }
 
-        private async Task OpenDialogCreateBooking()
-        {
+    private async Task OpenDialogCreateBooking()
+    {
         string nameDialog = "Đặt lịch tại quầy";
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
+                MaxWidth = MaxWidth.Large,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer>(nameDialog, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer1>(nameDialog, options);
         var result = await createUpdateDialog.Result;
+        ClearBookingRequests();
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
             await LoadData();
         }
-        }
+    }
 
 }

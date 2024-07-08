@@ -1,5 +1,6 @@
 ﻿@using DATN.ADMIN.IServices
 @using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.ServiceDetail
 @inject IDialogService _dialogservice;
 
@@ -68,7 +69,10 @@
     private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
+
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    [Inject] private BookingService bookingService { get; set; }
 
 
     private string searchString = "";
@@ -112,7 +116,7 @@
                 DisableBackdropClick = true,
             };
         _dialogBox.Close();
-        var createUpdateDialog = await _dialogservice.ShowAsync<SelectBookingTimeAndStaff>(nameDialog,parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectBookingTimeAndStaff3>(nameDialog,parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Cancelled)
         {

@@ -1,0 +1,265 @@
+﻿@page "/CreateBookingCustomer"
+@using DATN.ADMIN.IServices
+@using DATN.ADMIN.Pages.ManagerGuest
+@using DATN.ADMIN.Pages.ManagerServices
+@using DATN.ViewModels.DTOs.Booking
+@using DATN.ViewModels.DTOs.Guest
+@using DATN.ViewModels.DTOs.Pet
+@using DATN.ViewModels.DTOs.ServiceDetail
+@inject IDialogService _dialogservice;
+@inject ISnackbar Snackbar
+<MudForm Style="text-align:center;margin-bottom:20px">
+    <MudItem xs="12" sm="6" md="4">
+        <div style="display: flex; justify-content: flex-end; width: 1240px; margin-left: auto;margin-left:10px">
+            <MudAutocomplete T="GuestViewModel" Label="Chọn khách hàng *" ValueChanged="Change" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" />
+            <div style="display: flex; align-items: center;padding-left:200px">
+                <MudButton OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
+                <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+                @if (bookingService.lstBooking.Count > 0 && value1 != null)
+                {
+                    <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm lịch hẹn</MudButton>
+                }
+                else
+                {
+                    <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Disabled> Thêm lịch hẹn</MudButton>
+
+                }
+            </div>
+        </div>
+    </MudItem>
+    <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            @* <MudTh>Tên dịch vụ</MudTh> *@
+            <MudTh>ID nhân viên</MudTh>
+            <MudTh>ID Dịch vụ chi tiết</MudTh>
+            <MudTh>Giá</MudTh>
+            <MudTh>Giờ bắt đầu</MudTh>
+            <MudTh>Giờ kết thúc</MudTh>
+            <MudTh>Hành động</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            @* <MudTd DataLabel="Sign">@(async()=> await _serviceDetailService.GetById(context.ServiceDetailId))</MudTd> *@
+            <MudTd DataLabel="Sign">@context.StaffId</MudTd>
+            <MudTd DataLabel="Sign">@context.ServiceDetailId</MudTd>
+            <MudTd DataLabel="Sign">@context.Price</MudTd>
+            <MudTd DataLabel="Name">@context.StartDateTime</MudTd>
+            <MudTd DataLabel="Molar mass">@context.EndDateTime</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveBooking(@context))" Color="Color.Error">Xoá</MudButton>
+            </MudTd>
+        </RowTemplate>
+
+    </MudTable>
+</MudForm>
+
+@code {
+    [Inject] private BookingService bookingService { get; set; }
+    [Inject]
+    private IGuestManagerClient _guestService { get; set; }
+    private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
+    [Inject]
+    public IServiceDetailServices _serviceDetailService { get; set; }
+    private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
+
+    [Inject]
+    private IBookingViewServices _BookingSer { get; set; }
+
+    //gắn cờ
+    private bool isEditing = false;
+
+    [Inject]
+    public IPetServiceClient petService { get; set; }
+    public List<PetVM> lstPet = new List<PetVM>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        StateHasChanged();
+        bookingService.OnChange += HandleStateChange;
+    }
+    protected async Task LoadData()
+    {
+        var response = await _guestService.GetGuest();
+        lstGuest = response.Data;
+        //lấy dịch vụ theo id truyền ra
+        StateHasChanged();
+
+    }
+    private void HandleStateChange()
+    {
+        // Xử lý sự kiện thay đổi danh sách booking
+        StateHasChanged();
+    }
+
+    //tìm kiếm khách hàng
+    private GuestViewModel value1;
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    private async Task<IEnumerable<GuestViewModel>> Search(string value)
+    {
+        await Task.Delay(5); // Simulate async operation
+        if (lstGuest.Count < 0)
+        {
+            return lstGuest = new List<GuestViewModel>();
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                value1 = null;
+                return lstGuest;
+            }
+            return lstGuest.Where(x => x.Name.Contains(value.TrimStart().TrimEnd(), StringComparison.InvariantCultureIgnoreCase));
+        }
+    }
+    private async void RemoveBooking(CreateBookingDetailRequest booking)
+    {
+        // Gọi phương thức từ BookingService để xóa booking
+        if (await Confirm() == true)
+        {
+            bookingService.RemoveBooking(booking);
+            Message("Đã xoá thành công.", Severity.Success);
+        }
+        // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
+    }
+    private void ClearBookingRequests()
+    {
+        bookingService.lstBooking.Clear();
+        StateHasChanged();
+    }
+    private async Task CloseComponent()
+    {
+        // Gọi dialog hoặc thực hiện hành động cần thiết trước khi đóng component
+        ClearBookingRequests(); // Gọi phương thức để xoá danh sách bookingRequest
+    }
+
+    private async Task Change(GuestViewModel value)
+    {
+        value1 = value;
+        var responsePet = await petService.GetAll();
+        if (responsePet.Data.Count > 0)
+        {
+            lstPet = responsePet.Data.Where(x => x.OwnerId == value.Id).ToList();
+        }
+        else
+        {
+            lstPet = new List<PetVM>();
+        }
+    }
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa dịch vụ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
+
+    private async Task<bool?> Confirm2()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận thêm lịch hẹn?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
+
+    public async Task OpenDialog()
+    {
+        if (isEditing)
+        {
+            return; // Exit if already editing
+        }
+        isEditing = true; // Set flag to true to indicate editing in progress
+
+        string nameDialog = "Thêm mới khách hàng";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+    public async Task OpenDialogServices()
+    {
+        if (value1 == null)
+        {
+            Message("Vui lòng chọn khách hàng trước khi xem dịch vụ.", Severity.Warning);
+            return;
+        }
+        var id = value1.Id;
+        var name = value1.Name;
+        string nameDialog = "Danh sách dịch vụ";
+        var parameters = new DialogParameters();
+        parameters.Add("idCustomer", id);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.ExtraLarge,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesBooking2>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Cancelled)
+        {
+            createUpdateDialog.Close();
+            StateHasChanged();
+        }
+
+    }
+
+    public async Task CreateBookingInDb()
+    {
+        try
+        {
+            if (await Confirm2() == true)
+            {
+                CreateBookingRequest createBookingRequest = new CreateBookingRequest()
+                    {
+                        GuestId = value1.Id,
+                        ListIdServiceDetail = bookingService.lstBooking,
+                        PaymentTypeId = 1
+                    };
+                var repos = await _BookingSer.CreateBookingStore(createBookingRequest);
+                if (repos.IsSuccess)
+                {
+                    Message(repos.Data, Severity.Success);
+                    StateHasChanged();
+                    _dialogBox.Close();
+                }
+                else
+                {
+                    Message(repos.Error, Severity.Error);
+                }
+            }
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+    }
+
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+}

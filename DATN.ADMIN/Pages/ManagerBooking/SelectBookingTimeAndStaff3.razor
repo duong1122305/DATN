@@ -6,13 +6,13 @@
 @using DATN.ViewModels.DTOs.Pet
 @inject IDialogService _diagService;
 @inject ISnackbar Snackbar
-@inject NavigationManager navigation;
+@inject BookingService bookingService;
 
-<div style="display:flex;width:500px">
+<div style="display:flex;width:500px;margin-left:10px">
     <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
     <MudButton @onclick="@(async()=>await OpeListPetDialog())">Thêm thú cưng</MudButton>
 </div>
-<div style="display:flex;width:500px">
+<div style="display:flex;width:500px;margin-left:10px">
     <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
     <MudButton OnClick="@(async()=>await Create())">Tìm Kiếm</MudButton>
 </div>
@@ -35,7 +35,7 @@
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <MudIconButton Icon="@Icons.Material.Filled.Done" OnClick="@(async()=>await CreateBooking(context.Item.IdStaff))" Color="Color.Success" title="Chọn">Chọn</MudIconButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" OnClick="@(async()=>await CreateBooking(context.Item.IdStaff))" Color="Color.Success" title="Chọn">Chọn</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -182,7 +182,8 @@ else
             StateHasChanged();
         }
     }
-    public event Action<CreateBookingDetailRequest> OnBookingCreated;
+
+
     protected async Task CreateBooking(Guid? id)
     {
         CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
@@ -194,18 +195,10 @@ else
                     StartDateTime = timeStart.Value,
                     EndDateTime = timeEnd.Value
                 };
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Medium,
-                CloseButton = true,
-                FullWidth = true,
-                DisableBackdropClick = true,
-            };
-        var parameters = new DialogParameters();
-        parameters.Add("lstBooking", bookingCreate);
-        OnBookingCreated?.Invoke(bookingCreate);
+        bookingService.AddBooking(bookingCreate);
+        // Đóng dialog sau khi thêm xong
+        _dialogBox.Close(DialogResult.Ok(true));
+        StateHasChanged();
     }
 
     //thông báo
