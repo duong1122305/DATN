@@ -84,11 +84,11 @@
                 }
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x=>x.Id" Title="Hành động" Filterable="false" Sortable="false">
+        <PropertyColumn Property="x=>x.IdGuest" Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <span>
                     <MudButtonGroup Variant="Variant.Filled">
-                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.Id.Value,context.Item.BookingTime))"></MudIconButton>
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))"></MudIconButton>
                         <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill())">Thanh toán</MudIconButton>
                     </MudButtonGroup>
                 </span>

@@ -40,7 +40,7 @@ namespace DATN.Aplication.Services
                         into view
                         select new BookingView
                         {
-                            Id = view.Key.Id,
+                            IdGuest = view.Key.Id,
                             Address = view.Key.Address,
                             BookingTime = view.Key.BookingTime,
                             Email = view.Key.Email,
@@ -168,6 +168,7 @@ namespace DATN.Aplication.Services
                                    PetName = pet.Name,
                                    Price = serviceDetail.Price,
                                    NameStaff = user.FullName,
+                                   ServiceDetailName=serviceDetail.Description
                                };
             var infoGuest = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
                              where guest.Id == IdGuest

@@ -9,7 +9,7 @@ namespace DATN.ViewModels.DTOs.Booking
 {
     public class BookingView
     {
-        public Guid? Id { get; set; }
+        public Guid? IdGuest { get; set; }
         public string NameGuest { get; set; }
         public string PhoneNumber { get; set; }
         public string? Email { get; set; }
