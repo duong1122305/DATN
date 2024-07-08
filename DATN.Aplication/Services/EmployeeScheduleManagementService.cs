@@ -355,16 +355,19 @@ namespace DATN.Aplication.Services
             }
             else
             {
+                var dateNow = DateTime.Now;
                 var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                  where shift.From.CompareTo(from1) >= 0 && shift.To.CompareTo(to) <= 0
+                                  where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To) <= 0
                                   select shift).FirstOrDefault();
                 if (queryShift == null)
                 {
                     queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                 where shift.From > to
-                                 select shift).FirstOrDefault();
+                                  where shift.From > from1
+                                  select shift).FirstOrDefault() == null ? (await _unitOfWork.ShiftRepository.GetAllAsync()).FirstOrDefault() : queryShift;
+                    if (to > new TimeSpan(23, 30, 00))
+                        dateNow = dateNow.AddDays(1);
                 }
-                var response = await GetListStaffInDay(queryShift.Id, DateTime.Now);
+                var response = await GetListStaffInDay(queryShift.Id, dateNow);
                 List<Guid> staffFree = new List<Guid>();
                 foreach (var item in response.Data)
                 {
