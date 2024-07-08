@@ -66,6 +66,7 @@
         {
             // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
             navigationManager.NavigateTo("/dangnhap", true);
+
         }
         else
         {
@@ -73,8 +74,19 @@
             var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
             // var listClaims = jwtSecurityToken.Claims.ToArray();
             name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
+
         }
 
+        navigationManager.LocationChanged += HandleLocationChanged;
+
+    }
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        if (e.Location.Contains("/booking"))
+        {
+            _drawerOpen = false;
+            StateHasChanged();
+        }
     }
     private async Task<bool?> Confirm()
     {

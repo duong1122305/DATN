@@ -8,7 +8,9 @@ namespace DATN.ADMIN.Services
 	public class AddressService : IAddressService
 	{
 		HttpClient _client;
-		public AddressService(HttpClient client)
+		string tokenAPI_GHN = "6a8b4534-35f4-11ef-a2fa-aa4a1d19c311";
+
+        public AddressService(HttpClient client)
 		{
 			_client = client;
 		}
@@ -112,12 +114,21 @@ namespace DATN.ADMIN.Services
 
 		public string GetAddress(string addressCode)
 		{
-			if (string.IsNullOrEmpty(addressCode))
+			try
 			{
-				return null;
+				if (string.IsNullOrEmpty(addressCode))
+				{
+					return null;
+				}
+				var arrAddress = addressCode.Split('!');
+				if (!string.IsNullOrEmpty(arrAddress[1])) return arrAddress[1] + ", " + arrAddress[2];
+				return arrAddress[2];
 			}
-			var arrAddress = addressCode.Split('!');
-			return arrAddress[1]+", "+ arrAddress[2];
+			catch (Exception)
+			{
+
+				return "Không có địa chỉ";
+			}
 		}
 	}
 }

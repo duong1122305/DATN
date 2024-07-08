@@ -33,7 +33,7 @@ namespace DATN.Aplication.Services
                         var voucher = new Discount()
                         {
                             VoucherName = voucherView.VoucherName,
-                            VoucherCode = voucherView.VoucherCode.ToUpper(),
+                            VoucherCode = Guid.NewGuid().ToString().ToUpper(),
                             Created = DateTime.Now,
                             StartDate = voucherView.StartDate,
                             EndDate = voucherView.EndDate,
@@ -50,7 +50,7 @@ namespace DATN.Aplication.Services
                         }
                         else
                         {
-                            if (voucher.EndDate.CompareTo(voucher.StartDate) < 0)
+                            if (voucher.StartDate.CompareTo(voucher.EndDate) > 0)
                             {
                                 return new ResponseData<string> { IsSuccess = false, Error = "Ngày bắt đầu phải nhỏ hơn ngày kết thúc" };
                             }
@@ -62,7 +62,7 @@ namespace DATN.Aplication.Services
                                 }
                                 else
                                 {
-                                    if (voucher.StartDate.Hour > dateNow.Hour)
+                                    if (voucher.StartDate.CompareTo(dateNow) <= 0 && voucher.EndDate.CompareTo(dateNow) > 0)
                                     {
                                         voucher.Status = VoucherStatus.GoingOn;
                                     }
@@ -99,7 +99,6 @@ namespace DATN.Aplication.Services
                     {
                         var voucher = query.FirstOrDefault();
                         voucher.VoucherName = voucherView.VoucherName;
-                        voucher.VoucherCode = voucherView.VoucherCode;
                         voucher.StartDate = voucherView.StartDate;
                         voucher.EndDate = voucherView.EndDate;
                         voucher.DiscountPercent = voucherView.DiscountPercent;
@@ -122,29 +121,63 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<VoucherView>>> GetAllVoucher()
         {
+            var dateNow = DateTime.Now;
             var query = from discount in await _unitOfWork.DiscountRepository.GetAllAsync()
-                        select new VoucherView
-                        {
-                            Id = discount.Id,
-                            VoucherName = discount.VoucherName,
-                            VoucherCode = discount.VoucherCode,
-                            StartDate = discount.StartDate,
-                            EndDate = discount.EndDate,
-                            DiscountPercent = discount.DiscountPercent,
-                            MaxMoneyDiscount = discount.MaxMoneyDiscount,
-                            MinMoneyApplicable = discount.MinMoneyApplicable,
-                            Description = discount.Description,
-                            Quantity = discount.Quantity,
-                            Status = discount.Status
-                        };
-            if (query.Count() > 0)
+                        select discount;
+            List<Discount> listcheck = new List<Discount>();
+            foreach (var item in query)
+            {
+                if (item.EndDate < dateNow)
+                {
+                    if (item.Status != VoucherStatus.Expired)
+                    {
+                        item.Status = VoucherStatus.Expired;
+                        listcheck.Add(item);
+                    }
+                }
+                else if (item.StartDate.CompareTo(dateNow) <= 0 && item.EndDate.CompareTo(dateNow) > 0)
+                {
+                    if (item.DeleteAt == null)
+                    {
+                        item.Status = VoucherStatus.GoingOn;
+                        listcheck.Add(item);
+                    }
+                }
+                else
+                {
+                    if (item.DeleteAt == null)
+                    {
+                        item.Status = VoucherStatus.NotOccur;
+                        listcheck.Add(item);
+                    }
+                }
+            }
+            await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
+
+            if (query != null)
+            {
+                var list = query.Select(c => new VoucherView
+                {
+                    Id = c.Id,
+                    VoucherName = c.VoucherName,
+                    VoucherCode = c.VoucherCode,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    DiscountPercent = c.DiscountPercent,
+                    MaxMoneyDiscount = c.MaxMoneyDiscount,
+                    MinMoneyApplicable = c.MinMoneyApplicable,
+                    Description = c.Description,
+                    Quantity = c.Quantity,
+                    Status = c.Status
+                });
                 return new ResponseData<List<VoucherView>>
                 {
                     IsSuccess = true,
-                    Data = query.ToList()
+                    Data = list.ToList(),
                 };
+            }
             else
-                return new ResponseData<List<VoucherView>> { IsSuccess = false, Error = "Chưa có voucher nào", Data = new List<VoucherView>() };
+                return new ResponseData<List<VoucherView>> { IsSuccess = false, Data = new List<VoucherView>(), Error = "Chưa có voucher nào" };
         }
 
         public async Task<ResponseData<string>> ExpiresVoucher(int id)

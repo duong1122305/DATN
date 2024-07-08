@@ -10,6 +10,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.Aplication.Services
 {
@@ -24,7 +25,7 @@ namespace DATN.Aplication.Services
             _usermanager = userManager;
         }
 
-        public async Task<ResponseData<List<ScheduleView>>> GetUserInOneMonth(int month, int year)
+        public async Task<ResponseData<List<ScheduleView>>> GetUsersInOneMonth(int month, int year)
         {
             var query = from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                         join workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
@@ -70,42 +71,52 @@ namespace DATN.Aplication.Services
                 {
                     foreach (var workShift in query.ToList())
                     {
-                        var schedule = new EmployeeSchedule()
+                        var checkNumberStaffWokingInDay = await CheckNumberOfStaffWokingInDay(shift, workShift.WorkDate);
+
+                        if (checkNumberStaffWokingInDay < 5)
                         {
-                            UserId = Guid.Parse(user),
-                            WorkShiftId = workShift.Id,
-                        };
-                        var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                         where scheduletable.UserId == schedule.UserId &&
-                                         scheduletable.WorkShiftId == schedule.WorkShiftId
-                                         select scheduletable;
-                        if (querycheck.ToList().Count == 0)
-                        {
-                            employeeSchedules.Add(schedule);
-                            if (listSuccess.Count == 0)
+                            var schedule = new EmployeeSchedule()
                             {
-                                listSuccess.Add(schedule.UserId.ToString());
-                            }
-                            else
+                                UserId = Guid.Parse(user),
+                                WorkShiftId = workShift.Id,
+                            };
+                            var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                             where scheduletable.UserId == schedule.UserId &&
+                                             scheduletable.WorkShiftId == schedule.WorkShiftId
+                                             select scheduletable;
+                            if (querycheck.ToList().Count == 0)
                             {
-                                foreach (var item in listSuccess)
-                                {
-                                    if (item != schedule.UserId.ToString())
-                                    {
-                                        count++;
-                                    }
-                                }
-                                if (count == listSuccess.Count)
+                                employeeSchedules.Add(schedule);
+                                if (listSuccess.Count == 0)
                                 {
                                     listSuccess.Add(schedule.UserId.ToString());
-                                    count = 0;
+                                }
+                                else
+                                {
+                                    foreach (var item in listSuccess)
+                                    {
+                                        if (item != schedule.UserId.ToString())
+                                        {
+                                            count++;
+                                        }
+                                    }
+                                    if (count == listSuccess.Count)
+                                    {
+                                        listSuccess.Add(schedule.UserId.ToString());
+                                        count = 0;
+                                    }
                                 }
                             }
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định" };
                         }
                     }
                 }
                 await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
                 return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
+
             }
             catch (Exception e)
             {
@@ -130,15 +141,55 @@ namespace DATN.Aplication.Services
                 {
                     foreach (var workShift in query.ToList())
                     {
-                        if (workShift.WorkDate.Day == currentDay.Day && workShift.WorkDate.Month == currentDay.Month && workShift.WorkDate.Year == currentDay.Year)
+                        var checkNumberStaffWokingInDay = await CheckNumberOfStaffWokingInDay(shift, workShift.WorkDate);
+                        if (checkNumberStaffWokingInDay < 5)
                         {
-                            var queryShift = (from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                              where shifttable.Id == shift
-                                              select shifttable).FirstOrDefault();
 
-                            if (currentDay.Hour >= queryShift.To.Hours || currentDay.Hour >= queryShift.From.Hours && currentDay.Hour <= queryShift.To.Hours)
+                            if (workShift.WorkDate.Day == currentDay.Day && workShift.WorkDate.Month == currentDay.Month && workShift.WorkDate.Year == currentDay.Year)
                             {
-                                continue;
+                                var queryShift = (from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                                  where shifttable.Id == shift
+                                                  select shifttable).FirstOrDefault();
+
+                                if (currentDay.Hour >= queryShift.To.Hours || currentDay.Hour >= queryShift.From.Hours && currentDay.Hour <= queryShift.To.Hours)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    var schedule = new EmployeeSchedule()
+                                    {
+                                        UserId = Guid.Parse(user),
+                                        WorkShiftId = workShift.Id
+                                    };
+                                    var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                                     where scheduletable.UserId == schedule.UserId &&
+                                                     scheduletable.WorkShiftId == schedule.WorkShiftId
+                                                     select scheduletable;
+                                    if (querycheck.ToList().Count == 0)
+                                    {
+                                        employeeSchedules.Add(schedule);
+                                        if (listSuccess.Count == 0)
+                                        {
+                                            listSuccess.Add(schedule.UserId.ToString());
+                                        }
+                                        else
+                                        {
+                                            foreach (var item in listSuccess)
+                                            {
+                                                if (item != schedule.UserId.ToString())
+                                                {
+                                                    count++;
+                                                }
+                                            }
+                                            if (count == listSuccess.Count)
+                                            {
+                                                listSuccess.Add(schedule.UserId.ToString());
+                                                count = 0;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
@@ -178,38 +229,7 @@ namespace DATN.Aplication.Services
                         }
                         else
                         {
-                            var schedule = new EmployeeSchedule()
-                            {
-                                UserId = Guid.Parse(user),
-                                WorkShiftId = workShift.Id
-                            };
-                            var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                             where scheduletable.UserId == schedule.UserId &&
-                                             scheduletable.WorkShiftId == schedule.WorkShiftId
-                                             select scheduletable;
-                            if (querycheck.ToList().Count == 0)
-                            {
-                                employeeSchedules.Add(schedule);
-                                if (listSuccess.Count == 0)
-                                {
-                                    listSuccess.Add(schedule.UserId.ToString());
-                                }
-                                else
-                                {
-                                    foreach (var item in listSuccess)
-                                    {
-                                        if (item != schedule.UserId.ToString())
-                                        {
-                                            count++;
-                                        }
-                                    }
-                                    if (count == listSuccess.Count)
-                                    {
-                                        listSuccess.Add(schedule.UserId.ToString());
-                                        count = 0;
-                                    }
-                                }
-                            }
+                            return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định!!"};
                         }
                     }
                 }
@@ -288,7 +308,8 @@ namespace DATN.Aplication.Services
                         on workShift.Id equals schedule.WorkShiftId
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
-                        where shifttable.Id == shift
+                        where shifttable.Id == shift &&
+                        user.IsDeleted == false
                         select new ScheduleView
                         {
                             Name = user.FullName,
@@ -395,6 +416,23 @@ namespace DATN.Aplication.Services
             }
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Đổi ca thất bại!" };
+        }
+        private async Task<int> CheckNumberOfStaffWokingInDay(int shift, DateTime workdate)
+        {
+            var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                        join workShift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                        on shifttable.Id equals workShift.ShiftId
+                        join schedule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                        on workShift.Id equals schedule.WorkShiftId
+                        join user in await _usermanager.Users.ToListAsync()
+                        on schedule.UserId equals user.Id
+                        where shifttable.Id == shift && workShift.WorkDate.Year == workdate.Year
+                        && workShift.WorkDate.Month == workdate.Month && workShift.WorkDate.Day == workdate.Day
+                        select schedule;
+            if (query.ToList().Count > 0)
+                return query.Count();
+            else
+                return 0;
         }
     }
 }

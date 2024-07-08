@@ -11,29 +11,37 @@
 @inject IDialogService _dialogservice;
 
 <PageTitle>Danh sách nhân viên</PageTitle>
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách nhân viên</MudText>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng sau">Thêm vào ca làm tháng sau</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift2())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng hiện tại">Thêm ca làm tháng hiện tại</MudButton>
-<MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="width:100px; margin-bottom: 10px;" title="Chọn ca làm">
-    <MudSelectItem Value="Convert.ToInt32(null)">Chọn ca làm</MudSelectItem>
-    @foreach (var item in lstShift)
-    {
-        <MudSelectItem Value="@item.Id" title="@item.Name">@item.Name</MudSelectItem>
-    }
-</MudSelect>
-<MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" @bind-Value="selectedStatus" style="width: 200px; margin-bottom: 10px;" @onchange="HandleStatusChange">
-    <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
-    <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
-    <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
-</MudSelect>
+
 
 
 @if (lstUser.Count > 0 && lstUser != null)
 {
-    <MudDataGrid Items="@lstUser" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
+    <MudDataGrid Items="@lstUser" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true" Style="margin-top:5px">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Danh sách nhân viên</MudText>
+            <div style="display:flex">
+                <div style="width:200px;margin-right:5px">
+                    <MudSelect T="int" Label="Ca làm" Variant="Variant.Outlined" @bind-Value="selectedShiftId" @onchange="HandleShiftChange" AnchorOrigin="Origin.BottomCenter" Disabled="@(!IsAnyUserSelected)" style="width:100px; margin-bottom: 10px;" title="Chọn ca làm">
+                        <MudSelectItem Value="Convert.ToInt32(null)">Chọn ca làm</MudSelectItem>
+                        @foreach (var item in lstShift)
+                        {
+                            <MudSelectItem Value="@item.Id" title="@item.Name">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+                <div>
+                    <MudSelect T="UserStatus" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="UserStatus.All">Tất cả</MudSelectItem>
+                        <MudSelectItem Value="UserStatus.Active">Đang hoạt động</MudSelectItem>
+                        <MudSelectItem Value="UserStatus.Inactive">Ngừng hoạt động</MudSelectItem>
+                    </MudSelect>
+                </div>
+            </div>
+
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
@@ -82,15 +90,15 @@
                 <CellTemplate>
                     @if (!context.Item.IsDeleted)
                     {
-                            <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
+                        <MudChip Color="Color.Success" title="Hoạt động">Hoạt động</MudChip>
                     }
                     else
                     {
-                            <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng hoạt động</MudChip>
                     }
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x=>x.UserName" Title="Hành động" Filterable="false" Sortable="false">
+            <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
                 <CellTemplate>
                     <MudButtonGroup Variant="Variant.Filled">
                         @if (context.Item.IsDeleted)
@@ -104,7 +112,7 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.UserName))" title="Sửa"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
-            </PropertyColumn>
+            </TemplateColumn>
         </Columns>
         <PagerContent>
             <MudDataGridPager T="UserInfView" />
@@ -114,7 +122,10 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <div style="margin-top:200px;text-align:center;">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        <p>Đang tải dữ liệu</p>
+    </div>
 }
 <style>
     .my-custom-class {
@@ -144,8 +155,8 @@ else
     private int selectedShiftId;
     private enum UserStatus
     {
-        All = -1, // lấy tất cả isdeleted
-        Active = 0, // (IsDeleted = false)
+        Active = -1, // (IsDeleted = false)
+        All = 0,  // lấy tất cả isdeleted
         Inactive = 1 //(IsDeleted = true)
     }
 
@@ -161,32 +172,45 @@ else
     protected async Task LoadData()
     {
         var user = await _client.GetAll();
-        lstUser = user.Data;
+        lstUser = user.Data.OrderByDescending(x => x.UserName).ToList();
+        switch (selectedStatus)
+        {
+            case UserStatus.All:
+                lstUser = user.Data.OrderByDescending(x => x.UserName).ToList();
+                break;
+            case UserStatus.Active:
+                lstUser = user.Data.Where(x => !x.IsDeleted).ToList();
+                break;
+            case UserStatus.Inactive:
+                lstUser = user.Data.Where(x => x.IsDeleted).ToList();
+                break;
+        }
+
         selectedUsers = Enumerable.Repeat(false, lstUser.Count).ToList();
         var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
         lstShift = shift.Data;
         StateHasChanged();
     }
 
-    private async Task HandleStatusChange(ChangeEventArgs e)
+    private async Task Change(UserStatus selected)
     {
-        selectedStatus = (UserStatus)e.Value;
+        selectedStatus = selected;
         await LoadData();
     }
 
     private Func<UserInfView, bool> _quickFilter => x =>
      {
-             if (string.IsNullOrWhiteSpace(searchString))
-                 return true;
+         if (string.IsNullOrWhiteSpace(searchString))
+             return true;
 
-             if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
+         if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             return true;
 
-             if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
+         if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             return true;
 
-             if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
-                 return true;
+         if ($"{x.Address} {x.Position} {x.Email}".Contains(searchString.Trim()))
+             return true;
          return false;
      };
 
@@ -357,8 +381,15 @@ else
                 if (selectedShiftId > 0)
                 {
                     var repo = await _client2.InsertEmployeeCurrentMonth(listIdUser, selectedShiftId);
-                    Message(repo.Data, Severity.Success);
-                    await LoadData();
+                    if (repo.IsSuccess)
+                    {
+                        Message(repo.Data, Severity.Success);
+                        await LoadData();
+                    }
+                    else
+                    {
+                        Message(repo.Error, Severity.Error);
+                    }
                 }
                 else
                 {
@@ -387,7 +418,7 @@ else
         StateHasChanged();
         return confirm;
     }
-  
+
 
     //messenge
     private void Message(string message, Severity severity)

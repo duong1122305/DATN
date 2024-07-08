@@ -22,11 +22,7 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.RegisterWithUser(request);
         }  
-        [HttpPost("register-guest-no-user")]
-        public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request)
-        {
-            return await _guestManagerService.RegisterNoUser(request);
-        }
+        
   
         [HttpGet("GetGuest")]
         public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging( )
@@ -39,10 +35,10 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.FindGuestByID(id);
         }  
-        [HttpGet("verify-user")]
-        public async Task<ResponseData<string>> FindByID(string verifyConstring, string mail)
+        [HttpPost("verify-cus")]
+        public async Task<ResponseData<string>> VerifyCode(string verifyCode)
         {
-            return await _guestManagerService.VerififyUser(verifyConstring, mail);
+            return await _guestManagerService.VerififyUser(verifyCode);
         }
         [HttpPost("update-guest")]
         public async Task<ResponseData<string>> UpdateGuest(GuestUpdateRequest request)
@@ -53,6 +49,23 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> ChangStatus(DeleteRequest<Guid> request)
         {
              return await _guestManagerService.SoftDelete(request);
+        }  
+        [HttpPost("update-pass-by-verifyCode")]
+        public async Task<ResponseData<string>> UpdatePassByCode(string verifyCode, string newPass)
+        {
+             return await _guestManagerService.ChangPassWithVerifyCode(verifyCode,newPass);
+        }  
+        [HttpPost("forgot-pass")]
+        public async Task<ResponseData<string>> SendForgotMail(string email)
+        {
+             return await _guestManagerService.SendForgotMail(email);
         }
-    }
+	
+        [HttpPost("register-by-guest")]///////////////// đây là đăng ký mới
+		public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterByGuestRequest request)
+		{
+            return await _guestManagerService.RegisterByCustomer(request);
+        }
+
+	}
 }

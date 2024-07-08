@@ -17,12 +17,8 @@ namespace DATN.ViewModels.DTOs.Guest
         [RegularExpression(@"^(09|03|07|08|05)\d{8}$", ErrorMessage = "Nhập đúng định dạng số điện thoại Việt Nam")]
         public string PhoneNumber { get; set; } // Số điện thoại
 
-        [PasswordValidation]
-        public string Password { get; set; }
-        [MinLength(6, ErrorMessage ="Độ dài tên đăng nhập lớn hơn 4 ký tự")]
-        public string UserName { get; set; }
         [EmailAddress(ErrorMessage ="Phải đúng định dạng email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         public string? Address { get; set; }
        
        

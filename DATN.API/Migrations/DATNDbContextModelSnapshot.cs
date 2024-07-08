@@ -47,9 +47,6 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("AppointmentTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("BookingTime")
                         .HasColumnType("datetime2");
 
@@ -59,7 +56,8 @@ namespace DATN.API.Migrations
                     b.Property<bool>("IsAddToSchedule")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PaymentTypeId")
+                    b.Property<int?>("PaymentTypeId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<double?>("ReducedAmount")
@@ -68,8 +66,8 @@ namespace DATN.API.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<float>("TotalPrice")
-                        .HasColumnType("real");
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
 
                     b.Property<int?>("VoucherId")
                         .HasColumnType("int");
@@ -102,15 +100,22 @@ namespace DATN.API.Migrations
                     b.Property<DateTime>("EndDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Price")
+                    b.Property<int?>("PetId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("int");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ServiceDetailId")
                         .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<Guid>("StaffId")
+                    b.Property<Guid?>("StaffId")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDateTime")
@@ -124,6 +129,8 @@ namespace DATN.API.Migrations
                     b.HasIndex("BookingId");
 
                     b.HasIndex("ComboId");
+
+                    b.HasIndex("PetId");
 
                     b.HasIndex("ServiceDetailId");
 
@@ -165,11 +172,10 @@ namespace DATN.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("IdCategoryProduct")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -191,13 +197,18 @@ namespace DATN.API.Migrations
                     b.Property<int>("IdCategory")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("CategoryProducts", (string)null);
+                    b.HasIndex("IdCategory");
+
+                    b.ToTable("CategoryProducts");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ComboDetail", b =>
@@ -267,6 +278,9 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AmountUsed")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -322,7 +336,7 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CheckInTime")
+                    b.Property<DateTime?>("CheckInTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("CheckOutTime")
@@ -334,19 +348,13 @@ namespace DATN.API.Migrations
                     b.Property<string>("OtherNotes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeScheduleId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EmployeeAttendances", (string)null);
+                    b.ToTable("EmployeeAttendances");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeSchedule", b =>
@@ -412,6 +420,9 @@ namespace DATN.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VerifyCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -492,7 +503,7 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdProduct")
+                    b.Property<int>("IdProductDetail")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDefault")
@@ -504,7 +515,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdProduct");
+                    b.HasIndex("IdProductDetail");
 
                     b.ToTable("ImageProducts", (string)null);
                 });
@@ -639,9 +650,6 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryProductIdCategory")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -661,10 +669,9 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryProductIdCategory");
+                    b.HasIndex("IdBrand");
 
-                    b.HasIndex("IdBrand")
-                        .IsUnique();
+                    b.HasIndex("IdCategoryProduct");
 
                     b.ToTable("Products", (string)null);
                 });
@@ -1116,6 +1123,12 @@ namespace DATN.API.Migrations
                         .WithMany("BookingDetails")
                         .HasForeignKey("ComboId");
 
+                    b.HasOne("DATN.Data.Entities.Pet", "Pet")
+                        .WithMany("BookingDetails")
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("DATN.Data.Entities.ServiceDetail", "ServiceDetail")
                         .WithMany("BookingDetails")
                         .HasForeignKey("ServiceDetailId")
@@ -1131,6 +1144,8 @@ namespace DATN.API.Migrations
                     b.Navigation("Booking");
 
                     b.Navigation("ComboService");
+
+                    b.Navigation("Pet");
 
                     b.Navigation("ServiceDetail");
 
@@ -1190,15 +1205,7 @@ namespace DATN.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.User", "User")
-                        .WithMany("EmployeeAttendances")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("EmployeeSchedule");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeSchedule", b =>
@@ -1258,13 +1265,13 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.ImageProduct", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.Product", "Product")
+                    b.HasOne("DATN.Data.Entities.ProductDetail", "ProductDetail")
                         .WithMany("ImageProducts")
-                        .HasForeignKey("IdProduct")
+                        .HasForeignKey("IdProductDetail")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("ProductDetail");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.OrderDetail", b =>
@@ -1318,16 +1325,15 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Product", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.CategoryProduct", "CategoryProduct")
+                    b.HasOne("DATN.Data.Entities.Brand", "Brands")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryProductIdCategory")
-                        .HasPrincipalKey("IdCategory")
+                        .HasForeignKey("IdBrand")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.Brand", "Brands")
-                        .WithOne("Product")
-                        .HasForeignKey("DATN.Data.Entities.Product", "IdBrand")
+                    b.HasOne("DATN.Data.Entities.CategoryProduct", "CategoryProduct")
+                        .WithMany("Products")
+                        .HasForeignKey("IdCategoryProduct")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1464,8 +1470,7 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Brand", b =>
                 {
-                    b.Navigation("Product")
-                        .IsRequired();
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Category", b =>
@@ -1507,6 +1512,8 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Pet", b =>
                 {
+                    b.Navigation("BookingDetails");
+
                     b.Navigation("ImagePets");
                 });
 
@@ -1524,13 +1531,13 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Product", b =>
                 {
-                    b.Navigation("ImageProducts");
-
                     b.Navigation("ProductDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ProductDetail", b =>
                 {
+                    b.Navigation("ImageProducts");
+
                     b.Navigation("OrderDetails");
                 });
 
@@ -1561,8 +1568,6 @@ namespace DATN.API.Migrations
             modelBuilder.Entity("DATN.Data.Entities.User", b =>
                 {
                     b.Navigation("BookingDetails");
-
-                    b.Navigation("EmployeeAttendances");
 
                     b.Navigation("EmployeeSchedules");
 
