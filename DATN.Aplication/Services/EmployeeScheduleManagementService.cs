@@ -349,7 +349,7 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from1, TimeSpan to)
         {
-            if (from1.CompareTo(to) > 0)
+            if (from1.CompareTo(to) >= 0)
             {
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu lớn hơn giờ kết thúc" };
             }
@@ -358,6 +358,12 @@ namespace DATN.Aplication.Services
                 var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                   where shift.From.CompareTo(from1) >= 0 && shift.To.CompareTo(to) <= 0
                                   select shift).FirstOrDefault();
+                if (queryShift == null)
+                {
+                    queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                 where shift.From > to
+                                 select shift).FirstOrDefault();
+                }
                 var response = await GetListStaffInDay(queryShift.Id, DateTime.Now);
                 List<Guid> staffFree = new List<Guid>();
                 foreach (var item in response.Data)
