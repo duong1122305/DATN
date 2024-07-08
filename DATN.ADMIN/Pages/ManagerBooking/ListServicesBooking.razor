@@ -15,7 +15,7 @@
 <PageTitle>Danh sách đặt dịch vụ</PageTitle>
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
-<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
+<MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" @ref="dataGrid" Hideable="true" Groupable="true" GroupExpanded="false" MultiSelection="true">
     <ToolBarContent>
         <MudSpacer />
@@ -146,7 +146,7 @@
             };
         parameters.Add("id", id2);
         parameters.Add("dateBooking", dateBooking);
-        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsBooking>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -164,7 +164,7 @@
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true

@@ -51,16 +51,6 @@
                     }
                 </CellTemplate>
             </TemplateColumn>
-
-            @*  <PropertyColumn Property="x=>x." Title="Hành động" Filterable="false" Sortable="false">
-        <CellTemplate>
-        <span>
-        <MudButtonGroup Variant="Variant.Filled">
-        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem nhân viên trong ca" OnClick="@(async()=>await OpenDialog(context.Item.ShiftID,context.Item.WorkDate,context.Item.From.Hours,context.Item.To.Hours))"></MudIconButton>
-        </MudButtonGroup>
-        </span>
-        </CellTemplate>
-        </PropertyColumn> *@
         </Columns>
         <PagerContent>
             <MudDataGridPager T="ListBokingDetailInDay" />

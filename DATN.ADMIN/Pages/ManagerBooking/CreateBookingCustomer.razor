@@ -5,31 +5,20 @@
 @using DATN.ViewModels.DTOs.Guest
 @using DATN.ViewModels.DTOs.Pet
 @inject IDialogService _dialogservice;
-
-@* thêm pet nếu chưa có(hiển thị ra view), thêm mới khách hàng nếu chưa có(hiển thị view danh sách khách hàng đã có)
-    chọn được nhiều dịch vụ, chọn nhân viên làm dịch vụ, chọn giờ làm dịch vụ
-*@
-<MudGrid>
-    <MudItem xs="12" sm="7">
-        <MudPaper Class="pa-4">
-            <MudForm>
-                <MudItem xs="12" sm="6" md="4">
-                    <div style="display:flex;width:600px">
-                        <MudAutocomplete T="GuestViewModel" Label="Chọn khách hàng" ValueChanged="Change" SearchFunc="@Search" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.PhoneNumber})")" />
-                        <MudButton OnClick="@(async()=>await OpenDialog())" Style="margin-top:10px">Thêm khách hàng</MudButton>
-                    </div>
-                    <div style="display:flex;width:600px">
-                        <MudButton OnClick="@(async()=>await OpenDialogServices())" Style="margin-top:10px">Chọn dịch vụ</MudButton>
-                    </div>
-                </MudItem>
-               @*  <MudItem xs="12" sm="6" md="4">
-                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
-                </MudItem> *@
-            </MudForm>
-        </MudPaper>
+@inject ISnackbar Snackbar
+<MudForm Style="text-align:center;margin-bottom:20px">
+    <MudItem xs="12" sm="6" md="4">
+        <div style="display:flex;width:400px;text-align:center;margin-left:10px">
+            <MudAutocomplete T="GuestViewModel" Label="Chọn khách hàng" ValueChanged="Change" SearchFunc="@Search" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.PhoneNumber})")"/>
+        </div>
+        <div style="display:flex;width:400px;text-align:justify">
+            <MudButton OnClick="@(async()=>await OpenDialog())" Style="margin-top:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary">Thêm khách hàng</MudButton>
+            <MudButton OnClick="@(async()=>await OpenDialogServices())" Style="margin-top:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary">Chọn dịch vụ</MudButton>
+        </div>
     </MudItem>
-</MudGrid>
-@code{
+</MudForm>
+
+@code {
     [Inject]
     private IGuestManagerClient _guestService { get; set; }
     private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
@@ -55,8 +44,7 @@
     }
 
     //tìm kiếm khách hàng
-    private GuestViewModel value1 = new GuestViewModel(){Name="Việt"};
-    private PetVM value2;
+    private GuestViewModel value1;
     private string[] guest;
     private async Task<IEnumerable<GuestViewModel>> Search(string value)
     {
@@ -69,6 +57,7 @@
         {
             if (string.IsNullOrEmpty(value))
             {
+                value1 = null;
                 return lstGuest;
             }
             return lstGuest.Where(x => x.Name.Contains(value.TrimStart().TrimEnd(), StringComparison.InvariantCultureIgnoreCase));
@@ -92,6 +81,7 @@
     }
     private async Task Change(GuestViewModel value)
     {
+        value1 = value;
         var responsePet = await petService.GetAll();
         if (responsePet.Data.Count > 0)
         {
@@ -101,10 +91,8 @@
         {
             lstPet = new List<PetVM>();
         }
-
-
     }
-   
+
     public async Task OpenDialog()
     {
 
@@ -129,7 +117,15 @@
     }
     public async Task OpenDialogServices()
     {
+        if (value1 == null)
+        {
+            Message("Vui lòng chọn khách hàng trước khi chọn dịch vụ.", Severity.Warning);
+            return;
+        }
+        var id = value1.Id;
         string nameDialog = "Chọn dịch vụ";
+        var parameters = new DialogParameters();
+        parameters.Add("idCustomer",id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -139,7 +135,7 @@
                 FullWidth = true,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesBooking>(nameDialog, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesBooking>(nameDialog,parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -147,5 +143,12 @@
             await LoadData();
             StateHasChanged();
         }
+
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
     }
 }
