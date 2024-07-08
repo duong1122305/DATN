@@ -35,9 +35,9 @@ namespace DATN.API.Controllers
             return await _bookingManagement.CreateBookingStore(createBookingRequest);
         }
         [HttpGet("List-Staff-Free-In-Time")]
-        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from,TimeSpan to)
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
         {
-            return await _employeeScheduleManagementService.ListStaffFreeInTime(from, to);
+            return await _employeeScheduleManagementService.ListStaffFreeInTime(TimeSpan.Parse(from), TimeSpan.Parse(to));
         }
     }
 }
