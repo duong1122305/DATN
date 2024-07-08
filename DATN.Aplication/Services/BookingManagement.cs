@@ -174,8 +174,8 @@ namespace DATN.Aplication.Services
                             PetId = item.PetId,
                             Price = item.Price,
                             StaffId = item.StaffId,
-                            EndDateTime = item.EndDateTime,
-                            StartDateTime = item.StartDateTime,
+                            EndDateTime=item.EndDateTime.CompareTo(new TimeSpan(23,30,00))>0?DateTime.Now.AddDays(1).Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes):DateTime.Now.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
+                            StartDateTime=item.EndDateTime.CompareTo(new TimeSpan(23,30,00))>0?DateTime.Now.AddDays(1).Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes):DateTime.Now.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
                         };

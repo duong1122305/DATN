@@ -387,7 +387,7 @@ namespace DATN.Aplication.Services
                     var query = await _usermanager.FindByIdAsync(item.ToString());
                     if (query != null)
                     {
-                        listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName });
+                        listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName, IdStaff = query.Id });
                     }
                 }
                 if (listStaff.Count > 0)
