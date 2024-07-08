@@ -1,0 +1,151 @@
+﻿@page "/CreateBookingCustomer"
+@using DATN.ADMIN.IServices
+@using DATN.ADMIN.Pages.ManagerGuest
+@using DATN.ADMIN.Pages.ManagerServices
+@using DATN.ViewModels.DTOs.Guest
+@using DATN.ViewModels.DTOs.Pet
+@inject IDialogService _dialogservice;
+
+@* thêm pet nếu chưa có(hiển thị ra view), thêm mới khách hàng nếu chưa có(hiển thị view danh sách khách hàng đã có)
+    chọn được nhiều dịch vụ, chọn nhân viên làm dịch vụ, chọn giờ làm dịch vụ
+*@
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <MudForm>
+                <MudItem xs="12" sm="6" md="4">
+                    <div style="display:flex;width:600px">
+                        <MudAutocomplete T="GuestViewModel" Label="Chọn khách hàng" ValueChanged="Change" SearchFunc="@Search" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.PhoneNumber})")" />
+                        <MudButton OnClick="@(async()=>await OpenDialog())" Style="margin-top:10px">Thêm khách hàng</MudButton>
+                    </div>
+                    <div style="display:flex;width:600px">
+                        <MudButton OnClick="@(async()=>await OpenDialogServices())" Style="margin-top:10px">Chọn dịch vụ</MudButton>
+                    </div>
+                </MudItem>
+               @*  <MudItem xs="12" sm="6" md="4">
+                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
+                </MudItem> *@
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+@code{
+    [Inject]
+    private IGuestManagerClient _guestService { get; set; }
+    private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
+
+    [Inject]
+    public IPetServiceClient petService { get; set; }
+    public List<PetVM> lstPet = new List<PetVM>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    protected async Task LoadData()
+    {
+        //var response = await _client.GetGuest();
+        var response = await _guestService.GetGuest();
+        lstGuest = response.Data;
+
+        //var response = await _client.lstpet();
+
+        StateHasChanged();
+    }
+
+    //tìm kiếm khách hàng
+    private GuestViewModel value1 = new GuestViewModel(){Name="Việt"};
+    private PetVM value2;
+    private string[] guest;
+    private async Task<IEnumerable<GuestViewModel>> Search(string value)
+    {
+        await Task.Delay(5); // Simulate async operation
+        if (lstGuest.Count < 0)
+        {
+            return lstGuest = new List<GuestViewModel>();
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return lstGuest;
+            }
+            return lstGuest.Where(x => x.Name.Contains(value.TrimStart().TrimEnd(), StringComparison.InvariantCultureIgnoreCase));
+        }
+    }
+
+    private async Task<IEnumerable<PetVM>> Search2(string value)
+    {
+        if (lstPet.Count() < 0)
+        {
+            return lstPet = new List<PetVM>();
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return lstPet;
+            }
+            return lstPet.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+    }
+    private async Task Change(GuestViewModel value)
+    {
+        var responsePet = await petService.GetAll();
+        if (responsePet.Data.Count > 0)
+        {
+            lstPet = responsePet.Data.Where(x => x.OwnerId == value.Id).ToList();
+        }
+        else
+        {
+            lstPet = new List<PetVM>();
+        }
+
+
+    }
+   
+    public async Task OpenDialog()
+    {
+
+        string nameDialog = "Thêm mới khách hàng";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+    public async Task OpenDialogServices()
+    {
+        string nameDialog = "Chọn dịch vụ";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.ExtraLarge,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesBooking>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+}
