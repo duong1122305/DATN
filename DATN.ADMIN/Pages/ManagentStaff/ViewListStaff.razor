@@ -184,7 +184,7 @@ else
     protected async Task LoadData()
     {
         var user = await _client.GetAll();
-        lstUser = user.Data.OrderByDescending(x => x.UserName).ToList();
+        lstUser = user.Data.Select((item, index) => new { Item = item, Index = index }).OrderBy(x => x.Index).Select(c => c.Item).ToList();
         switch (selectedStatus)
         {
             case UserStatus.All:
