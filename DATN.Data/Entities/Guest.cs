@@ -22,6 +22,7 @@ namespace DATN.Data.Entities
         public string? CodeConfirm { get; set; }
         public bool? IsComfirm { get; set; }
         public string? Address { get; set; }
+		public string? AvatarUrl { get; set; }
 		public string? VerifyCode { get; set; }
         public DateTime? RegisteredAt { get; set; } // Thời gian đăng ký
         public bool? IsDeleted { get; set; }
