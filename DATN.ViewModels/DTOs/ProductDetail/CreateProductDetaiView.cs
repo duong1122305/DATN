@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,6 @@ namespace DATN.ViewModels.DTOs.ProductDetail
         public string Name { get; set; }
         public double Price { get; set; }
         public int Amount { get; set; }
+        public List<IFormFile> Images { get; set; } = new List<IFormFile>();
     }
 }

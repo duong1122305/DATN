@@ -50,7 +50,7 @@ namespace DATN.API.Controllers
                     {"url", uploadResult.SecureUrl.AbsoluteUri }
                 });
 
-                await _context.ImageProducts.AddAsync(new ImageProduct { IdProduct = procId, UrlImage = uploadResult.SecureUrl.AbsoluteUri, IsDefault = false });
+                //await _context.ImageProducts.AddAsync(new ImageProduct { IdProduct = procId, UrlImage = uploadResult.SecureUrl.AbsoluteUri, IsDefault = false });
             }
             await _context.SaveChangesAsync();
             return Ok(uploadResults);
