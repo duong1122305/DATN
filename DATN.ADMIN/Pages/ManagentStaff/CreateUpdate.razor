@@ -5,20 +5,16 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-<EditForm Model="@user" OnValidSubmit="OnValidSubmit">
+<EditForm Model="@user" OnValidSubmit="@(async()=>await OnValidSubmit())">
     <DataAnnotationsValidator />
     <MudItem xs="12" sm="12">
         <MudCard>
             <MudCardContent>
                 <MudTextField T="string" @bind-Value="user.FullName" Label="Họ và tên" For="@(() => user.FullName)" MaxLength="50" />
-                  @if (userName ==null)
+                @if (userName == null)
                 {
                     <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50" />
                 }
-               @*  else
-                {
-                    <MudTextField T="string" @bind-Value="user.Email" Label="Email" For="@(() => user.Email)" MaxLength="50" Disabled/>
-                } *@
                 <MudTextField T="string" @bind-Value="user.PhoneNumber" Label="Số điện thoại" For="@(() => user.PhoneNumber)" MaxLength="10" />
                 <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                     <MudRadioGroup @bind-Value="user.Gender" Name="Giới tính" style="justify-content:space-between">
@@ -26,19 +22,22 @@
                         <MudRadio Value="false" Color="Color.Secondary">Nữ</MudRadio>
                     </MudRadioGroup>
                 </MudField>
-                 <MudSelect Class="mud-mb-2" T="RoleView" Label="Chức vụ" Width="200px" @bind-Value="role" AnchorOrigin="Origin.BottomCenter" Required>
-                    @foreach (var item in lstRole)
-                    {
-                        @if (item.NameRole == "ServiceStaff")
+                @if (userName == null)
+                {
+                    <MudSelect Class="mud-mb-2" T="RoleView" Label="Chức vụ" Width="200px" @bind-Value="role" AnchorOrigin="Origin.BottomCenter" Required>
+                        @foreach (var item in lstRole)
                         {
-                            <MudSelectItem T="RoleView" Value="@item">Nhân viên dịch vụ</MudSelectItem>
+                            @if (item.NameRole == "ServiceStaff")
+                            {
+                                <MudSelectItem T="RoleView" Value="@item">Nhân viên dịch vụ</MudSelectItem>
+                            }
+                            else
+                            {
+                                <MudSelectItem T="RoleView" Value="@item">Lễ tân</MudSelectItem>
+                            }
                         }
-                        else
-                        {
-                            <MudSelectItem T="RoleView" Value="@item">Lễ tân</MudSelectItem>
-                        }
-                    }
-                </MudSelect>
+                    </MudSelect>
+                }
                 <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
@@ -64,26 +63,27 @@
     public List<RoleView> lstRole = new List<RoleView>();
 
     public RoleView role;
-    UserUpdateView view = new UserUpdateView();
     protected async override Task OnInitializedAsync()
     {
         if (userName != null)
         {
             _nameButton = "Cập nhật";
+            if (!string.IsNullOrEmpty(user.Address))
+            {
+                AddressCode = user.Address;
+            }
         }
         var respone = await _client.ListPosition();
         if (respone.IsSuccess)
         {
             lstRole = respone.Data;
-        }else
+        }
+        else
         {
             lstRole = new List<RoleView>();
         }
     }
-    private void EditContext_OnFieldChanged(object sender, FieldChangedEventArgs e)
-    {
-        StateHasChanged();
-    }
+
 
     //thêm
     protected async Task Create()
@@ -100,10 +100,10 @@
         {
             var idUserAffterAdd = await _client.GetById(user.PhoneNumber);
             var addRole = new AddRoleForUserView()
-            {
+                {
                     RoleId = role.IdRole.ToString(),
                     UserId = idUserAffterAdd.Data
-            };
+                };
             var position = await _client.AddRoleForUser(addRole);
             Message(result.Data, Severity.Success);
             _dialogBox.Close();
@@ -112,7 +112,6 @@
         {
             Message(result.Error, Severity.Warning);
         }
-        Message("Vui lòng nhập đủ dữ liệu!", Severity.Error);
     }
     //thông báo xác nhận
     private async Task<bool> Confirm(string text)
@@ -133,11 +132,13 @@
         {
             return;
         }
-        view.FullName = user.FullName;
-        view.Address = user.Address;
-        view.PhoneNumber = user.PhoneNumber;
-        user.Email = view.Email;
-        view.Gender = user.Gender;
+        UserUpdateView view = new UserUpdateView()
+        {
+            FullName = user.FullName,
+            Address = user.Address,
+            // Email = user.Email,
+            Gender = user.Gender
+        };
         var result = await _client.UpdateUser(view, userName);
         if (result.IsSuccess)
         {
@@ -150,15 +151,16 @@
         }
 
     }
-    private async void OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit()
     {
-        if (_nameButton == "Thêm mới")
+        if (user.PhoneNumber != null)
         {
-            await Create();
+            await Update();
         }
         else
         {
-            await Update();
+            await Create();
+
         }
         StateHasChanged();
     }
@@ -170,7 +172,6 @@
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
-    bool success = false;
 
     private void HandleAddressChanged(string address)
     {
