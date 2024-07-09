@@ -1,6 +1,7 @@
 ﻿using Azure;
 using DATN.ADMIN.IServices;
 using DATN.ADMIN.Pages;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Newtonsoft.Json;
@@ -78,11 +79,6 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
-        public Task<ResponseData<string>> UpdateCaNhanVien(List<string> lstStaff, int idShift)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView, string id)
         {
             var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
@@ -117,6 +113,18 @@ namespace DATN.ADMIN.Services
             }
             else
                 return result;
+        }
+
+        public async Task<ResponseData<List<RoleView>>> ListPosition()
+        {
+            return await _client.GetFromJsonAsync<ResponseData<List<RoleView>>>("api/UserLogin/List-Position");
+        }
+
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            var lst = await _client.PostAsJsonAsync<AddRoleForUserView>("api/UserLogin/Add-role-user",addRoleForUserView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
         }
     }
 }

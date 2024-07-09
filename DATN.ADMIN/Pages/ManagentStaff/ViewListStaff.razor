@@ -68,6 +68,18 @@
             <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Chức vụ" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (context.Item.Position == "ServiceStaff")
+                    {
+                        <span>Nhân viên dịch vụ</span>
+                    }
+                    else
+                    {
+                        <span>Lễ tân</span>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn Title="Giới tính" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (context.Item.Gender == "Nam")

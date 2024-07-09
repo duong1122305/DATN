@@ -26,6 +26,19 @@
                         <MudRadio Value="false" Color="Color.Secondary">Nữ</MudRadio>
                     </MudRadioGroup>
                 </MudField>
+                 <MudSelect Class="mud-mb-2" T="RoleView" Label="Chức vụ" Width="200px" @bind-Value="role" AnchorOrigin="Origin.BottomCenter" Required>
+                    @foreach (var item in lstRole)
+                    {
+                        @if (item.NameRole == "ServiceStaff")
+                        {
+                            <MudSelectItem T="RoleView" Value="@item">Nhân viên dịch vụ</MudSelectItem>
+                        }
+                        else
+                        {
+                            <MudSelectItem T="RoleView" Value="@item">Lễ tân</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
                 <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
@@ -47,12 +60,24 @@
     [Parameter]
     public UserRegisterView user { get; set; } = new UserRegisterView();
     private string AddressCode = "";
+
+    public List<RoleView> lstRole = new List<RoleView>();
+
+    public RoleView role;
     UserUpdateView view = new UserUpdateView();
     protected async override Task OnInitializedAsync()
     {
         if (userName != null)
         {
             _nameButton = "Cập nhật";
+        }
+        var respone = await _client.ListPosition();
+        if (respone.IsSuccess)
+        {
+            lstRole = respone.Data;
+        }else
+        {
+            lstRole = new List<RoleView>();
         }
     }
     private void EditContext_OnFieldChanged(object sender, FieldChangedEventArgs e)
@@ -70,8 +95,16 @@
         }
         //gọi api thêm
         var result = await _client.Register(user);
+
         if (result.IsSuccess)
         {
+            var idUserAffterAdd = await _client.GetById(user.PhoneNumber);
+            var addRole = new AddRoleForUserView()
+            {
+                    RoleId = role.IdRole.ToString(),
+                    UserId = idUserAffterAdd.Data
+            };
+            var position = await _client.AddRoleForUser(addRole);
             Message(result.Data, Severity.Success);
             _dialogBox.Close();
         }
