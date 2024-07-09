@@ -150,7 +150,7 @@ namespace DATN.API.Controllers
 
         //api lấy chức vụ
         [HttpGet("List-Position")]
-        public async Task<ResponseData<List<string>>> ListPosition()
+        public async Task<ResponseData<List<RoleView>>> ListPosition()
         {
             return await _userrepo.ListPosition();
         }

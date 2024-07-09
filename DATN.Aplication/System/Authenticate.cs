@@ -346,20 +346,27 @@ namespace DATN.Aplication.System
             return new ResponseData<string> { IsSuccess = false, Error = "Chức vụ không có" };
         }
 
-        public async Task<ResponseData<List<string>>> ListPosition()
+        public async Task<ResponseData<List<RoleView>>> ListPosition()
         {
-            var listRole = await _roleManager.Roles.ToListAsync();
-            if (listRole.Count > 0)
+            var listRole = from role in await _roleManager.Roles.ToListAsync()
+                           where role.Name != "Admin"
+                           select role;
+            if (listRole.Count() > 0)
             {
-                var list = new List<string>();
+                var list = new List<RoleView>();
                 foreach (var role in listRole)
                 {
-                    list.Add(role.Name);
+                    var roleView = new RoleView()
+                    {
+                        IdRole = role.Id,
+                        NameRole = role.Name,
+                    };
+                    list.Add(roleView);
                 }
-                return new ResponseData<List<string>> { IsSuccess = true, Data = list };
+                return new ResponseData<List<RoleView>> { IsSuccess = true, Data = list };
             }
             else
-                return new ResponseData<List<string>> { IsSuccess = false, Error = "Chưa có chức vụ nào" };
+                return new ResponseData<List<RoleView>> { IsSuccess = false, Error = "Chưa có chức vụ nào" };
         }
 
         public async Task<ResponseData<string>> GetRoleUser(string id)

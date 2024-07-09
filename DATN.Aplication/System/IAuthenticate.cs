@@ -19,7 +19,7 @@ namespace DATN.Aplication.System
         public Task<ResponseData<string>> GetIdUser(string username);
         public Task<ResponseData<string>> GetRoleUser(string id);
         public Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView);
-        public Task<ResponseData<List<string>>> ListPosition();
+        public Task<ResponseData<List<RoleView>>> ListPosition();
         public Task<ResponseData<string>> AddRole(string roleName);
         public Task<ResponseData<string>> ActiveAccount(string id);
         public Task<ResponseData<UserInfView>> GetInfByToken(string id);
