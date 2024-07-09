@@ -5,7 +5,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
-<EditForm Model="@user" OnValidSubmit="@(async()=>await OnValidSubmit())">
+<EditForm Model="@user">
     <DataAnnotationsValidator />
     <MudItem xs="12" sm="12">
         <MudCard>
@@ -41,7 +41,7 @@
                 <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                 <hr class="hr" />
                 <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async()=>await OnValidSubmit())">@_nameButton</MudButton>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -136,7 +136,8 @@
         {
             FullName = user.FullName,
             Address = user.Address,
-            // Email = user.Email,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
             Gender = user.Gender
         };
         var result = await _client.UpdateUser(view, userName);
@@ -153,7 +154,7 @@
     }
     private async Task OnValidSubmit()
     {
-        if (user.PhoneNumber != null)
+        if (userName != null )
         {
             await Update();
         }
