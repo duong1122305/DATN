@@ -205,7 +205,7 @@ namespace DATN.API.Controllers
         [HttpGet("Get-user-inf-by-token/{id}")]
         public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
-            return await _userrepo.GetInfByToken(id);
+            return await _userrepo.GetInfById(id);
         }
         [HttpPost("Create-Voucher")]
         public async Task<ResponseData<string>> CreateVoucher(VoucherView voucherView)
@@ -264,6 +264,11 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> CheckCode(string username, string code)
         {
             return await _userrepo.CheckCodeConfirm(username, code);
+        }
+        [HttpGet("Get-inf-by-token")]
+        public async Task<ResponseData<string>> GetUserByToken(string token)
+        {
+            return await _userrepo.GetUserByToken(token);
         }
     }
 }

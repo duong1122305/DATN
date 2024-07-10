@@ -71,6 +71,9 @@
     public IPetServiceClient petService { get; set; }
     public List<PetVM> lstPet = new List<PetVM>();
 
+    [Inject]
+    HttpContextAccessor _httpContextAccessor { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -236,7 +239,7 @@
                         ListIdServiceDetail = bookingService.lstBooking,
                         PaymentTypeId = 1
                     };
-                var repos = await _BookingSer.CreateBookingStore(createBookingRequest);
+                var repos = await _BookingSer.CreateBookingStore(createBookingRequest,_httpContextAccessor.HttpContext.Session.GetString("Key"));
                 if (repos.IsSuccess)
                 {
                     Message(repos.Data, Severity.Success);
@@ -251,7 +254,7 @@
         }
         catch (Exception)
         {
-            
+
             throw;
         }
     }

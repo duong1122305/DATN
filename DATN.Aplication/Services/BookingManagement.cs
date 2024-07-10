@@ -1,4 +1,5 @@
 ﻿using DATN.Aplication.Services.IServices;
+using DATN.Aplication.System;
 using DATN.Data.Entities;
 using DATN.Data.Enum;
 using DATN.ViewModels.Common;
@@ -21,12 +22,14 @@ namespace DATN.Aplication.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly NotificationHub _notificationHub;
+        private readonly IAuthenticate _user;
 
-        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub)
+        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _notificationHub = notificationHub;
+            _user = authenticate;
         }
         public async Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek()
         {
@@ -97,7 +100,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<List<ListBokingDetailInDay>> { IsSuccess = false, Data = new List<ListBokingDetailInDay>(), Error = "Chưa có dữ liệu" };
             }
         }
-        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest)
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
         {
             if (createBookingRequest.ListIdServiceDetail.Count > 0)
             {
@@ -136,6 +139,20 @@ namespace DATN.Aplication.Services
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
+                    var idUserAction = await _user.GetUserByToken(token);
+                    if (idUserAction.IsSuccess)
+                    {
+                        var history = new HistoryAction()
+                        {
+                            ActionByID = Guid.Parse(idUserAction.Data),
+                            ActionTime = DateTime.Now,
+                            ActionID = 12,
+                            Description = "Dây là tạo lịch chăm sóc tại quầy",
+                            BookingID = queryBooking.FirstOrDefault().Id,
+                        };
+                        await _unitOfWork.HistoryActionRepository.AddAsync(history);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
                     return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
                 }
                 catch (Exception e)
@@ -168,7 +185,7 @@ namespace DATN.Aplication.Services
                                    PetName = pet.Name,
                                    Price = serviceDetail.Price,
                                    NameStaff = user.FullName,
-                                   ServiceDetailName=serviceDetail.Description
+                                   ServiceDetailName = serviceDetail.Description
                                };
             var infoGuest = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
                              where guest.Id == IdGuest
@@ -234,8 +251,8 @@ namespace DATN.Aplication.Services
             };
             if (bill != null)
                 return new ResponseData<Bill> { IsSuccess = true, Data = bill };
-            else 
-                return new ResponseData<Bill> {IsSuccess = false, Error = "Không tìm thấy bill" };
+            else
+                return new ResponseData<Bill> { IsSuccess = false, Error = "Không tìm thấy bill" };
         }
     }
 }

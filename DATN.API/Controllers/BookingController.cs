@@ -30,9 +30,9 @@ namespace DATN.API.Controllers
             return _bookingManagement.GetListBookingDetailInDay(id, date);
         }
         [HttpPost("Create-Booking")]
-        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest)
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest,string token)
         {
-            return await _bookingManagement.CreateBookingStore(createBookingRequest);
+            return await _bookingManagement.CreateBookingStore(createBookingRequest,token);
         }
         [HttpGet("List-Staff-Free-In-Time")]
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
