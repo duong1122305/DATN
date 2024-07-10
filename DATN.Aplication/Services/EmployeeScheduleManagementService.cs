@@ -64,9 +64,9 @@ namespace DATN.Aplication.Services
                             workshift.WorkDate.Month == nextMonth &&
                             workshift.ShiftId == shift
                             select workshift;
+                bool checkCount = false;
                 List<string> listSuccess = new List<string>();
                 List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
-                int count = 0;
                 foreach (var user in listUser)
                 {
                     foreach (var workShift in query.ToList())
@@ -86,24 +86,37 @@ namespace DATN.Aplication.Services
                                              select scheduletable;
                             if (querycheck.ToList().Count == 0)
                             {
-                                employeeSchedules.Add(schedule);
-                                if (listSuccess.Count == 0)
+                                if (listSuccess.Count + checkNumberStaffWokingInDay > 5)
                                 {
-                                    listSuccess.Add(schedule.UserId.ToString());
+                                    checkCount = true;
+                                    continue;
                                 }
                                 else
                                 {
-                                    foreach (var item in listSuccess)
+                                    if (listSuccess.Count == 0)
                                     {
-                                        if (item != schedule.UserId.ToString())
-                                        {
-                                            count++;
-                                        }
-                                    }
-                                    if (count == listSuccess.Count)
-                                    {
+                                        employeeSchedules.Add(schedule);
                                         listSuccess.Add(schedule.UserId.ToString());
-                                        count = 0;
+                                    }
+                                    else
+                                    {
+                                        var check = false;
+                                        foreach (var item in listSuccess)
+                                        {
+                                            if (item.ToLower() == schedule.UserId.ToString().ToLower())
+                                            {
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!check)
+                                        {
+                                            listSuccess.Add(schedule.UserId.ToString());
+                                        }
+                                        if (listSuccess.Count + checkNumberStaffWokingInDay <= 5)
+                                        {
+                                            employeeSchedules.Add(schedule);
+                                        }
                                     }
                                 }
                             }
@@ -115,7 +128,8 @@ namespace DATN.Aplication.Services
                     }
                 }
                 await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
-                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count}!" };
+                var count= checkCount ? listSuccess.Count - 1:listSuccess.Count;
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {count}!" };
 
             }
             catch (Exception e)
@@ -135,8 +149,8 @@ namespace DATN.Aplication.Services
                             workshift.ShiftId == shift
                             select workshift;
                 List<string> listSuccess = new List<string>();
+                var checkCount = false;
                 List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
-                int count = 0;
                 foreach (var user in listUser)
                 {
                     foreach (var workShift in query.ToList())
@@ -168,24 +182,37 @@ namespace DATN.Aplication.Services
                                                      select scheduletable;
                                     if (querycheck.ToList().Count == 0)
                                     {
-                                        employeeSchedules.Add(schedule);
-                                        if (listSuccess.Count == 0)
+                                        if (listSuccess.Count + checkNumberStaffWokingInDay > 5)
                                         {
-                                            listSuccess.Add(schedule.UserId.ToString());
+                                            checkCount = true;
+                                            continue;
                                         }
                                         else
                                         {
-                                            foreach (var item in listSuccess)
+                                            if (listSuccess.Count == 0)
                                             {
-                                                if (item != schedule.UserId.ToString())
-                                                {
-                                                    count++;
-                                                }
-                                            }
-                                            if (count == listSuccess.Count)
-                                            {
+                                                employeeSchedules.Add(schedule);
                                                 listSuccess.Add(schedule.UserId.ToString());
-                                                count = 0;
+                                            }
+                                            else
+                                            {
+                                                var check = false;
+                                                foreach (var item in listSuccess)
+                                                {
+                                                    if (item.ToLower() == schedule.UserId.ToString().ToLower())
+                                                    {
+                                                        check = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (!check)
+                                                {
+                                                    listSuccess.Add(schedule.UserId.ToString());
+                                                }
+                                                if (listSuccess.Count + checkNumberStaffWokingInDay <= 5)
+                                                {
+                                                    employeeSchedules.Add(schedule);
+                                                }
                                             }
                                         }
                                     }
@@ -204,24 +231,37 @@ namespace DATN.Aplication.Services
                                                  select scheduletable;
                                 if (querycheck.ToList().Count == 0)
                                 {
-                                    employeeSchedules.Add(schedule);
-                                    if (listSuccess.Count == 0)
+                                    if (listSuccess.Count + checkNumberStaffWokingInDay > 5)
                                     {
-                                        listSuccess.Add(schedule.UserId.ToString());
+                                        checkCount = true;
+                                        continue;
                                     }
                                     else
                                     {
-                                        foreach (var item in listSuccess)
+                                        if (listSuccess.Count == 0)
                                         {
-                                            if (item != schedule.UserId.ToString())
-                                            {
-                                                count++;
-                                            }
-                                        }
-                                        if (count == listSuccess.Count)
-                                        {
+                                            employeeSchedules.Add(schedule);
                                             listSuccess.Add(schedule.UserId.ToString());
-                                            count = 0;
+                                        }
+                                        else
+                                        {
+                                            var check = false;
+                                            foreach (var item in listSuccess)
+                                            {
+                                                if (item.ToLower() == schedule.UserId.ToString().ToLower())
+                                                {
+                                                    check = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!check)
+                                            {
+                                                listSuccess.Add(schedule.UserId.ToString());
+                                            }
+                                            if (listSuccess.Count + checkNumberStaffWokingInDay <= 5)
+                                            {
+                                                employeeSchedules.Add(schedule);
+                                            }
                                         }
                                     }
                                 }
@@ -234,7 +274,8 @@ namespace DATN.Aplication.Services
                     }
                 }
                 await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
-                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {listSuccess.Count} !" };
+                var count = checkCount ? listSuccess.Count - 1 : listSuccess.Count;
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {count}!" };             
             }
             catch (Exception e)
             {
