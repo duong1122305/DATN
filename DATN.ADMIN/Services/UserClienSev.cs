@@ -126,5 +126,12 @@ namespace DATN.ADMIN.Services
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
         }
+
+        public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
+        {
+            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/create-schedule-oneday-suddenly?shift={shift}&dateTime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}",listUser);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
+        }
     }
 }

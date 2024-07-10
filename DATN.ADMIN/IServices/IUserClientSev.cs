@@ -26,5 +26,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView);
         Task<ResponseData<List<RoleView>>> ListPosition();
         Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView);
+        Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime);
     }
 }

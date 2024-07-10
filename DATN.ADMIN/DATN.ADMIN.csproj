@@ -61,4 +61,10 @@
     <ProjectReference Include="..\DATN.ViewModels\DATN.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\ManagentStaff\AddStaffSuddenly.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>
