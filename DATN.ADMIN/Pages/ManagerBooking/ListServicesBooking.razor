@@ -25,7 +25,7 @@
         <MudSpacer />
     </ToolBarContent>
     <Columns>
-        <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+        <TemplateColumn Title="Ngày" GroupBy="@_groupBy" Sortable="false" Filterable="false">
             <GroupTemplate>
                 <span style="font-weight:bold">@context.Grouping.Key</span>
             </GroupTemplate>
@@ -48,38 +48,38 @@
             <CellTemplate>
                 @if (context.Item.Status == BookingStatus.PendingConfirmation)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Warning">Chờ xác nhận</MudChip>
+                    <MudChip  Color="Color.Warning">Chờ xác nhận</MudChip>
                 }
                 @if (context.Item.Status == BookingStatus.Confirmed)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Success">Đã xác nhận</MudChip>
+                    <MudChip  Color="Color.Success">Đã xác nhận</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.Arrived)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Success">Khách đã đến</MudChip>
+                    <MudChip  Color="Color.Success">Khách đã đến</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.InProgress)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Primary">Đang thực hiện</MudChip>
+                    <MudChip  Color="Color.Primary">Đang thực hiện</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.Completed)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Success">Đã hoàn thành</MudChip>
+                    <MudChip  Color="Color.Success">Đã hoàn thành</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.NoShow)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Surface">Khách không đến</MudChip>
+                    <MudChip  Color="Color.Surface">Khách không đến</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.CustomerCancelled)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Error">Khách huỷ</MudChip>
+                    <MudChip  Color="Color.Error">Khách huỷ</MudChip>
                 }@if (context.Item.Status == BookingStatus.StaffCancelled)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Error">Nhân viên huỷ</MudChip>
+                    <MudChip  Color="Color.Error">Nhân viên huỷ</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.AdminCancelled)
                 {
-                    <MudChip Style="width:120px!important;" Color="Color.Error">Quản trị viên huỷ</MudChip>
+                    <MudChip  Color="Color.Error">Quản trị viên huỷ</MudChip>
 
                 }
             </CellTemplate>
