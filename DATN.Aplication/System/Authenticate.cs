@@ -24,14 +24,16 @@ namespace DATN.Aplication.System
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
         private readonly RandomCodeExtention _random;
-        private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager)
+		private readonly IHttpContextAccessor _httpContextAccessor;
+		private User _user;
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
             _random = randomCodeExtention;
-            _roleManager = roleManager;
+			_httpContextAccessor = httpContextAccessor;
+			_roleManager = roleManager;
         }
         public async Task<ResponseData<string>> Login(UserLoginView userView)
         {
@@ -55,7 +57,7 @@ namespace DATN.Aplication.System
                         if (await _userManager.CheckPasswordAsync(userIdentity, userView.Password))
                         {
                             _user = userIdentity;
-                            return new ResponseData<string>
+							return new ResponseData<string>
                             {
                                 IsSuccess = true,
                                 Data = await GenerateTokenString(userView)
@@ -87,9 +89,11 @@ namespace DATN.Aplication.System
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.UserData, user.FullName),
                 new Claim(ClaimTypes.Role, string.Join(",",await _userManager.GetRolesAsync(_user))),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
+         
             SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             SecurityToken securityToken = new JwtSecurityToken(
@@ -101,6 +105,7 @@ namespace DATN.Aplication.System
                 );
             string token = new JwtSecurityTokenHandler().WriteToken(securityToken);
             return token;
+
         }
 
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)

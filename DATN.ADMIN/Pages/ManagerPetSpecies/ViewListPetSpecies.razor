@@ -17,10 +17,7 @@
 {
 
 	
-	<EditForm Model="@tien">
-
-    <MudTextField @bind-Value="tien.money" Label="Money" Format="N0" Culture="CultureInfo.CurrentCulture" />
-</EditForm>
+	
 
 
 	<MudTable Items="@lstPetSpecies" Hover="true" SortLabel="Sort By" Filter="new Func<PetSpeciesVM,bool>(FilterFunc)">
@@ -74,21 +71,7 @@ else
 	}
 </style>
 @code {
-	private string FormatValue(decimal value)
-	{
-		return value.ToString("N2");
-	}
-
-	private bool TryParseValueFromString(string str, out decimal value)
-	{
-		return decimal.TryParse(str, out value);
-	}
-	private DemoCurrecy tien = new DemoCurrecy();
-	public class DemoCurrecy
-	{
-		[DisplayFormat(DataFormatString = "{0:F2}", ApplyFormatInEditMode = true)]
-		public decimal money { get; set; }
-	}
+	
 	//button trạng thái
 	private string searchString = "";
 	[CascadingParameter]

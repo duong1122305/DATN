@@ -16,18 +16,11 @@ namespace DATN.Aplication.Repository
         {
         }
 
-        public async Task<bool> RemoveAttendance(EmployeeAttendance employeeAttendance)
+        public async Task RemoveAttendance(EmployeeAttendance employeeAttendance)
         {
-            try
-            {
+           
                  _context.EmployeeAttendances.Remove(employeeAttendance);
-                return await _context.SaveChangesAsync()>0;
-            }
-            catch (Exception)
-            {
-
-               return false;
-            }
+          
         }
     }
 }

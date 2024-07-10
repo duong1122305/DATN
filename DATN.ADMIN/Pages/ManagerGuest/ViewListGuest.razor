@@ -11,7 +11,7 @@
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
 <PageTitle>Danh sách nhân viên</PageTitle>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
 @if (lstGuest != null && lstGuest.Count > 0)
 {
 
@@ -84,7 +84,7 @@
 				</MudTd>
 				<MudTd>
 					<MudButtonGroup Variant="Variant.Filled">
-						<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
+						<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Disabled=@isOpenDialog OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
 						<MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
 
 					</MudButtonGroup>
@@ -109,6 +109,7 @@ else
 </style>
 @code {
 	//button trạng thái
+	private bool isOpenDialog = false;
 	private string searchString = "";
 	private bool cusDetailOpen = false;
 	[CascadingParameter]
@@ -205,7 +206,7 @@ else
 	// them sửa khách
 	public async Task OpenDialog(Guid id)
 	{
-
+		isOpenDialog = true;
 		var parameters = new DialogParameters();
 		string nameDialog = "Thêm mới khách hàng";
 		if (id != Guid.Empty)
@@ -232,6 +233,7 @@ else
 			await LoadData();
 			StateHasChanged();
 		}
+		isOpenDialog = false;
 	}// them sửa khách
 	public async Task OpeListPetDialog(Guid id)
 	{
