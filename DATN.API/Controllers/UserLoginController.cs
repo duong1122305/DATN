@@ -119,6 +119,13 @@ namespace DATN.API.Controllers
             return result;
         }
 
+        [HttpPost("create-schedule-oneday-suddenly")]
+        public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
+        {
+            var result = await _employeeSchedule.InsertOneDayScheduleForStaffSuddenly(listUser, shift, dateTime);
+            return result;
+        }
+
         //api xoá chuyển trạng thái của nhân viên
         [HttpGet("remove")]
         public async Task<ResponseData<string>> RemoveEmployee(string id)
@@ -254,9 +261,9 @@ namespace DATN.API.Controllers
             return await _vouchermanagement.ExpiresVoucher(id);
         }
         [HttpGet("Check-Otp")]
-        public async Task<ResponseData<string>> CheckCode(string username,string code)
+        public async Task<ResponseData<string>> CheckCode(string username, string code)
         {
-            return await _userrepo.CheckCodeConfirm(username,code);
+            return await _userrepo.CheckCodeConfirm(username, code);
         }
     }
 }

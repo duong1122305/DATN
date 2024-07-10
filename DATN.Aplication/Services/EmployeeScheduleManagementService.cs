@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using DATN.Aplication.Extentions;
 using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
@@ -18,11 +19,13 @@ namespace DATN.Aplication.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _usermanager;
+        private readonly MailExtention _mail;
 
-        public EmployeeScheduleManagementService(IUnitOfWork unitOfWork, UserManager<User> userManager)
+        public EmployeeScheduleManagementService(IUnitOfWork unitOfWork, UserManager<User> userManager, MailExtention mailExtention)
         {
             _unitOfWork = unitOfWork;
             _usermanager = userManager;
+            _mail = mailExtention;
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetUsersInOneMonth(int month, int year)
@@ -50,7 +53,163 @@ namespace DATN.Aplication.Services
             }
             return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = $"Chưa có dữ liệu làm việc của tháng {month}/{year} !" };
         }
+        public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
+        {
+            var query = (from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                         where workshift.WorkDate.Month == dateTime.Month &&
+                         workshift.WorkDate.Day == dateTime.Day &&
+                         workshift.WorkDate.Year == dateTime.Year &&
+                         workshift.ShiftId == shift
+                         select workshift).FirstOrDefault();
 
+            if (query != null)
+            {
+                var shiftFind = (from shiftTable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                 where shiftTable.Id == query.ShiftId
+                                 select shiftTable).FirstOrDefault();
+                var currentDay = DateTime.Now;
+                if (dateTime.Date.CompareTo(currentDay.Date) == 0)
+                {
+                    if (currentDay.TimeOfDay.CompareTo(shiftFind.From) >= 0)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Ca này của hôm nay vượt qua giờ thêm lịch làm việc" };
+                    }
+                    else
+                    {
+                        if (shiftFind.From.TotalMinutes - currentDay.TimeOfDay.TotalMinutes >= 360)
+                        {
+                            List<string> listSuccess = new List<string>();
+                            List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
+                            foreach (var item in listUser)
+                            {
+                                var schedule = new EmployeeSchedule()
+                                {
+                                    UserId = Guid.Parse(item),
+                                    WorkShiftId = query.Id,
+                                };
+                                var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                                 where scheduletable.UserId == schedule.UserId &&
+                                                 scheduletable.WorkShiftId == schedule.WorkShiftId
+                                                 select scheduletable;
+                                if (querycheck.ToList().Count == 0)
+                                {
+                                    if (listSuccess.Count == 0)
+                                    {
+                                        employeeSchedules.Add(schedule);
+                                        listSuccess.Add(schedule.UserId.ToString());
+                                    }
+                                    else
+                                    {
+                                        var check = false;
+                                        foreach (var item1 in listSuccess)
+                                        {
+                                            if (item1.ToLower() == schedule.UserId.ToString().ToLower())
+                                            {
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!check)
+                                        {
+                                            listSuccess.Add(schedule.UserId.ToString());
+                                        }
+                                        employeeSchedules.Add(schedule);
+                                    }
+                                }
+                            }
+                            if (employeeSchedules.Count > 0)
+                            {
+                                await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
+                                List<string> lstMail = new List<string>();
+                                foreach (var item in listSuccess)
+                                {
+                                    var user = await _usermanager.FindByIdAsync(item);
+                                    lstMail.Add(user.Email);
+                                }
+                                if (lstMail.Count > 0)
+                                {
+                                    _mail.SendMailNotificationAddStaffInShift(lstMail, dateTime, shiftFind.Name);
+                                }
+                            }
+                            return new ResponseData<string> { IsSuccess = true, Data = $"Thêm ca thành công cho {listSuccess.Count} người!!!" };
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = $"Vui lòng không thêm ca khi thời gian vào ca còn không quá nửa ngày!!!" };
+                        }
+                    }
+                }
+                else
+                {
+                    if (dateTime.Date.CompareTo(currentDay.Date) > 0)
+                    {
+                        List<string> listSuccess = new List<string>();
+                        List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
+                        foreach (var item in listUser)
+                        {
+                            var schedule = new EmployeeSchedule()
+                            {
+                                UserId = Guid.Parse(item),
+                                WorkShiftId = query.Id,
+                            };
+                            var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                             where scheduletable.UserId == schedule.UserId &&
+                                             scheduletable.WorkShiftId == schedule.WorkShiftId
+                                             select scheduletable;
+                            if (querycheck.ToList().Count == 0)
+                            {
+                                if (listSuccess.Count == 0)
+                                {
+                                    employeeSchedules.Add(schedule);
+                                    listSuccess.Add(schedule.UserId.ToString());
+                                }
+                                else
+                                {
+                                    var check = false;
+                                    foreach (var item1 in listSuccess)
+                                    {
+                                        if (item1.ToLower() == schedule.UserId.ToString().ToLower())
+                                        {
+                                            check = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!check)
+                                    {
+                                        listSuccess.Add(schedule.UserId.ToString());
+                                    }
+                                    employeeSchedules.Add(schedule);
+                                }
+                            }
+                        }
+                        if (employeeSchedules.Count > 0)
+                        {
+                            await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
+                            List<string> lstMail = new List<string>();
+                            foreach (var item in listSuccess)
+                            {
+                                var user = await _usermanager.FindByIdAsync(item);
+                                lstMail.Add(user.Email);
+                            }
+                            if (lstMail.Count > 0)
+                            {
+                                _mail.SendMailNotificationAddStaffInShift(lstMail, dateTime, shiftFind.Name);
+                            }
+                        }
+                        return new ResponseData<string> { IsSuccess = true, Data = $"Thêm ca thành công cho {listSuccess.Count} người!!!" };
+                    }
+                    else
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = $"Quá muộn màng rồi con người chứ không phải quỷ mà thêm ca của ngày trong quá khứ!!!" };
+                    }
+                }
+
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = $"Ngày chọn vượt quá ngày có thể thêm ca cho phép!!!" };
+            }
+        }
         public async Task<ResponseData<string>> InsertEmployeeNextMonthCompareCurrentMonth(List<string> listUser, int shift)
         {
             try
@@ -128,7 +287,7 @@ namespace DATN.Aplication.Services
                     }
                 }
                 await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
-                var count= checkCount ? listSuccess.Count - 1:listSuccess.Count;
+                var count = checkCount ? listSuccess.Count - 1 : listSuccess.Count;
                 return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {count}!" };
 
             }
@@ -145,6 +304,7 @@ namespace DATN.Aplication.Services
                 int nextMonth = currentDay.Month;
                 var query = from workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
                             where workshift.WorkDate.Month == nextMonth &&
+                            workshift.WorkDate.Year == currentDay.Year &&
                             workshift.WorkDate.Day >= currentDay.Day &&
                             workshift.ShiftId == shift
                             select workshift;
@@ -275,7 +435,7 @@ namespace DATN.Aplication.Services
                 }
                 await _unitOfWork.EmployeeScheduleRepository.AddRangeAsync(employeeSchedules);
                 var count = checkCount ? listSuccess.Count - 1 : listSuccess.Count;
-                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {count}!" };             
+                return new ResponseData<string> { IsSuccess = true, Data = $"Số người thêm lịch làm việc thành công là: {count}!" };
             }
             catch (Exception e)
             {
