@@ -4,13 +4,18 @@
 @using DATN.ViewModels.DTOs.Booking
 @inject IAddressService _addressServive;
 
-<MudContainer Class="invoice-container">
+<MudContainer Class="invoice-container" Style="margin-top: 20px">
     <MudPaper Elevation="3" Class="invoice-paper">
         <div class="invoice-body">
             @if (bill != null)
             {
-                <div style="text-align:center">
-                    <MudText Typo="Typo.h3" Class="invoice-label">Thông tin hóa đơn</MudText>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-center flex-grow-1">
+                        <MudText Typo="Typo.h3" Class="invoice-label" Style="color: hotpink;text-align:center;">THÔNG TIN HOÁ ĐƠN</MudText>
+                    </div>
+                    <div class="text-right">
+                        <MudButton Class="invoice-label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Style="margin:15px">In</MudButton>
+                    </div>
                 </div>
                 <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
                     <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
@@ -26,7 +31,6 @@
                         <MudTh>Tên thú cưng</MudTh>
                         <MudTh>Nhân viên làm dịch vụ</MudTh>
                         <MudTh>Đơn giá</MudTh>
-
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@context.ServiceDetailName</MudTd>
@@ -53,26 +57,18 @@
                         <br />
                         <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
                         <br />
-                        <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span>
+                        <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
+
+                        <MudRadioGroup T="int" @bind-Checked="@selectedPaymentMethod">
+                            <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
+                            <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
+                        </MudRadioGroup>
+                        @if (selectedPaymentMethod == 2)
+                        {
+                            <div>Mã qr aaaaaaaaaaaaaa </div>
+                        }
                     </div>
                 </div>
-
-                @*   <div class="invoice-total">
-            <span><b>Tổng tiền:</b> @selectedBooking.TotalAmount.ToString("C0")</span>
-            </div>
-            *@
-                <MudDivider />
-
-                @*       <MudText Typo="Typo.h6" Class="invoice-label">Thông tin thanh toán</MudText>
-            <MudTextField Label="Phương thức thanh toán" @bind-Value="paymentInfo.PaymentMethod" Required="true" />
-            <MudNumericField Label="Số tiền thanh toán" @bind-Value="paymentInfo.AmountPaid" Required="true" />
-            <MudDatePicker Label="Ngày thanh toán" @bind-Date="paymentInfo.PaymentDate" Required="true" />
-            <MudTextField Label="Ghi chú" @bind-Value="paymentInfo.Notes" Multiline="true" /> *@
-
-                @*  <div class="invoice-actions">
-            <MudButton Color="Color.Primary" @onclick="ConfirmPayment">Xác nhận thanh toán</MudButton>
-            <MudButton Color="Color.Secondary" @onclick="Close">Hủy bỏ</MudButton>
-            </div> *@
             }
             else
             {
@@ -92,6 +88,7 @@
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
+    private int selectedPaymentMethod;
     private async Task LoadData()
     {
         var respone = await _client.GetBillOfGuest(guid.Value, date);
@@ -101,6 +98,7 @@
     {
         await LoadData();
     }
+
 }
 
 

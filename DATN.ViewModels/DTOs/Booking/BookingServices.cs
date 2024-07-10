@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,12 @@ namespace DATN.ViewModels.DTOs.Booking
     {
         public List<CreateBookingDetailRequest> lstBooking { get; set; } = new List<CreateBookingDetailRequest>();
         public event Action OnChange;
+        //private readonly IJSRuntime _jsRuntime;
+        // public BookingService(IJSRuntime jsRuntime)
+        //{
+        //    _jsRuntime = jsRuntime;
+        //}
+
         public void AddBooking(CreateBookingDetailRequest booking)
         {
             lstBooking.Add(booking);

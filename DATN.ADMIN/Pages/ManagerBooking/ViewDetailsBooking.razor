@@ -42,11 +42,11 @@
                 <CellTemplate>
                     @if (context.Item.Status == BookingDetailStatus.IsActive)
                     {
-                        <MudChip Style="width:120px!important;" Color="Color.Success">Đã hoàn thành</MudChip>
+                        <MudChip Color="Color.Success">Đã hoàn thành</MudChip>
                     }
                     else
                     {
-                        <MudChip Style="width:120px!important;" Color="Color.Error">Chưa hoàn thành</MudChip>
+                        <MudChip Color="Color.Error">Chưa hoàn thành</MudChip>
                     }
                 </CellTemplate>
             </TemplateColumn>
