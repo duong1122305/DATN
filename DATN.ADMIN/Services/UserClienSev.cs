@@ -7,6 +7,7 @@ using DATN.ViewModels.DTOs.Authenticate;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
@@ -15,9 +16,12 @@ namespace DATN.ADMIN.Services
     public class UserClienSev : IUserClientSev
     {
         private readonly HttpClient _client;
-        public UserClienSev(HttpClient client)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserClienSev(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _client = client;
+            _httpContextAccessor = httpContextAccessor;
+            //_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
 
         }
 
@@ -122,14 +126,14 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
         {
-            var lst = await _client.PostAsJsonAsync<AddRoleForUserView>("api/UserLogin/Add-role-user",addRoleForUserView);
+            var lst = await _client.PostAsJsonAsync<AddRoleForUserView>("api/UserLogin/Add-role-user", addRoleForUserView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
         }
 
         public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
         {
-            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/create-schedule-oneday-suddenly?shift={shift}&dateTime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}",listUser);
+            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/create-schedule-oneday-suddenly?shift={shift}&dateTime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}", listUser);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
         }

@@ -40,7 +40,7 @@
             </TemplateColumn>
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    @if (context.Item.Status == BookingDetailStatus.IsActive)
+                    @if (context.Item.Status == BookingDetailStatus.Completed)
                     {
                         <MudChip Color="Color.Success">Đã hoàn thành</MudChip>
                     }

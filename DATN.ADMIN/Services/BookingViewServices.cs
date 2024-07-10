@@ -18,7 +18,7 @@ namespace DATN.ADMIN.Services
         }
 
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest,string token)
-        {
+            {
             var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>($"/api/Booking/Create-Booking?token={token}", createBookingRequest);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
