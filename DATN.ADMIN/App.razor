@@ -1,4 +1,4 @@
-﻿@using DATN.ADMIN.Pages.qr
+﻿
 @using DATN.Aplication.CustomProvider
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
@@ -7,12 +7,7 @@
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
-            @if (routeData.PageType == typeof(Qrocdetesstcheck))
-            {
-                <RouteView RouteData="routeData" DefaultLayout="typeof(LayoutNoAuth)"></RouteView>
-            }
-            else
-            {
+           
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
                     <Authorizing>
                         <h3>Authorizing...</h3>
@@ -21,7 +16,7 @@
                         <h3>Not authorized</h3>
                     </NotAuthorized>
                 </AuthorizeRouteView>
-            }
+            
         </Found>
         <NotFound>
             <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
@@ -41,21 +36,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (httpContextAccessor.HttpContext.Request.Path!="/qrcode")
+        string url = httpContextAccessor.HttpContext!.Request.Path;
+        if (url == "/_blazor")
         {
-            var key = httpContextAccessor.HttpContext.Session.GetString("Key");
+            url = "/";
+        }
+
+        var key = httpContextAccessor.HttpContext.Session.GetString("Key");
             if (key != null)
             {
                 var authenState = await authenticationStateProvider.GetAuthenticationStateAsync();
                 if (!authenState.User.Identity.IsAuthenticated)
                 {
-                    navigationManager.NavigateTo("/dangnhap");
+                    navigationManager.NavigateTo($"/dangnhap/?returnUrl={url}");
                 }
             }
             else
             {
-                navigationManager.NavigateTo("/dangnhap");
+                navigationManager.NavigateTo($"/dangnhap/?returnUrl={url}");
             }
-        }
+        
     }
 }

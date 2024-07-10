@@ -13,173 +13,208 @@
 @if (lstAtendance != null && lstAtendance.Count > 0)
 {
 
-    <MudTable Items="@lstAtendance" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<AttendanceViewModel,bool>(FilterFunc)">
-        <ToolBarContent>
-            <div style="width:200px;margin-bottom:10px">
-                <MudSelect T="Shift" Value="selectedShift" Label="Ca làm trong ngày" ValueChanged="ChangeShift" Style="width:200px">
-                    @foreach (var item in lstShift)
-                    {
-                        <MudSelectItem Value="@item">Ca @item.Name</MudSelectItem>
-                    }
-               </MudSelect>
-            </div>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+	<MudTable Items="@lstAtendance" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<AttendanceViewModel,bool>(FilterFunc)">
+		<ToolBarContent>
+			<div style="width:200px;margin-bottom:10px">
+				<MudSelect T="Shift" Value="selectedShift" Label="Ca làm trong ngày" ValueChanged="ChangeShift" Style="width:200px">
+					@foreach (var item in lstShift)
+					{
+						<MudSelectItem Value="@item">Ca @item.Name</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+			<MudSpacer />
+			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
+						  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
 
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh>STT</MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.StaffName)">Tên nhân viên</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.DateAttendace)">Ngày làm</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckInTime)">Thời gian điểm danh</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckOutTime)">Thời gian check out</MudTableSortLabel></MudTh>
-           
-        </HeaderContent>
-        <RowTemplate>
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>STT</MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.StaffName)">Tên nhân viên</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.UserName)">Mã nhân viên</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.DateAttendace)">Ngày làm</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckInTime)">Thời gian điểm danh</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckOutTime)">Thời gian check out</MudTableSortLabel></MudTh>
 
-            <MudTd>@(lstAtendance.IndexOf(context) + 1)</MudTd>
-            <MudTd>@context.StaffName</MudTd>
-            <MudTd>@context.DateAttendace</MudTd>
-  
-            <MudTd >
-                @{
-                    bool checkIn = @context.CheckInTime!="0";
-                    
-                    <MudText> @(checkIn?context.CheckInTime:"Chưa điểm danh") </MudText>
-                    if (checkIn)
-                    {
-                        <MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,false)" Variant="Variant.Filled">Huỷ</MudButton>
+		</HeaderContent>
+		<RowTemplate>
 
-                    }
-                    else
-                    {
+			<MudTd>@(lstAtendance.IndexOf(context) + 1)</MudTd>
+			<MudTd>@context.StaffName</MudTd>
+			<MudTd>@context.UserName</MudTd>
+			<MudTd>@context.DateAttendace</MudTd>
 
-                        <MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,true)" Variant="Variant.Filled" Color="Color.Secondary">Điểm danh</MudButton>
-                    }
+			<MudTd>
+				@{
+					bool checkIn = @context.CheckInTime != "0";
+
+					if (checkIn)
+					{
+						<MudGrid >
+
+							<MudItem>
+								<MudText> @(checkIn ? context.CheckInTime : "")   </MudText>
+							</MudItem>
+
+							<MudItem>
+								<MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,false)" Variant="Variant.Filled">Huỷ</MudButton>
+							</MudItem>
+						</MudGrid>
+					}
+					else
+					{
+
+						<MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,true)" Variant="Variant.Filled" Color="Color.Secondary">Điểm danh</MudButton>
+					}
+				}
+
+			</MudTd>
+			<MudTd>
+				@{
+					bool checkOut = @context.CheckOutTime != "0";
+					if (checkOut)
+					{
+						<MudGrid>
+							<MudItem>
+								<MudText>
+									<MudText> @(checkOut ? context.CheckOutTime : "") </MudText>
+								</MudText>
+							</MudItem>
+							<MudItem>
+								<MudButton OnClick="async()=>await CheckOut(context.ID,false) " Variant="Variant.Filled">Huỷ</MudButton>
+							</MudItem>
+						</MudGrid>
+					}
+					else
+					{
+
+						<MudButton OnClick="async()=>await CheckOut(context.ID,true)" Variant=" Variant.Filled" Color="Color.Secondary">Check out</MudButton>
+					}
+				}
+			</MudTd>
 
 
-                }
+		</RowTemplate>
 
-            </MudTd>
-            <MudTd>
-                @{
-                    bool checkOut = @context.CheckInTime != "0";
-
-                    <MudText> @(checkOut ? context.CheckOutTime : "Chưa Check out") </MudText>
-                    if (checkOut)
-                    {
-                        <MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,false) "Variant="Variant.Filled">Huỷ</MudButton>
-
-                    }
-                    else
-                    {
-
-                        <MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,true)"  Variant=" Variant.Filled" Color="Color.Secondary">Check out</MudButton>
-                    }
-
-
-                }
-            </MudTd>
-         
-           
-        </RowTemplate>
-       
-    </MudTable>
+	</MudTable>
 }
 else
 {
-    <div style="justify-content:center; justify-items:center">
-        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-    </div>
+	<div style="justify-content:center; justify-items:center">
+		<MudProgressCircular Color="Color.Default" Indeterminate="true" />
+	</div>
 }
 @code {
-    private DateTime dateNow = DateTime.Now;
-    private string searchString = "";
+	private DateTime dateNow = DateTime.Now;
+	private string searchString = "";
 
-    private List<Shift> lstShift = new List<Shift>();
-    private Shift selectedShift = new Shift();
-    private List<AttendanceViewModel> lstAtendance = new List<AttendanceViewModel>();
-    [Inject]
-    IAttendanceServiceClient _ser { get; set; }
+	private List<Shift> lstShift = new List<Shift>();
+	private Shift selectedShift = new Shift();
+	private List<AttendanceViewModel> lstAtendance = new List<AttendanceViewModel>();
+	[Inject]
+	IAttendanceServiceClient _ser { get; set; }
 
-    protected async Task LoadData()
-    {
-        var dataShift = await _ser.GetShiftNow();
-        if (dataShift.IsSuccess && dataShift.Data!=null && dataShift.Data.Count() > 0)
-        {
-            lstShift = dataShift.Data;
-            selectedShift = lstShift.First();
-            var dataAttendance= await _ser.ListAttendanceToday(selectedShift.Id);
-            if (dataAttendance.IsSuccess)
-            {
-                lstAtendance = dataAttendance.Data!;
-            }
-            else
-            {
-                Snackbar.Add(dataAttendance.Error, Severity.Warning);
-            }
-        }
-        else
-        {
-            Snackbar.Add(dataShift.Error, Severity.Warning);
-        }
-    }
+	protected async Task LoadData()
+	{
+			var dataAttendance = await _ser.ListAttendanceToday(selectedShift.Id);
+			if (dataAttendance.IsSuccess)
+			{
+				lstAtendance = dataAttendance.Data!;
+			}
+			else
+			{
+				Snackbar.Add(dataAttendance.Error, Severity.Warning);
+			}
+		
+	}
 
-    protected async Task CheckIn(int scheduleId, int attendanceID, bool isCheckin)
-    {
-        
-    } 
-    protected async Task CheckOut(int scheduleId, int attendanceID, bool isCheckOut)
-    {
-        
-    } 
-    protected async Task ChangeShift(Shift value)
-    {
-        
-    }
+	protected async Task CheckIn(int scheduleId, int attendanceID, bool isCheckin)
+	{
+		var response = await _ser.CheckIn(scheduleId, attendanceID, isCheckin);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data, Severity.Success);
+			await LoadData();
+			StateHasChanged();
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
-    }
+	}
+	protected async Task CheckOut(int attendanceID, bool isCheckout)
+	{
+		var response = await _ser.CheckOut(attendanceID, isCheckout);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data, Severity.Success);
+			await LoadData();
+			StateHasChanged();
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	protected async Task ChangeShift(Shift value)
+	{
+
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+
+		var dataShift = await _ser.GetShiftNow();
+		if (dataShift.IsSuccess && dataShift.Data != null && dataShift.Data.Count() > 0)
+		{
+			lstShift = dataShift.Data;
+			selectedShift = lstShift.First();
+			await LoadData();
+		}
+		else
+		{
+			Snackbar.Add(dataShift.Error, Severity.Warning);
+		}
+
+	}
 
 
-    private bool FilterFunc(AttendanceViewModel element)// lọc data
-    {
-        if (string.IsNullOrWhiteSpace(searchString.Trim()))
-            return true;
-        if (element.StaffName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
+	private bool FilterFunc(AttendanceViewModel element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
+			return true;
+		if (element.StaffName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
 
 
 
-    private async Task OpenDialog(int id, DateTime workDate, int from, int to)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Xem thông tin chi tiết ca làm";
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
-                CloseButton = true,
-                FullWidth = true,
-                DisableBackdropClick = true
-            };
-        parameters.Add("id", id);
-        parameters.Add("workDate", workDate);
-        parameters.Add("from", from);
-        parameters.Add("to", to);
-        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-        }
-    }
+	private async Task OpenDialog(int id, DateTime workDate, int from, int to)
+	{
+		var parameters = new DialogParameters();
+		string nameDialog = "Xem thông tin chi tiết ca làm";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true
+			};
+		parameters.Add("id", id);
+		parameters.Add("workDate", workDate);
+		parameters.Add("from", from);
+		parameters.Add("to", to);
+		var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+		}
+	}
 
 }
