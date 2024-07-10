@@ -9,9 +9,9 @@ namespace DATN.Data.Entities
     public class ImageProduct
     {
         public int Id { get; set; }
-        public int IdProduct { get; set; }
+        public int IdProductDetail { get; set; }
         public string UrlImage { get; set; }
         public bool IsDefault { get; set; }
-        public virtual Product Product { get; set; }
+        public virtual ProductDetail ProductDetail { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using DATN.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    partial class DATNDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240704052952_ver1.5.2")]
+    partial class ver152
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,9 +281,6 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AmountUsed")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -386,9 +386,6 @@ namespace DATN.API.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AvatarUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CodeConfirm")
@@ -504,7 +501,7 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdProductDetail")
+                    b.Property<int>("IdProduct")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDefault")
@@ -516,7 +513,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdProductDetail");
+                    b.HasIndex("IdProduct");
 
                     b.ToTable("ImageProducts");
                 });
@@ -1266,13 +1263,13 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.ImageProduct", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.ProductDetail", "ProductDetail")
+                    b.HasOne("DATN.Data.Entities.Product", "Product")
                         .WithMany("ImageProducts")
-                        .HasForeignKey("IdProductDetail")
+                        .HasForeignKey("IdProduct")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProductDetail");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.OrderDetail", b =>
@@ -1532,13 +1529,13 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Product", b =>
                 {
+                    b.Navigation("ImageProducts");
+
                     b.Navigation("ProductDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ProductDetail", b =>
                 {
-                    b.Navigation("ImageProducts");
-
                     b.Navigation("OrderDetails");
                 });
 

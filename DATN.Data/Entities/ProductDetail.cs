@@ -18,5 +18,6 @@ namespace DATN.Data.Entities
         public virtual Product Product { get; set; }
         public virtual PetType PetType { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<ImageProduct> ImageProducts { get; set; }
     }
 }

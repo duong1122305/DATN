@@ -16,6 +16,7 @@ namespace DATN.Data.Entities
         public int Id { get; set; } // Khóa chính
 
         public int Quantity { get; set; } // Số lượng
+        public int AmountUsed { get; set; }
         public string VoucherName { get; set; }
 
         public string VoucherCode { get; set; } // Mã giảm giá
