@@ -260,12 +260,12 @@ else
         var repon = await _client.activeUser(username);
         if (repon.IsSuccess)
         {
-            Message("Đã kích hoạt trạng thái", Severity.Success);
+            Message(repon.Data, Severity.Success);
             await LoadData();
         }
         else
         {
-            Message("Chưa kích hoạt", Severity.Success);
+            Message(repon.Error, Severity.Success);
         }
     }
 
