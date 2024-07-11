@@ -62,7 +62,7 @@
                 <CellTemplate>
                     <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" OnClick="@(async()=>await SuccessServices(context.Item.IdBookingDetail.Value))">Hoàn thành</MudButton>
                     <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(context.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await StartServices(context.Item.IdBookingDetail.Value))">Thực hiện</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Start" Color="Color.Success" OnClick="@(async()=>await StartServices(context.Item.IdBookingDetail.Value))">Thực hiện</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
