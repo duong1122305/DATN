@@ -17,6 +17,26 @@ namespace DATN.ADMIN.Services
             _httpClient = httpClient;
         }
 
+        public Task<ResponseData<string>> CancelBooking(int id, string reason, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseData<string>> CancelBookingDetail(int id, string reason, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseData<string>> CompleteBooking(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseData<string>> CompleteBookingDetail(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest,string token)
             {
             var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>($"/api/Booking/Create-Booking?token={token}", createBookingRequest);
@@ -41,6 +61,16 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
         {
             return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}").GetAwaiter().GetResult();
+        }
+
+        public Task<ResponseData<string>> StartBooking(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseData<string>> StartBookingDetail(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
