@@ -5,7 +5,9 @@ using DATN.ViewModels.DTOs.Action;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using Newtonsoft.Json;
+using Syncfusion.Blazor.Gantt.Internal;
 using System.Collections.Generic;
+using System.Threading.Channels;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.ADMIN.Services
@@ -20,22 +22,23 @@ namespace DATN.ADMIN.Services
 
         public Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
-            throw new NotImplementedException();
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/canel-booking?id={id}&reason={reason}&token={token}");
+
         }
 
         public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
-            throw new NotImplementedException();
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/cancel-booking-details?id={id}&reason={reason}&token={token}");
         }
 
         public Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
-            throw new NotImplementedException();
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/Complete-Booking?id={id}");
         }
 
         public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
-            throw new NotImplementedException();
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/complete-bookingDetails?id={id}");
         }
 
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest,string token)
@@ -64,14 +67,15 @@ namespace DATN.ADMIN.Services
             return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}").GetAwaiter().GetResult();
         }
 
-        public Task<ResponseData<string>> StartBooking(ActionView actionView)
+        public Task<ResponseData<string>> StartBooking(int id)
         {
-            throw new NotImplementedException();
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/start-booking?id={id}");
         }
 
-        public Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
+        public Task<ResponseData<string>> StartBookingDetail(int id)
         {
-            throw new NotImplementedException();
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/start-booking-details?id={id}");
+
         }
     }
 }
