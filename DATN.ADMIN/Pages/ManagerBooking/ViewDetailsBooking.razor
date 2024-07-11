@@ -8,7 +8,6 @@
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.Enum
-@inject IDialogService _dialogservice;
 @if (lstBooking.Count > 0 && lstBooking != null)
 {
     <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
@@ -62,7 +61,7 @@
             <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                 <CellTemplate>
                     <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" OnClick="@(async()=>await SuccessServices(context.Item.IdBookingDetail.Value))">Hoàn thành</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices())">Huỷ dịch vụ</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(context.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -86,6 +85,9 @@ else
     IBookingViewServices _client { get; set; }
     [Parameter]
     public List<ListBokingDetailInDay> lstBooking { get; set; } = new List<ListBokingDetailInDay>();
+
+    [Inject]
+    private IHttpContextAccessor _httpContextAccessor { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -113,7 +115,9 @@ else
         }
         ActionView actionView = new ActionView()
             {
-                IdBokingOrDetail = idS
+                IdBokingOrDetail = idS,
+Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                
             };
         var respone = await _client.CompleteBookingDetail(actionView);
         if (respone.IsSuccess)
@@ -126,9 +130,27 @@ else
             Message(respone.Error, Severity.Error);
         }
     }
-    private async Task CancelServices()
+    private async Task CancelServices(int id)
     {
-   
+        var parameters = new DialogParameters();
+        string nameDialog = "Huỷ dịch vụ";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("id", id);
+        var createUpdateDialog = await _diagService.ShowAsync<CanelBookingg>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
     }
 
     private async Task<bool> Confirm(string text)
