@@ -45,32 +45,32 @@ namespace DATN.API.Controllers
             return await _bookingManagement.GetBill(idguest, dateBooking);
         }
 
-        [HttpPost("Complete-Booking")]
+        [HttpGet("Complete-Booking")]
         public async Task<ResponseData<string>> CompleteBooking(int id)
         {
             return await _bookingManagement.CompleteBooking(id);
         }
-        [HttpPost("start-booking")]
+        [HttpGet("start-booking")]
         public async Task<ResponseData<string>> StartBooking(int id)
         {
             return await _bookingManagement.StartBooking(id);
         }
-        [HttpPost("canel-booking")]
+        [HttpGet("canel-booking")]
         public async Task<ResponseData<string>> CancelBooking(int id, string reason, string token)
         {
             return await _bookingManagement.CancelBooking(id, reason, token);
         }
-        [HttpPost("start-booking-details")]
+        [HttpGet("start-booking-details")]
         public async Task<ResponseData<string>> StartBookingDetail(int id)
         {
             return await _bookingManagement.StartBookingDetail(id);
         }
-        [HttpPost("cancel-booking-details")]
+        [HttpGet("cancel-booking-details")]
         public async Task<ResponseData<string>> CancelBookingDetail(int id, string reason, string token)
         {
             return await _bookingManagement.CancelBookingDetail(id, reason, token);
         }
-        [HttpPost("complete-bookingDetails")]
+        [HttpGet("complete-bookingDetails")]
         public async Task<ResponseData<string>> CompleteBookingDetail(int id)
         {
             return await _bookingManagement.CompleteBookingDetail(id);
