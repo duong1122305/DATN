@@ -5,6 +5,7 @@
 @using DATN.Data.Enum
 @using DATN.Utilites
 @using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.ActionBooking
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.Enum
@@ -88,6 +89,8 @@
             <CellTemplate>
                     <MudButtonGroup Variant="Variant.Filled">
                         <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))"></MudIconButton>
+                        <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Cancel" Title="Huỷ" OnClick="@(async()=>await CanncelSerices())"></MudIconButton>
+                    <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.DoneAll" Title="Hoàn thành" OnClick="@(async()=>await CompleteServicesAll())"></MudIconButton>
                         <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
                     </MudButtonGroup>
             </CellTemplate>
@@ -107,7 +110,8 @@
 
     MudDataGrid<BookingView> dataGrid;
     [Inject] private BookingService bookingService { get; set; }
-
+    [Inject]
+    private IHttpContextAccessor _httpContextAccessor { get; set; }
 
     [Inject]
     private IBookingViewServices _client { get; set; }
@@ -119,13 +123,6 @@
     {
         await LoadData();
     }
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
-
 
     private async Task LoadData()
     {
@@ -181,7 +178,7 @@
     {
         var parameters = new DialogParameters();
         string nameDialog = "";
-        
+
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -194,6 +191,46 @@
         parameters.Add("guid", id);
         parameters.Add("date", date);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog,parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+    private async Task CompleteServicesAll()
+    {
+        ActionView actionView = new ActionView()
+            {
+                IdBokingOrDetail = ,
+                Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+            };
+        var respone = await _client.CompleteBooking(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            await LoadData();
+        }else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+    }
+    
+    private async Task CanncelSerices()
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Huỷ dịch vụ";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        // parameters.Add("id", id);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CanelBookingg>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -227,6 +264,12 @@
             createUpdateDialog.Close();
             await LoadData();
         }
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
     }
 
 }

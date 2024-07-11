@@ -14,9 +14,10 @@
 </MudDialog>
 @code {
     [Parameter]
-    public int id{ get; set; }
+    public int id { get; set; }
 
     private string CancellationReason { get; set; }
+
     [Inject]
     private IHttpContextAccessor _httpContextAccessor { get; set; }
 
@@ -28,17 +29,18 @@
     public async Task ConfirmCancel()
     {
         ActionView actionView = new ActionView()
-        {
-            IdBokingOrDetail = id,
+            {
+                IdBokingOrDetail = id,
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
                 Reason = CancellationReason
-        };
+            };
         var respone = await _client.CancelBookingDetail(actionView);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);
             _dialogBox.Close(DialogResult.Ok(true));
-        }else
+        }
+        else
         {
             Message(respone.Error, Severity.Error);
         }
