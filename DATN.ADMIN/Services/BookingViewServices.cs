@@ -1,6 +1,7 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Action;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using Newtonsoft.Json;
@@ -17,22 +18,22 @@ namespace DATN.ADMIN.Services
             _httpClient = httpClient;
         }
 
-        public Task<ResponseData<string>> CancelBooking(int id, string reason, string token)
+        public Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ResponseData<string>> CancelBookingDetail(int id, string reason, string token)
+        public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ResponseData<string>> CompleteBooking(int id)
+        public Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ResponseData<string>> CompleteBookingDetail(int id)
+        public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
             throw new NotImplementedException();
         }
@@ -63,12 +64,12 @@ namespace DATN.ADMIN.Services
             return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}").GetAwaiter().GetResult();
         }
 
-        public Task<ResponseData<string>> StartBooking(int id)
+        public Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ResponseData<string>> StartBookingDetail(int id)
+        public Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
             throw new NotImplementedException();
         }

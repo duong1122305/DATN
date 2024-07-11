@@ -1,6 +1,7 @@
 ﻿using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Action;
 
 namespace DATN.ADMIN.IServices
 {
@@ -11,11 +12,11 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to);
         Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token);
         Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking);
-        Task<ResponseData<string>> CompleteBooking(int id);
-        Task<ResponseData<string>> StartBooking(int id);
-        Task<ResponseData<string>> CancelBooking(int id, string reason, string token);
-        Task<ResponseData<string>> StartBookingDetail(int id);
-        Task<ResponseData<string>> CancelBookingDetail(int id, string reason, string token);
-        Task<ResponseData<string>> CompleteBookingDetail(int id);
+        public Task<ResponseData<string>> CompleteBooking(ActionView actionView);
+        public Task<ResponseData<string>> StartBooking(ActionView actionView);
+        public Task<ResponseData<string>> CancelBooking(ActionView actionView);
+        public Task<ResponseData<string>> StartBookingDetail(ActionView actionView);
+        public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView);
+        public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView);
     }
 }

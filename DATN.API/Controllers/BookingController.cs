@@ -1,6 +1,7 @@
 ﻿using DATN.Aplication.Services;
 using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Action;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using Microsoft.AspNetCore.Mvc;
@@ -45,35 +46,35 @@ namespace DATN.API.Controllers
             return await _bookingManagement.GetBill(idguest, dateBooking);
         }
 
-        [HttpGet("Complete-Booking")]
-        public async Task<ResponseData<string>> CompleteBooking(int id)
+        [HttpPut("Complete-Booking")]
+        public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
-            return await _bookingManagement.CompleteBooking(id);
+            return await _bookingManagement.CompleteBooking(actionView);
         }
-        [HttpGet("start-booking")]
-        public async Task<ResponseData<string>> StartBooking(int id)
+        [HttpPut("start-booking")]
+        public async Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
-            return await _bookingManagement.StartBooking(id);
+            return await _bookingManagement.StartBooking(actionView);
         }
-        [HttpGet("canel-booking")]
-        public async Task<ResponseData<string>> CancelBooking(int id, string reason, string token)
+        [HttpPut("canel-booking")]
+        public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
-            return await _bookingManagement.CancelBooking(id, reason, token);
+            return await _bookingManagement.CancelBooking(actionView);
         }
-        [HttpGet("start-booking-details")]
-        public async Task<ResponseData<string>> StartBookingDetail(int id)
+        [HttpPut("start-booking-details")]
+        public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
-            return await _bookingManagement.StartBookingDetail(id);
+            return await _bookingManagement.StartBookingDetail(actionView);
         }
-        [HttpGet("cancel-booking-details")]
-        public async Task<ResponseData<string>> CancelBookingDetail(int id, string reason, string token)
+        [HttpPut("cancel-booking-details")]
+        public async Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
-            return await _bookingManagement.CancelBookingDetail(id, reason, token);
+            return await _bookingManagement.CancelBookingDetail(actionView);
         }
-        [HttpGet("complete-bookingDetails")]
-        public async Task<ResponseData<string>> CompleteBookingDetail(int id)
+        [HttpPut("complete-bookingDetails")]
+        public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
-            return await _bookingManagement.CompleteBookingDetail(id);
+            return await _bookingManagement.CompleteBookingDetail(actionView);
         }
     }
 }
