@@ -2,6 +2,8 @@
 @using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.ADMIN.Pages.ManagerServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Guest
 @using DATN.ViewModels.DTOs.Pet
@@ -30,8 +32,8 @@
     <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
         <HeaderContent>
             @* <MudTh>Tên dịch vụ</MudTh> *@
-            <MudTh>ID nhân viên</MudTh>
-            <MudTh>ID Dịch vụ chi tiết</MudTh>
+            <MudTh>nhân viên</MudTh>
+            <MudTh>Dịch vụ chi tiết</MudTh>
             <MudTh>Giá</MudTh>
             <MudTh>Giờ bắt đầu</MudTh>
             <MudTh>Giờ kết thúc</MudTh>
@@ -39,8 +41,8 @@
         </HeaderContent>
         <RowTemplate>
             @* <MudTd DataLabel="Sign">@(async()=> await _serviceDetailService.GetById(context.ServiceDetailId))</MudTd> *@
-            <MudTd DataLabel="Sign">@context.StaffId</MudTd>
-            <MudTd DataLabel="Sign">@context.ServiceDetailId</MudTd>
+            <MudTd DataLabel="Sign">@context.StaffName</MudTd>
+            <MudTd DataLabel="Sign">@context.ServiceDetailName</MudTd>
             <MudTd DataLabel="Sign">@context.Price</MudTd>
             <MudTd DataLabel="Name">@context.StartDateTime</MudTd>
             <MudTd DataLabel="Molar mass">@context.EndDateTime</MudTd>
@@ -59,11 +61,10 @@
     private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
     [Inject]
     public IServiceDetailServices _serviceDetailService { get; set; }
-    private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
-
     [Inject]
     private IBookingViewServices _BookingSer { get; set; }
-
+    [Inject]
+    private IUserClientSev _userClientSev { get; set; }
     //gắn cờ
     private bool isEditing = false;
 
@@ -239,7 +240,7 @@
                         ListIdServiceDetail = bookingService.lstBooking,
                         PaymentTypeId = 1
                     };
-                var repos = await _BookingSer.CreateBookingStore(createBookingRequest,_httpContextAccessor.HttpContext.Session.GetString("Key"));
+                var repos = await _BookingSer.CreateBookingStore(createBookingRequest, _httpContextAccessor.HttpContext.Session.GetString("Key"));
                 if (repos.IsSuccess)
                 {
                     Message(repos.Data, Severity.Success);

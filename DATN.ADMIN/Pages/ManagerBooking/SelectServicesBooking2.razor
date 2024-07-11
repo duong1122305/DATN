@@ -49,11 +49,11 @@
             <CellTemplate>
                 @if (!context.Item.IsDeleted)
                 {
-                    <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price))" StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton>
+                    <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price,context.Item.Description))" StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton>
                 }
                 else
                 {
-                    <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price))" Disabled StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton>
+                    <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price,context.Item.Description))" Disabled StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton>
                 }
             </CellTemplate>
         </TemplateColumn>
@@ -98,7 +98,7 @@
         return false;
     };
 
-    private async Task OpenDialog(double time, int idDetailsServices,float price)
+    private async Task OpenDialog(double time, int idDetailsServices,float price,string servicedetailname)
     {
         string nameDialog = "Chọn thời gian";
         var parameters = new DialogParameters();
@@ -106,6 +106,7 @@
         parameters.Add("idCus", idCustomer);
         parameters.Add("idDetailsServices", idDetailsServices);
         parameters.Add("priceServicesDetails", price);
+        parameters.Add("servicedetailname", servicedetailname);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,

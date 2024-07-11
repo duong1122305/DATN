@@ -35,7 +35,7 @@
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" OnClick="@(async()=>await CreateBooking(context.Item.IdStaff))" Color="Color.Success" title="Chọn">Chọn</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" OnClick="@(async()=>await CreateBooking(context.Item.IdStaff,context.Item.FullName))" Color="Color.Success" title="Chọn">Chọn</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -50,9 +50,11 @@
     [Parameter]
     public Guid idCus { get; set; }
     [Parameter]
-    public int idDetailsServices{ get; set; }
+    public int idDetailsServices { get; set; }
     [Parameter]
-    public float priceServicesDetails{ get; set; }
+    public float priceServicesDetails { get; set; }
+    [Parameter]
+    public string servicedetailname { get; set; }
     [Inject]
     private IBookingViewServices _iBooking { get; set; }
 
@@ -177,17 +179,19 @@
     }
 
 
-    protected async Task CreateBooking(Guid? id)
+    protected async Task CreateBooking(Guid? id,string name)
     {
         CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
-                {
-                    PetId = value2.Id,
-                    StaffId = id,
-                    ServiceDetailId = idDetailsServices,
-                    Price = (double)priceServicesDetails,
-                    StartDateTime = timeStart.Value,
-                    EndDateTime = timeEnd.Value
-                };
+            {
+                PetId = value2.Id,
+                ServiceDetailName = servicedetailname,
+                StaffName = name,
+                StaffId = id,
+                ServiceDetailId = idDetailsServices,
+                Price = (double)priceServicesDetails,
+                StartDateTime = timeStart.Value,
+                EndDateTime = timeEnd.Value
+            };
         bookingService.AddBooking(bookingCreate);
         // Đóng dialog sau khi thêm xong
         _dialogBox.Close(DialogResult.Ok(true));

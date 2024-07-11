@@ -12,6 +12,8 @@ namespace DATN.ViewModels.DTOs.Booking
         public int BookingId { get; set; } 
 
         public Guid? StaffId { get; set; }
+        public string? StaffName { get; set; }
+        public string? ServiceDetailName { get; set; }
 
         public int PetId { get; set; }
 
