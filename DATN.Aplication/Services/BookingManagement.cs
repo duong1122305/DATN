@@ -3,6 +3,7 @@ using DATN.Aplication.System;
 using DATN.Data.Entities;
 using DATN.Data.Enum;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Action;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.ServiceDetail;
 using DATN.ViewModels.Enum;
@@ -257,10 +258,10 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<Bill> { IsSuccess = false, Error = "Không tìm thấy bill" };
         }
-        public async Task<ResponseData<string>> CompleteBookingDetail(int id)
+        public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                         where bookingDetail.Id == id
+                         where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
             if (query != null)
             {
@@ -272,11 +273,11 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
         }
-        public async Task<ResponseData<string>> CancelBookingDetail(int id, string reason, string token)
+        public async Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
-            var idUserAction = await _user.GetUserByToken(token);
+            var idUserAction = await _user.GetUserByToken(actionView.Token);
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                         where bookingDetail.Id == id
+                         where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
             if (query != null)
             {
@@ -285,7 +286,7 @@ namespace DATN.Aplication.Services
                 {
                     BookingID = query.Id,
                     ActionTime = DateTime.Now,
-                    Description = reason,
+                    Description = actionView.Reason,
                     ActionID = 14,
                     ActionByID = Guid.Parse(idUserAction.Data)
                 };
@@ -297,10 +298,10 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
         }
-        public async Task<ResponseData<string>> StartBookingDetail(int id)
+        public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                         where bookingDetail.Id == id
+                         where bookingDetail.Id == actionView?.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
             if (query != null)
             {
@@ -312,11 +313,11 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
         }
-        public async Task<ResponseData<string>> CancelBooking(int id, string reason, string token)
+        public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
-            var idUserAction = await _user.GetUserByToken(token);
+            var idUserAction = await _user.GetUserByToken(actionView.Token);
             var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                         where booking.Id == id
+                         where booking.Id == actionView.IdBokingOrDetail
                          select booking).FirstOrDefault();
             if (query != null)
             {
@@ -332,7 +333,7 @@ namespace DATN.Aplication.Services
                 {
                     BookingID = query.Id,
                     ActionTime = DateTime.Now,
-                    Description = reason,
+                    Description = actionView.Reason,
                     ActionID = 14,
                     ActionByID = Guid.Parse(idUserAction.Data)
                 };
@@ -346,10 +347,10 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "không tìm thấy" };
         }
-        public async Task<ResponseData<string>> StartBooking(int id)
+        public async Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
             var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                         where booking.Id == id
+                         where booking.Id == actionView.IdBokingOrDetail
                          select booking).FirstOrDefault();
             if (query != null)
             {
@@ -367,10 +368,10 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "không tìm thấy" };
         }
-        public async Task<ResponseData<string>> CompleteBooking(int id)
+        public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
             var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                         where booking.Id == id
+                         where booking.Id == actionView.IdBokingOrDetail
                          select booking).FirstOrDefault();
             if (query != null)
             {

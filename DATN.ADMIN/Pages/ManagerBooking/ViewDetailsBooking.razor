@@ -44,9 +44,17 @@
                     {
                         <MudChip Color="Color.Success">Đã hoàn thành</MudChip>
                     }
-                    else
+                    else if (context.Item.Status == BookingDetailStatus.Cancelled)
                     {
                         <MudChip Color="Color.Error">Chưa hoàn thành</MudChip>
+                    }
+                    else if (context.Item.Status == BookingDetailStatus.Processing)
+                    {
+                        <MudChip Color="Color.Info">Đang thực hiện</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Secondary">Chưa hoàn thành</MudChip>
                     }
                 </CellTemplate>
             </TemplateColumn>
