@@ -76,5 +76,10 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.CompleteBookingDetail(actionView);
         }
+        [HttpPut("Confirm-booking")]
+        public async Task<ResponseData<string>> ConfirmBooking(ActionView actionView)
+        {
+            return await _bookingManagement.ConfirmBooking(actionView);
+        }
     }
 }

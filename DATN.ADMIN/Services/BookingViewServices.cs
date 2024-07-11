@@ -49,6 +49,13 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
+        public async Task<ResponseData<string>> ConfirmBooking(ActionView actionView)
+        {
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/Confirm-booking", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
+        }
+
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
         {
             var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>($"/api/Booking/Create-Booking?token={token}", createBookingRequest);

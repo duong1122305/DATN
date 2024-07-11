@@ -13,6 +13,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token);
         Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking);
         public Task<ResponseData<string>> CompleteBooking(ActionView actionView);
+        public Task<ResponseData<string>> ConfirmBooking(ActionView actionView);
         public Task<ResponseData<string>> StartBooking(ActionView actionView);
         public Task<ResponseData<string>> CancelBooking(ActionView actionView);
         public Task<ResponseData<string>> StartBookingDetail(ActionView actionView);
