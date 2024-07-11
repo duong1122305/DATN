@@ -89,9 +89,10 @@
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
                     <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))"></MudIconButton>
-                    <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Cancel" Title="Huỷ" OnClick="@(async()=>await CanncelSerices())"></MudIconButton>
+                    <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Cancel" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))"></MudIconButton>
                     <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.DoneAll" Title="Hoàn thành" OnClick="@(async()=>await CompleteServicesAll(context.Item.IdBooking.Value))"></MudIconButton>
                     <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.Done" Title="Xác nhận" OnClick="@(async()=>await CompleteServicesOnline(context.Item.IdBooking.Value))"></MudIconButton>
+                    <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.Done" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartServices(context.Item.IdBooking.Value))"></MudIconButton>
                     <MudIconButton Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
                 </MudButtonGroup>
             </CellTemplate>
@@ -200,6 +201,23 @@
         }
     }
 
+    private async Task StartServices(int id)
+    {
+        ActionView actionView = new ActionView()
+            {
+                IdBokingOrDetail = id,
+            };
+        var respone = await _client.StartBooking(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+    }
     private async Task CompleteServicesOnline(int id)
     {
         ActionView actionView = new ActionView()
@@ -237,7 +255,7 @@
         }
     }
 
-    private async Task CanncelSerices()
+    private async Task CanncelSerices(int? id)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Huỷ dịch vụ";
@@ -250,8 +268,8 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        // parameters.Add("id", id);
-        var createUpdateDialog = await _dialogservice.ShowAsync<CanelBookingg>(nameDialog, parameters, options);
+        parameters.Add("id", id);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CanelBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {

@@ -2,7 +2,6 @@
 @using DATN.ViewModels.DTOs.ActionBooking
 @inject ISnackbar Snackbar
 
-<h3>CanelBookingg</h3>
 <MudDialog>
     <DialogContent>
         <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" />
@@ -34,7 +33,7 @@
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
                 Reason = CancellationReason
             };
-        var respone = await _client.CancelBookingDetail(actionView);
+        var respone = await _client.CancelBooking(actionView);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);

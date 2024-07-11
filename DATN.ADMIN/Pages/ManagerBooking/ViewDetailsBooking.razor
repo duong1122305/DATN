@@ -62,6 +62,7 @@
                 <CellTemplate>
                     <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" OnClick="@(async()=>await SuccessServices(context.Item.IdBookingDetail.Value))">Hoàn thành</MudButton>
                     <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(context.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await StartServices(context.Item.IdBookingDetail.Value))">Thực hiện</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -130,6 +131,31 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             Message(respone.Error, Severity.Error);
         }
     }
+    
+    private async Task StartServices(int id)
+    {
+        var confirm = await Confirm("bắt đầu");
+        if (!confirm)
+        {
+            return;
+        }
+        ActionView actionView = new ActionView()
+            {
+                IdBokingOrDetail = id,
+
+            };
+        var respone = await _client.StartBookingDetail(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            await LoadData();
+            StateHasChanged();
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+    }
     private async Task CancelServices(int id)
     {
         var parameters = new DialogParameters();
@@ -144,7 +170,7 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
                 DisableBackdropClick = true
             };
         parameters.Add("id", id);
-        var createUpdateDialog = await _diagService.ShowAsync<CanelBookingg>(nameDialog, parameters, options);
+        var createUpdateDialog = await _diagService.ShowAsync<CanelBookinggDetails>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
