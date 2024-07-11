@@ -110,23 +110,95 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
-                    var booking = new Booking()
-                    {
-                        GuestId = createBookingRequest.GuestId,
-                        BookingTime = DateTime.Now,
-                        PaymentTypeId = createBookingRequest.PaymentTypeId,
-                        VoucherId = null,
-                        TotalPrice = 0,
-                        ReducedAmount = 0,
-                        Status = BookingStatus.Confirmed,
-                    };
-                    await _unitOfWork.BookingRepository.AddAsync(booking);
-                    await _unitOfWork.SaveChangeAsync();
                     var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
                                        && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
                                        select bookingTable;
+                    if (queryBooking.Count() == 0)
+                    {
+                        var booking = new Booking()
+                        {
+                            GuestId = createBookingRequest.GuestId,
+                            BookingTime = DateTime.Now,
+                            PaymentTypeId = createBookingRequest.PaymentTypeId,
+                            VoucherId = null,
+                            TotalPrice = 0,
+                            ReducedAmount = 0,
+                            Status = BookingStatus.Confirmed,
+                        };
+                        await _unitOfWork.BookingRepository.AddAsync(booking);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                    else
+                    {
+                        var queryBookingDetailHaven = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                                       where bookingDetail.BookingId == queryBooking.FirstOrDefault().Id
+                                                       select bookingDetail).ToList();
+                        for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
+                        {
+                            for (global::System.Int32 j = 0; j < queryBookingDetailHaven.Count(); j++)
+                            {
+                                var term1 = createBookingRequest.ListIdServiceDetail[i];
+                                var term2 = queryBookingDetailHaven[j];
+                                if (term1.ServiceDetailId == term2.ServiceDetailId && term1.PetId == term2.PetId)
+                                {
+                                    return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có 1 dịch vụ sử dùng 2 lần cho 1 bé thú cưng!!!" };
+                                }
+                                else if (term1.ServiceDetailId == term2.ServiceDetailId && term1.StaffId == term2.StaffId)
+                                {
+                                    if (term1.StartDateTime.CompareTo(term2.StartDateTime.TimeOfDay) > 0 && term1.StartDateTime.CompareTo(term2.EndDateTime.TimeOfDay) < 0)
+                                    {
+                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                                    }
+                                    else if (term1.EndDateTime.CompareTo(term2.StartDateTime) > 0 && term1.EndDateTime.CompareTo(term2.EndDateTime) < 0)
+                                    {
+                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     List<BookingDetail> list = new List<BookingDetail>();
+                    for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
+                    {
+                        for (global::System.Int32 j = 0; j < createBookingRequest.ListIdServiceDetail.Count; j++)
+                        {
+                            if (i == j)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                var term1 = createBookingRequest.ListIdServiceDetail[i];
+                                var term2 = createBookingRequest.ListIdServiceDetail[j];
+                                if (term1.ServiceDetailId == term2.ServiceDetailId && term1.PetId == term2.PetId)
+                                {
+                                    return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có 1 dịch vụ sử dùng 2 lần cho 1 bé thú cưng!!!" };
+                                }
+                                else if (term1.ServiceDetailId == term2.ServiceDetailId && term1.StaffId == term2.StaffId)
+                                {
+                                    if (term1.StartDateTime.CompareTo(term2.StartDateTime) > 0 && term1.StartDateTime.CompareTo(term2.EndDateTime) < 0)
+                                    {
+                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                                    }
+                                    else if (term1.EndDateTime.CompareTo(term2.StartDateTime) > 0 && term1.EndDateTime.CompareTo(term2.EndDateTime) < 0)
+                                    {
+                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
                     foreach (var item in createBookingRequest.ListIdServiceDetail)
                     {
                         var bookingDetail = new BookingDetail()
@@ -505,11 +577,11 @@ namespace DATN.Aplication.Services
                     {
                         HistoryAction historyAction = new HistoryAction()
                         {
-                            ActionByID= Guid.Parse((await _user.GetUserByToken(actionView.Token)).Data),
-                            ActionTime= DateTime.Now,
-                            BookingID=query.Id,
-                            ActionID=12,
-                            Description="Xác nhận đặt lịch online của khách",
+                            ActionByID = Guid.Parse((await _user.GetUserByToken(actionView.Token)).Data),
+                            ActionTime = DateTime.Now,
+                            BookingID = query.Id,
+                            ActionID = 12,
+                            Description = "Xác nhận đặt lịch online của khách",
                         };
                         query.Status = BookingStatus.Confirmed;
                         await _unitOfWork.BookingRepository.UpdateAsync(query);

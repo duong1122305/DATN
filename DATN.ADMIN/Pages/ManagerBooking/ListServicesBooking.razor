@@ -225,7 +225,7 @@
                 IdBokingOrDetail = id,
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             };
-        var respone = await _client.ConfirmBooking(actionView);
+        var respone = await _client.CompleteBooking(actionView);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);
