@@ -1,4 +1,5 @@
-﻿using DATN.ADMIN.IServices;
+﻿using Azure;
+using DATN.ADMIN.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Action;
@@ -20,29 +21,36 @@ namespace DATN.ADMIN.Services
             _httpClient = httpClient;
         }
 
-        public Task<ResponseData<string>> CancelBooking(ActionView actionView)
+        public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/canel-booking?id={id}&reason={reason}&token={token}");
-
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/canel-booking", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
 
-        public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
+        public async Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/cancel-booking-details?id={id}&reason={reason}&token={token}");
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/cancel-booking-details", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
 
-        public Task<ResponseData<string>> CompleteBooking(ActionView actionView)
+        public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/Complete-Booking?id={id}");
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/Complete-Booking", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
 
-        public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
+        public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/complete-bookingDetails?id={id}");
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/complete-bookingDetails", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
 
-        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest,string token)
-            {
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
+        {
             var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>($"/api/Booking/Create-Booking?token={token}", createBookingRequest);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
@@ -67,14 +75,18 @@ namespace DATN.ADMIN.Services
             return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}").GetAwaiter().GetResult();
         }
 
-        public Task<ResponseData<string>> StartBooking(int id)
+        public async Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/start-booking?id={id}");
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/start-booking", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
 
-        public Task<ResponseData<string>> StartBookingDetail(int id)
+        public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/start-booking-details?id={id}");
+            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/start-booking-details", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
 
         }
     }
