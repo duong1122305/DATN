@@ -135,7 +135,7 @@ namespace DATN.Aplication.Services
                             Price = item.Price,
                             StaffId = item.StaffId,
                             EndDateTime = item.EndDateTime.CompareTo(new TimeSpan(23, 30, 00)) > 0 ? DateTime.Now.AddDays(1).Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes) : DateTime.Now.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
-                            StartDateTime = item.EndDateTime.CompareTo(new TimeSpan(23, 30, 00)) > 0 ? DateTime.Now.AddDays(1).Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes) : DateTime.Now.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
+                            StartDateTime = item.EndDateTime.CompareTo(new TimeSpan(23, 30, 00)) > 0 ? DateTime.Now.AddDays(1).Date.AddHours(7) : DateTime.Now.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
                         };
@@ -263,10 +263,20 @@ namespace DATN.Aplication.Services
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                          where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
+            var idUser = await _user.GetUserByToken(actionView.Token);
             if (query != null)
             {
+                HistoryAction historyAction = new HistoryAction()
+                {
+                    ActionByID = Guid.Parse(idUser.Data),
+                    ActionID = 15,
+                    ActionTime = DateTime.Now,
+                    BookingID = query.Id,
+                    Description = "Đây là hoàn thành 1 dịch vụ con của dịch vụ"
+                };
                 query.Status = BookingDetailStatus.Completed;
                 await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
+                await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
                 await _unitOfWork.SaveChangeAsync();
                 return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
             }
@@ -373,6 +383,7 @@ namespace DATN.Aplication.Services
             var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
                          where booking.Id == actionView.IdBokingOrDetail
                          select booking).FirstOrDefault();
+            var idUser = await _user.GetUserByToken(actionView.Token);
             if (query != null)
             {
                 query.Status = BookingStatus.Completed;
@@ -383,6 +394,14 @@ namespace DATN.Aplication.Services
                 {
                     item.Status = BookingDetailStatus.Completed;
                 }
+                HistoryAction historyAction = new HistoryAction()
+                {
+                    ActionByID = Guid.Parse(idUser.Data),
+                    ActionID = 15,
+                    ActionTime = DateTime.Now,
+                    BookingID = query.Id,
+                    Description = "Đây là hoàn thành toàn bộ dịch vụ"
+                };
                 await _unitOfWork.BookingRepository.UpdateAsync(query);
                 await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(queryBooking);
                 await _unitOfWork.SaveChangeAsync();
