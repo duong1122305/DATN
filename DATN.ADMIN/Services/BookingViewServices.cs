@@ -2,7 +2,7 @@
 using DATN.ADMIN.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Action;
+using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using Newtonsoft.Json;

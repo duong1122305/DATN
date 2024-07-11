@@ -1,5 +1,4 @@
-﻿using Microsoft.JSInterop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +28,7 @@ namespace DATN.ViewModels.DTOs.Booking
             if (bookingToRemove != null)
             {
                 lstBooking.Remove(bookingToRemove); // Xoá đối tượng booking từ danh sách
-                NotifyStateChanged(); // Thông báo sự thay đổi để giao diện có thể cập nhật
+                //NotifyStateChanged(); // Thông báo sự thay đổi để giao diện có thể cập nhật
             }
         }
         public void RemoveBookingAll(CreateBookingDetailRequest booking)

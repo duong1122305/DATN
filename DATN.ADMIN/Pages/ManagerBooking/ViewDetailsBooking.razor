@@ -4,6 +4,7 @@
 @using DATN.ADMIN.IServices
 @using DATN.Utilites
 @using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.ActionBooking
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.Enum
@@ -60,8 +61,8 @@
             </TemplateColumn>
             <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success">Hoàn thành</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Huỷ dịch vụ</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" OnClick="@(async()=>await SuccessServices(context.Item.IdBookingDetail.Value))">Hoàn thành</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices())">Huỷ dịch vụ</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -103,4 +104,48 @@ else
             lstBooking = new List<ListBokingDetailInDay>();
         }
     }
+    private async Task SuccessServices(int idS)
+    {
+        var confirm = await Confirm("hoàn thành");
+        if (!confirm)
+        {
+            return;
+        }
+        ActionView actionView = new ActionView()
+            {
+                IdBokingOrDetail = idS
+            };
+        var respone = await _client.CompleteBookingDetail(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            await LoadData();
+            StateHasChanged();
+        }else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+    }
+    private async Task CancelServices()
+    {
+   
+    }
+
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
 }

@@ -1,7 +1,7 @@
 ﻿using DATN.Aplication.Services;
 using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Action;
+using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using Microsoft.AspNetCore.Mvc;

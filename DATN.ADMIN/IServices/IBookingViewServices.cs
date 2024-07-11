@@ -1,7 +1,7 @@
 ﻿using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Booking;
-using DATN.ViewModels.DTOs.Action;
+using DATN.ViewModels.DTOs.ActionBooking;
 
 namespace DATN.ADMIN.IServices
 {

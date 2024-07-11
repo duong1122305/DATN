@@ -3,7 +3,7 @@ using DATN.Aplication.System;
 using DATN.Data.Entities;
 using DATN.Data.Enum;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Action;
+using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.ServiceDetail;
 using DATN.ViewModels.Enum;
