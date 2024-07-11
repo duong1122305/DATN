@@ -1,5 +1,5 @@
 ﻿using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Action;
+using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Booking;
 
 namespace DATN.Aplication.Services.IServices
