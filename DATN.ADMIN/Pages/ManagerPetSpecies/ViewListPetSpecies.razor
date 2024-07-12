@@ -7,6 +7,8 @@
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Guest
 @using DATN.ViewModels.DTOs.PetSpecies
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
 
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -14,7 +16,8 @@
 @if (lstPetSpecies != null && lstPetSpecies.Count > 0)
 {
 
-
+	
+	
 
 
 	<MudTable Items="@lstPetSpecies" Hover="true" SortLabel="Sort By" Filter="new Func<PetSpeciesVM,bool>(FilterFunc)">
@@ -68,6 +71,7 @@ else
 	}
 </style>
 @code {
+	
 	//button trạng thái
 	private string searchString = "";
 	[CascadingParameter]

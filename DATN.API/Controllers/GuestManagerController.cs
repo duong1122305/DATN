@@ -35,7 +35,7 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.FindGuestByID(id);
         }  
-        [HttpPost("verify-cus")]
+        [HttpGet("verify-cus")]//////////////đây là để xác minh khi đăng ký
         public async Task<ResponseData<string>> VerifyCode(string verifyCode)
         {
             return await _guestManagerService.VerififyUser(verifyCode);

@@ -41,7 +41,7 @@ namespace DATN.Aplication.System
 
 				var guest = await _unitOfWork.GuestRepository.FindAsync(x => (x.Email == request.UserName || x.UserName == request.UserName || x.PhoneNumber == request.UserName)
 				&& x.PasswordHash == _passwordExtensitons.HashPassword(request.Password) && x.IsComfirm != false && x.IsDeleted != true);
-				if (guest != null|| guest.Count()!=0)
+				if (guest != null&& guest.Any())
 				{
 
 					return new ResponseData<string>( await GenerateTokenString(guest.First()));

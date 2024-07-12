@@ -203,10 +203,11 @@ namespace DATN.Aplication.Extentions
         }
         public string GennarateVerifyCode(string ID)
         {
+            Guid randomGuid = Guid.NewGuid();
 
             string verifyString = ID + "|" + DateTime.Now.AddMinutes(3).ToString();
             PasswordExtensitons hasCode = new PasswordExtensitons();
-            string verifyCode = hasCode.HasCode(verifyString.Replace(" ", "+"));
+            string verifyCode = hasCode.HashCode(verifyString);
             return verifyCode;
         }
     }

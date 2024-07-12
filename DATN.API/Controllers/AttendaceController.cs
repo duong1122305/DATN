@@ -26,6 +26,24 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<List<Shift>>> GetShiftNow()
         {
             return await _attendante.GetShiftNow();
+        }  
+        [HttpGet("check-in-hand")]  
+        public async Task<ResponseData<string>> CheckInHand(int scheduleId, int attendanceID, bool isCheckin, Guid userId)
+		{
+            return await _attendante.CheckIn(scheduleId,attendanceID,isCheckin, userId);
         }
-    }
+        [HttpGet("check-out-hand")]  
+        public async Task<ResponseData<string>> CheckOutHand(int attendanceID, bool isCheckout, Guid userId)
+        {
+            return await _attendante.CheckOut(attendanceID,isCheckout, userId);
+        }
+		[HttpGet("check-shift-qr")]
+		public async Task<ResponseData<List<ShiftVM>>> GetShiftQR(Guid id)
+		{
+			return await _attendante.GetPersonalShift(id);
+		}
+      
+       
+       
+	}
 }

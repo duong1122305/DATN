@@ -57,7 +57,6 @@ builder.Services.AddAuthentication(options =>
 
     };
 });
-
 builder.Services.AddCors(otp =>
 {
     otp.AddPolicy("cor", options =>
@@ -111,7 +110,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
 app.UseCors("cor");
 app.UseAuthentication();
