@@ -3,6 +3,7 @@
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.ADMIN.Pages.ManagerServices
 @using DATN.Data.Entities
+@using DATN.Utilites
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Guest
@@ -43,7 +44,7 @@
             @* <MudTd DataLabel="Sign">@(async()=> await _serviceDetailService.GetById(context.ServiceDetailId))</MudTd> *@
             <MudTd DataLabel="Sign">@context.StaffName</MudTd>
             <MudTd DataLabel="Sign">@context.ServiceDetailName</MudTd>
-            <MudTd DataLabel="Sign">@context.Price</MudTd>
+            <MudTd DataLabel="Sign">@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
             <MudTd DataLabel="Name">@context.StartDateTime</MudTd>
             <MudTd DataLabel="Molar mass">@context.EndDateTime</MudTd>
             <MudTd>
