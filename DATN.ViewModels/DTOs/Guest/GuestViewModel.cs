@@ -22,6 +22,7 @@ namespace DATN.ViewModels.DTOs.Guest
         public int? CountPet { get; set; } = 0;
         [EmailAddress(ErrorMessage ="Email sai định dạng ")]
         public string? Email { get; set; }
+        public string? AvatarUrl { get; set; }
         public string? Address { get; set; }
         public bool? IsDelete { get; set; }
         public bool? IsConfirm { get; set; }    
