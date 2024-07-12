@@ -4,7 +4,7 @@
 
 <div class="d-flex m-3">
 
-	<MudSelect Class="mud-mb-2" T="DataAdress" Value="selectedProvinces" Label="Tỉnh/ Thành phố" ValueChanged="ChooseProvinces" Width="200px">
+	<MudSelect Class="mud-mb-2" T="DataAdress" Value="selectedProvinces" Label="Tỉnh/ Thành phố" ValueChanged="ChooseProvinces" Width="200px" ToStringFunc="@(item => item.full_name)">
 			@foreach (var item in provinces)
 			{
 			<MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
@@ -14,15 +14,15 @@
 
 
 
-	<MudSelect Class="mud-mb-2" T="DataAdress" Value=@selectedDistrict Label="Quận/ Huyện" ValueChanged="ChooseDistricts" Width="200px">
+	<MudSelect Class="mud-mb-2" T="DataAdress" Value="selectedDistrict" Label="Quận/ Huyện" ValueChanged="ChooseDistricts" Width="200px" ToStringFunc="@(item => item.full_name)">
 			@foreach (var item in districs)
 			{
-			<MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
+			<MudSelectItem T="DataAdress"  Value="@item">@item.full_name</MudSelectItem>
 			}
 		</MudSelect>
 
 
-	<MudSelect Class="mud-mb-2" T="DataAdress" Value="@selectedWards" Label="Xã/ Phường" Width="200px" ValueChanged="ChooseWards">
+	<MudSelect Class="mud-mb-2" T="DataAdress" Value="@selectedWards" Label="Xã/ Phường" Width="200px" ValueChanged="ChooseWards" ToStringFunc="@(item => item.full_name)">
 			@foreach (var item in wards)
 			{
 			<MudSelectItem T="DataAdress" Value="@item">@item.full_name</MudSelectItem>
@@ -85,12 +85,17 @@
 	{
 		selectedProvinces = value;
 		districs = await addressService.GetDistricts(value.id);
+		selectedDistrict = null;
+		selectedDistrict = districs.First();
+		wards = await addressService.GetWards(selectedDistrict.id);
+		selectedWards = wards.First();
 	}
 
 	public async Task ChooseDistricts(DataAdress value)
 	{
 		selectedDistrict = value;
 		wards = await addressService.GetWards(selectedDistrict.id);
+		selectedWards = wards.First();
 	}
 	public async Task ChooseWards(DataAdress value)
 	{

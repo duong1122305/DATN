@@ -468,7 +468,7 @@ namespace DATN.Aplication.Services
             try
             {
                 string verifyString = _passwordExtensitons.DeCode(verifyCode);// giải mã thông tin xác minh
-                string[] dataVerify = verifyString.Split('|');// [0] id khách // [1] mã thời hạn
+                string[] dataVerify = verifyString.Split('|');// [0] id khách // [1] mã thời hạn// [2] mã bảo mật thêm
 
                 var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
                 if (guest != null && guest.VerifyCode == verifyCode)
@@ -482,6 +482,7 @@ namespace DATN.Aplication.Services
                         };
                     }
                     guest.IsComfirm = true;
+                    guest.VerifyCode = null;
                     var result = await _unitOfWork.SaveChangeAsync();
 
                     if (result > 0)
