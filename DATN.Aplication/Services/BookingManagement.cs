@@ -105,7 +105,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<List<ListBokingDetailInDay>> { IsSuccess = false, Data = new List<ListBokingDetailInDay>(), Error = "Chưa có dữ liệu" };
             }
         }
-        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
+        public async Task<ResponseData<string>> CreateBookingInStore(CreateBookingRequest createBookingRequest, string token)
         {
             if (createBookingRequest.ListIdServiceDetail.Count > 0)
             {
@@ -122,11 +122,12 @@ namespace DATN.Aplication.Services
                         {
                             GuestId = createBookingRequest.GuestId,
                             BookingTime = DateTime.Now,
-                            PaymentTypeId = createBookingRequest.PaymentTypeId,
                             VoucherId = null,
                             TotalPrice = 0,
                             ReducedAmount = 0,
                             Status = BookingStatus.Confirmed,
+                            IsPayment = false,
+                            IsAddToSchedule = true,
                         };
                         await _unitOfWork.BookingRepository.AddAsync(booking);
                         await _unitOfWork.SaveChangeAsync();
@@ -741,7 +742,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "không tìm thấy" };
         }
 
-        public async Task<ResponseData<string>> Payment(Payment payment)
+        public async Task<ResponseData<string>> PaymentInStore(Payment payment)
         {
             var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
                                 where booking.GuestId == payment.IdGuest &&
@@ -749,8 +750,28 @@ namespace DATN.Aplication.Services
                                 select booking).FirstOrDefault();
             if (queryBooking != null)
             {
-
-                return new ResponseData<string>();
+                if (!queryBooking.IsPayment)
+                {
+                    if (payment.TypePaymenId==1)
+                    {
+                        queryBooking.TotalPrice = payment.TotalPrice;
+                        queryBooking.PaymentTypeId = payment.TypePaymenId;
+                        queryBooking.ReducedAmount = payment.Reduce;
+                        queryBooking.IsPayment = true;
+                        queryBooking.VoucherId = payment.VoucherId;
+                        await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
+                    }
+                    else
+                    {
+                        return new ResponseData<string> { IsSuccess = true, Data = "Chưa biết làm chuyển khoản" };
+                    }
+                }
+                else
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Đơn này thanh toán rồi thanh toán đéo gì lắm" };
+                }
             }
             else
             {

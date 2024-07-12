@@ -555,7 +555,7 @@ namespace DATN.Aplication.Services
             {
                 if (from1.CompareTo(new TimeSpan(7, 0, 0)) < 0 || from1.CompareTo(new TimeSpan(22, 30, 0)) > 0 || to.CompareTo(new TimeSpan(22, 30, 0)) > 0)
                 {
-                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này đéo ai làm mà phục vụ đâu" };
+                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không ai làm mà phục vụ đâu" };
                 }
                 else
                 {
@@ -577,7 +577,7 @@ namespace DATN.Aplication.Services
                                               select shift).FirstOrDefault();
                             if (queryShift == null)
                             {
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn đéo nằm trong ca nào cả không ai phục vụ" };
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
                             }
                             var response = await GetListStaffInDay(queryShift.Id, dateNow);
                             List<Guid> staffFree = new List<Guid>();
@@ -641,7 +641,7 @@ namespace DATN.Aplication.Services
                             if (listStaff.Count > 0)
                                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                             else
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không có nhân viên rảnh để làm r bảo khách phắn" };
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
                         }
 
                     }

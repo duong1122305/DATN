@@ -8,7 +8,7 @@ namespace DATN.Aplication.Services.IServices
     {
         public Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek();
         public Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(string idGuest, DateTime date);
-        public Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token);
+        public Task<ResponseData<string>> CreateBookingInStore(CreateBookingRequest createBookingRequest, string token);
         public Task<ResponseData<Bill>> GetBill(Guid IdGuest, DateTime dateBooking);
         public Task<ResponseData<string>> CompleteBooking(ActionView actionView);
         public Task<ResponseData<string>> StartBooking(ActionView actionView);
@@ -18,6 +18,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> ConfirmBooking(ActionView actionView);
         public Task<ResponseData<string>> GuestCreateBooking(CreateBookingRequest createBookingRequest, DateTime dateTime);
-        public Task<ResponseData<string>> Payment(Payment payment);
+        public Task<ResponseData<string>> PaymentInStore(Payment payment);
     }
 }
