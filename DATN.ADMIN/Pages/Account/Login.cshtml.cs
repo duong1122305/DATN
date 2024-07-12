@@ -33,15 +33,10 @@ namespace DATN.ADMIN.Pages.Account
         }
         public async Task HandleLogin()
         {
-            var returnUrl = HttpContext.Request.Query["returnUrl"].ToString();
-            var redirectUrl = "~/trangchu";
-            if (returnUrl != null && returnUrl!="/")
-            {
-                redirectUrl = returnUrl;
-            }
+            
             if (_contextAccessor.HttpContext.Session.GetString("Key") != null)
             {
-                _contextAccessor.HttpContext.Response.Redirect(Url.Content(redirectUrl));
+                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
             }
             else
             {
@@ -61,7 +56,7 @@ namespace DATN.ADMIN.Pages.Account
                         {
 
                             _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
-                            _contextAccessor.HttpContext.Response.Redirect(Url.Content(redirectUrl));
+                            _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
 
                         }
                         else if (!checkLogin.IsSuccess)

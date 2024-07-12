@@ -124,6 +124,7 @@ namespace DATN.Aplication.Services
                             BookingTime = DateTime.Now,
                             VoucherId = null,
                             TotalPrice = 0,
+                            PaymentTypeId = 1,
                             ReducedAmount = 0,
                             Status = BookingStatus.Confirmed,
                             IsPayment = false,
