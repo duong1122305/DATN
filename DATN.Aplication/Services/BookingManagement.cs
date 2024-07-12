@@ -132,6 +132,11 @@ namespace DATN.Aplication.Services
                         };
                         await _unitOfWork.BookingRepository.AddAsync(booking);
                         await _unitOfWork.SaveChangeAsync();
+                        queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
+                                       where bookingTable.GuestId == createBookingRequest.GuestId
+                                       && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
+                                       && bookingTable.Status != BookingStatus.StaffCancelled && bookingTable.Status != BookingStatus.AdminCancelled && bookingTable.Status != BookingStatus.CustomerCancelled
+                                       select bookingTable;
                     }
                     else
                     {
@@ -203,8 +208,6 @@ namespace DATN.Aplication.Services
                                 }
                             }
                         }
-                        var term = queryServiceDetail.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[i].ServiceDetailId).Duration;
-
                     }
                     foreach (var item in createBookingRequest.ListIdServiceDetail)
                     {
@@ -753,7 +756,7 @@ namespace DATN.Aplication.Services
             {
                 if (!queryBooking.IsPayment)
                 {
-                    if (payment.TypePaymenId==1)
+                    if (payment.TypePaymenId == 1)
                     {
                         queryBooking.TotalPrice = payment.TotalPrice;
                         queryBooking.PaymentTypeId = payment.TypePaymenId;
