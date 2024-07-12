@@ -17,5 +17,7 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> ConfirmBooking(ActionView actionView);
+        public Task<ResponseData<string>> GuestCreateBooking(CreateBookingRequest createBookingRequest, DateTime dateTime);
+        public Task<ResponseData<string>> Payment(Payment payment);
     }
 }

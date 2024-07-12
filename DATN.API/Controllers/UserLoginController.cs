@@ -270,5 +270,10 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.GetUserByToken(token);
         }
+        [HttpGet("Get-all-voucher-can-apply")]
+        public async Task<ResponseData<List<VoucherView>>> GetAllVoucherCanApply(double totalPrice)
+        {
+            return await _vouchermanagement.GetAllVoucherCanApply(totalPrice);
+        }
     }
 }

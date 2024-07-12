@@ -15,7 +15,7 @@ namespace DATN.API.Controllers
         private readonly IBookingManagement _bookingManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
 
-        public BookingController(IBookingManagement bookingManagement,IEmployeeScheduleManagementService employeeScheduleManagementService)
+        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService)
         {
             _bookingManagement = bookingManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
@@ -31,9 +31,9 @@ namespace DATN.API.Controllers
             return _bookingManagement.GetListBookingDetailInDay(id, date);
         }
         [HttpPost("Create-Booking")]
-        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest,string token)
+        public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
         {
-            return await _bookingManagement.CreateBookingStore(createBookingRequest,token);
+            return await _bookingManagement.CreateBookingStore(createBookingRequest, token);
         }
         [HttpGet("List-Staff-Free-In-Time")]
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
@@ -41,7 +41,7 @@ namespace DATN.API.Controllers
             return await _employeeScheduleManagementService.ListStaffFreeInTime(TimeSpan.Parse(from), TimeSpan.Parse(to));
         }
         [HttpGet("Get-Bill-Of-Guest")]
-        public async Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest,DateTime dateBooking)
+        public async Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking)
         {
             return await _bookingManagement.GetBill(idguest, dateBooking);
         }
@@ -80,6 +80,11 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> ConfirmBooking(ActionView actionView)
         {
             return await _bookingManagement.ConfirmBooking(actionView);
+        }
+        [HttpPost("Guest-Booking")]
+        public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest, DateTime dateTime)
+        {
+            return await _bookingManagement.GuestCreateBooking(createBookingRequest, dateTime);
         }
     }
 }

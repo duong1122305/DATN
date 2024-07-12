@@ -553,7 +553,7 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                if (from1.CompareTo(new TimeSpan(7, 0, 0)) < 0 || from1.CompareTo(new TimeSpan(23, 30, 0)) > 0)
+                if (from1.CompareTo(new TimeSpan(7, 0, 0)) < 0 || from1.CompareTo(new TimeSpan(22, 30, 0)) > 0 || to.CompareTo(new TimeSpan(22, 30, 0)) > 0)
                 {
                     return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này đéo ai làm mà phục vụ đâu" };
                 }
@@ -577,17 +577,7 @@ namespace DATN.Aplication.Services
                                               select shift).FirstOrDefault();
                             if (queryShift == null)
                             {
-                                queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                              where shift.From.CompareTo(from1) >= 0
-                                              select shift).FirstOrDefault();
-                                if (to > new TimeSpan(23, 30, 00))
-                                {
-                                    dateNow = dateNow.AddDays(1);
-                                    queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                                  where shift.From.CompareTo(new TimeSpan(0, 0, 0)) >= 0
-                                                  select shift).FirstOrDefault();
-                                }
-
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn đéo nằm trong ca nào cả không ai phục vụ" };
                             }
                             var response = await GetListStaffInDay(queryShift.Id, dateNow);
                             List<Guid> staffFree = new List<Guid>();
