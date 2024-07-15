@@ -106,9 +106,9 @@
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
                     <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))">Chi tiết</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartServices(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteServicesOnline(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await CompleteServicesAll(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteBooking(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
                     <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
                     <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
                 </MudButtonGroup>
@@ -290,7 +290,7 @@
         }
     }
 
-    private async Task StartServices(int id)
+    private async Task StartBooking(int id)
     {
         ActionView actionView = new ActionView()
             {
@@ -307,7 +307,7 @@
             Message(respone.Error, Severity.Error);
         }
     }
-    private async Task CompleteServicesOnline(int id)
+    private async Task CompleteBooking(int id)
     {
         ActionView actionView = new ActionView()
             {
@@ -325,14 +325,14 @@
             Message(respone.Error, Severity.Error);
         }
     }
-    private async Task CompleteServicesAll(int id)
+    private async Task ConfimBooking(int id)
     {
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             };
-        var respone = await _client.CompleteBooking(actionView);
+        var respone = await _client.ConfirmBooking(actionView);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);
