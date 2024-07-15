@@ -61,7 +61,7 @@
 			<MudTd >@context.DaysLeftEarly</MudTd>
 			<MudTd>
 				<MudButtonGroup Variant="Variant.Filled">
-					<MudIconButton Color="Color.Warning" Icon="@Icons.Material.TwoTone.RemoveRedEye" Disabled=@(context.ActualWorkingDays==0) 
+					<MudIconButton Color="Color.Warning" Icon="@Icons.Material.TwoTone.RemoveRedEye" 
 					OnClick="@(async()=>await OpenDialog(context.IdUser))" Title="Xem chi tiết"></MudIconButton>
 				</MudButtonGroup>
 			</MudTd>
