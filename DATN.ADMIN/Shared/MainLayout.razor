@@ -77,7 +77,11 @@
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
             // var listClaims = jwtSecurityToken.Claims.ToArray();
-            name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
+            name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value!;
+            string idUser = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
+            string fullName = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.UserData).FirstOrDefault()?.Value!;
+            httpContextAccessor.HttpContext.Session.SetString("id",idUser);
+            httpContextAccessor.HttpContext.Session.SetString("fullName",fullName);
 
         }
 

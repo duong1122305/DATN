@@ -1,0 +1,144 @@
+﻿@page "/viewAAM"
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.Attendace
+@inject IDialogService _dialogservice;
+<MudDrawerContainer Class="mud-height-full" Style=" width:100%">
+	<MudText Typo="Typo.h6">Thông tin chấm công tháng @month</MudText>
+	<MudTable Items="@lstAM" Hover="true" Style="width:100% auto; margin-top: 30px"  SortLabel="Sort By" Filter="new Func<AttendanceMonth,bool>(FilterFunc)">
+		<ToolBarContent>
+		
+			<div style="display:flex">
+				<div style="width:200px;margin-right:5px">
+					<MudSelect T="int" Label="Tháng" Variant="Variant.Outlined" Value="month" ValueChanged="(value)=>ChangeDate(value,year)" AnchorOrigin="Origin.BottomCenter"  style="width:100px; margin-bottom: 10px;" title="Chọn ca làm">
+						@for(int i= 1; i<=12; i++)
+						{
+							var mon= i;
+							<MudSelectItem Value="@mon">Tháng @mon</MudSelectItem>
+						}
+					</MudSelect>
+				</div>
+				<div>
+					<MudSelect T="int" Label="Năm" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" Value="year" ValueChanged="(value)=>ChangeDate(month,value)" AnchorOrigin="Origin.BottomCenter">
+						@{
+							var yearNow = DateTime.Now.Year;
+							
+						}
+						@for (int i = yearNow; i >= yearNow-3; i--)
+						{
+							var yer = i;
+							<MudSelectItem Value="@yer">Năm @yer</MudSelectItem>
+						}
+					</MudSelect>
+				</div>
+			</div>
+			<MudSpacer />
+			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>STT</MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.FullName)">Tên nhân viên</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.UserName)">Tên đăng nhập</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.ScheduleWorkingDays)">Số ca trên lịch</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.ActualWorkingDays)">Số ca đi làm</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.TotalLeaveDays)">Số ca nghỉ</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.TotalWorkingHours)">Tổng số giờ đi làm</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.DaysLate)">Số ca đi muộn</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceMonth, object>(x=>x.DaysLeftEarly)">Số ca về sớm</MudTableSortLabel></MudTh>
+			<MudTh Class="text-center">Chi tiết</MudTh>
+		</HeaderContent>
+		<RowTemplate>
+			@{
+				var stt = 1;
+			}
+			<MudTd DataLabel="STT">@(lstAM.IndexOf(context) + 1)</MudTd>
+			<MudTd >@context.FullName</MudTd>
+			<MudTd >@context.UserName</MudTd>
+			<MudTd >@context.ScheduleWorkingDays</MudTd>
+			<MudTd >@context.ActualWorkingDays</MudTd>
+			<MudTd >@context.TotalLeaveDays</MudTd>
+			<MudTd >@(Math.Round(context.TotalWorkingHours))</MudTd>
+			<MudTd >@context.DaysLate</MudTd>
+			<MudTd >@context.DaysLeftEarly</MudTd>
+			<MudTd>
+				<MudButtonGroup Variant="Variant.Filled">
+					<MudIconButton Color="Color.Warning" Icon="@Icons.Material.TwoTone.RemoveRedEye" Disabled=@(context.ActualWorkingDays==0) 
+					OnClick="@(async()=>await OpenDialog(context.IdUser))" Title="Xem chi tiết"></MudIconButton>
+				</MudButtonGroup>
+			</MudTd>
+		</RowTemplate>
+		<PagerContent>
+			<MudTablePager />
+		</PagerContent>
+	</MudTable>
+</MudDrawerContainer>
+@code{
+	[Inject]
+	ISnackbar Snackbar { get; set; }
+	[Inject]
+	IAttendanceServiceClient _ser { get; set; }
+	private List<AttendanceMonth> lstAM = new List<AttendanceMonth>();
+	private string searchString="";
+	private int month= DateTime.Now.Month;
+	private int year= DateTime.Now.Year;
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+	private async Task LoadData()
+	{
+		var response = await _ser.GetAllAttandanceMonth(month,year);
+		if (response.IsSuccess)
+		{
+			lstAM = response.Data!;
+
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+			lstAM = new List<AttendanceMonth>();
+		}
+	}
+	private async Task OpenDialog(Guid id)
+	{
+
+		var parameters = new DialogParameters();
+		string nameDialog = "Xem chi tiết";
+
+		parameters.Add("IdUser", id);
+		parameters.Add("Month", month);
+		parameters.Add("Year", year);
+
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<AttendanePersonalMonthView>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+		}
+	}
+	private bool FilterFunc(AttendanceMonth element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
+			return true;
+		if (element.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		if (element.UserName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+	private async Task ChangeDate(int monthChange,int yearChanger)
+	{
+		month= monthChange;
+		year = yearChanger;
+		await LoadData();
+		StateHasChanged();
+	}
+}

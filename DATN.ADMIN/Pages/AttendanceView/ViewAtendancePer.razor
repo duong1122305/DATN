@@ -1,0 +1,192 @@
+﻿@page "/attendancePersonal"
+@using System.Timers
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Attendace
+@inject ISnackbar Snackbar
+<style>
+	.card-atten{
+		font-size:16px!important;
+		font-family: 'Open Sans';
+		height:100%;
+	}
+	.card-header{
+		text-align:center;
+		padding-top: 70px;
+		font-size: 25px;
+		color: #3b4754;
+		margin-bottom:15px;
+	}
+	.card-body{
+		padding-left: 15%;
+		text-align: left;
+	}
+
+	.text-secondary{
+		color: #798da3;
+		line-height: 50px;
+		display:flex;
+	}
+	.btn_atten{
+		padding: 10px 50px;
+		background-color: #29323d;
+		color:white;
+		border-radius:20px;
+		margin: 50px 0;
+		margin-left:26%;
+	}
+	.btn_atten:hover{
+		padding: 10px 50px;
+			background-color: #ff8db4;
+		color:white;
+		border-radius:20px;
+		margin: 50px 0;
+		margin-left:26%;
+	}
+	.time-current{
+		padding-bottom:30px;
+		margin-left: 23%;
+	}
+	.data{
+		font-weight:800;
+		color: #29323d;
+	}
+</style>
+<MudContainer Style="background-color:#edf0f4; width:100%">
+	<MudGrid>
+		
+		<MudItem md="6" xs="0">
+			<MudImage Style="width:100%" Src="/img/uiShop.jpg">
+				
+			</MudImage>
+		</MudItem>
+		<MudItem Style="background-color:#edf0f" md="6" xs="12">
+			<MudCard Class="card-atten">
+				<div class="card-header">
+					<h1>ĐIỂM DANH</h1>
+
+				</div>
+				<div class="card-body">
+					<div class="time-current">Giờ hiện tại: @currentTime </div>
+					<div class="text-secondary">Ca của bạn hôm nay: <p class="data">@attendance.ListShift </p> </div>
+					<div class="text-secondary">Điểm danh ca: <p class="data">@attendance.ShiftNow </p> </div>
+					<div class="text-secondary">Loại điểm danh: <p class="data">@(!attendance.TypeAttendance.HasValue ? "Không trong thời gian điểm danh" : attendance.TypeAttendance.Value ? "Check-in" : "Check-out") @attendance.ShiftAttendance </p> </div>
+					<MudButton OnClick="Attendance" Class="btn_atten">Điểm danh</MudButton>
+				</div>
+			</MudCard>
+		</MudItem>
+	</MudGrid>
+
+</MudContainer>
+@code {
+	private string currentTime;
+	private Timer timer;
+	private AttendancePersonal attendance;
+	Guid id;
+	[Inject]
+	IAttendanceServiceClient _ser{ set; get; }
+	[Inject]
+	protected IHttpContextAccessor? _httpContextAccessor { get; set; }
+	[Inject] 
+	private IDialogService DialogService { get; set; }
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		LoadTime();
+		await LoadData();
+	}
+
+	async Task LoadData()
+	{
+		var idStr = _httpContextAccessor?.HttpContext?.Session.GetString("id");
+
+		if (idStr != null)
+		{
+			id = Guid.Parse(idStr);
+		}
+		var response = await _ser.GetPersonalShift(id);
+		if (response.IsSuccess)
+		{
+			attendance = response.Data!;
+
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	void LoadTime()
+	{
+		currentTime = DateTime.Now.ToString("HH:mm:ss");
+		timer = new Timer(1000); // Cập nhật mỗi giây
+		timer.Elapsed += UpdateTime!;
+		timer.Start();
+	}
+
+	private void UpdateTime(object sender, ElapsedEventArgs e)
+	{
+		currentTime = DateTime.Now.ToString("HH:mm:ss");
+		InvokeAsync(StateHasChanged);
+	}
+
+	public void Dispose()
+	{
+		timer?.Dispose();
+	}
+	private async Task Attendance()
+	{
+		if(attendance.ScheduleID==0|| attendance.TypeAttendance == null)
+		{
+			Snackbar.Add("Hiện tại không trong khoảng thời gian điểm danh", Severity.Warning);
+			return;
+		}
+		var response = new ResponseData<string>();
+
+		if (attendance.TypeAttendance.HasValue && attendance.TypeAttendance.Value)
+		{
+			var check= await Confirm(true);
+			if (!check) return;
+			response=await _ser.CheckInPersonal(attendance);
+		}
+		else
+		{
+			var check = await Confirm(false);
+			if (!check) return;
+			response = await _ser.CheckOutPersonal(attendance);
+		}
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data, Severity.Success);
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+		attendance = new AttendancePersonal();
+		await LoadData();
+		StateHasChanged();
+	}
+	private async Task<bool> Confirm(bool isCheckin)
+	{
+		var now = DateTime.Now.TimeOfDay;
+		var checkLate = await _ser.CheckLate(attendance.ShiftID,isCheckin);
+		if (checkLate.IsSuccess)
+		{
+			bool? result = await DialogService.ShowMessageBox(
+			"Thông báo",
+			$"Bạn xác nhận điểm danh {checkLate.Data}!",
+			yesText: "Xác nhận!", cancelText: "Huỷ");
+			if(result!=null&& result.Value)
+			{
+				attendance.Note = isCheckin ? "Checkin cá nhân":"Checkout cá nhân";
+				return true;
+			}
+			return false;
+		}
+		Snackbar.Add(checkLate.Error, Severity.Warning);
+		return false;
+
+	}
+}

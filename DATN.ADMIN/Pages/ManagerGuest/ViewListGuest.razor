@@ -6,6 +6,7 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Guest
+@using System.Timers
 
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -16,12 +17,6 @@
 {
 
 	<MudDrawerContainer Class="mud-height-full" Style=" width:100%" >
-
-	
-
-
-
-
 
 		<MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
 			<ToolBarContent>
@@ -108,6 +103,7 @@ else
 	}
 </style>
 @code {
+
 	//button trạng thái
 	private bool isOpenDialog = false;
 	private string searchString = "";

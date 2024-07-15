@@ -10,7 +10,12 @@
         <MudNavLink Href="/ListStaff" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Danh sách nhân viên</MudNavLink>
         <MudNavLink Href="/ViewShift" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm</MudNavLink>
         <MudNavLink Href="/ViewListShudule" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm của nhân viên</MudNavLink>
-        <MudNavLink Href="/AttendanceView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FreeCancellation">Điểm danh </MudNavLink>
+    </MudNavGroup> 
+    <MudNavGroup Title="Điểm danh" Icon="@Icons.Material.Filled.Schedule">
+        <MudNavLink Href="/attendancePersonal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FreeCancellation">Điểm danh cá nhân </MudNavLink>
+        <MudNavLink Href="/AttendanceView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Điểm danh tay </MudNavLink>
+        <MudNavLink Href="/attenPerMonthView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper">Xem điểm danh cá nhân </MudNavLink>
+        <MudNavLink Href="/viewAAM" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Danh sách điểm danh tháng </MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Quản lý khách hàng" Icon="@Icons.Material.Filled.SupervisedUserCircle">
         <MudNavLink Href="/ListGuest" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách khách hàng</MudNavLink>

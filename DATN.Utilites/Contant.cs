@@ -18,7 +18,10 @@ namespace DATN.Utilites
         //
         //gán ID của khách lẻ
         public static readonly Guid GuestsID = Guid.Parse("CF9FA787-B64C-462A-A3BA-08DC8D178FC0");
+		// gắn giá trị combobox đi điểm danh
+		public const int AllAttendance = -1;//tất cả
+		public const int Present = 1;// có mặt
+		public const int Absent = 0;//vắng mặt
 
-
-    }
+	}
 }
