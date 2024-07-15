@@ -33,7 +33,7 @@ namespace DATN.API.Controllers
         [HttpPost("Create-Booking")]
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
         {
-            return await _bookingManagement.CreateBookingStore(createBookingRequest, token);
+            return await _bookingManagement.CreateBookingInStore(createBookingRequest, token);
         }
         [HttpGet("List-Staff-Free-In-Time")]
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
