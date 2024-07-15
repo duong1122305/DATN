@@ -18,15 +18,32 @@
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
-    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 </div>
 
-<MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" @ref="dataGrid" Hideable="true" Groupable="true" GroupExpanded="false" MultiSelection="true">
+<MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" QuickFilter="@_quickFilter" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
     <ToolBarContent>
+        <div style="width:200px">
+            <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+                       ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
+                <MudSelectItem Value="Status.PendingConfirmation">Chờ xác nhận</MudSelectItem>
+                <MudSelectItem Value="Status.Confirmed">Đã xác nhận</MudSelectItem>
+                <MudSelectItem Value="Status.Arrived">Đã đến nơi</MudSelectItem>
+                <MudSelectItem Value="Status.InProgress">Đang thực hiện</MudSelectItem>
+                <MudSelectItem Value="Status.Completed">Đã hoàn thành</MudSelectItem>
+                <MudSelectItem Value="Status.NoShow">Khách không đến</MudSelectItem>
+                <MudSelectItem Value="Status.CustomerCancelled">Khách huỷ</MudSelectItem>
+                <MudSelectItem Value="Status.StaffCancelled">Nhân viên huỷ</MudSelectItem>
+                <MudSelectItem Value="Status.AdminCancelled">Admin huỷ</MudSelectItem>
+            </MudSelect>
+        </div>
         <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+        <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
+
     </ToolBarContent>
     <Columns>
-        <TemplateColumn Title="Ngày" GroupBy="@_groupBy" Sortable="false" Filterable="false">
+        <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
             <GroupTemplate>
                 <span style="font-weight:bold">@context.Grouping.Key</span>
             </GroupTemplate>
@@ -65,7 +82,7 @@
 
                 }@if (context.Item.Status == BookingStatus.Completed)
                 {
-                    <MudChip Color="Color.Success">Đã hoàn thành</MudChip>
+                    <MudChip Color="Color.Success">Hoàn thành</MudChip>
 
                 }@if (context.Item.Status == BookingStatus.NoShow)
                 {
@@ -88,12 +105,12 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))">Chi tiết</MudIconButton>
-                    <MudIconButton Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartServices(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
-                    <MudIconButton Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteServicesOnline(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
-                    <MudIconButton Title="Xác nhận" OnClick="@(async()=>await CompleteServicesAll(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
-                    <MudIconButton  Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
-                    <MudIconButton Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))">Chi tiết</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteBooking(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
                 </MudButtonGroup>
             </CellTemplate>
         </TemplateColumn>
@@ -109,6 +126,7 @@
     bool _customizeGroupTemplate;
     static bool _customizeGroupBy;
     static bool _customizeGroupByCus;
+    private string searchString = "";
 
     MudDataGrid<BookingView> dataGrid;
     [Inject] private BookingService bookingService { get; set; }
@@ -129,10 +147,82 @@
     private async Task LoadData()
     {
         var respone = await _client.GetAll();
-        lstBookingServices = respone.Data;
+        lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime).ToList();
+        if (selectedStatus == Status.All)
+        {
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime).ToList();
+        }
+        else if (selectedStatus == Status.PendingConfirmation)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+        }
+        else if (selectedStatus == Status.Confirmed)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.Confirmed).ToList();
+        }
+        else if (selectedStatus == Status.Arrived)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.Arrived).ToList();
+        }
+        else if (selectedStatus == Status.InProgress)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.InProgress).ToList();
+        }
+        else if (selectedStatus == Status.Completed)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.Completed).ToList();
+        }
+        else if (selectedStatus == Status.NoShow)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.NoShow).ToList();
+        }
+        else if (selectedStatus == Status.CustomerCancelled)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
+        }
+        else if (selectedStatus == Status.StaffCancelled)
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
+        }
+        else
+        {
+            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
+        }
         StateHasChanged();
     }
+    private enum Status
+    {
+        All,
+        PendingConfirmation, // Chờ xác nhận
+        Confirmed,           // Đã xác nhận
+        Arrived,             // Đã đến nơi
+        InProgress,          // Đang thực hiện
+        Completed,           // Đã hoàn thành
+        NoShow,              // Khách không đến
+        CustomerCancelled,   // Khách huỷ
+        StaffCancelled,      // Nhân viên huỷ
+        AdminCancelled    // Admin huỷ
+    }
 
+    private Func<BookingView, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (x.NameGuest.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{x.Address} {x.BookingTime}".Contains(searchString.Trim()))
+            return true;
+
+        return false;
+    };
+    private Status selectedStatus = Status.All;
+    private async Task Change(Status selected)
+    {
+        selectedStatus = selected;
+        await LoadData();
+    }
     //group ngày
     private Func<BookingView, string> _groupBy = x =>
     {
@@ -149,7 +239,6 @@
     {
         dataGrid?.ExpandAllGroups();
     }
-
 
     private async Task OpenDialog(Guid id, DateTime dateBooking)
     {
@@ -201,7 +290,7 @@
         }
     }
 
-    private async Task StartServices(int id)
+    private async Task StartBooking(int id)
     {
         ActionView actionView = new ActionView()
             {
@@ -218,7 +307,7 @@
             Message(respone.Error, Severity.Error);
         }
     }
-    private async Task CompleteServicesOnline(int id)
+    private async Task CompleteBooking(int id)
     {
         ActionView actionView = new ActionView()
             {
@@ -236,14 +325,14 @@
             Message(respone.Error, Severity.Error);
         }
     }
-    private async Task CompleteServicesAll(int id)
+    private async Task ConfimBooking(int id)
     {
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             };
-        var respone = await _client.CompleteBooking(actionView);
+        var respone = await _client.ConfirmBooking(actionView);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);

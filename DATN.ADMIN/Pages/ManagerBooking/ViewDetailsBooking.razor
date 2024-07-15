@@ -33,7 +33,7 @@
                     <span style="text-align:center;">@context.Item.BookingTime.ToString("dd/MM/yyyy")</span>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn Title="Giá dịch vụ" Sortable="false" Filterable="false">
+            <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
                 <CellTemplate>
                     <span style="text-align:center;">@CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
                 </CellTemplate>
