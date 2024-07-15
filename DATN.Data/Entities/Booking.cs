@@ -15,8 +15,7 @@ namespace DATN.Data.Entities
     public class Booking
     {
         public int Id { get; set; } // Khóa chính
-
-
+        public bool IsPayment { get; set; }
         public int? VoucherId { get; set; } // ID mã giảm giá (nếu có)
         public double? ReducedAmount { get; set; } // số tiền giảm
 
@@ -28,7 +27,7 @@ namespace DATN.Data.Entities
 
         public DateTime BookingTime { get; set; } // Thời gian đặt lịch
 
-   //     public DateTime? AppointmentTime { get; set; } // Thời gian mong muốn bắt đầu
+        //     public DateTime? AppointmentTime { get; set; } // Thời gian mong muốn bắt đầu
 
         //public DateTime? ConfirmedTime { get; set; } // Thời gian xác nhận đơn đặt hàng
 

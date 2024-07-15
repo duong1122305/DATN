@@ -1,4 +1,5 @@
-﻿using DATN.ViewModels.Common;
+﻿using DATN.Data.Entities;
+using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Pet;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace DATN.Aplication.Services.IServices
 		Task<ResponseData<string>> UpdatePet(PetCreateUpdate petVM);
 		Task<ResponseData<string>> SoftDelete(DeleteRequest<int> request);
 		Task<ResponseData<List<PetVM>>> GetAll();
+		Task<ResponseData<List<PetType>>> GetAllTypes();
 	}
 }
