@@ -2,6 +2,7 @@
     @using DATN.Aplication.CustomProvider
     @using System.IdentityModel.Tokens.Jwt
     @using System.Security.Claims
+@using Microsoft.AspNetCore.SignalR.Client
     @inject IDialogService _dialogservice
     @inject AuthenticationStateProvider AuthenticationStateProvider
     @inherits LayoutComponentBase
@@ -15,6 +16,7 @@
         <MudAvatar>
             <MudImage Src="img/logo_bc.png"></MudImage>
         </MudAvatar>
+        <p>@mess</p>
         <MudMenu Label="@name" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
             <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
             <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
@@ -35,9 +37,11 @@
     protected NavigationManager navigationManager { get; set; }
     [Inject]
     protected IHttpContextAccessor httpContextAccessor { get; set; }
+    protected HubConnection hubConnection;
 
     bool _drawerOpen = true;
     private string name = "";
+    private string mess = "";
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -77,7 +81,15 @@
         }
 
         navigationManager.LocationChanged += HandleLocationChanged;
-
+        hubConnection = new HubConnectionBuilder()
+       .WithUrl(navigationManager.ToAbsoluteUri("https://localhost:7259/notification"))
+       .WithAutomaticReconnect()
+       .Build();
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            mess = user + message;
+        });
+        await hubConnection.StartAsync();
     }
     private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
     {
@@ -97,4 +109,19 @@
         return confirm;
     }
 }
+@*
+<script src="~\lib\microsoft\signalr\dist\browser\signalr.js"></script>
+<script>
 
+    var connection = new signalR.HubConnectionBuilder().withUrl("/notification").build();
+
+    connection.on("ReceiveMessage", function (user, message) {
+        alert("So key");
+    });
+
+    connection.start().then(function () {
+        alert("connected");
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+</script> *@

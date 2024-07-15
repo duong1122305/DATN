@@ -58,7 +58,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
         {
-            var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>($"/api/Booking/Create-Booking?token={token}", createBookingRequest);
+            var lst = await _httpClient.PostAsJsonAsync<CreateBookingRequest>($"/api/Booking/Guest-Booking?datetime=2024-7-15", createBookingRequest);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
         }
@@ -77,9 +77,9 @@ namespace DATN.ADMIN.Services
             return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}&date={date.Year}-{date.Month}-{date.Day}").GetAwaiter().GetResult();
         }
 
-        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to)
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to,DateTime dateTime)
         {
-            return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}").GetAwaiter().GetResult();
+            return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}&datetime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}").GetAwaiter().GetResult();
         }
 
         public async Task<ResponseData<string>> StartBooking(ActionView actionView)

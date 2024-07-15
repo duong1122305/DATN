@@ -24,6 +24,8 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public TimeSpan EndDateTime { get; set; }
 
+        public DateTime DateBooking { get; set; }
+
         public BookingDetailStatus Status { get; set; } 
 
         public double Price { get; set; }

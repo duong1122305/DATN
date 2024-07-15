@@ -9,7 +9,7 @@ namespace DATN.ADMIN.IServices
     {
         Task<ResponseData<List<BookingView>>> GetAll();
         Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id, DateTime date);
-        Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to);
+        Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to,DateTime dateTime);
         Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token);
         Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking);
         public Task<ResponseData<string>> CompleteBooking(ActionView actionView);

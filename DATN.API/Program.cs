@@ -25,6 +25,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
+builder.Services.AddSignalRCore();
 builder.Services.AddDbContext<DATNDbContext>(options =>
 {
     options.UseSqlServer(

@@ -532,8 +532,7 @@ namespace DATN.Aplication.Services
                         on workShift.Id equals schedule.WorkShiftId
                         join user in await _usermanager.Users.ToListAsync()
                         on schedule.UserId equals user.Id
-                        where shifttable.Id == shift && workShift.WorkDate.Year == workdate.Year
-                        && workShift.WorkDate.Month == workdate.Month && workShift.WorkDate.Day == workdate.Day
+                        where shifttable.Id == shift && workShift.WorkDate.Date.CompareTo(workdate.Date) == 0
                         && user.IsDeleted == false
                         select new NumberOfScheduleView
                         {
@@ -549,102 +548,85 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = $"Không có dữ liệu về nhân viên trong ca" };
         }
-        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from1, TimeSpan to)
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(TimeSpan from1, TimeSpan to, DateTime dateTime)
         {
             try
             {
-                if (from1.CompareTo(new TimeSpan(7, 0, 0)) < 0 || from1.CompareTo(new TimeSpan(22, 30, 0)) > 0 || to.CompareTo(new TimeSpan(22, 30, 0)) > 0)
+                var queryshift = from shiftTable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                 orderby shiftTable.From
+                                 select shiftTable;
+                var startShift = queryshift.FirstOrDefault().From;
+                var endShift = queryshift.OrderByDescending(c => c.To).FirstOrDefault().To;
+                if (from1.CompareTo(startShift) < 0 || from1.CompareTo(endShift) > 0 || to.CompareTo(endShift) > 0)
                 {
                     return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không ai làm mà phục vụ đâu" };
                 }
                 else
                 {
-                    if (from1.CompareTo(DateTime.Now.TimeOfDay) < 0)
+                    if (from1.CompareTo(to) >= 0)
                     {
-                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu làm dịch vụ đang nhỏ hơn giờ hiện tại" };
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu lớn hơn giờ kết thúc" };
                     }
+                    var dateNow = DateTime.Now;
+                    if (dateTime.Date.CompareTo(dateNow.Date) == 0)
+                    {
+                        if (from1.CompareTo(dateNow.TimeOfDay) < 0)
+                        {
+                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu làm dịch vụ đang nhỏ hơn giờ hiện tại" };
+                        }
+                    }
+                    var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                      where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To) <= 0
+                                      select shift).FirstOrDefault();
+                    if (queryShift == null)
+                    {
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
+                    }
+                    var response = await GetListStaffInDay(queryShift.Id, dateTime);
+                    List<Guid> staffFree = new List<Guid>();
+                    foreach (var item in response.Data)
+                    {
+
+                        var queryCheckUser = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                              join schdule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                              on bookingDetail.StaffId equals schdule.UserId
+                                              join workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
+                                              on schdule.WorkShiftId equals workshift.Id
+                                              join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                              on workshift.ShiftId equals shift.Id
+                                              where bookingDetail.StaffId == item.IdStaff
+                                              select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
+                        if (queryCheckUser.Count()==0)
+                        {
+                            staffFree.Add(item.IdStaff.Value);
+                            continue;
+                        }
+                        var count = 0;
+                        foreach (var item1 in queryCheckUser)
+                        {
+                            if (item1.StartDateTime.TimeOfDay.CompareTo(to) >= 0 || item1.EndDateTime.TimeOfDay.CompareTo(from1) <= 0)
+                            {
+                                count++;
+                            }
+                        }
+                        if (count == queryCheckUser.Count())
+                        {
+                            staffFree.Add(item.IdStaff.Value);
+                        }
+                    }
+                    List<NumberOfScheduleView> listStaff = new List<NumberOfScheduleView>();
+                    foreach (var item in staffFree)
+                    {
+                        var query = await _usermanager.FindByIdAsync(item.ToString());
+                        if (query != null)
+                        {
+                            listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName, IdStaff = query.Id });
+                        }
+                    }
+                    if (listStaff.Count > 0)
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                     else
-                    {
-                        if (from1.CompareTo(to) >= 0)
-                        {
-                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ bắt đầu lớn hơn giờ kết thúc" };
-                        }
-                        else
-                        {
-                            var dateNow = DateTime.Now;
-                            var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                              where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To) <= 0
-                                              select shift).FirstOrDefault();
-                            if (queryShift == null)
-                            {
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
-                            }
-                            var response = await GetListStaffInDay(queryShift.Id, dateNow);
-                            List<Guid> staffFree = new List<Guid>();
-                            foreach (var item in response.Data)
-                            {
-
-                                var queryCheckUser = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                                                     join schdule in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                                     on bookingDetail.StaffId equals schdule.UserId
-                                                     join workshift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
-                                                     on schdule.WorkShiftId equals workshift.Id
-                                                     join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                                     on workshift.ShiftId equals shift.Id
-                                                     where bookingDetail.StaffId == item.IdStaff
-                                                     && shift.Id == queryShift.Id
-                                                     group new { bookingDetail.StartDateTime, bookingDetail.EndDateTime }
-                                                     by new { bookingDetail }
-                                                     into view
-                                                     select new BookingDetail
-                                                     {
-                                                         BookingId = view.Key.bookingDetail.BookingId,
-                                                         PetId = view.Key.bookingDetail.PetId,
-                                                         ComboId = view.Key.bookingDetail.ComboId,
-                                                         Booking = view.Key.bookingDetail.Booking,
-                                                         ComboService = view.Key.bookingDetail.ComboService,
-                                                         EndDateTime = view.Key.bookingDetail.EndDateTime,
-                                                         Id = view.Key.bookingDetail.Id,
-                                                         Pet = view.Key.bookingDetail.Pet,
-                                                         Price = view.Key.bookingDetail.Price,
-                                                         Quantity = view.Key.bookingDetail.Quantity,
-                                                         Reports = view.Key.bookingDetail.Reports,
-                                                         ServiceDetail = view.Key.bookingDetail.ServiceDetail,
-                                                         ServiceDetailId = view.Key.bookingDetail.ServiceDetailId,
-                                                         Staff = view.Key.bookingDetail.Staff,
-                                                         StaffId = view.Key.bookingDetail.StaffId,
-                                                         StartDateTime = view.Key.bookingDetail.StartDateTime,
-                                                         Status = view.Key.bookingDetail.Status,
-                                                     };
-                                var count = 0;
-                                foreach (var item1 in queryCheckUser)
-                                {
-                                    if (item1.StartDateTime.TimeOfDay.CompareTo(to) >= 0 || item1.EndDateTime.TimeOfDay.CompareTo(from1) <= 0)
-                                    {
-                                        count++;
-                                    }
-                                }
-                                if (count == queryCheckUser.Count())
-                                {
-                                    staffFree.Add(item.IdStaff.Value);
-                                }
-                            }
-                            List<NumberOfScheduleView> listStaff = new List<NumberOfScheduleView>();
-                            foreach (var item in staffFree)
-                            {
-                                var query = await _usermanager.FindByIdAsync(item.ToString());
-                                if (query != null)
-                                {
-                                    listStaff.Add(new NumberOfScheduleView { FullName = query.FullName, UserName = query.UserName, IdStaff = query.Id });
-                                }
-                            }
-                            if (listStaff.Count > 0)
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
-                            else
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
-                        }
-
-                    }
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
                 }
             }
             catch (Exception e)
