@@ -14,7 +14,18 @@
 <MudForm Style="text-align:center;margin-bottom:20px">
     <MudItem xs="12" sm="6" md="4">
         <div style="display: flex; justify-content: flex-end; width: 1240px; margin-left: auto;margin-left:10px">
-            <MudAutocomplete T="GuestViewModel" Label="Chọn khách hàng *" ValueChanged="Change" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" />
+            <MudAutocomplete T="GuestViewModel" Label="Chọn khách hàng *" ValueChanged="Change" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" Disabled="@(!CanSelectGuest)" />
+            @if (value1 != null)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                               Color="Color.Error"
+                               Size="Size.Small"
+                               Disabled="@isEditing"
+                               OnClick="ClearGuestSelection"
+                               Style="margin-left: 8px;"
+                               ToolTip="Xoá lựa chọn khách hàng">
+                </MudIconButton>
+            }
             <div style="display: flex; align-items: center;padding-left:200px">
                 <MudButton OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
                 <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
@@ -33,7 +44,7 @@
     <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
         <HeaderContent>
             @* <MudTh>Tên dịch vụ</MudTh> *@
-            <MudTh>nhân viên</MudTh>
+            <MudTh>Nhân viên</MudTh>
             <MudTh>Dịch vụ chi tiết</MudTh>
             <MudTh>Giá</MudTh>
             <MudTh>Giờ bắt đầu</MudTh>
@@ -69,6 +80,8 @@
     //gắn cờ
     private bool isEditing = false;
 
+    // disable nếu chọn khách và đã có dịch vụ 
+    private bool CanSelectGuest => value1 == null && bookingService.lstBooking.Count == 0;
     [Inject]
     public IPetServiceClient petService { get; set; }
     public List<PetVM> lstPet = new List<PetVM>();
@@ -150,6 +163,13 @@
         {
             lstPet = new List<PetVM>();
         }
+    }
+    // xoá khách nếu chọn nhầm
+    private void ClearGuestSelection()
+    {
+        value1 = null;
+        // Cập nhật lại trạng thái giao diện
+        StateHasChanged();
     }
     private async Task<bool?> Confirm()
     {
