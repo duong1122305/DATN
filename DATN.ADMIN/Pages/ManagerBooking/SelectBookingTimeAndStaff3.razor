@@ -14,6 +14,7 @@
 </div>
 <div style="display:flex;width:500px;margin-left:10px">
     <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
+    <MudDatePicker @bind-Date="bookingDate" Label="Ngày hẹn" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" />
     <MudButton OnClick="@(async()=>await Create())">Tìm Kiếm</MudButton>
 </div>
 @if (lstFreeTime.Count > 0 && lstFreeTime != null)
@@ -72,6 +73,7 @@
     private List<NumberOfScheduleView> lstFreeTime = new List<NumberOfScheduleView>();
     TimeSpan? timeStart;
     TimeSpan? timeEnd;
+    DateTime? bookingDate;
     protected async override Task OnInitializedAsync()
     {
         LoadData();
@@ -179,7 +181,7 @@
     }
 
 
-    protected async Task CreateBooking(Guid? id,string name)
+    protected async Task CreateBooking(Guid? id, string name)
     {
         CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
             {

@@ -26,7 +26,7 @@
         <MudSpacer />
     </ToolBarContent>
     <Columns>
-        <TemplateColumn Title="Ngày" GroupBy="@_groupBy" Sortable="false" Filterable="false">
+        <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
             <GroupTemplate>
                 <span style="font-weight:bold">@context.Grouping.Key</span>
             </GroupTemplate>
@@ -149,7 +149,6 @@
     {
         dataGrid?.ExpandAllGroups();
     }
-
 
     private async Task OpenDialog(Guid id, DateTime dateBooking)
     {
