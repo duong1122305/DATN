@@ -23,6 +23,8 @@ Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQx
 builder.Services.AddSyncfusionBlazor();
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/"), Timeout = TimeSpan.FromMinutes(30) });
@@ -120,6 +122,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapBlazorHub();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/notification");
+});
 app.MapFallbackToPage("/_Host");
 
 app.Run();

@@ -82,9 +82,9 @@ namespace DATN.API.Controllers
             return await _bookingManagement.ConfirmBooking(actionView);
         }
         [HttpPost("Guest-Booking")]
-        public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest, DateTime dateTime)
+        public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest)
         {
-            return await _bookingManagement.GuestCreateBooking(createBookingRequest, dateTime);
+            return await _bookingManagement.GuestCreateBooking(createBookingRequest);
         }
     }
 }

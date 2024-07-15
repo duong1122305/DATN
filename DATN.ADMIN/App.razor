@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Security.Claims
 @using System.IdentityModel.Tokens.Jwt
+@using Microsoft.AspNetCore.SignalR.Client
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -32,6 +33,7 @@
 
     [Inject]
     protected NavigationManager navigationManager { get; set; }
+    HubConnection hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,6 +50,6 @@
         {
             navigationManager.NavigateTo($"/dangnhap");
         }
-
+       
     }
 }

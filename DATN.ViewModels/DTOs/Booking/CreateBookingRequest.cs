@@ -15,6 +15,7 @@ namespace DATN.ViewModels.DTOs.Booking
         public int? PaymentTypeId { get; set; }
         public Guid GuestId { get; set; }
         public double? TotalPrice { get; set; }
+        public DateTime DateBooking { get; set; }
         public BookingStatus Status { get; set; } 
     }
 }
