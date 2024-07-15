@@ -1,0 +1,13 @@
+﻿<div style="text-align:center">
+    <img src="@linkqr" height="640px" width="540px">
+</div>
+
+@code {
+    [Parameter]
+    public string linkqr { get; set; }
+    protected override Task OnInitializedAsync()
+    {
+        var test = linkqr;
+        return base.OnInitializedAsync();
+    }
+}

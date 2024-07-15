@@ -2,8 +2,10 @@
 @using DATN.ADMIN.IServices
 @using DATN.Utilites
 @using DATN.ViewModels.DTOs.Booking
+@using DATN.ViewModels.DTOs.Payment
+@using Newtonsoft.Json
 @inject IAddressService _addressServive;
-
+@inject IDialogService _dialogservice;
 <MudContainer Class="invoice-container" Style="margin-top: 20px">
     <MudPaper Elevation="3" Class="invoice-paper">
         <div class="invoice-body">
@@ -63,8 +65,10 @@
                             <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
+                        <MudButton OnClick="Payment">Thanh toán thử</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
+                           
                             <div>Mã qr aaaaaaaaaaaaaa </div>
                         }
                     </div>
@@ -97,6 +101,47 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+    }
+    protected async Task Payment()
+    {
+        APIRequest request = new APIRequest()
+            {
+                accountName = "Meo Shop",
+                accountNo = 37110001031335,
+                acqId = 970418,
+                addInfo = $"Thanh toán hóa đơn chăm sóc thú cưng ngày {date.ToString("dd/MM/yyyy")}",
+                amount = bill.TotalPayment,
+                format = "text",
+                template = "compact2"
+            };
+        HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.Add("x-client-id", "c43d080b-f369-4700-bd96-f96d79bcd172");
+        client.DefaultRequestHeaders.Add("x-api-key", "26b18710-94ae-4c9c-8d22-a6880a530924");
+        var response = await client.PostAsJsonAsync<APIRequest>("https://api.vietqr.io/v2/generate", request);
+        var result = JsonConvert.DeserializeObject<APIResponse>(await response.Content.ReadAsStringAsync());
+        if (result.code == "00")
+        {
+            string nameDialog = "Thanh toán";
+
+            DialogOptions options = new DialogOptions()
+                {
+                    CloseOnEscapeKey = true,
+                    Position = DialogPosition.Center,
+                    MaxWidth = MaxWidth.Large,
+                    CloseButton = true,
+                    FullWidth = true,
+                    DisableBackdropClick = true
+                };
+            DialogParameters parameter = new DialogParameters();
+            parameter.Add("linkqr", result.data.qrDataURL);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog,parameter, options);
+            var result1 = await createUpdateDialog.Result;
+            if (!result1.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
+        }
     }
 
 }
