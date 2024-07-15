@@ -68,9 +68,9 @@
                         <MudButton OnClick="Payment">Thanh toán thử</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
-                           
-                            <div>Mã qr aaaaaaaaaaaaaa </div>
+                           <QRVietQRBankking/>
                         }
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                     </div>
                 </div>
             }
