@@ -112,7 +112,7 @@ namespace DATN.Aplication.Services
                 {
                     var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
-                                       && bookingTable.BookingTime.Date.CompareTo(createBookingRequest.DateBooking.Date) == 0
+                                       && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
                                        && bookingTable.Status != BookingStatus.StaffCancelled && bookingTable.Status != BookingStatus.AdminCancelled && bookingTable.Status != BookingStatus.CustomerCancelled
                                        select bookingTable;
                     if (queryBooking.Count() == 0)
@@ -133,7 +133,7 @@ namespace DATN.Aplication.Services
                         await _unitOfWork.SaveChangeAsync();
                         queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
-                                       && bookingTable.BookingTime.Date.CompareTo(createBookingRequest.DateBooking.Date) == 0
+                                       && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
                                        && bookingTable.Status != BookingStatus.StaffCancelled && bookingTable.Status != BookingStatus.AdminCancelled && bookingTable.Status != BookingStatus.CustomerCancelled
                                        select bookingTable;
                     }
@@ -216,8 +216,8 @@ namespace DATN.Aplication.Services
                             PetId = item.PetId,
                             Price = item.Price,
                             StaffId = item.StaffId,
-                            EndDateTime = createBookingRequest.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
-                            StartDateTime = createBookingRequest.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
+                            EndDateTime = item.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
+                            StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
                         };

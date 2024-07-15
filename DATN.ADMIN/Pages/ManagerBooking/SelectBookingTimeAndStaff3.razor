@@ -144,7 +144,7 @@
         //gọi api thêm
         int time = (int)duration / 60;
         timeEnd = timeStart.Value.Add(new TimeSpan(time, (int)(duration - (time * 60)), 0));
-        var result = await _iBooking.ListStaffFreeInTime(timeStart.Value.ToString(), timeEnd.Value.ToString());
+        var result = await _iBooking.ListStaffFreeInTime(timeStart.Value.ToString(), timeEnd.Value.ToString(),bookingDate.Value);
         if (result.IsSuccess)
         {
             Message("Tìm thành công", Severity.Success);
@@ -192,7 +192,8 @@
                 ServiceDetailId = idDetailsServices,
                 Price = (double)priceServicesDetails,
                 StartDateTime = timeStart.Value,
-                EndDateTime = timeEnd.Value
+                EndDateTime = timeEnd.Value,
+                DateBooking = bookingDate.Value,
             };
         bookingService.AddBooking(bookingCreate);
         // Đóng dialog sau khi thêm xong

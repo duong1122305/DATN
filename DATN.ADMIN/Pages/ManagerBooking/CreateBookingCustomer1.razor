@@ -239,7 +239,7 @@
                     {
                         GuestId = value1.Id,
                         ListIdServiceDetail = bookingService.lstBooking,
-                        PaymentTypeId = 1
+                        PaymentTypeId = 1,
                     };
                 var repos = await _BookingSer.CreateBookingStore(createBookingRequest, _httpContextAccessor.HttpContext.Session.GetString("Key"));
                 if (repos.IsSuccess)
