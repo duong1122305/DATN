@@ -526,6 +526,7 @@ namespace DATN.Aplication.Services
 							 where typeAttendance == -1 
 							 || (typeAttendance == 1 && at != null&& at.CheckInTime.HasValue&& at.CheckOutTime.HasValue)
 							 || (typeAttendance == 0 &&( at == null|| !at.CheckInTime.HasValue|| !at.CheckOutTime.HasValue))
+							 orderby ws.WorkDate
 							 select new AttendancePerMonth
 							 {
 								 Date = ws.WorkDate.Date.ToString("dd/MM/yyy"),
