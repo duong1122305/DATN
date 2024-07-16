@@ -42,7 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     ValidateIssuerSigningKey = true,
                     ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value,
                     ValidIssuer = builder.Configuration.GetSection("JWT:Issuer").Value,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value!))
                 };
             });
 
@@ -82,6 +82,7 @@ builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddScoped<ICategoryServices,CategoryServices>();
 builder.Services.AddScoped<IProductServices,ProductServices>();
 builder.Services.AddScoped<IBrandServices,BrandServices>();
+builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
 builder.Services.AddMudServices(config =>
