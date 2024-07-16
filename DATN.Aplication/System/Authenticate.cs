@@ -224,6 +224,7 @@ namespace DATN.Aplication.System
                 {
                     userIdentity.FullName = userUpdateView.FullName;
                     userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
+                    userIdentity.Address = string.IsNullOrEmpty(userUpdateView.Address) ? userIdentity.Address: userUpdateView.Address;
                     var result = await _userManager.UpdateAsync(userIdentity);
                     if (result.Succeeded)
                         return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
@@ -236,7 +237,8 @@ namespace DATN.Aplication.System
                     {
                         userIdentity.FullName = userUpdateView.FullName;
                         userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
-                        var result = await _userManager.UpdateAsync(userIdentity);
+						userIdentity.Address = string.IsNullOrEmpty(userUpdateView.Address) ? userIdentity.Address : userUpdateView.Address;
+						var result = await _userManager.UpdateAsync(userIdentity);
                         if (result.Succeeded)
                             return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
                         else

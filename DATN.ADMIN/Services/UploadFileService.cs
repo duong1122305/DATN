@@ -4,6 +4,7 @@ using DATN.ADMIN.IServices;
 using DATN.Aplication;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
 
 namespace DATN.ADMIN.Services
@@ -11,9 +12,8 @@ namespace DATN.ADMIN.Services
     public class UploadFileService: IUpLoadFileService
 	{
 		private readonly Cloudinary _cloundinary;
-		private readonly IUnitOfWork _unitOfWork;
 
-		public UploadFileService(IOptions<CloundinarySettings> cloundConfig, IUnitOfWork unitOfWork)
+		public UploadFileService(IOptions<CloundinarySettings> cloundConfig)
 		{
 			Account account = new Account(
 				cloundConfig.Value.CloundName,
@@ -22,7 +22,6 @@ namespace DATN.ADMIN.Services
 				);
 
 			_cloundinary = new Cloudinary(account);
-			_unitOfWork = unitOfWork;
 		}
 		public async Task<ResponseData<string>> UploadFile( IFormFile file)
 		{
@@ -31,6 +30,27 @@ namespace DATN.ADMIN.Services
 				var param = new ImageUploadParams()
 				{
 					File = new FileDescription(file.FileName, file.OpenReadStream())
+				};
+
+				var uploadFile = await _cloundinary.UploadAsync(param);
+				var x= uploadFile.StatusCode;
+				var result=  uploadFile.SecureUrl.AbsoluteUri;
+
+
+				return new ResponseData<string>("ok");
+			}
+			catch (Exception ex)
+			{
+				return  new ResponseData<string>(false,"Thất bại"+ex); ;
+			}
+		}
+		public async Task<ResponseData<string>> UploadFile( IBrowserFile file)
+		{
+			try
+			{
+				var param = new ImageUploadParams()
+				{
+					File = new FileDescription(Guid.NewGuid().ToString(), file.OpenReadStream())
 				};
 
 				var uploadFile = await _cloundinary.UploadAsync(param);

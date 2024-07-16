@@ -17,12 +17,6 @@
 
 	<MudDrawerContainer Class="mud-height-full" Style=" width:100%" >
 
-	
-
-
-
-
-
 		<MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
 			<ToolBarContent>
 				<MudText Typo="Typo.h6">Danh sách khách hàng</MudText>
@@ -80,7 +74,7 @@
 				}
 
 				<MudTd>
-					<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
+					<MudSwitch T="bool" Value="@(context.IsDelete!.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
 				</MudTd>
 				<MudTd>
 					<MudButtonGroup Variant="Variant.Filled">
@@ -128,7 +122,7 @@ else
 	{
 		//var response = await _client.GetGuest();
 		var response = await _guestService.GetGuest();
-		lstGuest = response.Data;
+		lstGuest = response.Data!;
 
 		StateHasChanged();
 	}
