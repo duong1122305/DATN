@@ -452,5 +452,21 @@ namespace DATN.Aplication.System
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản sai" };
         }
-    }
+		public async Task<ResponseData<string>> UpdateImg(string url, string id)
+		{
+			var userIdentity = await _userManager.FindByIdAsync(id);
+			if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
+			else
+			{
+
+				userIdentity.url = url;
+				var result = await _userManager.UpdateAsync(userIdentity);
+				if (result.Succeeded)
+					return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật ảnh thành công!!" };
+				else
+					return new ResponseData<string> { IsSuccess = result.Succeeded, Error = "Thông tin chưa được thay đổi" };
+
+			}
+		}
+	}
 }

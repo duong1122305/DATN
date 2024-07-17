@@ -66,5 +66,14 @@ namespace DATN.ADMIN.Services
 				return  new ResponseData<string>(false,"Thất bại"+ex); ;
 			}
 		}
+		public async Task<DeletionResult> RemoveImg(string publicId)
+		{
+			var deleteParams = new DeletionParams(publicId);
+
+			var result = await _cloundinary.DestroyAsync(deleteParams);
+
+			return result;
+		}
+
 	}
 }
