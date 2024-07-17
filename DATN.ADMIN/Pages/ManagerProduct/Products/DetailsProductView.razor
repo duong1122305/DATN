@@ -22,7 +22,7 @@
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
-                          <MudSpacer/>
+            <MudSpacer />
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
         </ToolBarContent>
         <Columns>
@@ -73,10 +73,10 @@
 }
 else
 {
-   <div style="text-align:center">
+    <div style="text-align:center">
         <MudProgressCircular Color="Color.Default" Indeterminate="true" />
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
-   </div>
+    </div>
 }
 <style>
     .my-custom-class {
@@ -91,7 +91,7 @@ else
     public List<CategoryProductView> lstCateProduct = new List<CategoryProductView>();
     string _nameButton = "";
     [Inject]
-    private ICategoryServices _client { get; set; }
+    private IProductServices _client { get; set; }
 
 
     string searchString = "";

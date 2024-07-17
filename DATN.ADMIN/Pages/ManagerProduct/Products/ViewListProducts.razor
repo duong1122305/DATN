@@ -69,6 +69,7 @@
 
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Default" OnClick="@(async()=>await OpenDetails(context.Item.Id))" title="Xem chi tiết"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
             </TemplateColumn>
@@ -277,7 +278,31 @@ else
             StateHasChanged();
         }
     }
+    private async Task OpenDetails(int? id)
+    {
 
+        var parameters = new DialogParameters();
+        // var cate = lstProduct.FirstOrDefault(x => x.Id == id);
+        parameters.Add("id", id);
+        string nameDialog = "Danh mục chi tiết";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Medium,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsProductView>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
     //messenge
     private void Message(string message, Severity severity)
     {

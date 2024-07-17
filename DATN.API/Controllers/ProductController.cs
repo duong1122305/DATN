@@ -41,5 +41,34 @@ namespace DATN.API.Controllers
         {
             return await _productManagementServicel.ListProduct();
         }
+
+        //product details
+        [HttpPost("Create-Product-Details")]
+        public async Task<ResponseData<string>> CreateProductDetails(CreateProductView productView)
+        {
+            return await _productManagementServicel.CreateProduct(productView);
+        }
+        [HttpPut("Update-Product-Details")]
+        public async Task<ResponseData<string>> UpdateProductDetails(CreateProductView productView)
+        {
+            return await _productManagementServicel.UpdateProduct(productView);
+        }
+        [HttpGet("Remove-Product-Details")]
+        public async Task<ResponseData<string>> RemoveProductDetails(int id)
+        {
+            return await _productManagementServicel.RemoveProduct(id);
+
+        }
+        [HttpGet("Active-Product-Details")]
+        public async Task<ResponseData<string>> ActiveProductDetails(int id)
+        {
+            return await _productManagementServicel.ActiveProduct(id);
+
+        }
+        [HttpGet("List-Product-Details")]
+        public async Task<ResponseData<List<ProductView>>> ListProductDetails()
+        {
+            return await _productManagementServicel.ListProduct();
+        }
     }
 }

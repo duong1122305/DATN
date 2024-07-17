@@ -49,7 +49,7 @@
                             <MudTextField T="string" Label="Mô tả" @bind-Value="@product.Description" For="@(() => product.Description)" />
                             <div class="mud-select">
                                 <label class="mud-input-label">Chọn thương hiệu</label>
-                                <select @bind="product.Brand" required>
+                                <select @bind="product.IdBrand" required>
                                     <option value="0">Chọn thương hiệu</option>
                                     @foreach (var i in lstBrand)
                                     {
@@ -171,13 +171,12 @@
 
         if (product != null)
         {
-
-
             var result = await _client.UpdateProduct(new CreateProductView()
                 {
+                    Id = product.Id,
                     Name = product.Name,
                     Description = product.Description,
-                    IdBrand = product.IdBrand,
+                    IdBrand = product.IdBrand.Value,
                     IdCategoryProduct = product.CategoryProductId
                 });
             if (result.IsSuccess)
