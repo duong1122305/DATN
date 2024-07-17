@@ -23,7 +23,7 @@ namespace DATN.Aplication.Services
             try
             {
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
+                               where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() == 0)
                 {
@@ -54,7 +54,7 @@ namespace DATN.Aplication.Services
                                 where cate.Id == categoryView.Id
                                 select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
+                               where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() != 0)
                 {

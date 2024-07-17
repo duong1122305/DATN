@@ -21,7 +21,7 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
         {
             var check = (from product in await _unitOfWork.ProductRepository.GetAllAsync()
-                         where product.Name == productView.Name
+                         where product.Name == productView.Name.Trim().TrimStart().TrimEnd()
                          select product).FirstOrDefault();
             try
             {
@@ -55,7 +55,7 @@ namespace DATN.Aplication.Services
                                where cate.Id == productView.Id
                                select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == productView.Name
+                               where cate.Name == productView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() > 0)
                 {

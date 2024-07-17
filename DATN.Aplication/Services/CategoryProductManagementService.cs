@@ -24,7 +24,7 @@ namespace DATN.Aplication.Services
             try
             {
                 var check = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
-                            where cate.Name == categoryView.Name
+                            where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                             select cate;
                 if (check.Count() == 0)
                 {
@@ -55,7 +55,7 @@ namespace DATN.Aplication.Services
                                 where cate.Id == categoryView.Id
                                 select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
+                               where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() != 0)
                 {
@@ -145,7 +145,7 @@ namespace DATN.Aplication.Services
                            Name = cate.Name,
                            Category = catepro.Name,
                            IsDeleted = cate.IsDeleted,
-                           CategoryId=catepro.Id,
+                           CategoryId = catepro.Id,
                        };
             if (list.Count() > 0)
                 return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.ToList() };
