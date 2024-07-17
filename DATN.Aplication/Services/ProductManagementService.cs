@@ -51,12 +51,12 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductRepository.GetAllAsync()
-                               where cate.Id == productView.Id
-                               select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == productView.Name.Trim().TrimStart().TrimEnd()
-                               select cate;
+                var product = (from pro in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where pro.Id == productView.Id
+                               select pro).FirstOrDefault();
+                var checkdup = from pro in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where pro.Name == productView.Name.Trim().TrimStart().TrimEnd()
+                               select pro;
                 if (checkdup.Count() > 0)
                 {
                     if (product.Id == checkdup.FirstOrDefault().Id)
