@@ -3,92 +3,189 @@
 @using System.IdentityModel.Tokens.Jwt
 @using DATN.ADMIN.IServices
 @using DATN.ADMIN.Services
+@using DATN.Utilites
 @using DATN.ViewModels.DTOs.Authenticate
 @using System.Security.Claims
 @inject IDialogService _dialogservice;
+@inject ISnackbar Snackbar;
+@inject IJSRuntime JSRuntime;
 
-<PageTitle>Hồ Sơ Người Dùng</PageTitle>
+<div>
+	<PageTitle>Hồ Sơ Người Dùng</PageTitle>
 
-<MudGrid>
-    <MudItem xs="12" sm="6">
-        <MudText Typo="Typo.h6" Class="p-4">Hồ sơ người dùng</MudText>
-        <MudPaper Class="pa-4">
-            <MudForm @bind-IsValid="@success">
-                <MudTextField T="string" Label="Tên người dùng" @bind-Value="@user.UserName" Required="true" RequiredError="Vui lòng không để trống!" />
-                <MudTextField T="string" Label="Họ và tên" @bind-Value="@user.FullName" Required="true" RequiredError="Vui lòng không để trống" />
-                <MudTextField T="string" Label="Số điện thoại" @bind-Value="@user.PhoneNumber" Required="true" RequiredError="Vui lòng không để trống" />
-                <MudTextField T="string" Label="Email" @bind-Value="@user.Email" Required="true" RequiredError="Vui lòng không để trống" />
-                <MudTextField T="string" Label="Địa chỉ" @bind-Value="@user.Address" Required="true" RequiredError="Vui lòng không để trống" />
-                <div class="d-flex align-center justify-space-between pt-2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Xác nhận</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Class="ml-auto">Đổi mật khẩu</MudButton>
-                </div>
-            </MudForm>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+	<MudGrid Style="margin-top: 70px">
+		<MudItem xs="0" sm="2">
+		</MudItem>
+		<MudItem xs="12" sm="5">
+			<MudText Typo="Typo.h6" Class="p-4">Hồ sơ người dùng</MudText>
+			<MudPaper Class="pa-4">
+				<MudForm @bind-IsValid="@success">
+					<MudTextField T="string" Label="Tên người dùng" @bind-Value="@user.UserName" Disabled=true Required="true" RequiredError="Vui lòng không để trống!" />
+					<MudTextField T="string" Label="Họ và tên" @bind-Value="@user.FullName" Required="true" RequiredError="Vui lòng không để trống" />
+					<MudTextField T="string" Label="Số điện thoại" @bind-Value="@user.PhoneNumber" Required="true" RequiredError="Vui lòng không để trống" />
+					<MudTextField T="string" Label="Email" @bind-Value="@user.Email" Disabled=true Required="true" RequiredError="Vui lòng không để trống" />
+
+					@if (!string.IsNullOrEmpty(user.Address))
+					{
+						<DATN.ADMIN.Components.AddressComponent AddressCode="@AddressCode" OnAddressChanged="HandleAddressChanged"></DATN.ADMIN.Components.AddressComponent>
+					}
+
+					<div class="d-flex align-center justify-space-between pt-2">
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async()=>await Update())" Disabled="@(!success)" Class="ml-auto">Xác nhận</MudButton>
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Class="ml-auto">Đổi mật khẩu</MudButton>
+					</div>
+				</MudForm>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="0" sm="3" Style="background-color:#e4f8ff; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+			<MudImage Src="@url" Alt="Mony the dog" Height="250" Width="250" Elevation="25" Class="rounded-lg" Style="border-radius: 50%;" />
+			<div style="display: flex; justify-content: center; margin-top: 20px;">
+				<MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="ChooseFile" Style="width:100px; padding: 15px 2px">
+					<ButtonTemplate >
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" Style="width:45px" for="@fileInput">Sửa</MudButton>
+					</ButtonTemplate>
+				</MudFileUpload>
+
+				<MudButton Size="Size.Small" Style="height:35px; margin-top: 21px"  OnClick="RemoveImg" Variant="Variant.Filled" Color="Color.Secondary">Xoá ảnh</MudButton>
+			</div>
+		</MudItem>
+	</MudGrid>
+</div>
+
 @code {
+	[Inject]
+	public IDialogService _dialogService { get; set; }
 
+	[Inject]
+	public NavigationManager navi { get; set; }
 
-    [Inject]
-    NavigationManager navi { get; set; }
+	[Inject]
+	public IUserClientSev userClient { get; set; }
+	[Inject]
+	public IUpLoadFileService _upFile { get; set; }
 
-    [Inject]
-    IUserClientSev userClient { get; set; }
+	[Inject]
+	public IHttpContextAccessor _contextAccessor { get; set; }
 
-    [Inject]
-    HttpContextAccessor _contextAccessor { get; set; }
+	private UserInfView user { get; set; } = new UserInfView();
+	private bool success = false;
+	private string id = "";
+	private string AddressCode = "";
+	private string url = Contant.ImgUser;
+	protected async override Task OnInitializedAsync()
+	{
+		var token = _contextAccessor.HttpContext.Session.GetString("Key");
+		var tokenHandler = new JwtSecurityTokenHandler();
+		var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+		id = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
 
-    UserInfView user { get; set; } = new UserInfView();
-    List<UserInfView> lstUser { get; set; } = new List<UserInfView>();
+		var result = await userClient.GetInfoUser(id);
+		if (result != null)
+		{
+			user = result.Data;
+			AddressCode = user.Address ?? "";
+			if (!string.IsNullOrEmpty(user.ImgId))
+			{
+				url = user.ImgUrl!;
+			}
+			StateHasChanged();
+		}
+		else
+		{
+			navi.NavigateTo("/NotFound");
+		}
+	}
 
-    bool success = false;
-    private string id = "";
+	private async Task Update()
+	{
+		var userCU = new UserUpdateView()
+			{
+				FullName = user.FullName,
+				Address = user.Address,
+				PhoneNumber = user.PhoneNumber,
+			};
+		var result = await userClient.UpdateUser(userCU, user.UserName);
+		if (result.IsSuccess)
+		{
+			Snackbar.Add(result.Data, Severity.Success);
+			StateHasChanged();
+		}
+		else
+		{
+			Snackbar.Add(result.Error, Severity.Warning);
+		}
+	}
+	private async Task OpenDialog(string username)
+	{
+		var parameters = new DialogParameters();
+		string nameDialog = "Thay đổi mật khẩu";
+		DialogOptions options = new DialogOptions
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<UpdatePassword>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+		}
+	}
 
-    protected async override Task OnInitializedAsync()
-    {
-        var token = _contextAccessor.HttpContext.Session.GetString("Key");
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
-        // var listClaims = jwtSecurityToken.Claims.ToArray();
-        id = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-        // foreach(var i in listClaims)
-        // {
-        //     if(i.Type == ClaimTypes.NameIdentifier)
-        //     {
-        //         id = i.Value;
-        //     }
-        // }
+	private void HandleAddressChanged(string address)
+	{
+		user.Address = address;
+	}
+	private async Task ChooseFile(IBrowserFile file)
+	{
+		var result = await _upFile.UploadFile(file);
+		if (result.IsSuccess)
+		{
+			user.ImgUrl = result.Data![0];
+			var oldID = user.ImgId;
+			var response = await userClient.UpdateImg(result.Data![0], result.Data![1], user.UserName);
+			if (response.IsSuccess)
+			{
+				url = result.Data[0];
+				if (!string.IsNullOrEmpty(oldID))
+				{
+					await _upFile.RemoveImg(oldID);
+				}
+				StateHasChanged();
+				Snackbar.Add(response.Data, Severity.Success);
+			}
+			else
+			{
+				Snackbar.Add(response.Error, Severity.Warning);
+			}
+		}
+		else
+		{
+			Snackbar.Add(result.Error, Severity.Warning);
+		}
+	}
+	private bool Confirm(string text)
+	{
+		return true;
+	}
 
-        var result = await userClient.GetInfoUser(id);
-        if (result != null) user = result.Data;
-
-        if (result == null) navi.NavigateTo("/NotFound");
-    }
-    // mở popup
-    private async Task OpenDialog(string username)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Thay đổi mật khẩu";
-        // user = lstUser.FirstOrDefault(c => c.UserName == username);
-        // var updateView = new UserRegisterView()
-        //     {
-        //         UserName = username,
-        //         Password = user.Password,
-        //     };
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
-                CloseButton = true,
-                FullWidth = true
-            };
-        var createUpdateDialog = await _dialogservice.ShowAsync<UpdatePassword>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-        }
-    }
+	private async Task RemoveImg()
+	{
+		var response = await userClient.UpdateImg("0", "0", user.UserName);
+		var oldID = user.ImgId;
+		if (response.IsSuccess)
+		{
+			await _upFile.RemoveImg(oldID);
+			url = Contant.ImgUser;
+			StateHasChanged();
+			Snackbar.Add("Xoá ảnh thành công", Severity.Success);
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
 }

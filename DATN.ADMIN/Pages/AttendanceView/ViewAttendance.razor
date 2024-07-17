@@ -81,14 +81,14 @@
 								</MudText>
 							</MudItem>
 							<MudItem>
-								<MudButton OnClick="async()=>await CheckOut(context.ID,false) " Variant="Variant.Filled">Huỷ</MudButton>
+								<MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,false) " Variant="Variant.Filled">Huỷ</MudButton>
 							</MudItem>
 						</MudGrid>
 					}
 					else
 					{
 
-						<MudButton OnClick="async()=>await CheckOut(context.ID,true)" Variant=" Variant.Filled" Color="Color.Secondary">Check out</MudButton>
+						<MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,true)" Variant=" Variant.Filled" Color="Color.Secondary">Check out</MudButton>
 					}
 				}
 			</MudTd>
@@ -110,27 +110,49 @@ else
 
 	private List<Shift> lstShift = new List<Shift>();
 	private Shift selectedShift = new Shift();
+	[Inject]
+	protected IHttpContextAccessor _httpContextAccessor { get; set; }
+
 	private List<AttendanceViewModel> lstAtendance = new List<AttendanceViewModel>();
 	[Inject]
 	IAttendanceServiceClient _ser { get; set; }
+	Guid IdUser;
+	protected override async Task OnInitializedAsync()
+	{
+		string idStr = _httpContextAccessor.HttpContext.Session.GetString("id");
+		IdUser = Guid.Parse(idStr);
+		var dataShift = await _ser.GetShiftNow();
+		if (dataShift.IsSuccess && dataShift.Data != null && dataShift.Data.Count() > 0)
+		{
+			lstShift = dataShift.Data;
+			selectedShift = lstShift.First();
+			await LoadData();
+		}
+		else
+		{
+			Snackbar.Add(dataShift.Error, Severity.Warning);
+		}
+
+	}
 
 	protected async Task LoadData()
 	{
-			var dataAttendance = await _ser.ListAttendanceToday(selectedShift.Id);
-			if (dataAttendance.IsSuccess)
-			{
-				lstAtendance = dataAttendance.Data!;
-			}
-			else
-			{
-				Snackbar.Add(dataAttendance.Error, Severity.Warning);
-			}
-		
+		var dataAttendance = await _ser.ListAttendanceToday(selectedShift.Id);
+		if (dataAttendance.IsSuccess)
+		{
+			lstAtendance = dataAttendance.Data!;
+		}
+		else
+		{
+			Snackbar.Add(dataAttendance.Error, Severity.Warning);
+		}
+
 	}
 
 	protected async Task CheckIn(int scheduleId, int attendanceID, bool isCheckin)
 	{
-		var response = await _ser.CheckIn(scheduleId, attendanceID, isCheckin);
+
+		var response = await _ser.CheckIn(scheduleId, attendanceID, isCheckin, IdUser);
 		if (response.IsSuccess)
 		{
 			Snackbar.Add(response.Data, Severity.Success);
@@ -143,9 +165,10 @@ else
 		}
 
 	}
-	protected async Task CheckOut(int attendanceID, bool isCheckout)
+	protected async Task CheckOut(int scheduleId, int attendanceID, bool isCheckout)
 	{
-		var response = await _ser.CheckOut(attendanceID, isCheckout);
+		
+		var response = await _ser.CheckOut(scheduleId,attendanceID, isCheckout, IdUser);
 		if (response.IsSuccess)
 		{
 			Snackbar.Add(response.Data, Severity.Success);
@@ -162,22 +185,6 @@ else
 
 	}
 
-	protected override async Task OnInitializedAsync()
-	{
-
-		var dataShift = await _ser.GetShiftNow();
-		if (dataShift.IsSuccess && dataShift.Data != null && dataShift.Data.Count() > 0)
-		{
-			lstShift = dataShift.Data;
-			selectedShift = lstShift.First();
-			await LoadData();
-		}
-		else
-		{
-			Snackbar.Add(dataShift.Error, Severity.Warning);
-		}
-
-	}
 
 
 	private bool FilterFunc(AttendanceViewModel element)// lọc data
@@ -191,30 +198,5 @@ else
 
 
 
-	private async Task OpenDialog(int id, DateTime workDate, int from, int to)
-	{
-		var parameters = new DialogParameters();
-		string nameDialog = "Xem thông tin chi tiết ca làm";
-		DialogOptions options = new DialogOptions()
-			{
-				CloseOnEscapeKey = true,
-				Position = DialogPosition.Center,
-				MaxWidth = MaxWidth.Large,
-				CloseButton = true,
-				FullWidth = true,
-				DisableBackdropClick = true
-			};
-		parameters.Add("id", id);
-		parameters.Add("workDate", workDate);
-		parameters.Add("from", from);
-		parameters.Add("to", to);
-		var createUpdateDialog = await _dialogservice.ShowAsync<DetailsShedule>(nameDialog, parameters, options);
-		var result = await createUpdateDialog.Result;
-		if (!result.Canceled)
-		{
-			createUpdateDialog.Close();
-			await LoadData();
-		}
-	}
-
+	  
 }

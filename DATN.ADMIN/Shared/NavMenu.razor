@@ -10,7 +10,12 @@
         <MudNavLink Href="/ListStaff" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Danh sách nhân viên</MudNavLink>
         <MudNavLink Href="/ViewShift" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm</MudNavLink>
         <MudNavLink Href="/ViewListShudule" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm của nhân viên</MudNavLink>
-        <MudNavLink Href="/AttendanceView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FreeCancellation">Điểm danh </MudNavLink>
+    </MudNavGroup> 
+    <MudNavGroup Title="Điểm danh" Icon="@Icons.Material.Filled.Schedule">
+        <MudNavLink Href="/attendancePersonal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FreeCancellation">Điểm danh cá nhân </MudNavLink>
+        <MudNavLink Href="/AttendanceView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Điểm danh tay </MudNavLink>
+        <MudNavLink Href="/attenPerMonthView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper">Xem điểm danh cá nhân </MudNavLink>
+        <MudNavLink Href="/viewAAM" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Danh sách điểm danh tháng </MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Quản lý khách hàng" Icon="@Icons.Material.Filled.SupervisedUserCircle">
         <MudNavLink Href="/ListGuest" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách khách hàng</MudNavLink>
@@ -22,10 +27,12 @@
         <MudNavLink Href="/ListVoucher" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách mã giảm giá</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Quản lý sản phẩm" Icon="@Icons.Material.Filled.ListAlt">
-        <MudNavLink Href="#" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách sản phẩm</MudNavLink>
+        <MudNavLink Href="/ListProduct" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách sản phẩm</MudNavLink>
+        <MudNavLink Href="/ListCategory" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh mục sản phẩm</MudNavLink>
+        <MudNavLink Href="/ListBrand" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách thương hiệu</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Thống kê" Icon="@Icons.Material.Filled.Assignment">
-        <MudNavLink Href="#" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.FileFormats.FileDocument">Báo cáo</MudNavLink>
+        <MudNavLink Href="/UploadFile" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.FileFormats.FileDocument">Báo cáo</MudNavLink>
         <MudNavLink Href="#" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.Brands.Calculator">Doanh thu</MudNavLink>
     </MudNavGroup>
 </MudNavMenu>
