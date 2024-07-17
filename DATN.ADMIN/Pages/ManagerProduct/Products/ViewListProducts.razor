@@ -40,7 +40,8 @@
             </TemplateColumn>
             <PropertyColumn Property="x => x.CategoryProduct" Title="Tên danh mục" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Description" Title="Mô tả" style="width:400px" Sortable="false" Filterable="false" />
+
             <PropertyColumn Property="x => x.Brand" Title="Thương hiệu" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
@@ -252,11 +253,10 @@ else
 
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới sản phẩm";
-        parameters.Add("id", id);
         if (id != null)
         {
             product = lstProduct.FirstOrDefault(x => x.Id == id);
-            parameters.Add("_product", product);
+            parameters.Add("product", product);
             nameDialog = "Cập nhật sản phẩm";
         }
         DialogOptions options = new DialogOptions()

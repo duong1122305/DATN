@@ -11,13 +11,13 @@
 @using MudBlazor
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
-<EditForm Model="@_product" OnValidSubmit="@(async () => await Submit())">
+<EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
     <MudGrid>
         <MudItem md="5">
             <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
-                        @if (id == 0 || id == null)
+                        @if (product.Id == 0 || product.Id == null)
                         {
 
                             <div class="mud-select">
@@ -48,8 +48,9 @@
                             <MudTextField T="string" Label="Tên danh mục" @bind-Value="@product.Name" For="@(() => product.Name)" />
                             <MudTextField T="string" Label="Mô tả" @bind-Value="@product.Description" For="@(() => product.Description)" />
                             <div class="mud-select">
-                                <label class="mud-input-label">Chọn danh mục</label>
-                                <select @bind="product.CategoryProduct" required>
+                                <label class="mud-input-label">Chọn thương hiệu</label>
+                                <select @bind="product.Brand" required>
+                                    <option value="0">Chọn thương hiệu</option>
                                     @foreach (var i in lstBrand)
                                     {
                                         <option value="@i.Id">@i.Name</option>
@@ -57,8 +58,9 @@
                                 </select>
                             </div>
                             <div class="mud-select">
-                                <label class="mud-input-label">Chọn thương hiệu</label>
-                                <select @bind="product.Brand" required>
+                                <label class="mud-input-label">Chọn danh mục</label>
+                                <select @bind="product.CategoryProductId" required>
+                                    <option value="0">Chọn danh mục</option>
                                     @foreach (var i in lstCate)
                                     {
                                         <option value="@i.Id">@i.Name</option>
@@ -80,12 +82,11 @@
             <UpLoadFile lstFileReturn="OnReturnFile"></UpLoadFile>
         </MudItem>
     </MudGrid>
-  
+
 </EditForm>
 
 @code {
-    [Parameter]
-    public int id { get; set; }
+
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
     [Parameter]
@@ -113,7 +114,7 @@
         {
             lstBrand = brand.Data;
             lstCate = cate.Data;
-            if (id != null && id != 0)
+            if (product.Id != null && product.Id != 0)
             {
                 _nameButton = "Cập nhật";
             }
@@ -156,7 +157,10 @@
         }
     }
 
-
+    void HandleBrandChange(ChangeEventArgs e)
+    {
+        var selectedBrandId = e.Value.ToString();
+    }
     public async Task Update()
     {
         var confirm = await Confirm("cập nhật");
@@ -169,7 +173,13 @@
         {
 
 
-            var result = await _client.UpdateProduct(_product);
+            var result = await _client.UpdateProduct(new CreateProductView()
+                {
+                    Name = product.Name,
+                    Description = product.Description,
+                    IdBrand = product.IdBrand,
+                    IdCategoryProduct = product.CategoryProductId
+                });
             if (result.IsSuccess)
             {
                 Message(result.Data, Severity.Success);
@@ -190,7 +200,7 @@
 
     public async Task Submit()
     {
-        if (id == null || id == 0)
+        if (product.Id == null || product.Id == 0)
         {
             await Create();
         }
@@ -203,7 +213,7 @@
     {
         lstBrowerFile = files;
     }
-    private async Task<bool>  Confirm(string text)
+    private async Task<bool> Confirm(string text)
     {
         var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
         yesText: "Xác nhận",
