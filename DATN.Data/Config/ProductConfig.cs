@@ -20,7 +20,7 @@ namespace DATN.Data.Config
                 .HasForeignKey(c => c.IdBrand)
                 .IsRequired();
 
-            builder.HasOne(c => c.CategoryProduct)
+            builder.HasOne(c => c.CategoryDetails)
                 .WithMany(c => c.Products)
                 .HasForeignKey(c => c.IdCategoryProduct)
                 .IsRequired();
