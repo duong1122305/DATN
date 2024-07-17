@@ -45,7 +45,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> UpdateProductDetail(CreateProductDetaiView productView)
@@ -87,7 +87,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> RemoveProductDetail(int id)
@@ -110,7 +110,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> ActiveProductDetail(int id)
@@ -133,7 +133,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetail()
