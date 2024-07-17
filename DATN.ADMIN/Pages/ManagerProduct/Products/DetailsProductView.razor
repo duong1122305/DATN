@@ -1,9 +1,10 @@
-﻿@page "/DetailsCateProduct"
+﻿@page "/DetailsProductView"
 
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.DTOs.Category
 @using DATN.ViewModels.DTOs.CategoryProduct
+@using DATN.ViewModels.DTOs.ProductDetail
 @using DATN.ViewModels.DTOs.ServiceManager
 @using MudBlazor
 @inject ISnackbar Snackbar
@@ -31,8 +32,11 @@
                     <span>@(lstCateProduct.IndexOf(context.Item) + 1)</span>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.Category" Title="Tên danh mục" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.Name" Title="Tên danh mục chi tiết" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Product" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm chi tiết" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.PetType" Title="Sản phẩm cho" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Amount" Title="Số lượng" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Price" Title="Giá" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (context.Item.IsDeleted == true)
@@ -88,7 +92,7 @@ else
     public int id { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    public List<CategoryProductView> lstCateProduct = new List<CategoryProductView>();
+    public List<ProductDetaiView> lstCateProduct = new List<ProductDetaiView>();
     string _nameButton = "";
     [Inject]
     private IProductServices _client { get; set; }
@@ -114,16 +118,16 @@ else
     // load lai du lieu
     protected async Task LoadData()
     {
-        var respone = await _client.ListCategoryProduct();
+        var respone = await _client.ListProductDetails();
         if (respone.IsSuccess)
         {
-            var byId = respone.Data.Where(u => u.CategoryId == id).ToList();
+            var byId = respone.Data.Where(u => u.Id == id).ToList();
             lstCateProduct = byId;
             Search();
         }
         else
         {
-            lstCateProduct = new List<CategoryProductView>();
+            lstCateProduct = new List<ProductDetaiView>();
         }
     }
 
@@ -134,8 +138,8 @@ else
     }
     private async Task Search()
     {
-        var respone = await _client.ListCategoryProduct();
-        var byId = respone.Data.Where(u => u.CategoryId == id).ToList();
+        var respone = await _client.ListProductDetails();
+        var byId = respone.Data.Where(u => u.Id == id).ToList();
         lstCateProduct = byId;
         if (selectedStatus == CateStatus.All)
         {
@@ -159,7 +163,7 @@ else
             }
         }
     }
-    private Func<CategoryProductView, bool> _quickFilter => x =>
+    private Func<ProductDetaiView, bool> _quickFilter => x =>
      {
          if (selectedStatus == CateStatus.All && x.IsDeleted == true || selectedStatus == CateStatus.All && x.IsDeleted == false)
          {
@@ -169,7 +173,7 @@ else
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
 
-             if (x.Category.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             if (x.PetType.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
          }
          else if (selectedStatus == CateStatus.Active && x.IsDeleted == true)
@@ -180,7 +184,7 @@ else
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
 
-             if (x.Category.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             if (x.PetType.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
          }
          else
@@ -191,7 +195,7 @@ else
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
 
-             if (x.Category.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+             if (x.PetType.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
          }
          return false;
@@ -201,7 +205,7 @@ else
     private async Task<bool?> Confirm()
     {
         var confirm = await _diagService.ShowMessageBox("Thông báo",
-                    "Xác nhận xoá danh mục này?",
+                    "Xác nhận cập nhật trạng thái san phẩm chi tiết này?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();
@@ -213,7 +217,7 @@ else
     {
         if (await Confirm() == true)
         {
-            var response2 = await _client.RemoveCategoryProduct(id);
+            var response2 = await _client.RemoveProductDetails(id);
             if (response2.IsSuccess)
             {
                 Message(response2.Data, Severity.Success);
@@ -228,7 +232,7 @@ else
 
     private async Task ActiveCateDetails(int id)
     {
-        var repon = await _client.ActiveCategoryProduct(id);
+        var repon = await _client.ActiveProductDetails(id);
         if (repon.IsSuccess)
         {
             Message(repon.Data, Severity.Success);
@@ -245,7 +249,7 @@ else
     {
 
         var parameters = new DialogParameters();
-        string nameDialog = "Thêm mới danh mục chi tiết";
+        string nameDialog = "Thêm mới sản phẩm chi tiết";
         parameters.Add("id", id);
         DialogOptions options = new DialogOptions()
             {
@@ -256,7 +260,7 @@ else
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        var createUpdateDialog = await _diagService.ShowAsync<CreateUpdateCateDetails>(nameDialog, parameters, options);
+        var createUpdateDialog = await _diagService.ShowAsync<CreateUpdateProductDetails>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {

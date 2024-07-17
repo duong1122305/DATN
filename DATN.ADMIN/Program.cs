@@ -79,6 +79,7 @@ builder.Services.AddScoped<IGuestManagerClient,GuestManagerClient>();
 builder.Services.AddScoped<IEmployeeScheduleSer,EmployeeScheduleSer>();
 builder.Services.AddScoped<IPetSpeciesServiceClient,PetSpeciesServiceClient>();
 builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
+builder.Services.AddScoped<IPetManagerServices, PetManagerServices>();
 builder.Services.AddScoped<ICategoryServices,CategoryServices>();
 builder.Services.AddScoped<IProductServices,ProductServices>();
 builder.Services.AddScoped<IBrandServices,BrandServices>();
