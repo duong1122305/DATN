@@ -3,10 +3,12 @@
 @using System.IdentityModel.Tokens.Jwt
 @using DATN.ADMIN.IServices
 @using DATN.ADMIN.Services
+@using DATN.Utilites
 @using DATN.ViewModels.DTOs.Authenticate
 @using System.Security.Claims
 @inject IDialogService _dialogservice;
 @inject ISnackbar Snackbar;
+@inject IJSRuntime JSRuntime;
 
 <div>
 	<PageTitle>Hồ Sơ Người Dùng</PageTitle>
@@ -36,10 +38,15 @@
 			</MudPaper>
 		</MudItem>
 		<MudItem xs="0" sm="3" Style="background-color:#e4f8ff; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-			<MudImage Src="img/images.jpg" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Style="border-radius: 50%;" />
+			<MudImage Src="@url" Alt="Mony the dog" Height="250" Width="250" Elevation="25" Class="rounded-lg" Style="border-radius: 50%;" />
 			<div style="display: flex; justify-content: center; margin-top: 20px;">
-				<MudButton Style="margin-right: 10px;" Variant="Variant.Filled" Color="Color.Primary">Sửa ảnh</MudButton>
-				<MudButton Variant="Variant.Filled" Color="Color.Secondary">Xoá ảnh</MudButton>
+				<MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="ChooseFile" Style="width:100px; padding: 15px 2px">
+					<ButtonTemplate >
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" Style="width:45px" for="@fileInput">Sửa</MudButton>
+					</ButtonTemplate>
+				</MudFileUpload>
+
+				<MudButton Size="Size.Small" Style="height:35px; margin-top: 21px"  OnClick="RemoveImg" Variant="Variant.Filled" Color="Color.Secondary">Xoá ảnh</MudButton>
 			</div>
 		</MudItem>
 	</MudGrid>
@@ -54,6 +61,8 @@
 
 	[Inject]
 	public IUserClientSev userClient { get; set; }
+	[Inject]
+	public IUpLoadFileService _upFile { get; set; }
 
 	[Inject]
 	public IHttpContextAccessor _contextAccessor { get; set; }
@@ -62,7 +71,7 @@
 	private bool success = false;
 	private string id = "";
 	private string AddressCode = "";
-
+	private string url = Contant.ImgUser;
 	protected async override Task OnInitializedAsync()
 	{
 		var token = _contextAccessor.HttpContext.Session.GetString("Key");
@@ -75,6 +84,10 @@
 		{
 			user = result.Data;
 			AddressCode = user.Address ?? "";
+			if (!string.IsNullOrEmpty(user.ImgId))
+			{
+				url = user.ImgUrl!;
+			}
 			StateHasChanged();
 		}
 		else
@@ -82,6 +95,7 @@
 			navi.NavigateTo("/NotFound");
 		}
 	}
+
 	private async Task Update()
 	{
 		var userCU = new UserUpdateView()
@@ -90,7 +104,7 @@
 				Address = user.Address,
 				PhoneNumber = user.PhoneNumber,
 			};
-		var result = await userClient.UpdateUser(userCU,user.UserName);
+		var result = await userClient.UpdateUser(userCU, user.UserName);
 		if (result.IsSuccess)
 		{
 			Snackbar.Add(result.Data, Severity.Success);
@@ -124,5 +138,54 @@
 	private void HandleAddressChanged(string address)
 	{
 		user.Address = address;
+	}
+	private async Task ChooseFile(IBrowserFile file)
+	{
+		var result = await _upFile.UploadFile(file);
+		if (result.IsSuccess)
+		{
+			user.ImgUrl = result.Data![0];
+			var oldID = user.ImgId;
+			var response = await userClient.UpdateImg(result.Data![0], result.Data![1], user.UserName);
+			if (response.IsSuccess)
+			{
+				url = result.Data[0];
+				if (!string.IsNullOrEmpty(oldID))
+				{
+					await _upFile.RemoveImg(oldID);
+				}
+				StateHasChanged();
+				Snackbar.Add(response.Data, Severity.Success);
+			}
+			else
+			{
+				Snackbar.Add(response.Error, Severity.Warning);
+			}
+		}
+		else
+		{
+			Snackbar.Add(result.Error, Severity.Warning);
+		}
+	}
+	private bool Confirm(string text)
+	{
+		return true;
+	}
+
+	private async Task RemoveImg()
+	{
+		var response = await userClient.UpdateImg("0", "0", user.UserName);
+		var oldID = user.ImgId;
+		if (response.IsSuccess)
+		{
+			await _upFile.RemoveImg(oldID);
+			url = Contant.ImgUser;
+			StateHasChanged();
+			Snackbar.Add("Xoá ảnh thành công", Severity.Success);
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
 	}
 }

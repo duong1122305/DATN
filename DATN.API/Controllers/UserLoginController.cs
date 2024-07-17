@@ -258,10 +258,10 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.CheckCodeConfirm(username,code);
         }
-        [HttpPost("update-url")]
-        public async Task<ResponseData<string>> UpdateUrl(string url,string id)
+        [HttpGet("update-url")]
+        public async Task<ResponseData<string>> UpdateUrl(string url, string imgId,string id)
         {
-            return await _userrepo.UpdateImg(url,id);
+            return await _userrepo.UpdateImg(url, imgId,id);
         }
     }
 }

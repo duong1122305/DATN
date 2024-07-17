@@ -3,13 +3,15 @@ using CloudinaryDotNet.Actions;
 using DATN.ADMIN.IServices;
 using DATN.Aplication;
 using DATN.Data.Entities;
+using DATN.Utilites;
 using DATN.ViewModels.Common;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
+using System.Net;
 
 namespace DATN.ADMIN.Services
 {
-    public class UploadFileService: IUpLoadFileService
+	public class UploadFileService : IUpLoadFileService
 	{
 		private readonly Cloudinary _cloundinary;
 
@@ -23,7 +25,7 @@ namespace DATN.ADMIN.Services
 
 			_cloundinary = new Cloudinary(account);
 		}
-		public async Task<ResponseData<string>> UploadFile( IFormFile file)
+		public async Task<ResponseData<string>> UploadFile(IFormFile file)
 		{
 			try
 			{
@@ -33,46 +35,66 @@ namespace DATN.ADMIN.Services
 				};
 
 				var uploadFile = await _cloundinary.UploadAsync(param);
-				var x= uploadFile.StatusCode;
-				var result=  uploadFile.SecureUrl.AbsoluteUri;
+				var x = uploadFile.StatusCode;
+				var result = uploadFile.SecureUrl.AbsoluteUri;
 
 
 				return new ResponseData<string>("ok");
 			}
 			catch (Exception ex)
 			{
-				return  new ResponseData<string>(false,"Thất bại"+ex); ;
+				return new ResponseData<string>(false, "Thất bại" + ex); ;
 			}
 		}
-		public async Task<ResponseData<string>> UploadFile( IBrowserFile file)
+		public async Task<ResponseData<string[]>> UploadFile(IBrowserFile file)
 		{
 			try
 			{
+				if (file.Size > Contant.MaxIMGSize)
+				{
+					return new ResponseData<string[]>(false, "File chỉ nhận dưới 5mb");
+				}
+				string[] imageFormats = { "jpg", "png", "gif", "bmp", "tif" };
+				if (!imageFormats.Contains(file.Name.Split('.').Last()))
+				{
+					return new ResponseData<string[]>(false, "Hãy chọn file ảnh");
+				}
 				var param = new ImageUploadParams()
 				{
-					File = new FileDescription(Guid.NewGuid().ToString(), file.OpenReadStream())
+					File = new FileDescription(Guid.NewGuid().ToString(), file.OpenReadStream(Contant.MaxIMGSize))
 				};
 
 				var uploadFile = await _cloundinary.UploadAsync(param);
 
-				var x= uploadFile.StatusCode;
-				var result=  uploadFile.SecureUrl.AbsoluteUri;
-
-
-				return new ResponseData<string>("ok");
+				var response = uploadFile.StatusCode;
+                if (response==HttpStatusCode.OK)
+                {
+					var url = uploadFile.SecureUrl.AbsoluteUri;
+					var publicId = uploadFile.PublicId;
+				    return new ResponseData<string[]>(new string[] { url, publicId });
+				}
+				return new ResponseData<string[]>(false, "Thêm không thành công");
 			}
 			catch (Exception ex)
 			{
-				return  new ResponseData<string>(false,"Thất bại"+ex); ;
+				return new ResponseData<string[]>(false, "Có lỗi gì đó");
 			}
 		}
-		public async Task<DeletionResult> RemoveImg(string publicId)
+		public async Task<ResponseData<string>> RemoveImg(string publicId)
 		{
 			var deleteParams = new DeletionParams(publicId);
 
 			var result = await _cloundinary.DestroyAsync(deleteParams);
 
-			return result;
+			if (result.StatusCode == System.Net.HttpStatusCode.NoContent)
+			{
+				return new ResponseData<string>("Xoá thành công");
+			}
+			else
+			{ 
+				return new ResponseData<string>(false, "Xoá thất bại");
+			}
+
 		}
 
 	}

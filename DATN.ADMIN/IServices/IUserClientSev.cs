@@ -25,6 +25,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView);
         Task<ResponseData<string>> CheckCodeOtp(string username, string code);
         Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView);
-		Task<ResponseData<string>> UpdateImg(string url, string id);
+		Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
 	}
 }

@@ -423,7 +423,9 @@ namespace DATN.Aplication.System
                     Password = user.PasswordHash,
                     FullName = user.FullName,
                     IsDeleted = user.IsDeleted,
-                    IsConfirm = user.EmailConfirmed
+                    IsConfirm = user.EmailConfirmed,
+                    ImgId=user.ImgID,
+                    ImgUrl= user.ImgUrl,
                 };
                 return new ResponseData<UserInfView> { IsSuccess = true, Data = userinf };
             }
@@ -452,14 +454,17 @@ namespace DATN.Aplication.System
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản sai" };
         }
-		public async Task<ResponseData<string>> UpdateImg(string url, string id)
+		public async Task<ResponseData<string>> UpdateImg(string url, string imgID, string id)
 		{
-			var userIdentity = await _userManager.FindByIdAsync(id);
+            url = url == "0" ? "" : url;
+            imgID= imgID=="0"?"": imgID;
+			var userIdentity = await _userManager.FindByNameAsync(id);
 			if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
 			else
 			{
 
-				userIdentity.url = url;
+				userIdentity.ImgID = imgID;
+				userIdentity.ImgUrl = url;
 				var result = await _userManager.UpdateAsync(userIdentity);
 				if (result.Succeeded)
 					return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật ảnh thành công!!" };

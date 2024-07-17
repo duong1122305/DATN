@@ -18,5 +18,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
         public string Position { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsConfirm { get; set; }
+        public string? ImgUrl { get; set; }
+        public string? ImgId { get; set; }
     }
 }
