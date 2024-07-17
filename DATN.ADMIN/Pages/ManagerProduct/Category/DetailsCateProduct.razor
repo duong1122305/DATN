@@ -108,7 +108,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        // await LoadData();
 
     }
     // load lai du lieu
@@ -247,11 +247,11 @@ else
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới danh mục chi tiết";
         parameters.Add("id", id);
-        if (id != null)
-        {
-            parameters.Add("id", id);
-            nameDialog = "Thêm mới danh mục chi tiết";
-        }
+        // if (id != null)
+        // {
+        //     parameters.Add("id", id);
+        //     nameDialog = "Thêm mới danh mục chi tiết";
+        // }
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
