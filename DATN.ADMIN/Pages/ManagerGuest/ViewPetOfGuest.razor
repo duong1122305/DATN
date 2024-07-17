@@ -11,41 +11,51 @@
 	}
 
 </style>
-<MudButton Class="add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(0))">Thêm</MudButton>
-<MudTable Items="@lstPet" Hover="true" SortLabel="Sort By" Filter="new Func<PetVM,bool>(FilterFunc)">
-	<ToolBarContent>
-		<MudSpacer />
-		<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-	</ToolBarContent>
-	<HeaderContent>
-		<MudTh>STT</MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Name)">Tên pet</MudTableSortLabel></MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Species)">Loài</MudTableSortLabel></MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Weight)">Cân nặng</MudTableSortLabel></MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Vaccinated)">Tiêm phòng</MudTableSortLabel></MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Neutered)">Triệt sản</MudTableSortLabel></MudTh>
-		<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Note)">Ghi chú</MudTableSortLabel></MudTh>
-		<MudTh>Thao tác</MudTh>
+<MudPaper Style="height: 700px ; padding:30px" >
 
-	</HeaderContent>
-	<RowTemplate>
 
-		<MudTd DataLabel="STT">@(lstPet.IndexOf(context) + 1)</MudTd>
-		<MudTd DataLabel="Tên">@context.Name</MudTd>
-		<MudTd>@(context.Species)</MudTd>
-		<MudTd>@(context.Gender ? "Đực" : "Cái")</MudTd>
-		<MudTd>@(context.Weight ?? 0.0f)</MudTd>
-		<MudTd>@(!context.Vaccinated.HasValue ? "Chưa có thông tin" : context.Vaccinated!.Value ? "Đã tiêm" : "Chưa tiêm")</MudTd>
-		<MudTd>@(!context.Neutered.HasValue ? "Chưa có thông tin" : context.Neutered!.Value ? "Đã triệt sản" : "Chưa triệt sản")</MudTd>
-		<MudTd>@(context.Note ?? "Chưa có ghi chú")</MudTd>
-		<MudTd>	<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton></MudTd>
-		
-	</RowTemplate>
-	<PagerContent>
-		<MudTablePager />
-	</PagerContent>
-</MudTable>
+	
+	
+	<MudTable Items="@lstPet" Hover="true" SortLabel="Sort By" Filter="new Func<PetVM,bool>(FilterFunc)">
+		<ToolBarContent>
+			<MudRadioGroup T="int" Value="@filterStatus" ValueChanged="LoadData">
+				<MudRadio Value="@(-1)">Tất cả</MudRadio>
+				<MudRadio Value="@(1)" Color="Color.Secondary">Không hoạt động</MudRadio>
+				<MudRadio Value="@(0)" Color="Color.Primary">Đang hoạt động</MudRadio>
+			</MudRadioGroup>
+					<MudSpacer />
+			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+			<MudButton Class="add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(0))">Thêm</MudButton>
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>STT</MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Name)">Tên pet</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Species)">Loài</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Weight)">Cân nặng</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Neutered)">Triệt sản</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<PetVM, object>(x=>x.Note)">Ghi chú</MudTableSortLabel></MudTh>
+			<MudTh>Thao tác</MudTh>
+
+		</HeaderContent>
+		<RowTemplate>
+
+			<MudTd DataLabel="STT">@(lstPet.IndexOf(context) + 1)</MudTd>
+			<MudTd DataLabel="Tên">@context.Name</MudTd>
+			<MudTd>@(context.Species)</MudTd>
+			<MudTd>@(context.Gender ? "Đực" : "Cái")</MudTd>
+			<MudTd>@(context.Weight ?? 0.0f)</MudTd>
+			<MudTd>@(!context.Neutered.HasValue ? "Chưa có thông tin" : context.Neutered!.Value ? "Đã triệt sản" : "Chưa triệt sản")</MudTd>
+			<MudTd>@(context.Note ?? "Chưa có ghi chú")</MudTd>
+			<MudTd>	<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton></MudTd>
+
+		</RowTemplate>
+		<PagerContent>
+			<MudTablePager />
+		</PagerContent>
+	</MudTable>
+</MudPaper>
+
 @code {
 	[Parameter]
 	public Guid Id { get; set; }
@@ -53,17 +63,18 @@
 	public IPetServiceClient petService { get; set; }
 	public List<PetVM> lstPet = new List<PetVM>();
 	public string searchString = "";
-
+	public int filterStatus=-1;
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadData();
 	}
-	private async Task LoadData()
+	private async Task LoadData(int value=-1)
 	{
+		filterStatus = value;
 		var response = await petService.GetPetByGuestId(Id);
 		if (response.IsSuccess)
 		{
-			lstPet = response.Data;
+			lstPet = response.Data.Where(p=>(p.IsDelete&& value==1)||(!p.IsDelete&&value==0)||value==-1).ToList();
 		}
 		else
 		{
@@ -72,9 +83,9 @@
 	}
 	private bool FilterFunc(PetVM element)// lọc data
 	{
-		if (string.IsNullOrWhiteSpace(searchString))
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
 			return true;
-		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+		if (element.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
 			return true;
 		return false;
 	}

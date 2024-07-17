@@ -28,7 +28,7 @@ namespace DATN.Aplication.Services
                             select cate;
                 if (check.Count() == 0)
                 {
-                    var category = new Data.Entities.CategoryProduct()
+                    var category = new Data.Entities.CategoryDetails()
                     {
                         Name = categoryView.Name,
                         IdCategory = categoryView.IdCategory,

@@ -13,6 +13,6 @@ namespace DATN.Data.Entities
         public string? Description { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual ICollection<CategoryProduct> CategoryProducts { get; set; }
+        public virtual ICollection<CategoryDetails> CategoryProducts { get; set; }
     }
 }

@@ -66,7 +66,7 @@ namespace DATN.Data.EF
         public DbSet<ImagePet> ImagePets { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<CategoryProduct> CategoryProducts { get; set; }
+        public DbSet<CategoryDetails> CategoryDetails { get; set; }
         public DbSet<ImageProduct> ImageProducts { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Product> Products { get; set; }

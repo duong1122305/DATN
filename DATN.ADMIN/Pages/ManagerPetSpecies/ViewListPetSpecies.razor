@@ -7,6 +7,8 @@
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Guest
 @using DATN.ViewModels.DTOs.PetSpecies
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
 
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -14,7 +16,8 @@
 @if (lstPetSpecies != null && lstPetSpecies.Count > 0)
 {
 
-
+	
+	
 
 
 	<MudTable Items="@lstPetSpecies" Hover="true" SortLabel="Sort By" Filter="new Func<PetSpeciesVM,bool>(FilterFunc)">
@@ -68,6 +71,7 @@ else
 	}
 </style>
 @code {
+	
 	//button trạng thái
 	private string searchString = "";
 	[CascadingParameter]
@@ -93,26 +97,16 @@ else
 	}
 
 	bool isShowPass = false;
-	InputType PasswordInput = InputType.Password;
-	void ButtonShowclick()
-	{
-		@if (isShowPass)
-		{
-			isShowPass = false;
-			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-			PasswordInput = InputType.Password;
-		}
-		else
-		{
-			isShowPass = true;
-			PasswordInputIcon = Icons.Material.Filled.Visibility;
-			PasswordInput = InputType.Text;
-		}
-	}
-
-
+	
+	/// <summary>
+	/// Sự kiện thay đổi trạng thái
+	/// </summary>
+	/// <param name="value">Giá trị của trạng thái</param>
+	/// <param name="id">Id của loài muốn chuyển</param>
+	/// <returns>Không trả về kq</returns>
 	private async Task OnchangeStatus(bool value, int id)
 	{
+		
 		ChangeUIStatus(value, id);
 		DeleteRequest<int> request = new DeleteRequest<int>()
 			{
@@ -141,9 +135,9 @@ else
 
 	private bool FilterFunc(PetSpeciesVM element)// lọc data
 	{
-		if (string.IsNullOrWhiteSpace(searchString))
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
 			return true;
-		if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+		if (element.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
 			return true;
 		return false;
 	}

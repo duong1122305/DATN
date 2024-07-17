@@ -26,7 +26,6 @@ namespace DATN.ADMIN.Pages.Account
         [BindProperty]
         public string password { get; set; }
         HttpContextAccessor _contextAccessor;
-
         public LoginModel(IUserClientSev userClientSev, HttpContextAccessor contextAccessor)
         {
             _userClienSev = userClientSev;
@@ -34,9 +33,15 @@ namespace DATN.ADMIN.Pages.Account
         }
         public async Task HandleLogin()
         {
+            var returnUrl = HttpContext.Request.Query["returnUrl"].ToString();
+            var redirectUrl = "~/trangchu";
+            if (returnUrl != null && returnUrl!="/")
+            {
+                redirectUrl = returnUrl;
+            }
             if (_contextAccessor.HttpContext.Session.GetString("Key") != null)
             {
-                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                _contextAccessor.HttpContext.Response.Redirect(Url.Content(redirectUrl));
             }
             else
             {
@@ -56,7 +61,7 @@ namespace DATN.ADMIN.Pages.Account
                         {
 
                             _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
-                            _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                            _contextAccessor.HttpContext.Response.Redirect(Url.Content(redirectUrl));
 
                         }
                         else if (!checkLogin.IsSuccess)

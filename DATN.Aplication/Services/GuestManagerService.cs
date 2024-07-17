@@ -5,6 +5,7 @@ using DATN.Aplication.Repository;
 using DATN.Aplication.Repository.IRepository;
 using DATN.Data.EF;
 using DATN.Data.Entities;
+using DATN.Utilites;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
 using Microsoft.EntityFrameworkCore;
@@ -71,7 +72,7 @@ namespace DATN.Aplication.Services
             {
                 var result = await _unitOfWork.GuestRepository.GetAllAsync();
                 var lstPet = await _unitOfWork.PetRepository.GetAllAsync();
-                var response = result.Where(p => p.IsComfirm == true).OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
+                var response = result.Where(x => x.Id != Contant.GuestsID).OrderByDescending(p => p.RegisteredAt).Select(p => new GuestViewModel()
                 {
                     Address = p.Address,
                     Email = p.Email,
@@ -82,6 +83,7 @@ namespace DATN.Aplication.Services
                     Password = p.PasswordHash != null ? _passwordExtensitons.Decrypt(p.PasswordHash) : "",
                     PhoneNumber = p.PhoneNumber,
                     UserName = p.UserName,
+                    IsConfirm = p.IsComfirm
                 }).ToList();
                 foreach (var item in response)
                 {
@@ -114,27 +116,143 @@ namespace DATN.Aplication.Services
                 };
             }
         }
-
-        public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterUserRequest request)
+        public async Task<ResponseData<string>> CheckAndSendMail(string email)
         {
             try
             {
-                var guest = new Guest()
+                if (await _unitOfWork.GuestRepository.CheckEmailExist(email))
                 {
-                    Address = request.Address,
-                    Email = request.Email,
-                    Gender = request.Gender,
-                    Name = request.Name,
-                    IsDeleted = false,
-                    PhoneNumber = request.PhoneNumber,
-                    RegisteredAt = DateTime.Now,
-                    UserName = request.UserName,
-                    PasswordHash = _passwordExtensitons.HashPassword(request.Password),
-                    IsComfirm = false,
-                };
-                await _unitOfWork.GuestRepository.AddAsync(guest);
+                    return new ResponseData<string>(false, "Email đã xem được sử dụng");
+                }
+                var verifyCode = _mailExtension.GennarateVerifyCode(Guid.NewGuid().ToString());//tạo mã xác mình
+                await _mailExtension.SendMailVerificationGuestAsync(email, verifyCode);
+                return new ResponseData<string>(verifyCode);
+            }
+            catch (Exception ex)
+            {
+
+                return new ResponseData<string>(false, "Có lỗi ở máy chủ: " + ex.Message);
+            }
+        }
+        public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterByGuestRequest request)
+        {
+            throw new NotImplementedException();
+            //try
+            //{
+
+            //    string erorrMessage = "";
+            //    bool checkUser = true;
+            //    if (!string.IsNullOrEmpty(request.Email))
+            //    {
+            //        if (await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
+            //        {
+            //            checkUser = false;
+            //            erorrMessage = "Email đã được đăng ký ở tài khoản khác";
+            //        }
+            //        if (await _unitOfWork.GuestRepository.CheckPhoneNumberExist(request.PhoneNumber))
+            //        {
+            //            checkUser = false;
+            //            erorrMessage = "Số điện thoiaj đã được đăng ký ở tài khoản khác";
+            //        }
+            //        if (!checkUser)
+            //        {
+            //            return new ResponseData<string>
+            //            {
+            //                IsSuccess = false,
+            //                Error = erorrMessage,
+            //            };
+            //        }
+            //    }
+            //    var guest = new Guest()
+            //    {
+            //        Address = request.Address,
+            //        Email = request.Email,
+            //        Gender = request.Gender,
+            //        Name = request.Name,
+            //        IsDeleted = false,
+            //        PhoneNumber = request.PhoneNumber,
+            //        RegisteredAt = DateTime.Now,
+            //        UserName = request.UserName,
+            //        PasswordHash = _passwordExtensitons.HashPassword(request.Password),
+            //        IsComfirm = true,
+            //    };
+            //    await _unitOfWork.GuestRepository.AddAsync(guest);
+            //    var result = await _unitOfWork.SaveChangeAsync();
+            //    if (result > 0)
+            //    {
+            //        return new ResponseData<string>
+            //        {
+            //            IsSuccess = true,
+            //            Data = " Thêm thành công"
+            //        };
+            //    }
+            //    return new ResponseData<string>
+            //    {
+            //        IsSuccess = false,
+            //        Error = "Thêm thất bại"
+            //    };
+            //}
+            //catch (Exception ex)
+            //{
+            //    return new ResponseData<string>
+            //    {
+            //        IsSuccess = false,
+            //        Error = ex.Message
+            //    };
+            //}
+        }
+        public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterByGuestRequest request)
+        {
+            try
+            {
+                bool hasEmail = !string.IsNullOrEmpty(request.Email);
+
+                if (await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Error = "Email đã được đăng ký ở tài khoản khác"
+                    };
+                }
+
+                var guest = new Guest();
+                guest = await _unitOfWork.GuestRepository.FindByEmail(request.Email);
+                if (guest == null || guest.Name == null)
+                {
+                    guest = new Guest()
+                    {
+                        Address = request.Address,
+                        Email = request.Email,
+                        Gender = request.Gender,
+                        Name = request.Name,
+                        IsDeleted = false,
+                        PhoneNumber = request.PhoneNumber,
+                        RegisteredAt = DateTime.Now,
+                        UserName = request.UserName,
+                        PasswordHash = !hasEmail ? null : _passwordExtensitons.HashPassword(request.Password),
+                        IsComfirm = !hasEmail,
+                    };
+                   await _unitOfWork.GuestRepository.AddAsync(guest);
+                }
+                else
+                {
+                    guest.Name = request.Name;
+                    guest.Address = request.Address;
+                    guest.Email = request.Email;
+                    guest.Gender = request.Gender;
+                    guest.RegisteredAt = DateTime.Now;
+                    guest.PasswordHash = _passwordExtensitons.HashPassword(request.Password);
+                    await _unitOfWork.GuestRepository.UpdateAsync(guest);
+                }
+          
+                if (hasEmail)
+                {
+                    var verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
+                    guest.VerifyCode = verifyCode;
+                    await _mailExtension.SendMailVerificationGuestAsync(request.Email, verifyCode);
+                }
                 var result = await _unitOfWork.SaveChangeAsync();
-                await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, request.Password, guest.Id.ToString());
                 if (result > 0)
                 {
                     return new ResponseData<string>
@@ -159,91 +277,23 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<string>> RegisterNoUser(GuestRegisterNoUserRequest request)
-        {
-            try
-            {
-                var checkMail= _unitOfWork.GuestRepository.CheckEmailExist(request.Email);
-                if (checkMail != null)
-                {
-                    return new ResponseData<string>(false, "Tài khoản email đã được đăng ký trước đó");
-                }
-                string randomPass = "";
-                bool createUser = !string.IsNullOrEmpty(request.Email);
-                if (createUser)
-                {
-                    randomPass = GeneratePassword();
-                }
-                var guest = new Guest()
-                {
-                    Address = request.Address,
-                    Name = request.Name,
-                    PhoneNumber = request.PhoneNumber,
-                    Gender = request.Gender,
-                    Email = request.Email,
-                    UserName = request.Email,
-                    PasswordHash = randomPass != "" ? _passwordExtensitons.HashPassword(randomPass) : null,
-                    IsComfirm = !createUser,
-                    IsDeleted = false,
-                    RegisteredAt = DateTime.Now,
-                };
-                await _unitOfWork.GuestRepository.AddAsync(guest);
-                var result = await _unitOfWork.SaveChangeAsync();
-                if (createUser)
-                {
-                    //	await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, randomPass, guest.Id.ToString());
-                }
-                if (result > 0)
-                {
-                    return new ResponseData<string>
-                    {
-                        IsSuccess = true,
-                        Data = " Thêm thành công"
-                    };
-                }
-                return new ResponseData<string>
-                {
-                    IsSuccess = false,
-                    Error = "Thêm thất bại"
-                };
-            }
-            catch (Exception ex)
-            {
-
-                return new ResponseData<string>
-                {
-                    IsSuccess = false,
-                    Error = ex.Message
-                };
-            }
-        }
 
         public async Task<ResponseData<string>> RegisterWithUser(GuestRegisterUserRequest request)
         {
 
             try
             {
-                string erorrMessage = "";
-                bool checkUser = true;
+                string randomPass = "";
+                bool hasEmail = !string.IsNullOrEmpty(request.Email);
+
                 if (await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
-                {
-                    checkUser = false;
-                    erorrMessage = "Email đã được đăng ký ở tài khoản khác";
-                }
-                if (await _unitOfWork.GuestRepository.CheckUserExist(request.UserName))
-                {
-                    checkUser = false;
-                    erorrMessage = "Tên đăng nhập đã tồn tại";
-                }
-                if (!checkUser)
                 {
                     return new ResponseData<string>
                     {
                         IsSuccess = false,
-                        Error = erorrMessage,
+                        Error = "Email đã được đăng ký ở tài khoản khác"
                     };
                 }
-
 
                 var guest = new Guest()
                 {
@@ -254,15 +304,20 @@ namespace DATN.Aplication.Services
                     IsDeleted = false,
                     PhoneNumber = request.PhoneNumber,
                     RegisteredAt = DateTime.Now,
-                    UserName = request.UserName,
-                    PasswordHash = _passwordExtensitons.HashPassword(request.Password),
-                    IsComfirm = false,
+                    UserName = request.Email,
+                    PasswordHash = hasEmail ? _passwordExtensitons.HashPassword(randomPass) : null,
+                    IsComfirm = !hasEmail,
+
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
+
+                if (hasEmail)
+                {
+                    var verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
+                    guest.VerifyCode = verifyCode;
+                    await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, randomPass, verifyCode);
+                }
                 var result = await _unitOfWork.SaveChangeAsync();
-
-
-                await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, request.Password, guest.Id.ToString());
                 if (result > 0)
                 {
                     return new ResponseData<string>
@@ -365,15 +420,69 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<string>> VerififyUser(string verifyConstring, string mail)
+        public async Task<ResponseData<string>> SendForgotMail(string mail)
         {
             try
             {
 
-                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(verifyConstring));
-                if (guest != null && guest.Email == mail)
+                var guest = await _unitOfWork.GuestRepository.FindByEmail(mail.Trim());
+
+                if (guest != null)
                 {
+
+                    string verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());
+                    guest.VerifyCode = verifyCode;
+                    await _unitOfWork.GuestRepository.UpdateAsync(guest);
+                    var result = await _unitOfWork.SaveChangeAsync();
+                    if (result == 0)
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Error = "Có gì đó sai sai"
+                        };
+                    }
+                    await _mailExtension.SendMailCodeForgot(guest.Email, guest.VerifyCode);
+
+                }
+                return new ResponseData<string>
+                {
+                    IsSuccess = true,
+                    Error = "Tin nhắn đã gửi vào mail của quý khách"
+                };
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Có lỗi xảy ra: " + ex.Message
+                };
+            }
+        }
+        public async Task<ResponseData<string>> VerififyUser(string verifyCode)
+        {
+            try
+            {
+                string verifyString = _passwordExtensitons.DeCode(verifyCode);// giải mã thông tin xác minh
+                string[] dataVerify = verifyString.Split('|');// [0] id khách // [1] mã thời hạn// [2] mã bảo mật thêm
+
+                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
+                if (guest != null && guest.VerifyCode == verifyCode)
+                {
+                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Error = "Thông tin xác minh của bạn đã quá hạn"
+                        };
+                    }
                     guest.IsComfirm = true;
+                    guest.VerifyCode = null;
                     var result = await _unitOfWork.SaveChangeAsync();
 
                     if (result > 0)
@@ -389,7 +498,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string>
                 {
                     IsSuccess = false,
-                    Error = "Xác minh thất bại thất bại"
+                    Error = "Tài khoản đã được xác minh hoặc mã xác minh sai"
                 };
             }
             catch (Exception ex)
@@ -397,54 +506,64 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string>
                 {
                     IsSuccess = false,
-                    Error = ex.Message
+                    Error = "Có lỗi trong quá trình xác minh"
                 };
             }
         }
 
-        private string GeneratePassword()
+
+        public async Task<ResponseData<string>> ChangPassWithVerifyCode(string verifyCode, string newPass)
         {
-            int passLength = 8;
-            const string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
-            const string digits = "0123456789";
-            const string specialChars = "!@#$%^&*()_+<>?";
-
-            string allChars = upperCase + lowerCase + digits + specialChars;
-            Random random = new Random();
-
-            StringBuilder password = new StringBuilder();
-
-            // Add one random character from each category to ensure the password contains at least one of each
-            password.Append(upperCase[random.Next(upperCase.Length)]);
-            password.Append(lowerCase[random.Next(lowerCase.Length)]);
-            password.Append(digits[random.Next(digits.Length)]);
-            password.Append(specialChars[random.Next(specialChars.Length)]);
-
-            // Fill the rest of the password length with random characters
-            for (int i = 4; i < passLength; i++)
+            try
             {
-                password.Append(allChars[random.Next(allChars.Length)]);
-            }
+                var checkPass = _passwordExtensitons.ValidatePassword(newPass);
+                if (!checkPass.IsSuccess)
+                {
+                    return checkPass;
+                }
+                string verifyString = _passwordExtensitons.DeCode(verifyCode);// giải mã thông tin xác minh
+                string[] dataVerify = verifyString.Split('|');// [0] id khách // [1] mã thời hạn
 
-            // Shuffle the password to remove any predictable pattern
-            return ShuffleString(password.ToString());
+                var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
+                if (guest != null)
+                {
+                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Error = "Thông tin xác minh của bạn đã quá hạn"
+                        };
+                    }
+                    guest.PasswordHash = _passwordExtensitons.HashPassword(newPass);
+                    var result = await _unitOfWork.SaveChangeAsync();
+
+                    if (result > 0)
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Data = " Thay đổi mật khẩu thành công"
+                        };
+                    }
+                }
+
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Thay đôi mật khẩu thất bại"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Error = "Có lỗi trong quá trình thay đổi mật khẩu"
+                };
+            }
         }
 
-        private string ShuffleString(string input)
-        {
-            char[] array = input.ToCharArray();
-            Random random = new Random();
-            int n = array.Length;
-            for (int i = n - 1; i > 0; i--)
-            {
-                int j = random.Next(i + 1);
-                char temp = array[i];
-                array[i] = array[j];
-                array[j] = temp;
-            }
-            return new string(array);
-        }
 
     }
 }

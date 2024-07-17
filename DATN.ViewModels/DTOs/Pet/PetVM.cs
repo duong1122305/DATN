@@ -16,8 +16,8 @@ namespace DATN.ViewModels.DTOs.Pet
 		public string? Species { get; set; } // Khóa ngoại đến ID giống thú cưng
 		public string Name { get; set; } // Tên thú cưng
 		public bool Gender { get; set; } // Giới tính
-
-		public DateTime? Birthday { get; set; } // Ngày sinh
+        public int? PetTypeId { get; set; }
+        public DateTime? Birthday { get; set; } // Ngày sinh
 
 		public float? Weight { get; set; } // Cân nặng
 
@@ -29,6 +29,6 @@ namespace DATN.ViewModels.DTOs.Pet
 
 		public string? Note { get; set; } // Ghi chú
 		public string? Address {  get; set; }	
-		public string? IsDelete {  get; set; }	
+		public bool IsDelete {  get; set; }	
 	}
 }

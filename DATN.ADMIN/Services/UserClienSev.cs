@@ -99,10 +99,30 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseMail> ForgotPassword(string mail)
         {
-            var respone = await _client.PostAsJsonAsync("api/UserLogin/User-ForgotPass", mail);
-            var result = await respone.Content.ReadFromJsonAsync<ResponseMail>();
-            return result;
-
+            var respone = _client.GetFromJsonAsync<ResponseMail>($"api/UserLogin/User-ForgotPass?mail={mail}").GetAwaiter().GetResult();
+            return respone;
         }
-    }
+        public async Task<ResponseData<string>> CheckCodeOtp(string username, string code)
+        {
+            var result = _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Check-Otp?username={username}&code={code}").GetAwaiter().GetResult();
+            return result;
+        }
+        public async Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView)
+        {
+            var response = _client.PostAsJsonAsync("api/UserLogin/Reset-Pass", userResetPassView).GetAwaiter().GetResult();
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            if (result == null)
+            {
+                return new ResponseData<string> { IsSuccess = false };
+            }
+            else
+                return result;
+        }
+
+		public async Task<ResponseData<string>> UpdateImg(string url, string imgId, string id)
+		{
+			var result = _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/update-url?url={url}&imgId={imgId}&id={id}").GetAwaiter().GetResult();
+			return result;
+		}
+	}
 }

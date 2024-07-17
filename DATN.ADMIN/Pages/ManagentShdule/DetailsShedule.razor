@@ -39,7 +39,14 @@
                     }
                     else
                     {
-                        <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
+                        if (context.Date.CompareTo(dateNow) > 0)
+                        {
+                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
+                        }
+                        else
+                        {
+                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))" Disabled></MudIconButton>
+                        }
                     }
                 </MudButtonGroup>
             </MudTd>
@@ -58,9 +65,9 @@
     public int to { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     [Inject]
-    IEmployeeScheduleSer _client{ get; set; }
+    IEmployeeScheduleSer _client { get; set; }
     [Inject]
-    IUserClientSev _userClient{ get; set; }
+    IUserClientSev _userClient { get; set; }
     [Parameter]
     public List<NumberOfScheduleView> lsstvi { get; set; } = new List<NumberOfScheduleView>();
     //lấy các nhân viên làm việc trong ca ngày hôm ấy
@@ -79,7 +86,7 @@
         }
     }
 
-    private async Task OpenDialog(int idShift, string idNhanVien, DateTime workDate,string fulName)
+    private async Task OpenDialog(int idShift, string idNhanVien, DateTime workDate, string fulName)
     {
         var idRespone = await _userClient.GetById(idNhanVien);
         var parameters = new DialogParameters();

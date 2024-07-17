@@ -1,0 +1,202 @@
+﻿@page "/AttendanceView"
+@using System.Net.Http.Json
+@using DATN.ADMIN.IServices
+@using DATN.ADMIN.Services
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Attendace
+@using DATN.ViewModels.DTOs.Authenticate
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:10px;">Điểm danh ngày: @DateTime.Now.ToString("dd/ MM/ yyyy")</MudText>
+@if (lstAtendance != null && lstAtendance.Count > 0)
+{
+
+	<MudTable Items="@lstAtendance" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<AttendanceViewModel,bool>(FilterFunc)">
+		<ToolBarContent>
+			<div style="width:200px;margin-bottom:10px">
+				<MudSelect T="Shift" Value="selectedShift" Label="Ca làm trong ngày" ValueChanged="ChangeShift" Style="width:200px">
+					@foreach (var item in lstShift)
+					{
+						<MudSelectItem Value="@item">Ca @item.Name</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+			<MudSpacer />
+			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Immediate="true"
+						  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>STT</MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.StaffName)">Tên nhân viên</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.UserName)">Mã nhân viên</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.DateAttendace)">Ngày làm</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckInTime)">Thời gian điểm danh</MudTableSortLabel></MudTh>
+			<MudTh><MudTableSortLabel SortBy="new Func<AttendanceViewModel, object>(x => x.CheckOutTime)">Thời gian check out</MudTableSortLabel></MudTh>
+
+		</HeaderContent>
+		<RowTemplate>
+
+			<MudTd>@(lstAtendance.IndexOf(context) + 1)</MudTd>
+			<MudTd>@context.StaffName</MudTd>
+			<MudTd>@context.UserName</MudTd>
+			<MudTd>@context.DateAttendace</MudTd>
+
+			<MudTd>
+				@{
+					bool checkIn = @context.CheckInTime != "0";
+
+					if (checkIn)
+					{
+						<MudGrid >
+
+							<MudItem>
+								<MudText> @(checkIn ? context.CheckInTime : "")   </MudText>
+							</MudItem>
+
+							<MudItem>
+								<MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,false)" Variant="Variant.Filled">Huỷ</MudButton>
+							</MudItem>
+						</MudGrid>
+					}
+					else
+					{
+
+						<MudButton OnClick="async()=>await CheckIn(context.ScheduleID,context.ID,true)" Variant="Variant.Filled" Color="Color.Secondary">Điểm danh</MudButton>
+					}
+				}
+
+			</MudTd>
+			<MudTd>
+				@{
+					bool checkOut = @context.CheckOutTime != "0";
+					if (checkOut)
+					{
+						<MudGrid>
+							<MudItem>
+								<MudText>
+									<MudText> @(checkOut ? context.CheckOutTime : "") </MudText>
+								</MudText>
+							</MudItem>
+							<MudItem>
+								<MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,false) " Variant="Variant.Filled">Huỷ</MudButton>
+							</MudItem>
+						</MudGrid>
+					}
+					else
+					{
+
+						<MudButton OnClick="async()=>await CheckOut(context.ScheduleID,context.ID,true)" Variant=" Variant.Filled" Color="Color.Secondary">Check out</MudButton>
+					}
+				}
+			</MudTd>
+
+
+		</RowTemplate>
+
+	</MudTable>
+}
+else
+{
+	<div style="justify-content:center; justify-items:center">
+		<MudProgressCircular Color="Color.Default" Indeterminate="true" />
+	</div>
+}
+@code {
+	private DateTime dateNow = DateTime.Now;
+	private string searchString = "";
+
+	private List<Shift> lstShift = new List<Shift>();
+	private Shift selectedShift = new Shift();
+	[Inject]
+	protected IHttpContextAccessor _httpContextAccessor { get; set; }
+
+	private List<AttendanceViewModel> lstAtendance = new List<AttendanceViewModel>();
+	[Inject]
+	IAttendanceServiceClient _ser { get; set; }
+	Guid IdUser;
+	protected override async Task OnInitializedAsync()
+	{
+		string idStr = _httpContextAccessor.HttpContext.Session.GetString("id");
+		IdUser = Guid.Parse(idStr);
+		var dataShift = await _ser.GetShiftNow();
+		if (dataShift.IsSuccess && dataShift.Data != null && dataShift.Data.Count() > 0)
+		{
+			lstShift = dataShift.Data;
+			selectedShift = lstShift.First();
+			await LoadData();
+		}
+		else
+		{
+			Snackbar.Add(dataShift.Error, Severity.Warning);
+		}
+
+	}
+
+	protected async Task LoadData()
+	{
+		var dataAttendance = await _ser.ListAttendanceToday(selectedShift.Id);
+		if (dataAttendance.IsSuccess)
+		{
+			lstAtendance = dataAttendance.Data!;
+		}
+		else
+		{
+			Snackbar.Add(dataAttendance.Error, Severity.Warning);
+		}
+
+	}
+
+	protected async Task CheckIn(int scheduleId, int attendanceID, bool isCheckin)
+	{
+
+		var response = await _ser.CheckIn(scheduleId, attendanceID, isCheckin, IdUser);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data, Severity.Success);
+			await LoadData();
+			StateHasChanged();
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+
+	}
+	protected async Task CheckOut(int scheduleId, int attendanceID, bool isCheckout)
+	{
+		
+		var response = await _ser.CheckOut(scheduleId,attendanceID, isCheckout, IdUser);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data, Severity.Success);
+			await LoadData();
+			StateHasChanged();
+		}
+		else
+		{
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	protected async Task ChangeShift(Shift value)
+	{
+
+	}
+
+
+
+	private bool FilterFunc(AttendanceViewModel element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
+			return true;
+		if (element.StaffName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+
+
+
+	  
+}

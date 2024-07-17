@@ -12,6 +12,8 @@ using DATN.Aplication;
 using DATN.Aplication.Services.IServices;
 using System.Net;
 using DATN.Aplication.Mapping;
+using Microsoft.AspNetCore.Mvc;
+using DATN.ViewModels.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,10 +57,19 @@ builder.Services.AddAuthentication(options =>
 
     };
 });
+builder.Services.AddCors(otp =>
+{
+    otp.AddPolicy("cor", options =>
+    options.AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    );
+});
 
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
+builder.Services.AddScoped<IAuthenticateGuest, AuthenticateGuest>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IGuestManagerService, GuestManagerService>();
 builder.Services.AddScoped<IWorkShiftManagementService, WorkShiftManagementService>();
@@ -74,12 +85,30 @@ builder.Services.AddScoped<ICategoryProductManagementService, CategoryProductMan
 builder.Services.AddScoped<IBrandManagementService, BrandManagementService>();
 builder.Services.AddScoped<IProductManagementService, ProductManagementService>();
 builder.Services.AddScoped<IProductDetaiManagementService, ProductDetaiManagementService>();
-
+builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
+builder.Services.AddScoped<IAttendanteMangarService, AttendanteMangarService>();
 
 // Add auto mapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
+
+builder.Services.AddMvcCore().ConfigureApiBehaviorOptions(options =>
+{
+    options.InvalidModelStateResponseFactory = (errorContext) =>
+    {
+        var errors = errorContext.ModelState.Values.SelectMany(e => e.Errors.Select(m => new
+        {
+            ErrorMessage = m.ErrorMessage
+        })).ToList();
+        var result = new ResponseData<string>()
+        {
+            IsSuccess = false,
+            Error = errors.Select(e => e.ErrorMessage).First()
+        };
+        return new BadRequestObjectResult(result);
+    };
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -88,9 +117,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
-
+app.UseCors("cor");
 app.UseAuthentication();
 app.UseAuthorization();
 

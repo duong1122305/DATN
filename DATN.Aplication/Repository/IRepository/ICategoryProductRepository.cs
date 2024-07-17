@@ -3,7 +3,7 @@ using DATN.Data.Entities;
 
 namespace DATN.Aplication.Repository.IRepository
 {
-    public interface ICategoryProductRepository : IGenericRepository<CategoryProduct>
+    public interface ICategoryProductRepository : IGenericRepository<CategoryDetails>
     {
     }
 }

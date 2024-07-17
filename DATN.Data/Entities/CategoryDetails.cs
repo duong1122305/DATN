@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Data.Entities
 {
-    public class CategoryProduct
+    public class CategoryDetails
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -18,7 +18,7 @@ namespace DATN.Aplication.Mapping
        
         public MappingProfile()
         {
-            CreateMap<GuestRegisterNoUserRequest, Guest>().ReverseMap();
+            CreateMap<GuestRegisterByGuestRequest, Guest>().ReverseMap();
             CreateMap<Guest, GuestViewModel>().ReverseMap();
             CreateMap<PetSpeciesCreateUpdate, PetSpecies>().ReverseMap();
             CreateMap<PetCreateUpdate, Pet>();

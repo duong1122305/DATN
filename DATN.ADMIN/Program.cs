@@ -14,9 +14,12 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using System.Net;
 using Syncfusion.Blazor;
+using DATN.Aplication.Services.IServices;
+using DATN.Aplication.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
+builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
 builder.Services.AddSyncfusionBlazor();
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -40,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     ValidateIssuerSigningKey = true,
                     ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value,
                     ValidIssuer = builder.Configuration.GetSection("JWT:Issuer").Value,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value!))
                 };
             });
 
@@ -67,7 +70,6 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IAddressService,AddressService>();
@@ -80,8 +82,10 @@ builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
 builder.Services.AddScoped<ICategoryServices,CategoryServices>();
 builder.Services.AddScoped<IProductServices,ProductServices>();
 builder.Services.AddScoped<IBrandServices,BrandServices>();
+builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
-
+builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
+builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddMudServices(config =>
 {
 	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;

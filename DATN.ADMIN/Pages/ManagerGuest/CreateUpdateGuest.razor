@@ -12,8 +12,8 @@
         <MudItem xs="12" sm="12">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField @bind-Value="@guest.Name" Label="Họ và tên" For="@(() => guest.Name)" />
-                    <MudTextField @bind-Value="@guest.PhoneNumber" Label="Số điện thoại" For="@(() => guest.PhoneNumber)" style="margin-top:15px;margin-bottom:15px" />
+                <MudTextField @bind-Value="@guest.Name" Required="true" Label="Họ và tên" For="@(() => guest.Name)" />
+                <MudTextField @bind-Value="@guest.PhoneNumber" Required="true" Label="Số điện thoại" For="@(() => guest.PhoneNumber)" style="margin-top:15px;margin-bottom:15px" />
                     <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                         <MudRadioGroup @bind-Value="Gender" Name="Giới tính" style="justify-content:space-between">
                             <MudRadio Value="@(1)" Color="Color.Primary">Nam</MudRadio>
@@ -22,7 +22,7 @@
                         </MudRadioGroup>
                     </MudField>
                     <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
-                    <MudTextField HelperText="Nhập email để đăng ký tài khoản" ReadOnly="@(!IsNew)" Required="true" T="string" @bind-Value="@guest.Email" Label="Email" For="@(() => guest.Email)" style="margin-top:15px" />
+                    <MudTextField HelperText="Nhập email để đăng ký tài khoản" ReadOnly="@(!IsNew)"  T="string" @bind-Value="@guest.Email" Label="Email" For="@(() => guest.Email)" style="margin-top:15px" />
                     <hr class="hr" />
                     <div class="mt-5 me-5" style="text-align: end;">
                         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
@@ -70,13 +70,13 @@
 		{
 			return;
 		}
-		var response = await _client.RegisterNoUser(new GuestRegisterNoUserRequest()
+		var response = await _client.RegisterNoUser(new GuestRegisterByGuestRequest()
 				{
 					Name = guest.Name,
 					Address = guest.Address,
 					Gender = guest.Gender,
 					PhoneNumber = guest.PhoneNumber,
-					Email=guest.Email
+					Email=guest.Email!
 				});
 		if (response.IsSuccess)
 		{

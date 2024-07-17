@@ -16,11 +16,11 @@ namespace DATN.Data.Config
             builder.HasKey(c => c.Id);
 
             builder.HasOne(c => c.Brands)
-                .WithOne(c => c.Product)
-                .HasForeignKey<Product>(c => c.IdBrand)
+                .WithMany(c => c.Products)
+                .HasForeignKey(c => c.IdBrand)
                 .IsRequired();
 
-            builder.HasOne(c => c.CategoryProduct)
+            builder.HasOne(c => c.CategoryDetails)
                 .WithMany(c => c.Products)
                 .HasForeignKey(c => c.IdCategoryProduct)
                 .IsRequired();

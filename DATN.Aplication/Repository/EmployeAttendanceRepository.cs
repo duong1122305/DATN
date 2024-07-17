@@ -15,5 +15,12 @@ namespace DATN.Aplication.Repository
         public EmployeAttendanceRepository(DATNDbContext context) : base(context)
         {
         }
+
+        public async Task RemoveAttendance(EmployeeAttendance employeeAttendance)
+        {
+           
+                 _context.EmployeeAttendances.Remove(employeeAttendance);
+          
+        }
     }
 }
