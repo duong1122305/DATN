@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DATN.ViewModels.DTOs.Product;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace DATN.ViewModels.DTOs.Booking
     public class BookingService
     {
         public List<CreateBookingDetailRequest> lstBooking { get; set; } = new List<CreateBookingDetailRequest>();
+        public List<ProductDetailView> ListProductDetail { get; set; } = new List<ProductDetailView>();
+
         public event Action OnChange;
         //private readonly IJSRuntime _jsRuntime;
         // public BookingService(IJSRuntime jsRuntime)
@@ -19,6 +22,11 @@ namespace DATN.ViewModels.DTOs.Booking
         public void AddBooking(CreateBookingDetailRequest booking)
         {
             lstBooking.Add(booking);
+            NotifyStateChanged();
+        }
+        public void AddProduct(ProductDetailView product)
+        {
+            ListProductDetail.Add(product);
             NotifyStateChanged();
         }
 

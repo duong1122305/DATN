@@ -41,6 +41,20 @@
                         <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <br/>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
+                <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
+                    <HeaderContent>
+                        <MudTh>Tên sản phẩm</MudTh>
+                        <MudTh>Số lượng</MudTh>
+                        <MudTh>Đơn giá</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Name</MudTd>
+                        <MudTd>@context.Quantity</MudTd>
+                        <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                    </RowTemplate>
+                </MudTable>
                 <style>
                     .outer-div {
                         display: flex;
@@ -143,6 +157,31 @@
             }
         }
     }
+
+    public async Task OpenDialog()
+    {
+
+        string nameDialog = "Thêm mới khách hàng";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+
 
 }
 
