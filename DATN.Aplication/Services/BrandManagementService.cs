@@ -38,7 +38,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên hãng trùng với hãng đã có đã có" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên thương hiệu trùng với thương hiệu đã có đã có" };
             }
             catch (Exception)
             {
@@ -100,7 +100,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
@@ -121,15 +121,15 @@ namespace DATN.Aplication.Services
                     brand.Status = true;
                     await _unitOfWork.BrandRepository.UpdateAsync(brand);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Kích hoạt thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Active không thành công " };
+                return new ResponseData<string> { IsSuccess = false, Error = "Kích hoạt không thành công " };
             }
         }
         public async Task<ResponseData<List<BrandView>>> ListBrand()
@@ -145,7 +145,7 @@ namespace DATN.Aplication.Services
             if (list.Count() > 0)
                 return new ResponseData<List<BrandView>> { IsSuccess = true, Data = list.ToList() };
             else
-                return new ResponseData<List<BrandView>> { IsSuccess = false, Data = new List<BrandView>(), Error = "Chưa có dữ liệu" };
+                return new ResponseData<List<BrandView>> { IsSuccess = false, Data = new List<BrandView>(), Error = "Chưa có dữ liệu!" };
         }
     }
 }

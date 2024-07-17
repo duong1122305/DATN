@@ -102,7 +102,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
@@ -123,15 +123,15 @@ namespace DATN.Aplication.Services
                     category.IsDeleted = false;
                     await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Kích hoạt thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Active không thành công " };
+                return new ResponseData<string> { IsSuccess = false, Error = "Kích hoạt không thành công " };
             }
         }
         public async Task<ResponseData<List<CategoryProductView>>> ListCategory()
