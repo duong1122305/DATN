@@ -20,9 +20,6 @@ namespace DATN.Data.Config
                 .WithMany(c => c.EmployeeAttendances)
                 .HasForeignKey(c => c.EmployeeScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
-            //
-          
-  
         }
     }
 }
