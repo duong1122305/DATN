@@ -72,7 +72,7 @@ namespace DATN.Aplication.Extentions
         }
 
 
-        public string HasCode(string verifyString)
+        public string HashCode(string verifyString)
         {
             using (Aes aesAlg = Aes.Create())
             {
