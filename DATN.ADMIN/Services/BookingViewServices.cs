@@ -5,8 +5,10 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
 using Syncfusion.Blazor.Gantt.Internal;
+using Syncfusion.Blazor.Schedule.Internal;
 using System.Collections.Generic;
 using System.Threading.Channels;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -19,6 +21,13 @@ namespace DATN.ADMIN.Services
         public BookingViewServices(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
+        {
+            var response = await _httpClient.PostAsJsonAsync<List<BuyProduct>>($"/api/Booking/Add-Product-For-Bill", buyProducts);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
 
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)

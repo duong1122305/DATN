@@ -1,4 +1,5 @@
-﻿using DATN.ViewModels.DTOs.ServiceDetail;
+﻿using DATN.ViewModels.DTOs.Product;
+using DATN.ViewModels.DTOs.ServiceDetail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public double ReducePrice { get; set; }
         public double TotalPayment { get; set; }
         public List<ServiceDetailView> ListServiceBooked { get; set; }
+        public List<ProductDetailView> ListProductDetail { get; set; }
     }
 }

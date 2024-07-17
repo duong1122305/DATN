@@ -2,6 +2,7 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.ActionBooking;
+using DATN.ViewModels.DTOs.Product;
 
 namespace DATN.ADMIN.IServices
 {
@@ -19,5 +20,6 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> StartBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView);
+        public Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts);
     }
 }

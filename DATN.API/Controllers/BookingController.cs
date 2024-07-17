@@ -4,6 +4,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Product;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
@@ -14,11 +15,12 @@ namespace DATN.API.Controllers
     {
         private readonly IBookingManagement _bookingManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
-
-        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService)
+        private readonly IProductManagement _productManagement;
+        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement)
         {
             _bookingManagement = bookingManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
+            _productManagement = productManagement;
         }
         [HttpGet("List")]
         public Task<ResponseData<List<BookingView>>> Index()
@@ -38,7 +40,7 @@ namespace DATN.API.Controllers
         [HttpGet("List-Staff-Free-In-Time")]
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to, DateTime dateTime)
         {
-            return await _employeeScheduleManagementService.ListStaffFreeInTime(TimeSpan.Parse(from), TimeSpan.Parse(to),dateTime);
+            return await _employeeScheduleManagementService.ListStaffFreeInTime(TimeSpan.Parse(from), TimeSpan.Parse(to), dateTime);
         }
         [HttpGet("Get-Bill-Of-Guest")]
         public async Task<ResponseData<Bill>> GetBillOfGuest(Guid idguest, DateTime dateBooking)
@@ -85,6 +87,12 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest)
         {
             return await _bookingManagement.GuestCreateBooking(createBookingRequest);
+        }
+
+        [HttpPost("Add-Product-For-Bill")]
+        public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
+        {
+            return await _productManagement.BuyProduct(buyProducts);
         }
     }
 }

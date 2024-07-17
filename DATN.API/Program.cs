@@ -82,6 +82,7 @@ builder.Services.AddScoped<IPetManagerService, PetManagerService>();
 builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
 builder.Services.AddScoped<IServiceDetailManagementService, ServiceDetailManagementService>();
 builder.Services.AddScoped<IBookingManagement, BookingManagement>();
+builder.Services.AddScoped<IProductManagement, ProductManagement>();
 builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

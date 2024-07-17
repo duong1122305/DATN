@@ -15,7 +15,7 @@ namespace DATN.ViewModels.DTOs.Booking
         public string? StaffName { get; set; }
         public string? ServiceDetailName { get; set; }
 
-        public int PetId { get; set; }
+        public int? PetId { get; set; }
 
         public int? ComboId { get; set; }
 

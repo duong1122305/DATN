@@ -1,0 +1,73 @@
+﻿using DATN.Data.Entities;
+using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Product;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DATN.Aplication.Services
+{
+    public class ProductManagement: IProductManagement
+    {
+        IUnitOfWork _unitOfWork;
+        public ProductManagement(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+        public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
+        {
+            try
+            {
+                List<OrderDetail> orderDetails = new List<OrderDetail>();
+                foreach (var buyProduct in buyProducts)
+                {
+                    OrderDetail orderDetail = new OrderDetail()
+                    {
+                        IdBooking = buyProduct.IdBooking,
+                        IdProductDetail = buyProduct.IdProductDetail,
+                        Price = buyProduct.Price,
+                        Quantity = buyProduct.Quantity,
+                    };
+                    orderDetails.Add(orderDetail);
+                }
+                await _unitOfWork.OrderDetailRepository.AddRangeAsync(orderDetails);
+                return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+            }
+            catch (Exception e)
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+            }
+        }
+        public async Task<ResponseData<BillProduct>> GetBillProduct(int id)
+        {
+            try
+            {
+                var query = from order in await _unitOfWork.OrderDetailRepository.GetAllAsync()
+                            join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                            on order.IdProductDetail equals productDetail.Id
+                            where order.IdBooking == id
+                            select new ProductDetailView
+                            {
+                                Name = productDetail.Name,
+                                Price = order.Price,
+                                Quantity = order.Quantity,
+                            };
+                BillProduct billProduct = new BillProduct()
+                {
+                    ListProductDetail = query.ToList(),
+                };
+                foreach (var item in query)
+                {
+                    billProduct.TotalPrice += item.Price * item.Quantity;
+                }
+                return new ResponseData<BillProduct> { IsSuccess = true, Data = billProduct };
+            }
+            catch (Exception e)
+            {
+                return new ResponseData<BillProduct> { IsSuccess = false, Error = e.Message };
+            }
+        }
+    }
+}
