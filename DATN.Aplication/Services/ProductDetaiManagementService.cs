@@ -20,7 +20,7 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
         {
-            var check = (from product in await _unitOfWork.ProductRepository.GetAllAsync()
+            var check = (from product in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                          where product.Name == productView.Name
                          select product).FirstOrDefault();
             try
