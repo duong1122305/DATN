@@ -140,7 +140,7 @@ namespace DATN.Aplication.Services
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
-                        join cate in await _unitOfWork.CategoryRepository.GetAllAsync()
+                        join cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
                         on product.IdCategoryProduct equals cate.Id
                         select new ProductView()
                         {
