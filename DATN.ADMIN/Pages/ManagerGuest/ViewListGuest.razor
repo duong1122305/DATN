@@ -75,7 +75,7 @@
 				}
 
 				<MudTd>
-					<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
+					<MudSwitch T="bool" Value="@(context.IsDelete!.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
 				</MudTd>
 				<MudTd>
 					<MudButtonGroup Variant="Variant.Filled">
@@ -125,7 +125,7 @@ else
 	{
 		//var response = await _client.GetGuest();
 		var response = await _guestService.GetGuest();
-		lstGuest = response.Data;
+		lstGuest = response.Data!;
 
 		StateHasChanged();
 	}

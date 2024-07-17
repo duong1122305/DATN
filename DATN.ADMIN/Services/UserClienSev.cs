@@ -118,5 +118,11 @@ namespace DATN.ADMIN.Services
             else
                 return result;
         }
-    }
+
+		public async Task<ResponseData<string>> UpdateImg(string url, string imgId, string id)
+		{
+			var result = _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/update-url?url={url}&imgId={imgId}&id={id}").GetAwaiter().GetResult();
+			return result;
+		}
+	}
 }

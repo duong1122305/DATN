@@ -36,7 +36,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("ActionBookings");
+                    b.ToTable("ActionBookings", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Booking", b =>
@@ -83,7 +83,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.BookingDetail", b =>
@@ -139,7 +139,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("BookingDetails");
+                    b.ToTable("BookingDetails", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Brand", b =>
@@ -163,7 +163,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Category", b =>
@@ -186,7 +186,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.CategoryProduct", b =>
@@ -232,7 +232,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ComboDetails");
+                    b.ToTable("ComboDetails", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ComboService", b =>
@@ -270,7 +270,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("PetTypeId");
 
-                    b.ToTable("ComboServices");
+                    b.ToTable("ComboServices", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Discount", b =>
@@ -328,7 +328,7 @@ namespace DATN.API.Migrations
                     b.HasIndex("VoucherCode")
                         .IsUnique();
 
-                    b.ToTable("Discounts");
+                    b.ToTable("Discounts", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.EmployeeAttendance", b =>
@@ -355,6 +355,8 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("EmployeeScheduleId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("EmployeeAttendances");
                 });
 
@@ -378,7 +380,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("WorkShiftId");
 
-                    b.ToTable("EmployeeSchedules");
+                    b.ToTable("EmployeeSchedules", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Guest", b =>
@@ -431,7 +433,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guests");
+                    b.ToTable("Guests", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.HistoryAction", b =>
@@ -469,7 +471,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("BookingID");
 
-                    b.ToTable("HistoryActions");
+                    b.ToTable("HistoryActions", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ImagePet", b =>
@@ -496,7 +498,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("ImagePets");
+                    b.ToTable("ImagePets", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ImageProduct", b =>
@@ -521,7 +523,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("IdProductDetail");
 
-                    b.ToTable("ImageProducts");
+                    b.ToTable("ImageProducts", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.OrderDetail", b =>
@@ -550,7 +552,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("IdProductDetail");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Pet", b =>
@@ -601,7 +603,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("SpeciesId");
 
-                    b.ToTable("Pets");
+                    b.ToTable("Pets", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.PetSpecies", b =>
@@ -626,7 +628,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("PetTypeId");
 
-                    b.ToTable("PetSpecies");
+                    b.ToTable("PetSpecies", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.PetType", b =>
@@ -643,7 +645,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PetTypes");
+                    b.ToTable("PetTypes", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Product", b =>
@@ -677,7 +679,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("IdCategoryProduct");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ProductDetail", b =>
@@ -713,7 +715,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("IdProduct");
 
-                    b.ToTable("ProductDetails");
+                    b.ToTable("ProductDetails", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Report", b =>
@@ -738,7 +740,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("BookingDetailId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Reports", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Role", b =>
@@ -789,7 +791,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ServiceDetail", b =>
@@ -832,7 +834,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ServiceDetails");
+                    b.ToTable("ServiceDetails", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Shift", b =>
@@ -855,7 +857,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shift");
+                    b.ToTable("Shift", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.TypePayment", b =>
@@ -872,7 +874,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TypePayments");
+                    b.ToTable("TypePayments", (string)null);
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.User", b =>
@@ -911,6 +913,12 @@ namespace DATN.API.Migrations
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ImgID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImgUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -984,7 +992,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("WorkShifts");
+                    b.ToTable("WorkShifts", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
