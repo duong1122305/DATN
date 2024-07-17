@@ -32,9 +32,9 @@ namespace DATN.Aplication.Services
                         Name = productView.Name,
                         Amount = productView.Amount,
                         IdPetType = productView.IdPetType,
-                        IdProduct=productView.IdProduct,
-                        IsDeleted=false,
-                        Price=productView.Price,
+                        IdProduct = productView.IdProduct,
+                        IsDeleted = false,
+                        Price = productView.Price,
                     };
                     await _unitOfWork.ProductDetailRepository.AddAsync(product);
                     await _unitOfWork.SaveChangeAsync();
@@ -135,6 +135,28 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
+        }
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id)
+        {
+            var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
+                        join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                        on product.Id equals productDetail.IdProduct
+                        select new ProductDetaiView
+                        {
+                            Id = productDetail.Id,
+                            Amount = productDetail.Amount,
+                            IsDeleted = productDetail.IsDeleted,
+                            Name = productDetail.Name,
+                            PetTypeId = productDetail.IdPetType,
+                            ProductId = productDetail.IdProduct,
+                            Product = product.Name,
+                            Price = productDetail.Price,
+                        };
+            if (query.Count()>0)
+            {
+                return new ResponseData<List<ProductDetaiView>> { IsSuccess=true,Data=query.ToList() };
+            }
+            return new ResponseData<List<ProductDetaiView>> { IsSuccess=false,Error="Chưa có sản phẩm chi tiết của sản phẩm"}
         }
         public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetail()
         {
