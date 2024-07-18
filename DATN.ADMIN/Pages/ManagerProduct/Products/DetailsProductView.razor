@@ -34,7 +34,6 @@
             </TemplateColumn>
             <PropertyColumn Property="x => x.Product" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm chi tiết" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.PetType" Title="Sản phẩm cho" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Amount" Title="Số lượng" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Price" Title="Giá" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
@@ -172,9 +171,6 @@ else
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
-
-             if (x.PetType.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
          }
          else if (selectedStatus == CateStatus.Active && x.IsDeleted == true)
          {
@@ -183,9 +179,6 @@ else
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
-
-             if (x.PetType.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
          }
          else
          {
@@ -193,9 +186,6 @@ else
                  return true;
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
-
-             if (x.PetType.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
          }
          return false;

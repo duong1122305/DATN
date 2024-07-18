@@ -25,7 +25,7 @@ namespace DATN.Aplication.Services
                          select product).FirstOrDefault();
             try
             {
-                if (productView == null)
+                if (productView != null)
                 {
                     var product = new ProductDetail()
                     {

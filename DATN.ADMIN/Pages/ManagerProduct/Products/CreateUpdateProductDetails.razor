@@ -22,16 +22,6 @@
                         <MudTextField T="string" Label="Tên sản phẩm chi tiết" @bind-Value="@product.Name" For="@(() => product.Name)" />
                         <MudTextField T="double" Label="Giá" @bind-Value="@product.Price" For="@(() => product.Price)" />
                         <MudTextField T="int" Label="Số lượng" @bind-Value="@product.Amount" For="@(() => product.Amount)" />
-                        <div class="mud-select">
-                            <label class="mud-input-label">Chọn loại</label>
-                            <select @bind="product.PetTypeId" required>
-                                <option value="0">Chọn loại</option>
-                                @foreach (var i in lstpetType)
-                                {
-                                    <option value="@i.Id">@i.Name</option>
-                                }
-                            </select>
-                        </div>
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
                             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
@@ -73,7 +63,7 @@
             if (id != null && id != 0)
             {
                 _nameButton = "Thêm mới";
-                
+
             }
             else
             {
@@ -88,27 +78,23 @@
         if (await Confirm("thêm mới") == true)
 
         {
-                if (product.PetTypeId == 0 || product.PetTypeId == null)
+            var result = await _client.CreateProductDetails(new CreateProductDetaiView()
                 {
-                    Message("Vui lòng chọn loại thú cưng", Severity.Warning);
-                }
+                   
+                    Name = product.Name,
+                    Amount = product.Amount,
+                    Price = product.Price,
+                    IdProduct = id
+                });
+            if (result.IsSuccess)
+            {
+
+                Message(result.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
             else
             {
-                var result = await _client.CreateProductDetails(new CreateProductDetaiView()
-                    {
-                        Name = product.Name,
-                        Amount = product.Amount,
-                        IdPetType = product.PetTypeId,
-                        IdProduct = product.ProductId
-                    });
-                if (result.IsSuccess)
-                {
-
-                    Message(result.Data, Severity.Success);
-                    _dialogBox.Close(DialogResult.Ok(true));
-                }
-                else
-                    Message(result.Error, Severity.Error);
+                Message(result.Error, Severity.Error);
             }
         }
         else
@@ -130,8 +116,8 @@
                 {
                     Name = product.Name,
                     Amount = product.Amount,
-                    IdPetType = product.PetTypeId,
-                    IdProduct = product.ProductId
+                    Price = product.Price,
+                    IdProduct = id
                 });
             if (result.IsSuccess)
             {
