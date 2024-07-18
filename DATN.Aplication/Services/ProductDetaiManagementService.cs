@@ -156,7 +156,7 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<List<ProductDetaiView>> { IsSuccess=true,Data=query.ToList() };
             }
-            return new ResponseData<List<ProductDetaiView>> { IsSuccess=false,Error="Chưa có sản phẩm chi tiết của sản phẩm"}
+            return new ResponseData<List<ProductDetaiView>> { IsSuccess = false, Error = "Chưa có sản phẩm chi tiết của sản phẩm" };
         }
         public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetail()
         {
