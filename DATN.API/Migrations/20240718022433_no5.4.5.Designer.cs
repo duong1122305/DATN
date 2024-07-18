@@ -4,6 +4,7 @@ using DATN.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    partial class DATNDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240718022433_no5.4.5")]
+    partial class no545
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -689,6 +692,9 @@ namespace DATN.API.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdPetType")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdProduct")
                         .HasColumnType("int");
 
@@ -699,17 +705,14 @@ namespace DATN.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PetTypeId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdProduct");
+                    b.HasIndex("IdPetType");
 
-                    b.HasIndex("PetTypeId");
+                    b.HasIndex("IdProduct");
 
                     b.ToTable("ProductDetails");
                 });
@@ -1352,15 +1355,15 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.ProductDetail", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.Product", "Product")
+                    b.HasOne("DATN.Data.Entities.PetType", "PetType")
                         .WithMany("ProductDetails")
-                        .HasForeignKey("IdProduct")
+                        .HasForeignKey("IdPetType")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.PetType", "PetType")
+                    b.HasOne("DATN.Data.Entities.Product", "Product")
                         .WithMany("ProductDetails")
-                        .HasForeignKey("PetTypeId")
+                        .HasForeignKey("IdProduct")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

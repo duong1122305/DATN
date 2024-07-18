@@ -163,16 +163,12 @@ namespace DATN.Aplication.Services
             var query = from productde in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                         join product in await _unitOfWork.ProductRepository.GetAllAsync()
                         on productde.IdProduct equals product.Id
-                        join pettype in await _unitOfWork.PetTypeRepository.GetAllAsync()
-                        on productde.IdPetType equals pettype.Id
                         select new ProductDetaiView()
                         {
                             Id = product.Id,
                             Amount = productde.Amount,
                             IsDeleted = productde.IsDeleted,
                             Name = productde.Name,
-                            PetType = pettype.Name,
-                            PetTypeId = pettype.Id,
                             Price = productde.Price,
                             Product = product.Name,
                             ProductId = product.Id,
