@@ -140,17 +140,19 @@ namespace DATN.Aplication.Services
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
-                        join cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                        on product.IdCategoryProduct equals cate.Id
+                        join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+                        on product.IdCategoryProduct equals cd.Id  
+                        join c in await _unitOfWork.CategoryRepository.GetAllAsync()
+                        on cd.IdCategory equals c.Id
                         select new ProductView()
                         {
                             Id = product.Id,
                             Brand = brand.Name,
                             Name = product.Name,
-                            CategoryProduct = cate.Name,
+                            CategoryProduct = c.Name+" > "+cd.Name,
                             Description = product.Description,
                             Status = product.Status,
-                            CategoryProductId=cate.Id,
+                            CategoryProductId=cd.Id,
                         };
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };

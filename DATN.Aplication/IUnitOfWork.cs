@@ -30,7 +30,7 @@ namespace DATN.Aplication
         ITypePaymentRepository TypePaymentRepository { get; }
         IWorkShiftRepository WorkShiftRepository { get; }
         IBrandRepository BrandRepository { get; }
-        ICategoryProductRepository CategoryProductRepository { get; }
+		ICategoryDetailRepository CategoryDetailRepository { get; }
         ICategoryRepository CategoryRepository { get; }
         IImageProductRepository ImageProductRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
