@@ -15,9 +15,9 @@ namespace DATN.Data.Config
         {
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(c => c.ProductDetail)
+            builder.HasOne(c => c.Product)
                 .WithMany(c => c.ImageProducts)
-                .HasForeignKey(c => c.IdProductDetail)
+                .HasForeignKey(c => c.ProductID)
                 .IsRequired();
         }
     }
