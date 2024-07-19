@@ -16,6 +16,6 @@ namespace DATN.Data.Entities
         public bool IsDeleted { get; set; }
         public virtual Product Product { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<ImageProduct> ImageProducts { get; set; }
+      
     }
 }

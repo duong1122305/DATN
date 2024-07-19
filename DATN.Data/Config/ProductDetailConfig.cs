@@ -19,8 +19,6 @@ namespace DATN.Data.Config
                 .WithMany(c => c.ProductDetails)
                 .HasForeignKey(c => c.IdProduct)
                 .IsRequired();
-
-        
         }
     }
 }

@@ -4,6 +4,7 @@ using DATN.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    partial class DATNDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240719014121_no5.4.6")]
+    partial class no546
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1354,7 +1357,7 @@ namespace DATN.API.Migrations
                 {
                     b.HasOne("DATN.Data.Entities.Product", "Product")
                         .WithMany("ProductDetails")
-                        .HasForeignKey("PetTypeId")
+                        .HasForeignKey("IdProduct")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
