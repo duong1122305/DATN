@@ -99,5 +99,10 @@ namespace DATN.API.Controllers
         {
             return await _productManagement.ListProductViewSale();
         }
+        [HttpPost("Check-bill")]
+        public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
+        {
+            return await _bookingManagement.CheckBill(idBooking ?? null, productdes);
+        }
     }
 }
