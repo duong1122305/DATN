@@ -171,7 +171,7 @@
                 Position = DialogPosition.Center,
                 MaxWidth = MaxWidth.Large,
                 CloseButton = true,
-                FullWidth = true,
+                FullWidth = false,
                 DisableBackdropClick = true,
             };
         var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog,parameter, options);

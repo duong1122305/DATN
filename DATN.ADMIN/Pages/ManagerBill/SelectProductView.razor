@@ -4,30 +4,41 @@
 @using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ProductDetail
 
-@foreach (var item in lstProductDetaiView)
-{
-    <div style="display:flex">
-        <MudCard Style="width:400px;margin-bottom:10px">
-            <MudCardMedia Image="img/images.jpg" Height="200" />
-            <MudCardContent>
-                <MudText Typo="Typo.h6">@item.Name</MudText>
-                <MudText Typo="Typo.body2">Tên danh mục: @item.CateName</MudText>
-                <MudText Typo="Typo.body2">Tên thương hiệu: @item.BrandName</MudText>
-
-                <MudSelect T="string" Label="Chọn" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var item2 in item.ListProductDetail)
+<MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="height:1000px;min-height:1000px;width:1200px;min-width:1200px">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @(lstProductDetaiView.IndexOf(context.Item) + 1)
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Ảnh" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudImage Src="@context.Item.LinkImg" Height="150" />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Name" Title="Tên SP" Sortable="false" Filterable="false" Style="width:200px"/>
+        <PropertyColumn Property="x=>x.CateName" Title="Danh mục" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudSelect T="int?" Label="Chọn" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var item2 in context.Item.ListProductDetail)
                     {
-                        <MudSelectItem Value="item2.Name" />
+                        <MudSelectItem Value="item2.IdProductDetail">@item2.Name - @item2.Price.ToString() VNĐ</MudSelectItem>
                     }
                 </MudSelect>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Chọn</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">???</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </div>
-}
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="ProductSelect" />
+    </PagerContent>
+</MudDataGrid>
+
 @code {
     [Parameter]
     public Guid? guid { get; set; }
