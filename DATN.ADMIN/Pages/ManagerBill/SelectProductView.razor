@@ -1,112 +1,67 @@
 ﻿@page "/SelectViewProduct"
 @using DATN.ADMIN.IServices
 @using DATN.Utilites
+@using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ProductDetail
-<MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Chọn sản phẩm</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
-    </ToolBarContent>
-    <Columns>
-        <MudCard>
-            <MudCardMedia Image="images/door.jpg" Height="200" />
-            <MudCardContent>
-                <TemplateColumn Title="STT" Sortable="false" Filterable="false">
-                    <CellTemplate>
-                        @(lstProductDetaiView.IndexOf(context.Item) + 1)
-                    </CellTemplate>
-                </TemplateColumn>
-                <PropertyColumn Property="x=>x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
-                <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
-                    <CellTemplate>
-                        @(CurrencyHelper.FormatCurrency((float)context.Item.Price))
-                    </CellTemplate>
-                </TemplateColumn>
-                <TemplateColumn Title="Số lượng" Sortable="false" Filterable="false">
-                    <CellTemplate>
-                        @context.Item.Amount
-                    </CellTemplate>
-                </TemplateColumn>
-                <PropertyColumn Property="x=>x.Product" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
-            </MudCardContent>
-          @*   <MudCardActions>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Share</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
-            </MudCardActions> *@
-        </MudCard>
-       
-        
-      
-        <TemplateColumn Sortable="false" Filterable="false" Title="Trạng thái">
-            <CellTemplate>
-                @if (!context.Item.IsDeleted)
-                {
-                    <span>
-                        <MudChip Color="Color.Success" title="Hoạt động">Còn hàng</MudChip>
-                    </span>
-                }
-                else
-                {
-                    <span>
-                        <MudChip Color="Color.Error" title="Hoạt động">Hết hàng</MudChip>
-                    </span>
-                }
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
-            <CellTemplate>
-                @if (!context.Item.IsDeleted)
-                {
-                    @* <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price,context.Item.Description))" StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton> *@
-                }
-                else
-                {
-                    @* <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price,context.Item.Description))" Disabled StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton> *@
-                }
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-    <PagerContent>
-        @* <MudDataGridPager T="" /> *@
 
-    </PagerContent>
-</MudDataGrid>
+@foreach (var item in lstProductDetaiView)
+{
+    <div style="display:flex">
+        <MudCard Style="width:400px;margin-bottom:10px">
+            <MudCardMedia Image="img/images.jpg" Height="200" />
+            <MudCardContent>
+                <MudText Typo="Typo.h6">@item.Name</MudText>
+                <MudText Typo="Typo.body2">Tên danh mục: @item.CateName</MudText>
+                <MudText Typo="Typo.body2">Tên thương hiệu: @item.BrandName</MudText>
+
+                <MudSelect T="string" Label="Chọn" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var item2 in item.ListProductDetail)
+                    {
+                        <MudSelectItem Value="item2.Name" />
+                    }
+                </MudSelect>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Chọn</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">???</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </div>
+}
 @code {
     [Parameter]
-    public Guid? guid { get;set; }
+    public Guid? guid { get; set; }
     [Inject]
-    private IProductServices _ClientProduct {get;set;}
+    private IBookingViewServices _ClientProduct { get; set; }
 
-    private List<ProductDetaiView> lstProductDetaiView = new List<ProductDetaiView>();
+    private List<ProductSelect> lstProductDetaiView = new List<ProductSelect>();
 
     private string searchString = "";
 
     private async Task LoadData()
     {
-        var respone = await _ClientProduct.ListProductDetails();
+        var respone = await _ClientProduct.ListProductViewSale();
         if (respone.IsSuccess)
         {
             lstProductDetaiView = respone.Data;
         }
         else
         {
-            lstProductDetaiView = new List<ProductDetaiView>();
+            lstProductDetaiView = new List<ProductSelect>();
         }
     }
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
     }
-    private Func<ProductDetaiView, bool> _quickFilter => x =>
+    private Func<ProductSelect, bool> _quickFilter => x =>
       {
-      if (string.IsNullOrWhiteSpace(searchString))
-          return true;
-      if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-          return true;
-      if ($"{x.Product} {x.Price}".Contains(searchString.Trim()))
-          return true;
-      return false;
+          if (string.IsNullOrWhiteSpace(searchString))
+              return true;
+          if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+              return true;
+          if ($"{x.CateName}".Contains(searchString.Trim()))
+              return true;
+          return false;
       };
 }
