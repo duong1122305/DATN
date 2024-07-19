@@ -8,6 +8,7 @@ namespace DATN.Aplication.Services
     {
         public Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts);
         public Task<ResponseData<BillProduct>> GetBillProduct(int id);
+        public Task<ResponseData<List<ProductSelect>>> ListProductViewSale();
 
     }
 }
