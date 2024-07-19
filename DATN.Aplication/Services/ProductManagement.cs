@@ -79,8 +79,10 @@ namespace DATN.Aplication.Services
                         on product.IdBrand equals brand.Id
                         join cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                         on product.IdCategoryProduct equals cate.Id
-                        group new { product, brand, cate }
-                        by new { product, brand, cate }
+                        join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
+                        on product.Id equals img.ProductID
+                        group new { product, brand, cate, img }
+                        by new { product, brand, cate, img }
                         into view
                         select new ProductSelect()
                         {
@@ -97,6 +99,7 @@ namespace DATN.Aplication.Services
                                                      Price = tetsa.Price,
                                                      Quantity = tetsa.Amount
                                                  }).ToList(),
+                            LinkImg = view.Key.img.UrlImage,
                         };
 
             return new ResponseData<List<ProductSelect>>() { IsSuccess = true, Data = query.ToList() };
