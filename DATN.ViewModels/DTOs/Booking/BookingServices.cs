@@ -13,11 +13,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public List<ProductDetailView> ListProductDetail { get; set; } = new List<ProductDetailView>();
 
         public event Action OnChange;
-        //private readonly IJSRuntime _jsRuntime;
-        // public BookingService(IJSRuntime jsRuntime)
-        //{
-        //    _jsRuntime = jsRuntime;
-        //}
 
         public void AddBooking(CreateBookingDetailRequest booking)
         {
