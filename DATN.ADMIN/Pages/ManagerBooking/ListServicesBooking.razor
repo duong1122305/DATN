@@ -280,7 +280,8 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-      
+        parameters.Add("guid", id);
+        parameters.Add("date", date);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)

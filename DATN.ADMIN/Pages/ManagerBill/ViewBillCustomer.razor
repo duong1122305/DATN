@@ -4,14 +4,15 @@
 @using DATN.Utilites
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Payment
+@using DATN.ViewModels.DTOs.Product
 @using Newtonsoft.Json
 @inject IAddressService _addressServive;
 @inject IDialogService _dialogservice;
+@inject ISnackbar Snackbar
 <style>
-    .mud-dialog-width-lg{
-        height:680px;
-        min-height:680px;
-       
+    .mud-dialog-width-lg {
+        height: 680px;
+        min-height: 680px;
     }
 
 </style>
@@ -35,7 +36,7 @@
                     <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
                 </MudText>
 
-                @if (guid !=null)
+                @if (guid != null)
                 {
                     <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
                 }
@@ -60,11 +61,21 @@
                         <MudTh>Tên sản phẩm</MudTh>
                         <MudTh>Số lượng</MudTh>
                         <MudTh>Đơn giá</MudTh>
+                        <MudTh>Hành động</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@context.Name</MudTd>
-                        <MudTd>@context.Quantity</MudTd>
+                        <MudTd>
+                            <div class="quantity-input">
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                               @*  <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" style="width:60px" /> *@
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
+                            </div>
+                        </MudTd>
                         <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                        <MudTd>
+                            <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                        </MudTd>
                     </RowTemplate>
                 </MudTable>
                 <style>
@@ -205,8 +216,50 @@
             StateHasChanged();
         }
     }
+    private async void RemoveProduct(ProductDetailView product)
+    {
+        // Gọi phương thức từ BookingService để xóa booking
+        if (await Confirm() == true)
+        {
+            bookingService.RemoveProduct(guid.Value,product);
+            Message("Đã xoá thành công.", Severity.Success);
+        }
+        // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
+    }
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa dịch vụ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
 
 
+    //thêm sản phẩm
+    void IncrementQuantity(ProductDetailView product)
+    {
+        if (product.SelectQuantityProduct < product.Quantity)
+        {
+            product.SelectQuantityProduct++;
+        }
+    }
+
+    //trừ sản phẩm
+    void DecrementQuantity(ProductDetailView product)
+    {
+        if (product.SelectQuantityProduct > 1)
+        {
+            product.SelectQuantityProduct--;
+        }
+    }
 
 }
 
