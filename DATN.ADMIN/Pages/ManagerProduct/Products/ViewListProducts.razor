@@ -14,6 +14,7 @@
 
 <PageTitle>Danh sách sản phẩm</PageTitle>
 <MudText Typo="Typo.h3" Style="text-align:center;margin-bottom:10px">Danh sách sản phẩm</MudText>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 @if (lstProduct.Count > 0 && lstProduct != null)
 {
     <MudDataGrid Items="@lstProduct" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
@@ -30,7 +31,6 @@
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
                           <MudSpacer/>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
         </ToolBarContent>
         <Columns>
             <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -40,7 +40,8 @@
             </TemplateColumn>
             <PropertyColumn Property="x => x.CategoryProduct" Title="Tên danh mục" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Description" Title="Mô tả" style="width:400px" Sortable="false" Filterable="false" />
+
             <PropertyColumn Property="x => x.Brand" Title="Thương hiệu" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
@@ -68,6 +69,7 @@
 
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Default" OnClick="@(async()=>await OpenDetails(context.Item.Id))" title="Xem chi tiết"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
             </TemplateColumn>
@@ -252,11 +254,10 @@ else
 
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới sản phẩm";
-        parameters.Add("id", id);
         if (id != null)
         {
             product = lstProduct.FirstOrDefault(x => x.Id == id);
-            parameters.Add("_product", product);
+            parameters.Add("product", product);
             nameDialog = "Cập nhật sản phẩm";
         }
         DialogOptions options = new DialogOptions()
@@ -277,7 +278,31 @@ else
             StateHasChanged();
         }
     }
+    private async Task OpenDetails(int? id)
+    {
 
+        var parameters = new DialogParameters();
+        // var cate = lstProduct.FirstOrDefault(x => x.Id == id);
+        parameters.Add("id", id);
+        string nameDialog = "Sản phẩm chi tiết";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Medium,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<DetailsProductView>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
     //messenge
     private void Message(string message, Severity severity)
     {

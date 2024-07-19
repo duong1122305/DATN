@@ -21,7 +21,7 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
         {
             var check = (from product in await _unitOfWork.ProductRepository.GetAllAsync()
-                         where product.Name == productView.Name
+                         where product.Name == productView.Name.Trim().TrimStart().TrimEnd()
                          select product).FirstOrDefault();
             try
             {
@@ -44,19 +44,19 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> UpdateProduct(CreateProductView productView)
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductRepository.GetAllAsync()
-                               where cate.Id == productView.Id
-                               select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == productView.Name
-                               select cate;
+                var product = (from pro in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where pro.Id == productView.Id
+                               select pro).FirstOrDefault();
+                var checkdup = from pro in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where pro.Name == productView.Name.Trim().TrimStart().TrimEnd()
+                               select pro;
                 if (checkdup.Count() > 0)
                 {
                     if (product.Id == checkdup.FirstOrDefault().Id)
@@ -86,7 +86,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> RemoveProduct(int id)
@@ -109,7 +109,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> ActiveProduct(int id)
@@ -132,7 +132,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<List<ProductView>>> ListProduct()
@@ -152,7 +152,8 @@ namespace DATN.Aplication.Services
                             CategoryProduct = c.Name+" > "+cd.Name,
                             Description = product.Description,
                             Status = product.Status,
-                            CategoryProductId=cd.Id,
+                            CategoryProductId=cate.Id,
+                            IdBrand=brand.Id
                         };
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
