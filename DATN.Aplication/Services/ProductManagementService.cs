@@ -92,7 +92,27 @@ namespace DATN.Aplication.Services
                         product.IdBrand = productView.IdBrand;
                         product.IdCategoryProduct = productView.IdCategoryProduct;
                         await _unitOfWork.ProductRepository.UpdateAsync(product);
-                        await _unitOfWork.SaveChangeAsync();
+
+                        var imgPro=await _unitOfWork.ImageProductRepository.FindAsync(p=>p.ProductID==product.Id);
+                        if (imgPro == null|| !imgPro.Any())
+                        {
+                            var newImg = new ImageProduct
+                            {
+                                ProductID = product.Id,
+                                ImgKey= productView.ImgID,
+                                UrlImage=productView.ImgUrl,
+
+                            };
+							await _unitOfWork.ImageProductRepository.AddAsync(newImg);
+						}
+                        else
+                        {
+                            var imgU = imgPro.First();
+                            imgU.ImgKey = productView.ImgID;
+                            imgU.UrlImage = productView.ImgUrl;
+							await _unitOfWork.ImageProductRepository.UpdateAsync(imgU);
+						}
+						await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                     }
                     else
@@ -161,6 +181,26 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
+        public async Task<ResponseData<ImageProduct>> GetImgByProduct(int idProduct)
+        {
+            try
+            {
+                var img= await _unitOfWork.ImageProductRepository.FindAsync(p=>p.ProductID == idProduct);
+                if (img==null | !img.Any())
+                {
+                    return new ResponseData<ImageProduct>(false, "Không có ảnh");
+				}
+                else
+                {
+                    return new ResponseData<ImageProduct>(img.First());
+                }
+            }
+            catch (Exception)
+            {
+
+				return new ResponseData<ImageProduct>(false, "Lỗi lấy ảnh");
+			}
+        } 
         public async Task<ResponseData<List<ProductView>>> ListProduct()
         {
             var productDT =await _unitOfWork.ProductDetailRepository.FindAsync(p=>!p.IsDeleted);
@@ -168,8 +208,9 @@ namespace DATN.Aplication.Services
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
-
-                        join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+                        join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
+						on product.Id equals img.ProductID
+						join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                         on product.IdCategoryProduct equals cd.Id
                         join c in await _unitOfWork.CategoryRepository.GetAllAsync()
                         on cd.IdCategory equals c.Id
@@ -178,12 +219,14 @@ namespace DATN.Aplication.Services
                             Id = product.Id,
                             Brand = brand.Name,
                             Name = product.Name,
-                            CategoryProduct = c.Name + " > " + cd.Name,
+                            CategoryProduct =  cd.Name,
                             Description = product.Description,
                             Status = product.Status,
                             CategoryProductId = cd.Id,
                             IdBrand = brand.Id,
-                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString() + " - " + product.ProductDetails.Max(x => x.Price).ToString() : product.ProductDetails != null&& product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString() : "Sản phẩm ngừng bán"
+                            Url= img.UrlImage,
+                            IdImg= img.ImgKey,
+                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString() + " - " + product.ProductDetails.Max(x => x.Price).ToString() : product.ProductDetails != null&& product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString() : "Không có biến thể nào sẵn sàng"
 
 						};
             if (query.Count() > 0)

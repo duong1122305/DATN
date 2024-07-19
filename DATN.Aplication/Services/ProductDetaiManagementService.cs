@@ -25,7 +25,7 @@ namespace DATN.Aplication.Services
                          select product).FirstOrDefault();
             try
             {
-                if (productView == null)
+                if (check == null)
                 {
                     var product = new ProductDetail()
                     {
@@ -55,11 +55,10 @@ namespace DATN.Aplication.Services
                                where cate.Id == productView.Id
                                select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                               where cate.Name == productView.Name.Trim().TrimStart().TrimEnd()
+                               where cate.Name == productView.Name.Trim() && cate.Id!=productView.Id && cate.IdProduct== productView.IdProduct
                                select cate;
-                if (checkdup.Count() > 0)
-                {
-                    if (product.Id == checkdup.FirstOrDefault().Id)
+               
+                    if (checkdup == null || checkdup.FirstOrDefault() == null )
                     {
                         product.Name = productView.Name;
                         product.Price = productView.Price;
@@ -70,17 +69,9 @@ namespace DATN.Aplication.Services
                     }
                     else
                         return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
-                }
-                else
-                {
-                    product.Name = productView.Name;
-                    product.Price = productView.Price;
-                    product.Amount = productView.Amount;
-                    await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
-                    await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
-                }
+                
 
+             
             }
             catch (Exception)
             {
@@ -138,6 +129,8 @@ namespace DATN.Aplication.Services
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                         on product.Id equals productDetail.IdProduct
+                        where productDetail.IdProduct == id
+                        orderby productDetail.Price
                         select new ProductDetaiView
                         {
                             Id = productDetail.Id,

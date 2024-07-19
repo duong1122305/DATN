@@ -45,6 +45,11 @@ namespace DATN.ADMIN.Services
             return await _httpClient.GetFromJsonAsync<ResponseData<List<ProductView>>>("api/Product/List-Product");
         }
 
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id)
+        {
+            return await _httpClient.GetFromJsonAsync<ResponseData<List<ProductDetaiView>>>($"api/Product/list-product-details-by-id?id={id}");
+        }
+
         public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetails()
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<List<ProductDetaiView>>>("api/Product/List-Product-Details");

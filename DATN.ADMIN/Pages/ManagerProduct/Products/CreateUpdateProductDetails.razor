@@ -11,6 +11,7 @@
 @using DATN.ViewModels.DTOs.ProductDetail
 @using DATN.ViewModels.DTOs.ServiceManager
 @using MudBlazor
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
 <EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
@@ -20,8 +21,8 @@
                 <MudCard>
                     <MudCardContent>
                         <MudTextField T="string" Label="Tên sản phẩm chi tiết" @bind-Value="@product.Name" For="@(() => product.Name)" />
-                        <MudTextField T="double" Label="Giá" @bind-Value="@product.Price" For="@(() => product.Price)" />
-                        <MudTextField T="int" Label="Số lượng" @bind-Value="@product.Amount" For="@(() => product.Amount)" />
+                        <MudNumericField Immediate="true" Label="Giá" Format="N0" Culture="@_en" T="double" @bind-Value="@product.Price" For="@(() => product.Price)" />
+                        <MudNumericField Format="N0" Culture="@_en" Immediate="true" T="int" Label="Số lượng" @bind-Value="@product.Amount" For="@(() => product.Amount)" />
                       
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
@@ -39,13 +40,11 @@
 
 @code {
     [Parameter]
-    public int id { get; set; }
+    public int id { get; set; } 
 
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    [Parameter]
-    public CreateProductDetaiView productDetails { get; set; } = new CreateProductDetaiView();
-
+    
     [Parameter]
     public ProductDetaiView product { get; set; } = new ProductDetaiView();
     string _nameButton = "";
@@ -54,6 +53,7 @@
     [Inject]
     private IPetManagerServices petServices { get; set; }
     private List<PetType> lstpetType = new List<PetType>();
+    private CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
 
     protected async override Task OnInitializedAsync()
     {
@@ -61,7 +61,7 @@
         if (brand.IsSuccess)
         {
             lstpetType = brand.Data;
-            if (id != null && id != 0)
+            if (product==null|| product.Id ==null )
             {
                 _nameButton = "Thêm mới";
                 
@@ -84,8 +84,8 @@
                     {
                         Name = product.Name,
                         Amount = product.Amount,
-                        
-                        IdProduct = product.ProductId
+                        Price=product.Price,
+                        IdProduct =id
                     });
                 if (result.IsSuccess)
                 {
@@ -114,9 +114,11 @@
         {
             var result = await _client.UpdateProductDetails(new CreateProductDetaiView()
                 {
+                    Id=product.Id,
                     Name = product.Name,
                     Amount = product.Amount,
-                    IdProduct = product.ProductId
+                    IdProduct = product.ProductId,
+                    Price= product.Price
                 });
             if (result.IsSuccess)
             {
