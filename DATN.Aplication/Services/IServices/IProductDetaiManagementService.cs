@@ -12,6 +12,5 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> ActiveProductDetail(int id);
         public Task<ResponseData<List<ProductDetaiView>>> ListProductDetail();
         public Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id);
-        public Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id);
     }
 }

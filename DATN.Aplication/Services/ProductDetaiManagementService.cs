@@ -31,7 +31,6 @@ namespace DATN.Aplication.Services
                     {
                         Name = productView.Name,
                         Amount = productView.Amount,
-                        IdPetType = productView.IdPetType,
                         IdProduct = productView.IdProduct,
                         IsDeleted = false,
                         Price = productView.Price,
@@ -65,7 +64,6 @@ namespace DATN.Aplication.Services
                         product.Name = productView.Name;
                         product.Price = productView.Price;
                         product.Amount = productView.Amount;
-                        product.IdPetType = productView.IdPetType;
                         await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
@@ -78,7 +76,6 @@ namespace DATN.Aplication.Services
                     product.Name = productView.Name;
                     product.Price = productView.Price;
                     product.Amount = productView.Amount;
-                    product.IdPetType = productView.IdPetType;
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
@@ -147,7 +144,6 @@ namespace DATN.Aplication.Services
                             Amount = productDetail.Amount,
                             IsDeleted = productDetail.IsDeleted,
                             Name = productDetail.Name,
-                            PetTypeId = productDetail.IdPetType,
                             ProductId = productDetail.IdProduct,
                             Product = product.Name,
                             Price = productDetail.Price,
@@ -156,7 +152,7 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<List<ProductDetaiView>> { IsSuccess=true,Data=query.ToList() };
             }
-            return new ResponseData<List<ProductDetaiView>> { IsSuccess=false,Error="Chưa có sản phẩm chi tiết của sản phẩm"}
+            return new ResponseData<List<ProductDetaiView>> { IsSuccess = false, Error = "Chưa có sản phẩm chi tiết của sản phẩm" };
         }
         public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetail()
         {

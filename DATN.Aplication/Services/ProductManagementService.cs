@@ -3,6 +3,7 @@ using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.Product;
+using DATN.ViewModels.DTOs.ProductDetail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,8 +37,24 @@ namespace DATN.Aplication.Services
                         Status = true,
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
-                    await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
+                    if (productView.lstPD.Count() > 0)
+                    {
+                        foreach (var item in productView.lstPD)
+                        {
+                            var productDT = new ProductDetail()
+                            {
+                                IdProduct = product.Id,
+                                Name = productView.Name,
+                                Amount = item.Amount,
+                                Price = item.Price,
+                                IsDeleted = false,
+                            };
+                            await _unitOfWork.ProductDetailRepository.AddAsync(productDT);
+                        }
+                        await _unitOfWork.SaveChangeAsync();
+                         return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
+                    }
+                    return new ResponseData<string> { IsSuccess = false, Error = "Phải có ít nhất 1 biến thể" };
                 }
                 else
                     return new ResponseData<string> { IsSuccess = false, Error = "Tên sản phẩm bị trùng" };
@@ -141,7 +158,7 @@ namespace DATN.Aplication.Services
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
                         join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
-                        on product.IdCategoryProduct equals cd.Id  
+                        on product.IdCategoryProduct equals cd.Id
                         join c in await _unitOfWork.CategoryRepository.GetAllAsync()
                         on cd.IdCategory equals c.Id
                         select new ProductView()
@@ -149,11 +166,11 @@ namespace DATN.Aplication.Services
                             Id = product.Id,
                             Brand = brand.Name,
                             Name = product.Name,
-                            CategoryProduct = c.Name+" > "+cd.Name,
+                            CategoryProduct = c.Name + " > " + cd.Name,
                             Description = product.Description,
                             Status = product.Status,
-                            CategoryProductId=cate.Id,
-                            IdBrand=brand.Id
+                            CategoryProductId = cd.Id,
+                            IdBrand = brand.Id
                         };
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
