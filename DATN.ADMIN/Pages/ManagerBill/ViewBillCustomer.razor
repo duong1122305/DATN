@@ -47,7 +47,7 @@
                 </MudTable>
                 <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-                <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
+                <MudTable Items="@bookingService.ListProductDetail" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Tên sản phẩm</MudTh>
                         <MudTh>Số lượng</MudTh>
@@ -110,6 +110,7 @@
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
     private int selectedPaymentMethod;
+    [Inject] private BookingService bookingService { get; set; }
 
     private async Task LoadData()
     {
