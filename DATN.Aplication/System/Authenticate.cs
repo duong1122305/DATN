@@ -480,5 +480,22 @@ namespace DATN.Aplication.System
 
 			}
 		}
-	}
+        public async Task<ResponseData<string>> GetUserByToken(string token)
+        {
+            var jwt = new JwtSecurityTokenHandler();
+            var tok = jwt.ReadJwtToken(token);
+            var claim = tok.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+            var user = await _userManager.FindByIdAsync(claim);
+            if (user != null)
+            {
+                return new ResponseData<string>
+                {
+                    IsSuccess = true,
+                    Data = user.Id.ToString(),
+                };
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
+        }
+    }
 }
