@@ -58,6 +58,10 @@ namespace DATN.ViewModels.DTOs.Booking
         {
             OnChange?.Invoke();
         }
+        public void RemoveProductAll(ProductDetailView product)
+        {
+            ListProductDetail.Remove(product);
+        }
 
     }
 }
