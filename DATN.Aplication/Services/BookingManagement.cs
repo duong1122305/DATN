@@ -281,14 +281,14 @@ namespace DATN.Aplication.Services
 
                     foreach (var item in createBookingRequest.ListIdServiceDetail)
                     {
-                        var lst = (await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date)).Data;
-                        if (lst.Count > 0)
+                        var lst = await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date);
+                        if (lst.IsSuccess)
                         {
-                            item.StaffId = lst.FirstOrDefault().IdStaff;
+                            item.StaffId = lst.Data.FirstOrDefault().IdStaff;
                         }
                         else
                         {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Có dịch vụ không có nhân viên rảnh có thể bỏ bớt dịch vụ hoặc đổi giờ khác" };
+                            return new ResponseData<string> { IsSuccess = false, Error = lst.Error };
                         }
                     }
 
