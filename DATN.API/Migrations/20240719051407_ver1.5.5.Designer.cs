@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    [Migration("20240719014121_no5.4.6")]
-    partial class no546
+    [Migration("20240719051407_ver1.5.5")]
+    partial class ver155
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -702,17 +702,12 @@ namespace DATN.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PetTypeId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdProduct");
-
-                    b.HasIndex("PetTypeId");
 
                     b.ToTable("ProductDetails");
                 });
@@ -1361,10 +1356,6 @@ namespace DATN.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.PetType", null)
-                        .WithMany("ProductDetails")
-                        .HasForeignKey("PetTypeId");
-
                     b.Navigation("Product");
                 });
 
@@ -1531,8 +1522,6 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.PetType", b =>
                 {
-                    b.Navigation("ProductDetails");
-
                     b.Navigation("Species");
                 });
 

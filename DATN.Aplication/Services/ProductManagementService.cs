@@ -37,13 +37,19 @@ namespace DATN.Aplication.Services
                         Status = true,
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
+                    await _unitOfWork.SaveChangeAsync();
+                    var search=(from productTable in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where productTable.IdBrand == productView.IdBrand
+                               && productTable.IdCategoryProduct == productView.IdCategoryProduct 
+                               && productTable.Name == productView.Name
+                               select productTable).FirstOrDefault();
                     if (productView.lstPD.Count() > 0)
                     {
                         foreach (var item in productView.lstPD)
                         {
                             var productDT = new ProductDetail()
                             {
-                                IdProduct = product.Id,
+                                IdProduct = search.Id,
                                 Name = productView.Name,
                                 Amount = item.Amount,
                                 Price = item.Price,

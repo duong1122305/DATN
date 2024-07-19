@@ -699,17 +699,12 @@ namespace DATN.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PetTypeId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdProduct");
-
-                    b.HasIndex("PetTypeId");
 
                     b.ToTable("ProductDetails");
                 });
@@ -1354,13 +1349,9 @@ namespace DATN.API.Migrations
                 {
                     b.HasOne("DATN.Data.Entities.Product", "Product")
                         .WithMany("ProductDetails")
-                        .HasForeignKey("PetTypeId")
+                        .HasForeignKey("IdProduct")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("DATN.Data.Entities.PetType", null)
-                        .WithMany("ProductDetails")
-                        .HasForeignKey("PetTypeId");
 
                     b.Navigation("Product");
                 });
@@ -1528,8 +1519,6 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.PetType", b =>
                 {
-                    b.Navigation("ProductDetails");
-
                     b.Navigation("Species");
                 });
 

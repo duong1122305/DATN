@@ -5,7 +5,7 @@
 namespace DATN.API.Migrations
 {
     /// <inheritdoc />
-    public partial class no546 : Migration
+    public partial class ver155 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -13,18 +13,6 @@ namespace DATN.API.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_ImageProducts_ProductDetails_IdProductDetail",
                 table: "ImageProducts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_ProductDetails_PetTypes_PetTypeId",
-                table: "ProductDetails");
-
-            migrationBuilder.DropIndex(
-                name: "IX_ProductDetails_PetTypeId",
-                table: "ProductDetails");
-
-            migrationBuilder.DropColumn(
-                name: "PetTypeId",
-                table: "ProductDetails");
 
             migrationBuilder.RenameColumn(
                 name: "IdProductDetail",
@@ -36,8 +24,6 @@ namespace DATN.API.Migrations
                 table: "ImageProducts",
                 newName: "IX_ImageProducts_ProductID");
 
-         
-
             migrationBuilder.AddForeignKey(
                 name: "FK_ImageProducts_Products_ProductID",
                 table: "ImageProducts",
@@ -45,8 +31,6 @@ namespace DATN.API.Migrations
                 principalTable: "Products",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
-
-       
         }
 
         /// <inheritdoc />
@@ -55,8 +39,6 @@ namespace DATN.API.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_ImageProducts_Products_ProductID",
                 table: "ImageProducts");
-
-        
 
             migrationBuilder.RenameColumn(
                 name: "ProductID",
@@ -69,16 +51,16 @@ namespace DATN.API.Migrations
                 newName: "IX_ImageProducts_IdProductDetail");
 
             migrationBuilder.AddColumn<int>(
-                name: "IdPetType",
+                name: "PetTypeId",
                 table: "ProductDetails",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductDetails_IdPetType",
+                name: "IX_ProductDetails_PetTypeId",
                 table: "ProductDetails",
-                column: "IdPetType");
+                column: "PetTypeId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ImageProducts_ProductDetails_IdProductDetail",
@@ -89,9 +71,9 @@ namespace DATN.API.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProductDetails_PetTypes_IdPetType",
+                name: "FK_ProductDetails_PetTypes_PetTypeId",
                 table: "ProductDetails",
-                column: "IdPetType",
+                column: "PetTypeId",
                 principalTable: "PetTypes",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
