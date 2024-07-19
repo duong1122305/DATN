@@ -7,9 +7,10 @@
 @using DATN.ViewModels.DTOs.ProductDetail
 @using DATN.ViewModels.DTOs.ServiceManager
 @using MudBlazor
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
-@if (lstCateProduct.Count > 0 && lstCateProduct != null)
+@if ( lstCateProduct != null)
 {
     <MudDataGrid Items="@lstCateProduct" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
         <ToolBarContent>
@@ -24,7 +25,7 @@
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
             <MudSpacer />
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog())" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
         </ToolBarContent>
         <Columns>
             <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -68,9 +69,7 @@
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
-        <PagerContent>
-            <MudDataGridPager T="CategoryProductView" />
-        </PagerContent>
+      
     </MudDataGrid>
 
 }
@@ -96,7 +95,7 @@ else
     [Inject]
     private IProductServices _client { get; set; }
 
-
+    public CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
     string searchString = "";
 
     private enum CateStatus
@@ -117,17 +116,10 @@ else
     // load lai du lieu
     protected async Task LoadData()
     {
-        var respone = await _client.ListProductDetails();
-        if (respone.IsSuccess)
-        {
-            var byId = respone.Data.Where(u => u.Id == id).ToList();
-            lstCateProduct = byId;
-            Search();
-        }
-        else
-        {
-            lstCateProduct = new List<ProductDetaiView>();
-        }
+
+
+        Search();
+
     }
 
     private async Task HandleStatusChange(CateStatus e)
@@ -137,30 +129,34 @@ else
     }
     private async Task Search()
     {
-        var respone = await _client.ListProductDetails();
-        var byId = respone.Data.Where(u => u.Id == id).ToList();
-        lstCateProduct = byId;
-        if (selectedStatus == CateStatus.All)
+        var response = await _client.ListProductDetailForProduct(id);
+        if (response.IsSuccess)
         {
-            lstCateProduct = byId.OrderByDescending(x => x.Id).ToList();
-        }
-        else if (selectedStatus == CateStatus.Active)
-        {
-            lstCateProduct = byId.Where(x => x.IsDeleted == true).ToList();
-        }
-        else if (selectedStatus == CateStatus.Inactive)
-        {
-            lstCateProduct = byId.Where(x => x.IsDeleted != true).ToList();
-            if (lstCateProduct.Count == null || lstCateProduct.Count == 0)
+            var byId = response.Data;
+
+            if (selectedStatus == CateStatus.All)
             {
-                lstCateProduct = byId.OrderByDescending(x => x.Id).ToList();
+                lstCateProduct = byId.ToList();
+            }
+            else if (selectedStatus == CateStatus.Active)
+            {
+                lstCateProduct = byId.Where(x => !x.IsDeleted).ToList();
+            }
+            else if (selectedStatus == CateStatus.Inactive)
+            {
+                lstCateProduct = byId.Where(x => x.IsDeleted).ToList();
+            }
+            if (!lstCateProduct.Any())
+            {
+               
                 Message("Danh sách lọc bị trống", Severity.Warning);
             }
-            else
-            {
-                lstCateProduct = byId.Where(x => x.IsDeleted != true).ToList();
-            }
         }
+        else
+        {
+            lstCateProduct = new List<ProductDetaiView>();
+        }
+        StateHasChanged();
     }
     private Func<ProductDetaiView, bool> _quickFilter => x =>
      {
@@ -190,7 +186,7 @@ else
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
 
-            
+
          }
          return false;
      };
@@ -239,12 +235,18 @@ else
     }
 
     //thêm sửa !
-    private async Task OpenDialog(int? id)
+    private async Task OpenDialog(int idPD=0)
     {
-
         var parameters = new DialogParameters();
         string nameDialog = "Thêm mới sản phẩm chi tiết";
         parameters.Add("id", id);
+        if (idPD != 0)
+        {
+            var pd = lstCateProduct.FirstOrDefault(p => p.Id == idPD);
+            parameters.Add("product", pd);
+            nameDialog = "Sửa sản phẩm chi tiết";
+        }
+     
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
