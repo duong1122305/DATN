@@ -363,7 +363,7 @@ namespace DATN.Aplication.Services
                         {
                             BookingId = queryBooking.FirstOrDefault().Id,
                             PetId = item.PetId,
-                            Price = item.Price,
+                            Price = queryServiceDetail.FirstOrDefault(c=>c.Id==item.ServiceDetailId).Price,
                             StaffId = item.StaffId,
                             EndDateTime = item.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
                             StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
