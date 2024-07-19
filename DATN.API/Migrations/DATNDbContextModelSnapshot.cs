@@ -151,7 +151,6 @@ namespace DATN.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -189,7 +188,7 @@ namespace DATN.API.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("DATN.Data.Entities.CategoryProduct", b =>
+            modelBuilder.Entity("DATN.Data.Entities.CategoryDetails", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -211,7 +210,7 @@ namespace DATN.API.Migrations
 
                     b.HasIndex("IdCategory");
 
-                    b.ToTable("CategoryProducts");
+                    b.ToTable("CategoryDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ComboDetail", b =>
@@ -655,7 +654,6 @@ namespace DATN.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("IdBrand")
@@ -691,9 +689,6 @@ namespace DATN.API.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdPetType")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdProduct")
                         .HasColumnType("int");
 
@@ -704,14 +699,17 @@ namespace DATN.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PetTypeId")
+                        .HasColumnType("int");
+
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdPetType");
-
                     b.HasIndex("IdProduct");
+
+                    b.HasIndex("PetTypeId");
 
                     b.ToTable("ProductDetails");
                 });
@@ -911,6 +909,12 @@ namespace DATN.API.Migrations
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ImgID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImgUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1156,7 +1160,7 @@ namespace DATN.API.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("DATN.Data.Entities.CategoryProduct", b =>
+            modelBuilder.Entity("DATN.Data.Entities.CategoryDetails", b =>
                 {
                     b.HasOne("DATN.Data.Entities.Category", "Category")
                         .WithMany("CategoryProducts")
@@ -1335,7 +1339,7 @@ namespace DATN.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Data.Entities.CategoryProduct", "CategoryProduct")
+                    b.HasOne("DATN.Data.Entities.CategoryDetails", "CategoryDetails")
                         .WithMany("Products")
                         .HasForeignKey("IdCategoryProduct")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1343,20 +1347,20 @@ namespace DATN.API.Migrations
 
                     b.Navigation("Brands");
 
-                    b.Navigation("CategoryProduct");
+                    b.Navigation("CategoryDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ProductDetail", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.PetType", "PetType")
-                        .WithMany("ProductDetails")
-                        .HasForeignKey("IdPetType")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DATN.Data.Entities.Product", "Product")
                         .WithMany("ProductDetails")
                         .HasForeignKey("IdProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DATN.Data.Entities.PetType", "PetType")
+                        .WithMany("ProductDetails")
+                        .HasForeignKey("PetTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1482,7 +1486,7 @@ namespace DATN.API.Migrations
                     b.Navigation("CategoryProducts");
                 });
 
-            modelBuilder.Entity("DATN.Data.Entities.CategoryProduct", b =>
+            modelBuilder.Entity("DATN.Data.Entities.CategoryDetails", b =>
                 {
                     b.Navigation("Products");
                 });

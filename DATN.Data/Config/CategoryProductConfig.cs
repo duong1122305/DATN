@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace DATN.Data.Config
 {
-    public class CategoryProductConfig : IEntityTypeConfiguration<CategoryProduct>
+    public class CategoryProductConfig : IEntityTypeConfiguration<CategoryDetails>
     {
-        public void Configure(EntityTypeBuilder<CategoryProduct> builder)
+        public void Configure(EntityTypeBuilder<CategoryDetails> builder)
         {
             builder.HasKey(c => c.Id);
 

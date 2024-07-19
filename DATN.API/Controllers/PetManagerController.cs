@@ -1,4 +1,5 @@
 ﻿using DATN.Aplication.Services.IServices;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Pet;
 using Microsoft.AspNetCore.Http;
@@ -46,6 +47,12 @@ namespace DATN.API.Controllers
 		public async Task<ResponseData<string>> UpdatePet(PetCreateUpdate petCU)
 		{
 			return await _petManagerService.UpdatePet(petCU);
+		}
+
+		[HttpGet("get-types")]
+		public async Task<ResponseData<List<PetType>>> GetAllType()
+		{
+			return await _petManagerService.GetAllTypes();
 		}
 	}
 }

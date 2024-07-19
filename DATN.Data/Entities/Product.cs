@@ -11,11 +11,11 @@ namespace DATN.Data.Entities
         public int Id { get; set; }
         public int IdCategoryProduct { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public bool Status { get; set; }
         public int IdBrand { get; set; }
         public virtual Brand Brands { get; set; }
         public virtual ICollection<ProductDetail> ProductDetails { get; set; }
-        public virtual CategoryProduct CategoryProduct { get; set; }
+        public virtual CategoryDetails CategoryDetails { get; set; }
     }
 }

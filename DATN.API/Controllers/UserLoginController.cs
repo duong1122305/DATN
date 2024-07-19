@@ -275,5 +275,10 @@ namespace DATN.API.Controllers
         {
             return await _vouchermanagement.GetAllVoucherCanApply(totalPrice);
         }
+        [HttpGet("update-url")]
+        public async Task<ResponseData<string>> UpdateUrl(string url, string imgId,string id)
+        {
+            return await _userrepo.UpdateImg(url, imgId,id);
+        }
     }
 }

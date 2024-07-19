@@ -19,11 +19,6 @@ namespace DATN.Data.Config
                 .WithMany(c => c.ProductDetails)
                 .HasForeignKey(c => c.IdProduct)
                 .IsRequired();
-
-            builder.HasOne(c=>c.PetType)
-                .WithMany(c=>c.ProductDetails)
-                .HasForeignKey(c=>c.IdPetType)
-                .IsRequired();
         }
     }
 }

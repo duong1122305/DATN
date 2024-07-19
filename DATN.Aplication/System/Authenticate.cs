@@ -229,6 +229,7 @@ namespace DATN.Aplication.System
                 {
                     userIdentity.FullName = userUpdateView.FullName;
                     userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
+                    userIdentity.Address = string.IsNullOrEmpty(userUpdateView.Address) ? userIdentity.Address: userUpdateView.Address;
                     var result = await _userManager.UpdateAsync(userIdentity);
                     if (result.Succeeded)
                         return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
@@ -241,8 +242,8 @@ namespace DATN.Aplication.System
                     {
                         userIdentity.FullName = userUpdateView.FullName;
                         userIdentity.PhoneNumber = userUpdateView.PhoneNumber;
-                        userIdentity.Address = userUpdateView.Address;
-                        var result = await _userManager.UpdateAsync(userIdentity);
+						userIdentity.Address = string.IsNullOrEmpty(userUpdateView.Address) ? userIdentity.Address : userUpdateView.Address;
+						var result = await _userManager.UpdateAsync(userIdentity);
                         if (result.Succeeded)
                             return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật thông tin tài khoản thành công!!" };
                         else
@@ -429,7 +430,9 @@ namespace DATN.Aplication.System
                     Password = user.PasswordHash,
                     FullName = user.FullName,
                     IsDeleted = user.IsDeleted,
-                    IsConfirm = user.EmailConfirmed
+                    IsConfirm = user.EmailConfirmed,
+                    ImgId=user.ImgID,
+                    ImgUrl= user.ImgUrl,
                 };
                 return new ResponseData<UserInfView> { IsSuccess = true, Data = userinf };
             }
@@ -458,22 +461,24 @@ namespace DATN.Aplication.System
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản sai" };
         }
-        public async Task<ResponseData<string>> GetUserByToken(string token)
-        {
-            var jwt = new JwtSecurityTokenHandler();
-            var tok = jwt.ReadJwtToken(token);
-            var claim = tok.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-            var user = await _userManager.FindByIdAsync(claim);
-            if (user != null)
-            {
-                return new ResponseData<string>
-                {
-                    IsSuccess = true,
-                    Data = user.Id.ToString(),
-                };
-            }
-            else
-                return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
-        }
-    }
+		public async Task<ResponseData<string>> UpdateImg(string url, string imgID, string id)
+		{
+            url = url == "0" ? "" : url;
+            imgID= imgID=="0"?"": imgID;
+			var userIdentity = await _userManager.FindByNameAsync(id);
+			if (userIdentity == null) return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản nhập chưa được đăng kí" };
+			else
+			{
+
+				userIdentity.ImgID = imgID;
+				userIdentity.ImgUrl = url;
+				var result = await _userManager.UpdateAsync(userIdentity);
+				if (result.Succeeded)
+					return new ResponseData<string> { IsSuccess = result.Succeeded, Data = "Cập nhật ảnh thành công!!" };
+				else
+					return new ResponseData<string> { IsSuccess = result.Succeeded, Error = "Thông tin chưa được thay đổi" };
+
+			}
+		}
+	}
 }
