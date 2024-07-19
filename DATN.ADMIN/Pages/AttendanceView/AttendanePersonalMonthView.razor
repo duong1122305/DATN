@@ -1,0 +1,159 @@
+﻿@page "/attenPerMonthView"
+@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Attendace
+<MudPaper Style="padding:20px">
+<h3>Thông tin điểm danh tháng @Month/@Year</h3>
+	<MudTable Items="@mainAtendance" Style="width:100%; margin-bottom: 40px">
+
+		<ToolBarContent>
+
+	<div style="display:flex">
+		<div style="width:200px;margin-right:5px">
+			<MudSelect T="int" Label="Tháng" Variant="Variant.Outlined" Value="Month" ValueChanged="(value)=>ChangeDate(value,Year,TypeAttendance)" AnchorOrigin="Origin.BottomCenter"  style="width:100px; margin-bottom: 10px;" title="Chọn ca làm">
+				@for(int i= 1; i<=12; i++)
+				{
+					var mon= i;
+					<MudSelectItem Value="@mon">Tháng @mon</MudSelectItem>
+				}
+			</MudSelect>
+		</div>
+		<div>
+					<MudSelect T="int" Label="Năm" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" Value="Year" ValueChanged="(value)=>ChangeDate(Month,value,TypeAttendance)" AnchorOrigin="Origin.BottomCenter">
+				@{
+					var yearNow = DateTime.Now.Year;
+					
+				}
+				@for (int i = yearNow; i >= yearNow-3; i--)
+				{
+					var yer = i;
+					<MudSelectItem Value="@yer">Năm @yer</MudSelectItem>
+				}
+			</MudSelect>
+		</div>
+	</div>
+	<MudSpacer />
+	
+</ToolBarContent>
+		<HeaderContent>
+
+			<MudTh>Tên nhân viên</MudTh>
+			<MudTh>Mã nhân viên</MudTh>
+			<MudTh>Tổng ca làm theo lịch</MudTh>
+			<MudTh>Tổng số ca đi làm</MudTh>
+			<MudTh>Tổng số ca nghỉ</MudTh>
+			<MudTh>Tổng số giờ làm </MudTh>
+			<MudTh>Số ca đi muộn</MudTh>
+			<MudTh>Số ca về sớm</MudTh>
+		</HeaderContent>
+		<RowTemplate>
+
+			<MudTd>@context.FullName</MudTd>
+			<MudTd>@context.UserName</MudTd>
+			<MudTd>@context.ScheduleWorkingDays</MudTd>
+			<MudTd>@context.ActualWorkingDays</MudTd>
+			<MudTd>@context.TotalLeaveDays</MudTd>
+			<MudTd>@(Math.Round(context.TotalWorkingHours))</MudTd>
+			<MudTd>@context.DaysLate</MudTd>
+			<MudTd>@context.DaysLeftEarly</MudTd>
+		</RowTemplate>
+	</MudTable>
+<h3>Thông tin làm việc điểm danh theo ngày</h3>
+	<MudTable Items="@lstAttenDay" Hover="true" >
+		<ToolBarContent>
+			<div style="width:200px;margin-right:5px">
+				<MudSelect T="int"  Label="Trạng thái" Variant="Variant.Outlined" Value="TypeAttendance" ValueChanged="(value)=>ChangeDate(Month,Year,value)" AnchorOrigin="Origin.BottomCenter" style="width:100px; margin-bottom: 10px;">
+					<MudSelectItem Value="@Contant.AllAttendance">Tất cả</MudSelectItem>
+					<MudSelectItem Value="@Contant.Present">Đi làm</MudSelectItem>
+					<MudSelectItem Value="@Contant.Absent">Nghỉ làm</MudSelectItem>
+				</MudSelect>
+			</div>
+			<MudSpacer />
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>Ngày làm việc</MudTh>
+			<MudTh>Ca làm việc</MudTh>
+			<MudTh>Thời gian ca</MudTh>
+			<MudTh>Thời gian check in</MudTh>
+			<MudTh>Thời gian check out</MudTh>
+			<MudTh>Lịch sử</MudTh>
+		</HeaderContent>
+		<RowTemplate>
+
+		
+			
+			<MudTd>@context.Date</MudTd>
+			<MudTd>@context.Shift</MudTd>
+			<MudTd>@context.TimeOfShift</MudTd>
+			<MudTd>@context.CheckinAt</MudTd>
+			<MudTd>@context.CheckoutAt</MudTd>
+			<MudTd>
+				@if (!string.IsNullOrEmpty(context.History.Trim()))
+				{
+					var lstHis = context.History.Split('|');
+					foreach (var item in lstHis)
+					{
+						<div>@item</div>
+					}
+				}
+			</MudTd>
+			
+
+		</RowTemplate>
+		<PagerContent>
+			<MudTablePager />
+		</PagerContent>
+	</MudTable>
+</MudPaper>
+@code {
+	[Parameter]
+	public Guid IdUser { get; set; } = Guid.Empty;
+	[Parameter]
+	public int Month { get; set; } = DateTime.Now.Month;
+	[Parameter]
+	public int Year { get; set; } = DateTime.Now.Year;
+
+	[Inject]
+	IAttendanceServiceClient _ser { get; set; }
+	[Inject]
+	protected IHttpContextAccessor _httpContextAccessor { get; set; }
+	[Inject]
+	protected ISnackbar Snackbar { get; set; }
+
+	private List<AttendanceMonth> mainAtendance = new List<AttendanceMonth>();
+	private List<AttendancePerMonth> lstAttenDay = new List<AttendancePerMonth>();
+	private int TypeAttendance = Contant.AllAttendance;
+	protected override async Task OnInitializedAsync()
+	{
+		if (IdUser==Guid.Empty)
+		{
+			IdUser = Guid.Parse(_httpContextAccessor!.HttpContext!.Session.GetString("id")!);
+		}
+		await LoadData();
+	}
+	private async Task LoadData()
+	{
+		var response = await _ser.GetAttandanceMonth(IdUser, Month, Year,TypeAttendance);
+		if (response.IsSuccess)
+		{
+			mainAtendance = new List<AttendanceMonth>();
+			mainAtendance.Add(response.Data!.AllData);
+			lstAttenDay = response.Data.AttendancePerMonths;
+			StateHasChanged();
+		}
+		else
+		{
+			mainAtendance = new List<AttendanceMonth>();
+			lstAttenDay = new List<AttendancePerMonth>();
+			Snackbar.Add(response.Error, Severity.Warning);
+		}
+	}
+	private async Task ChangeDate(int monthChange, int yearChanger, int typeAtten)
+	{
+		Month = monthChange;
+		Year = yearChanger;
+		TypeAttendance = typeAtten;
+		await LoadData();
+		StateHasChanged();
+	}
+}

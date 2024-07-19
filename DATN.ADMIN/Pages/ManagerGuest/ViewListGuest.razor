@@ -6,6 +6,7 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Guest
+@using System.Timers
 
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
@@ -16,12 +17,6 @@
 {
 
 	<MudDrawerContainer Class="mud-height-full" Style=" width:100%" >
-
-	
-
-
-
-
 
 		<MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
 			<ToolBarContent>
@@ -80,7 +75,7 @@
 				}
 
 				<MudTd>
-					<MudSwitch T="bool" Value="@(context.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
+					<MudSwitch T="bool" Value="@(context.IsDelete!.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
 				</MudTd>
 				<MudTd>
 					<MudButtonGroup Variant="Variant.Filled">
@@ -108,6 +103,7 @@ else
 	}
 </style>
 @code {
+
 	//button trạng thái
 	private bool isOpenDialog = false;
 	private string searchString = "";
@@ -129,7 +125,7 @@ else
 	{
 		//var response = await _client.GetGuest();
 		var response = await _guestService.GetGuest();
-		lstGuest = response.Data;
+		lstGuest = response.Data!;
 
 		StateHasChanged();
 	}

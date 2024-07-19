@@ -22,6 +22,10 @@ namespace DATN.Aplication.System
         public Task<ResponseData<List<RoleView>>> ListPosition();
         public Task<ResponseData<string>> AddRole(string roleName);
         public Task<ResponseData<string>> ActiveAccount(string id);
+        public Task<ResponseData<UserInfView>> GetInfByToken(string id);
+        Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
+
+	}
         public Task<ResponseData<UserInfView>> GetInfById(string id);
         public Task<ResponseData<string>> GetUserByToken(string token);
     }
