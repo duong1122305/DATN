@@ -56,7 +56,7 @@
                 </MudTable>
                 <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-                <MudTable Items="@bookingService.ListProductDetail" Class="invoice-table">
+                <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Tên sản phẩm</MudTh>
                         <MudTh>Số lượng</MudTh>
@@ -103,7 +103,6 @@
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
                         <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
-                        <MudButton OnClick="@(async()=>await OpenDialogReload())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Tính tiền</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
                             <QRVietQRBankking />
@@ -136,17 +135,16 @@
 
     private async Task LoadData()
     {
-        var respone = await _client.GetBillOfGuest(guid.Value, date);
-        if (respone.IsSuccess)
-        {
-            bill = respone.Data;
-
-
-        }
-        else
-        {
-            bill = new Bill();
-        }
+        // var respone = await _client.GetBillOfGuest(guid.Value, date);
+        // if (respone.IsSuccess)
+        // {
+        //     bill = respone.Data;
+        // }
+        // else
+        // {
+        //     bill = new Bill();
+        // }
+        await OpenDialogReload();
         StateHasChanged();
     }
     protected override async Task OnInitializedAsync()
@@ -204,6 +202,7 @@
         string nameDialog = "Chọn sản phẩm";
         DialogParameters parameter = new DialogParameters();
         parameter.Add("guid", guid);
+        parameter.Add("IdBooking", idBooking);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -224,17 +223,12 @@
     }
     public async Task OpenDialogReload()
     {
-        if (bookingService.ListProductDetail.Count > 0)
+
+        var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking).ToList());
+        if (respone2.IsSuccess)
         {
-            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail);
-            if (respone2.IsSuccess)
-            {
-                bill = respone2.Data;
-            }
-        }
-        else
-        {
-            Message("lỗi", Severity.Error);
+            bill = respone2.Data;
+            StateHasChanged();
         }
     }
 
@@ -244,6 +238,7 @@
         if (await Confirm() == true)
         {
             bookingService.RemoveProduct(product);
+            await LoadData();
             Message("Đã xoá thành công.", Severity.Success);
         }
         // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
@@ -266,20 +261,22 @@
 
 
     //thêm sản phẩm
-    void IncrementQuantity(ProductDetailView product)
+    async void IncrementQuantity(ProductDetailView product)
     {
         if (product.SelectQuantityProduct < product.Quantity)
         {
             product.SelectQuantityProduct++;
+            await LoadData();
         }
     }
 
     //trừ sản phẩm
-    void DecrementQuantity(ProductDetailView product)
+    async void DecrementQuantity(ProductDetailView product)
     {
         if (product.SelectQuantityProduct > 1)
         {
             product.SelectQuantityProduct--;
+            await LoadData();
         }
     }
 
