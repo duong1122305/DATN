@@ -21,6 +21,7 @@ namespace DATN.Utilites
         public static readonly Guid GuestsID = Guid.Parse("CF9FA787-B64C-462A-A3BA-08DC8D178FC0");
         // Thêm ảnh mặc định
         public const string ImgUser = "img/images.jpg";
+        public const string ImgDefault = "img/productDefault.png";
 		public const int MaxIMGSize = 5*1024*1024;//5mb
 		// gắn giá trị combobox đi điểm danh
 		public const int AllAttendance = -1;//tất cả

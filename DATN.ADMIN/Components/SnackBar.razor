@@ -1,5 +1,140 @@
-﻿<h3>SnackBar</h3>
+﻿@* @using System.Net.Http.Json
+@using DATN.Data.Entities
+@using MudBlazor
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+<MudButton OnClick="@AddItem" Color="@Color.Success" Class="add-item-btn">Add Item</MudButton>
+<MudTable Items="@Pets" Dense="true" Hover="true" CanCancelEdit="true" Filter="new Func<Pet,bool>(FilterFunc)"
+          @bind-SelectedItem="selectedItem1" SortLabel="Sort By" CommitEditTooltip="Commit Edit"
+          OnCommitEditClick="@(() => Snackbar.Add("Commit Edit Handler Invoked"))" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+          RowEditCommit="ItemHasBeenCommitted" IsEditRowSwitchingBlocked="true" ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="@editButtonPosition" EditTrigger="TableEditTrigger.RowClick">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Periodic Pets</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <ColGroup>
+
+        <col style="width:50px;" />
+        <col style="width:80px;" />
+        <col style="width:50%;" />
+        <col />
+        <col />
+        <col style="width:50px;" />
+
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<Pet, object>(x=>x.Weight)">Nr</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Pet, object>(x=>x.Weight)">Sign</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Pet, object>(x=>x.Weight)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Pet, object>(x=>x.OriginalColor)">Position</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.Weight</MudTd>
+        <MudTd DataLabel="Sign">@context.Name</MudTd>
+        <MudTd DataLabel="Name">@context.Guest</MudTd>
+        <MudTd DataLabel="Position">@context.Weight</MudTd>
+       
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Nr">@context.Weight</MudTd>
+        <MudTd DataLabel="Sign">
+            <MudTextField @bind-Value="context.Weight" Required />
+        </MudTd>
+        <MudTd DataLabel="Name">
+            <MudTextField @bind-Value="context.Weight" Required />
+        </MudTd>
+        <MudTd DataLabel="Position">
+            <MudNumericField @bind-Value="context.Weight" Required Min="1" />
+        </MudTd>
+        <MudTd DataLabel="Molar mass">
+            <MudTextField @bind-Value="context.Weight" Required />
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <EditButtonContent Context="button">
+        <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
+    </EditButtonContent>
+</MudTable>
+
+
+
+
+
+
+<MudExpansionPanels Style="flex: 1;">
+    <MudExpansionPanel Text="Show inline-edit event log">
+
+    </MudExpansionPanel>
+</MudExpansionPanels>
 
 @code {
+    private List<string> editEvents = new();
+    private string searchString = "";
+    private Pet selectedItem1 = null;
+    private Pet elementBeforeEdit;
+    private HashSet<Pet> selectedItems1 = new HashSet<Pet>();
+    private TableApplyButtonPosition applyButtonPosition = TableApplyButtonPosition.End;
+    private TableEditButtonPosition editButtonPosition = TableEditButtonPosition.End;
+    private IEnumerable<Pet> Pets = new List<Pet>();
 
-}
+    protected override async Task OnInitializedAsync()
+    {
+        Pets = await httpClient.GetFromJsonAsync<List<Pet>>("webapi/periodictable");
+    }
+    void AddItem()
+    {
+        Elements.Add(new Element() { Number = 11, Sign = "G", Name = "Severity.Warning", Position = 222, Molar = 11 });
+    }
+    private void ClearEventLog()
+    {
+        editEvents.Clear();
+    }
+
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Sign = ((Pet)element).Sign,
+                Name = ((Pet)element).Name,
+                Molar = ((Pet)element).Molar,
+                Position = ((Pet)element).Position
+            };
+        AddEditionEvent($"RowEditPreview event: made a backup of Pet {((Pet)element).Name}");
+    }
+
+    private void ItemHasBeenCommitted(object element)
+    {
+        AddEditionEvent($"RowEditCommit event: Changes to Pet {((Pet)element).Name} committed");
+    }
+
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((Pet)element).Sign = elementBeforeEdit.Sign;
+        ((Pet)element).Name = elementBeforeEdit.Name;
+        ((Pet)element).Molar = elementBeforeEdit.Molar;
+        ((Pet)element).Position = elementBeforeEdit.Position;
+        AddEditionEvent($"RowEditCancel event: Editing of Pet {((Pet)element).Name} canceled");
+    }
+
+    private bool FilterFunc(Pet element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Sign.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Number} {element.Position} {element.Molar}".Contains(searchString))
+            return true;
+        return false;
+    }
+} *@

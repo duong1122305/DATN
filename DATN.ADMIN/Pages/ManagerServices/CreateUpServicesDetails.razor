@@ -3,6 +3,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.DTOs.ServiceDetail
 @using Microsoft.JSInterop
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
 <EditForm Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
@@ -23,7 +24,7 @@
                     <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
                     <MudTextField T="float" Label="Cân nặng tối thiểu" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
                     <MudTextField T="float" Label="Cân nặng tối đa" @bind-Value="@createServiceDetailVM.MaxWeight" For="@(() => createServiceDetailVM.MaxWeight)" />
-                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => createServiceDetailVM.Price)" />
+                    <MudNumericField T="float" Label="Giá" @bind-Value="@createServiceDetailVM.MaxWeight" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
                     <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
                     <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
                 }
@@ -77,6 +78,7 @@
 
     private string formattedPrice = string.Empty;
     private float tempPrice;
+    CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
 
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 

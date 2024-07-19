@@ -46,6 +46,7 @@ namespace DATN.ADMIN.Services
 				return new ResponseData<string>(false, "Thất bại" + ex); ;
 			}
 		}
+		
 		public async Task<ResponseData<string[]>> UploadFile(IBrowserFile file)
 		{
 			try

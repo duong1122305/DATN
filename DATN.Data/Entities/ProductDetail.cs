@@ -15,8 +15,7 @@ namespace DATN.Data.Entities
         public int Amount { get; set; }
         public bool IsDeleted { get; set; }
         public virtual Product Product { get; set; }
-        public virtual PetType PetType { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<ImageProduct> ImageProducts { get; set; }
+      
     }
 }

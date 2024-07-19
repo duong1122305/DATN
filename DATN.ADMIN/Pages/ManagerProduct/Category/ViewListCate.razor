@@ -66,7 +66,7 @@
                             
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
-                        <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Default" OnClick="@(async()=>await OpenDetails(context.Item.Id))" title="Xem chi tiết"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Default" OnClick="@(async()=>await OpenDetails(context.Item.Id,context.Item.Name))" title="Xem chi tiết"></MudIconButton>
                     </MudButtonGroup>
                 </CellTemplate>
             </TemplateColumn>
@@ -272,13 +272,13 @@ else
         }
     }
 
-    private async Task OpenDetails(int? id)
+    private async Task OpenDetails(int? id,string name)
     {
 
         var parameters = new DialogParameters();
             var cate = lstCate.FirstOrDefault(x => x.Id == id);
             parameters.Add("id", id);
-           string nameDialog = "Danh mục chi tiết";
+           string nameDialog = $"Chi tiết danh mục: "+name;
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
