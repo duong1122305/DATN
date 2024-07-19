@@ -221,7 +221,7 @@
         // Gọi phương thức từ BookingService để xóa booking
         if (await Confirm() == true)
         {
-            bookingService.RemoveProductproduct);
+            bookingService.RemoveProduct(product);
             Message("Đã xoá thành công.", Severity.Success);
         }
         // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
