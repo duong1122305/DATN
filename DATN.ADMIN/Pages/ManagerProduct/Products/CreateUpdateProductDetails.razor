@@ -22,16 +22,7 @@
                         <MudTextField T="string" Label="Tên sản phẩm chi tiết" @bind-Value="@product.Name" For="@(() => product.Name)" />
                         <MudTextField T="double" Label="Giá" @bind-Value="@product.Price" For="@(() => product.Price)" />
                         <MudTextField T="int" Label="Số lượng" @bind-Value="@product.Amount" For="@(() => product.Amount)" />
-                        <div class="mud-select">
-                            <label class="mud-input-label">Chọn loại</label>
-                            <select @bind="product.PetTypeId" required>
-                                <option value="0">Chọn loại</option>
-                                @foreach (var i in lstpetType)
-                                {
-                                    <option value="@i.Id">@i.Name</option>
-                                }
-                            </select>
-                        </div>
+                      
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
                             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
@@ -88,11 +79,6 @@
         if (await Confirm("thêm mới") == true)
 
         {
-                if (product.PetTypeId == 0 || product.PetTypeId == null)
-                {
-                    Message("Vui lòng chọn loại thú cưng", Severity.Warning);
-                }
-            else
             {
                 var result = await _client.CreateProductDetails(new CreateProductDetaiView()
                     {
