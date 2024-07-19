@@ -29,13 +29,15 @@ namespace DATN.Aplication.Services
         private readonly NotificationHub _notificationHub;
         private readonly IAuthenticate _user;
         private readonly IProductManagement _productManagement;
-        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate, IProductManagement productManagement)
+        private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
+        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate, IProductManagement productManagement, IEmployeeScheduleManagementService employeeScheduleManagementService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _notificationHub = notificationHub;
             _user = authenticate;
             _productManagement = productManagement;
+            _employeeScheduleManagementService = employeeScheduleManagementService;
         }
         public async Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek()
         {
@@ -260,6 +262,36 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+                    var query = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                select serviceDetail;
+                    for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            int time = (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[0].ServiceDetailId).Duration) / 60;
+                            createBookingRequest.ListIdServiceDetail[0].EndDateTime = createBookingRequest.ListIdServiceDetail[0].StartDateTime.Add(new TimeSpan(time, (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[0].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                        else
+                        {
+                            int time = (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[0].ServiceDetailId).Duration) / 60;
+                            createBookingRequest.ListIdServiceDetail[i].StartDateTime = createBookingRequest.ListIdServiceDetail[i - 1].EndDateTime;
+                            createBookingRequest.ListIdServiceDetail[i].EndDateTime = createBookingRequest.ListIdServiceDetail[i].StartDateTime.Add(new TimeSpan(time, (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[i].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                    }
+
+                    foreach (var item in createBookingRequest.ListIdServiceDetail)
+                    {
+                        var lst = (await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date)).Data;
+                        if (lst.Count > 0)
+                        {
+                            item.StaffId = lst.FirstOrDefault().IdStaff;
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Có dịch vụ không có nhân viên rảnh có thể bỏ bớt dịch vụ hoặc đổi giờ khác" };
+                        }
+                    }
+
                     var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
                                        && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
@@ -275,7 +307,7 @@ namespace DATN.Aplication.Services
                             TotalPrice = 0,
                             PaymentTypeId = 1,
                             ReducedAmount = 0,
-                            Status = BookingStatus.Confirmed,
+                            Status = BookingStatus.PendingConfirmation,
                             IsPayment = false,
                             IsAddToSchedule = true,
                         };
@@ -374,7 +406,6 @@ namespace DATN.Aplication.Services
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
-
                     return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
                 }
                 catch (Exception e)
