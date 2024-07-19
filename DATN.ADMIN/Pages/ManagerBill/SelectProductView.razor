@@ -1,0 +1,86 @@
+﻿@page "/SelectViewProduct"
+@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
+@using DATN.ViewModels.DTOs.Product
+@using DATN.ViewModels.DTOs.ProductDetail
+
+<MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="width:1200px;min-width:1200px">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên"  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @(lstProductDetaiView.IndexOf(context.Item) + 1)
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Ảnh" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudImage Src="@context.Item.LinkImg" Height="150" />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Name" Title="Tên SP" Sortable="false" Filterable="false" Style="width:200px"/>
+        <PropertyColumn Property="x=>x.CateName" Title="Danh mục" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var item2 in context.Item.ListProductDetail)
+                    {
+                        <MudSelectItem Value="item2">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price) - @item2.Quantity Sản phẩm</MudSelectItem>
+                    }
+                </MudSelect>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="ProductSelect" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public Guid? guid { get; set; }
+    [Inject]
+    private IBookingViewServices _ClientProduct { get; set; } 
+    [Inject]
+    private BookingService _tempLstProductDetail { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+    private List<ProductSelect> lstProductDetaiView = new List<ProductSelect>();
+
+    private string searchString = "";
+
+    private async Task LoadData()
+    {
+        var respone = await _ClientProduct.ListProductViewSale();
+        if (respone.IsSuccess)
+        {
+            lstProductDetaiView = respone.Data;
+        }
+        else
+        {
+            lstProductDetaiView = new List<ProductSelect>();
+        }
+    } 
+    private async Task ChooseProduct(ProductDetailView productDV)
+    {
+        _tempLstProductDetail.AddProduct(productDV);
+        _dialogBox.Close();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private Func<ProductSelect, bool> _quickFilter => x =>
+      {
+          if (string.IsNullOrWhiteSpace(searchString))
+              return true;
+          if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+              return true;
+          if ($"{x.CateName}".Contains(searchString.Trim()))
+              return true;
+          return false;
+      };
+}

@@ -21,5 +21,7 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> CancelBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView);
         public Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts);
+        public Task<ResponseData<List<ProductSelect>>> ListProductViewSale();
+
     }
 }

@@ -4,9 +4,18 @@
 @using DATN.Utilites
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Payment
+@using DATN.ViewModels.DTOs.Product
 @using Newtonsoft.Json
 @inject IAddressService _addressServive;
 @inject IDialogService _dialogservice;
+@inject ISnackbar Snackbar
+<style>
+    .mud-dialog-width-lg {
+        height: 680px;
+        min-height: 680px;
+    }
+
+</style>
 <MudContainer Class="invoice-container" Style="margin-top: 20px">
     <MudPaper Elevation="3" Class="invoice-paper">
         <div class="invoice-body">
@@ -27,7 +36,10 @@
                     <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
                 </MudText>
 
-                <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
+                @if (guid != null)
+                {
+                    <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
+                }
                 <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Dịch vụ sử dụng</MudTh>
@@ -42,18 +54,28 @@
                         <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
                     </RowTemplate>
                 </MudTable>
-                <br/>
+                <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-                <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
+                <MudTable Items="@bookingService.ListProductDetail" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Tên sản phẩm</MudTh>
                         <MudTh>Số lượng</MudTh>
                         <MudTh>Đơn giá</MudTh>
+                        <MudTh>Hành động</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@context.Name</MudTd>
-                        <MudTd>@context.Quantity</MudTd>
+                        <MudTd>
+                            <div class="quantity-input">
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                                <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
+                            </div>
+                        </MudTd>
                         <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                        <MudTd>
+                            <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                        </MudTd>
                     </RowTemplate>
                 </MudTable>
                 <style>
@@ -80,12 +102,11 @@
                             <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
-                        <MudButton OnClick="Payment">Thanh toán thử</MudButton>
+                        <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán thử</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
-                           <QRVietQRBankking/>
+                            <QRVietQRBankking />
                         }
-                        <MudButton Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                     </div>
                 </div>
             }
@@ -108,14 +129,26 @@
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
     private int selectedPaymentMethod;
+    [Inject] private BookingService bookingService { get; set; }
+
     private async Task LoadData()
     {
         var respone = await _client.GetBillOfGuest(guid.Value, date);
-        bill = respone.Data;
+        if (respone.IsSuccess)
+        {
+            bill = respone.Data;
+        }
+        else
+        {
+            bill = new Bill();
+        }
     }
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        if (guid != null)
+        {
+            await LoadData();
+        }
     }
     protected async Task Payment()
     {
@@ -149,7 +182,7 @@
                 };
             DialogParameters parameter = new DialogParameters();
             parameter.Add("linkqr", result.data.qrDataURL);
-            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog,parameter, options);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
             var result1 = await createUpdateDialog.Result;
             if (!result1.Canceled)
             {
@@ -162,17 +195,19 @@
     public async Task OpenDialog()
     {
 
-        string nameDialog = "Thêm mới khách hàng";
+        string nameDialog = "Chọn sản phẩm";
+        DialogParameters parameter = new DialogParameters();
+        parameter.Add("guid", guid);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
+                MaxWidth = MaxWidth.Large,
                 CloseButton = true,
-                FullWidth = true,
+                FullWidth = false,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog, parameter, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -181,7 +216,50 @@
             StateHasChanged();
         }
     }
+    private async void RemoveProduct(ProductDetailView product)
+    {
+        // Gọi phương thức từ BookingService để xóa booking
+        if (await Confirm() == true)
+        {
+            bookingService.RemoveProduct(product);
+            Message("Đã xoá thành công.", Severity.Success);
+        }
+        // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
+    }
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa dịch vụ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
 
+
+    //thêm sản phẩm
+    void IncrementQuantity(ProductDetailView product)
+    {
+        if (product.SelectQuantityProduct < product.Quantity)
+        {
+            product.SelectQuantityProduct++;
+        }
+    }
+
+    //trừ sản phẩm
+    void DecrementQuantity(ProductDetailView product)
+    {
+        if (product.SelectQuantityProduct > 1)
+        {
+            product.SelectQuantityProduct--;
+        }
+    }
 
 
 }
