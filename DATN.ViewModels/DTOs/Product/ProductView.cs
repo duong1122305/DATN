@@ -16,5 +16,6 @@ namespace DATN.ViewModels.DTOs.Product
         public bool Status { get; set; }
         public string Brand { get; set; }
         public int? IdBrand { get; set; }
+        public string Price { get; set; }
     }
 }

@@ -37,20 +37,20 @@ namespace DATN.Aplication.Services
                         Status = true,
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
-                    await _unitOfWork.SaveChangeAsync();
-                    var search=(from productTable in await _unitOfWork.ProductRepository.GetAllAsync()
-                               where productTable.IdBrand == productView.IdBrand
-                               && productTable.IdCategoryProduct == productView.IdCategoryProduct 
-                               && productTable.Name == productView.Name
-                               select productTable).FirstOrDefault();
+                    var img = new ImageProduct()
+                    {
+                        ProductID = product.Id,
+                        UrlImage = productView.ImgUrl,
+
+                    };
                     if (productView.lstPD.Count() > 0)
                     {
                         foreach (var item in productView.lstPD)
                         {
                             var productDT = new ProductDetail()
                             {
-                                IdProduct = search.Id,
-                                Name = productView.Name,
+                                IdProduct = product.Id,
+                                Name = item.Name,
                                 Amount = item.Amount,
                                 Price = item.Price,
                                 IsDeleted = false,
@@ -160,9 +160,12 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<ProductView>>> ListProduct()
         {
+            var productDT =await _unitOfWork.ProductDetailRepository.FindAsync(p=>!p.IsDeleted);
+
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
+
                         join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                         on product.IdCategoryProduct equals cd.Id
                         join c in await _unitOfWork.CategoryRepository.GetAllAsync()
@@ -176,8 +179,10 @@ namespace DATN.Aplication.Services
                             Description = product.Description,
                             Status = product.Status,
                             CategoryProductId = cd.Id,
-                            IdBrand = brand.Id
-                        };
+                            IdBrand = brand.Id,
+                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString() + " - " + product.ProductDetails.Max(x => x.Price).ToString() : product.ProductDetails != null&& product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString() : "Sản phẩm ngừng bán"
+
+						};
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
             else

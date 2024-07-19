@@ -16,6 +16,20 @@
 @inject IDialogService _diagService
 <EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
 	<MudGrid>
+		<MudItem xs="0" sm="3" Style="background-color:#e4f8ff; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+			<MudImage Src="@url" Alt="Ảnh đại diện" Height="250" Width="250" Elevation="25" Class="rounded-lg" Style="border-radius: 50%;" />
+			<div style="display: flex; justify-content: center; margin-top: 20px;">
+				<MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="ChooseFile" Style="width:100px; padding: 15px 2px">
+					<ButtonTemplate>
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" Style="width:45px" for="@fileInput">Sửa</MudButton>
+					</ButtonTemplate>
+				</MudFileUpload>
+
+				<MudButton Size="Size.Small" Style="height:35px; margin-top: 21px" OnClick="RemoveImg" Variant="Variant.Filled" Color="Color.Secondary">Xoá ảnh</MudButton>
+			</div>
+		</MudItem>
+
+
 		<MudItem md="4">
 			<MudItem xs="12" sm="12">
 				<MudCard>
@@ -81,18 +95,9 @@
 				</MudCard>
 			</MudItem>
 		</MudItem>
-		<MudItem xs="0" sm="3" Style="background-color:#e4f8ff; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-			<MudImage Src="@url" Alt="Mony the dog" Height="250" Width="250" Elevation="25" Class="rounded-lg" Style="border-radius: 50%;" />
-			<div style="display: flex; justify-content: center; margin-top: 20px;">
-				<MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="ChooseFile" Style="width:100px; padding: 15px 2px">
-					<ButtonTemplate>
-						<MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" Style="width:45px" for="@fileInput">Sửa</MudButton>
-					</ButtonTemplate>
-				</MudFileUpload>
 
-				<MudButton Size="Size.Small" Style="height:35px; margin-top: 21px" OnClick="RemoveImg" Variant="Variant.Filled" Color="Color.Secondary">Xoá ảnh</MudButton>
-			</div>
-		</MudItem>
+		
+
 		<MudItem md="5" Style="max-height: ">
 
 
@@ -184,8 +189,10 @@
 
 	[Inject]
 	private ICategoryServices _cateClient { get; set; }
+	[Inject]
+	private IUpLoadFileService _upFile { get; set; }
 	private List<CategoryProductView> lstCate = new List<CategoryProductView>();
-	private List<IBrowserFile> lstBrowerFile = new List<IBrowserFile>();
+	private IBrowserFile browerFile;
 	// biến thể sản phẩm,
 	private HashSet<CreateProductDetaiView> selectedItems = new HashSet<CreateProductDetaiView>();
 	public List<CreateProductDetaiView> lstPD = new List<CreateProductDetaiView>();
@@ -268,8 +275,23 @@
 	public async Task Create()
 	{
 		if (await Confirm("thêm mới") == true)
-
 		{
+			if (url == Contant.ImgDefault)
+			{
+				Message("Hãy chọn ảnh cho sản phầm", Severity.Warning);
+				return;
+			}
+			var fileRes = await _upFile.UploadFile(browerFile);
+			if (fileRes.IsSuccess)
+			{
+				_product.ImgID = fileRes.Data[0];
+				_product.ImgUrl = fileRes.Data[1];
+			}
+			else
+			{
+				Message(fileRes.Error, Severity.Warning);
+				return;
+			}
 			if (_product.IdCategoryProduct == 0 || _product.IdCategoryProduct == null)
 			{
 				Message("Vui lòng chọn danh mục", Severity.Warning);
@@ -349,10 +371,7 @@
 			await Update();
 		}
 	}
-	private async Task OnReturnFile(List<IBrowserFile> files)
-	{
-		lstBrowerFile = files;
-	}
+
 	private async Task<bool> Confirm(string text)
 	{
 		var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
@@ -376,11 +395,20 @@
 	}
 	private async Task ChooseFile(IBrowserFile file)
 	{
-			
+		var maxSize = Contant.MaxIMGSize;
+		using (var ms = new MemoryStream())
+		{
+			await file.OpenReadStream(maxSize).CopyToAsync(ms);
+			var buffer = ms.ToArray();
+			browerFile = file;
+			url = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+			StateHasChanged();
+		}
 	}
 	private async Task RemoveImg()
 	{
-		
+		url = Contant.ImgDefault;
+		browerFile = null;
 	}
 }
 <style>
