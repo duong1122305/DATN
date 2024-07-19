@@ -28,7 +28,7 @@
                 <MudSelect T="int?" Label="Chọn" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
                     @foreach (var item2 in context.Item.ListProductDetail)
                     {
-                        <MudSelectItem Value="item2.IdProductDetail">@item2.Name - @item2.Price.ToString() VNĐ</MudSelectItem>
+                        <MudSelectItem Value="item2.IdProductDetail">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price)</MudSelectItem>
                     }
                 </MudSelect>
             </CellTemplate>
