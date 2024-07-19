@@ -791,6 +791,7 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
         {
             var totalprice = 0d;
+            var info = new Guest();
             if (idBooking != null)
             {
                 var query = from booking in await _unitOfWork.BookingDetailRepository.GetAllAsync()
@@ -800,12 +801,17 @@ namespace DATN.Aplication.Services
                 {
                     totalprice += item.Price;
                 }
+                info = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                        join booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                        on guest.Id equals booking.GuestId
+                        where booking.Id == idBooking.Value
+                        select guest).FirstOrDefault();
             }
             if (productdes.Count > 0)
             {
                 foreach (var item in productdes)
                 {
-                    totalprice += item.Price * item.Quantity;
+                    totalprice += item.Price * item.SelectQuantityProduct;
                 }
             }
             if (totalprice != 0)
@@ -860,9 +866,9 @@ namespace DATN.Aplication.Services
                         ReducePrice = reduce.Value,
                         TotalPayment = totalprice - reduce.Value,
                         ListProductDetail = productdes,
-                        GuestName = idBooking != null ? "" : "Khách lẻ",
-                        Address = idBooking != null ? "" : "Không có",
-                        PhoneNumber = idBooking != null ? "" : "Không có",
+                        GuestName = idBooking != null ? info.Name : "Khách lẻ",
+                        Address = idBooking != null ? info.Address : "Không có",
+                        PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
                     }
                 };
             }
