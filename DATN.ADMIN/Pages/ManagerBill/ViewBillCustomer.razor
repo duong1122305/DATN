@@ -103,7 +103,7 @@
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
                         <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Tính tiền</MudButton>
+                        <MudButton OnClick="@(async()=>await OpenDialogReload())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Tính tiền</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
                             <QRVietQRBankking />
@@ -126,6 +126,8 @@
     public Guid? guid { get; set; }
     [Parameter]
     public DateTime date { get; set; }
+    [Parameter]
+    public int? idBooking{ get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
@@ -138,11 +140,14 @@
         if (respone.IsSuccess)
         {
             bill = respone.Data;
+
+
         }
         else
         {
             bill = new Bill();
         }
+        StateHasChanged();
     }
     protected override async Task OnInitializedAsync()
     {
@@ -217,6 +222,22 @@
             StateHasChanged();
         }
     }
+    public async Task OpenDialogReload()
+    {
+        if (bookingService.ListProductDetail.Count > 0)
+        {
+            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail);
+            if (respone2.IsSuccess)
+            {
+                bill = respone2.Data;
+            }
+        }
+        else
+        {
+            Message("lỗi", Severity.Error);
+        }
+    }
+
     private async void RemoveProduct(ProductDetailView product)
     {
         // Gọi phương thức từ BookingService để xóa booking
