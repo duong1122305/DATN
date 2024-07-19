@@ -5,6 +5,7 @@ using DATN.Data.Enum;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ServiceDetail;
 using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
@@ -650,6 +651,7 @@ namespace DATN.Aplication.Services
                         query.Status = BookingStatus.InProgress;
                         var queryBooking = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                                             where bookingDetail.BookingId == query.Id
+                                            && bookingDetail.Status == BookingDetailStatus.Unfulfilled
                                             select bookingDetail).FirstOrDefault();
                         queryBooking.Status = BookingDetailStatus.Processing;
                         await _unitOfWork.BookingRepository.UpdateAsync(query);
@@ -750,7 +752,6 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "không tìm thấy" };
         }
-
         public async Task<ResponseData<string>> PaymentInStore(Payment payment)
         {
             var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
@@ -786,6 +787,87 @@ namespace DATN.Aplication.Services
             {
                 return new ResponseData<string> { IsSuccess = false, Error = "Ngày này làm gì có khách này đặt mà thanh toán :)))))" };
             }
+        }
+        public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
+        {
+            var totalprice = 0d;
+            if (idBooking != null)
+            {
+                var query = from booking in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                            where booking.BookingId == idBooking.Value
+                            select booking;
+                foreach (var item in query)
+                {
+                    totalprice += item.Price;
+                }
+            }
+            if (productdes.Count > 0)
+            {
+                foreach (var item in productdes)
+                {
+                    totalprice += item.Price * item.Quantity;
+                }
+            }
+            if (totalprice != 0)
+            {
+                var queryCheckVoucherCanApply = from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                                where totalprice >= voucher.MinMoneyApplicable
+                                                && voucher.AmountUsed < voucher.Quantity
+                                                && voucher.Status == VoucherStatus.GoingOn
+                                                select voucher;
+                int voucherWillUse = 0;
+                if (queryCheckVoucherCanApply.Count() > 1)
+                {
+                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                    foreach (var item in queryCheckVoucherCanApply)
+                    {
+                        var reducedAmount1 = totalprice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalprice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
+                        foreach (var item2 in queryCheckVoucherCanApply)
+                        {
+                            if (item.Id == item.Id)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                var reducedAmount2 = totalprice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalprice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
+                                if (reducedAmount1 < reducedAmount2)
+                                {
+                                    voucherWillUse = item2.Id;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (queryCheckVoucherCanApply.Count() == 1)
+                    {
+                        voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                    }
+                }
+                var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
+                var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
+                var reduce = voucherWillUse != 0 ? (double)discount * totalprice / 100 >= maxMoney ? maxMoney : (double)discount * totalprice / 100 : 0;
+                return new ResponseData<Bill>
+                {
+                    IsSuccess = true,
+                    Data = new Bill()
+                    {
+                        TotalPrice = totalprice,
+                        DateBooking = DateTime.Now,
+                        IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
+                        ReducePrice = reduce.Value,
+                        TotalPayment = totalprice - reduce.Value,
+                        ListProductDetail = productdes,
+                        GuestName = idBooking != null ? "" : "Khách lẻ",
+                        Address = idBooking != null ? "" : "Không có",
+                        PhoneNumber = idBooking != null ? "" : "Không có",
+                    }
+                };
+            }
+            else
+                return new ResponseData<Bill> { IsSuccess = false, Error = "Tông tiền ko có gì" };
         }
     }
 }

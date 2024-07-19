@@ -104,5 +104,6 @@ namespace DATN.Aplication.Services
 
             return new ResponseData<List<ProductSelect>>() { IsSuccess = true, Data = query.ToList() };
         }
+
     }
 }
