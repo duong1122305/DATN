@@ -68,7 +68,7 @@
                         <MudTd>
                             <div class="quantity-input">
                                 <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
-                               @*  <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" style="width:60px" /> *@
+                                <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
                                 <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
                             </div>
                         </MudTd>
@@ -260,6 +260,7 @@
             product.SelectQuantityProduct--;
         }
     }
+
 
 }
 
