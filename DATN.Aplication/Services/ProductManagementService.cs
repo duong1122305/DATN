@@ -37,13 +37,16 @@ namespace DATN.Aplication.Services
                         Status = true,
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
-                    var img = new ImageProduct()
+					await _unitOfWork.SaveChangeAsync();
+					var img = new ImageProduct()
                     {
                         ProductID = product.Id,
                         UrlImage = productView.ImgUrl,
+                        ImgKey= productView.ImgID
 
                     };
-                    if (productView.lstPD.Count() > 0)
+					await _unitOfWork.ImageProductRepository.AddAsync(img);
+					if (productView.lstPD.Count() > 0)
                     {
                         foreach (var item in productView.lstPD)
                         {
