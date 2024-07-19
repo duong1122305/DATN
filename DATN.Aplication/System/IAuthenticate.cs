@@ -24,8 +24,6 @@ namespace DATN.Aplication.System
         public Task<ResponseData<string>> ActiveAccount(string id);
         public Task<ResponseData<UserInfView>> GetInfByToken(string id);
         Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
-
-	}
         public Task<ResponseData<UserInfView>> GetInfById(string id);
         public Task<ResponseData<string>> GetUserByToken(string token);
     }

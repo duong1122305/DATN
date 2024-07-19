@@ -160,7 +160,7 @@ namespace DATN.Aplication.Services
                                     {
                                         return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
                                     }
-                                    else if (term1.EndDateTime.CompareTo(term2.StartDateTime) > 0 && term1.EndDateTime.CompareTo(term2.EndDateTime) < 0)
+                                    else if (term1.EndDateTime.CompareTo(term2.StartDateTime.TimeOfDay) > 0 && term1.EndDateTime.CompareTo(term2.EndDateTime.TimeOfDay) < 0)
                                     {
                                         return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
                                     }
@@ -363,7 +363,7 @@ namespace DATN.Aplication.Services
                         {
                             BookingId = queryBooking.FirstOrDefault().Id,
                             PetId = item.PetId,
-                            Price = queryServiceDetail.FirstOrDefault(c=>c.Id==item.ServiceDetailId).Price,
+                            Price = queryServiceDetail.FirstOrDefault(c => c.Id == item.ServiceDetailId).Price,
                             StaffId = item.StaffId,
                             EndDateTime = item.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
                             StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
@@ -373,7 +373,7 @@ namespace DATN.Aplication.Services
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
-                
+
                     return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
                 }
                 catch (Exception e)
@@ -417,7 +417,7 @@ namespace DATN.Aplication.Services
                          where booking.GuestId == IdGuest && booking.BookingTime.Date.CompareTo(dateBooking.Date) == 0
                          select booking).FirstOrDefault();
             var billproduct = await _productManagement.GetBillProduct(query.Id);
-            totalPrice += billproduct.Data.TotalPrice;
+            totalPrice += billproduct != null ? billproduct.Data.TotalPrice : 0d;
             foreach (var item in queryBooking)
             {
                 var queryGetTotalPrice = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
