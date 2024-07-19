@@ -30,6 +30,17 @@ namespace DATN.ViewModels.DTOs.Booking
             NotifyStateChanged();
         }
 
+        public void RemoveProduct(ProductDetailView product)
+        {
+            var productDetailView = ListProductDetail.FirstOrDefault(b => b.IdProductDetail == product.IdProductDetail); // Tìm đối tượng booking cần xoá
+            if (productDetailView != null)
+            {
+                ListProductDetail.Remove(productDetailView); // Xoá đối tượng booking từ danh sách
+                //NotifyStateChanged(); // Thông báo sự thay đổi để giao diện có thể cập nhật
+            }
+        }
+
+
         public void RemoveBooking(CreateBookingDetailRequest booking)
         {
             var bookingToRemove = lstBooking.FirstOrDefault(b => b.BookingId == booking.BookingId); // Tìm đối tượng booking cần xoá
