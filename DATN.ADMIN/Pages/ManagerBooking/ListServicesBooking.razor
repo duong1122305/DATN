@@ -18,6 +18,7 @@
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Bán sản phẩm tại quầy</MudButton>
 </div>
 
 <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" QuickFilter="@_quickFilter" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
@@ -279,8 +280,7 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("guid", id);
-        parameters.Add("date", date);
+      
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
@@ -289,7 +289,27 @@
             await LoadData();
         }
     }
-
+    
+    private async Task OpenDialogBillInStore(Guid? id, DateTime date)
+    {
+        string nameDialog = "Bán hàng tại quầy";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
     private async Task StartBooking(int id)
     {
         ActionView actionView = new ActionView()
