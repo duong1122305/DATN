@@ -1,13 +1,14 @@
 ﻿@page "/SelectViewProduct"
 @using DATN.ADMIN.IServices
 @using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ProductDetail
 
-<MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="height:1000px;min-height:1000px;width:1200px;min-width:1200px">
+<MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="width:1200px;min-width:1200px">
     <ToolBarContent>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên"  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
     </ToolBarContent>
     <Columns>
         <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -25,10 +26,10 @@
         <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
         <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudSelect T="int?" Label="Chọn" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
                     @foreach (var item2 in context.Item.ListProductDetail)
                     {
-                        <MudSelectItem Value="item2.IdProductDetail">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price)</MudSelectItem>
+                        <MudSelectItem Value="item2">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price)</MudSelectItem>
                     }
                 </MudSelect>
             </CellTemplate>
@@ -43,8 +44,10 @@
     [Parameter]
     public Guid? guid { get; set; }
     [Inject]
-    private IBookingViewServices _ClientProduct { get; set; }
-
+    private IBookingViewServices _ClientProduct { get; set; } 
+    [Inject]
+    private BookingService _tempLstProductDetail { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private List<ProductSelect> lstProductDetaiView = new List<ProductSelect>();
 
     private string searchString = "";
@@ -60,6 +63,11 @@
         {
             lstProductDetaiView = new List<ProductSelect>();
         }
+    } 
+    private async Task ChooseProduct(ProductDetailView productDV)
+    {
+        _tempLstProductDetail.AddProduct(productDV);
+        _dialogBox.Close();
     }
     protected override async Task OnInitializedAsync()
     {
