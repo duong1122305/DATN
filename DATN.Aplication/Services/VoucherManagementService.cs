@@ -84,7 +84,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Quá trình thêm voucher sảy ra lỗi!!" };
                 }
             }
-            return new ResponseData<string> { IsSuccess = false, Error = "Chưa có data" };
+            return new ResponseData<string> { IsSuccess = false, Error = "Chưa có dữ liệu" };
         }
         public async Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView)
         {

@@ -32,7 +32,7 @@ namespace DATN.Aplication
         private ITypePaymentRepository _typePaymentRepository;
         private IWorkShiftRepository _workShiftRepository;
         IBrandRepository _brandRepository;
-        ICategoryProductRepository _categoryProductRepository;
+		ICategoryDetailRepository _categoryDetailRepository;
         ICategoryRepository _categoryRepository;
         IImageProductRepository _imageProductRepository;
         IOrderDetailRepository _orderDetailRepository;
@@ -262,15 +262,15 @@ namespace DATN.Aplication
             }
         }
 
-        public ICategoryProductRepository CategoryProductRepository
-        {
+        public ICategoryDetailRepository CategoryDetailRepository
+		{
             get
             {
-                if (_categoryProductRepository == null)
+                if (_categoryDetailRepository == null)
                 {
-                    _categoryProductRepository = new CategoryProductRepository(_context);
+                    _categoryDetailRepository = new CategoryProductRepository(_context);
                 }
-                return _categoryProductRepository;
+                return _categoryDetailRepository;
             }
         }
 

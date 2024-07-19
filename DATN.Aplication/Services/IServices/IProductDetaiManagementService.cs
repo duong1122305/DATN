@@ -6,10 +6,11 @@ namespace DATN.Aplication.Services.IServices
 {
     public interface IProductDetaiManagementService
     {
-        public Task<ResponseData<string>> CreateProduct(CreateProductView productView);
-        public Task<ResponseData<string>> UpdateProduct(CreateProductView productView);
-        public Task<ResponseData<string>> RemoveProduct(int id);
-        public Task<ResponseData<string>> ActiveProduct(int id);
-        public Task<ResponseData<List<ProductDetaiView>>> ListProduct();
+        public Task<ResponseData<string>> CreateProductDetail(CreateProductDetaiView productView);
+        public Task<ResponseData<string>> UpdateProductDetail(CreateProductDetaiView productView);
+        public Task<ResponseData<string>> RemoveProductDetail(int id);
+        public Task<ResponseData<string>> ActiveProductDetail(int id);
+        public Task<ResponseData<List<ProductDetaiView>>> ListProductDetail();
+        public Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id);
     }
 }

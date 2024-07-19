@@ -1,0 +1,214 @@
+﻿@page "/CreateUpdateProdcutDetails"
+
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.Aplication.Services.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.Brand
+@using DATN.ViewModels.DTOs.Category
+@using DATN.ViewModels.DTOs.CategoryProduct
+@using DATN.ViewModels.DTOs.Product
+@using DATN.ViewModels.DTOs.ProductDetail
+@using DATN.ViewModels.DTOs.ServiceManager
+@using MudBlazor
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
+<EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
+    <MudGrid>
+        <MudItem md="12">
+            <MudItem xs="12" sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField T="string" Label="Tên sản phẩm chi tiết" @bind-Value="@product.Name" For="@(() => product.Name)" />
+                        <MudTextField T="double" Label="Giá" @bind-Value="@product.Price" For="@(() => product.Price)" />
+                        <MudTextField T="int" Label="Số lượng" @bind-Value="@product.Amount" For="@(() => product.Amount)" />
+                      
+                        <hr class="hr" />
+                        <div class="mt-5" style="text-align: end;">
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                                @_nameButton
+                            </MudButton>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudItem>
+    </MudGrid>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    [Parameter]
+    public CreateProductDetaiView productDetails { get; set; } = new CreateProductDetaiView();
+
+    [Parameter]
+    public ProductDetaiView product { get; set; } = new ProductDetaiView();
+    string _nameButton = "";
+    [Inject]
+    private IProductServices _client { get; set; }
+    [Inject]
+    private IPetManagerServices petServices { get; set; }
+    private List<PetType> lstpetType = new List<PetType>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var brand = await petServices.GetAllTypes();
+        if (brand.IsSuccess)
+        {
+            lstpetType = brand.Data;
+            if (id != null && id != 0)
+            {
+                _nameButton = "Thêm mới";
+                
+            }
+            else
+            {
+                _nameButton = "Cập nhật";
+
+            }
+        }
+
+    }
+    public async Task Create()
+    {
+        if (await Confirm("thêm mới") == true)
+
+        {
+            {
+                var result = await _client.CreateProductDetails(new CreateProductDetaiView()
+                    {
+                        Name = product.Name,
+                        Amount = product.Amount,
+                        
+                        IdProduct = product.ProductId
+                    });
+                if (result.IsSuccess)
+                {
+
+                    Message(result.Data, Severity.Success);
+                    _dialogBox.Close(DialogResult.Ok(true));
+                }
+                else
+                    Message(result.Error, Severity.Error);
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+    public async Task Update()
+    {
+        var confirm = await Confirm("cập nhật");
+        if (!confirm)
+        {
+            return;
+        }
+
+        if (product != null)
+        {
+            var result = await _client.UpdateProductDetails(new CreateProductDetaiView()
+                {
+                    Name = product.Name,
+                    Amount = product.Amount,
+                    IdProduct = product.ProductId
+                });
+            if (result.IsSuccess)
+            {
+                Message(result.Data, Severity.Success);
+
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(result.Error, Severity.Error);
+            }
+        }
+        else
+        {
+            Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+        }
+
+    }
+
+    public async Task Submit()
+    {
+        if (product.Id == null || product.Id == 0)
+        {
+            await Create();
+        }
+        else
+        {
+            await Update();
+        }
+    }
+    // private async Task OnReturnFile(List<IBrowserFile> files)
+    // {
+    //     lstBrowerFile = files;
+    // }
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
+        yesText: "Xác nhận",
+        cancelText: "Hủy", noText: null,
+        options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+
+    }
+
+    //thông báo
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+        Snackbar.Add(message, severity);
+    }
+}
+<style>
+    .mud-select {
+        display: inline-block;
+        position: relative;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .mud-input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #495057; /* màu chữ */
+    }
+
+    .mud-select select {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+        /* hiệu ứng khi hover */
+        .mud-select select:hover {
+            border-color: #b3b3b3;
+        }
+
+        .mud-select select:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+</style>

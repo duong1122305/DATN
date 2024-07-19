@@ -3,6 +3,7 @@ using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.Product;
+using DATN.ViewModels.DTOs.ProductDetail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
         {
             var check = (from product in await _unitOfWork.ProductRepository.GetAllAsync()
-                         where product.Name == productView.Name
+                         where product.Name == productView.Name.Trim().TrimStart().TrimEnd()
                          select product).FirstOrDefault();
             try
             {
@@ -37,26 +38,48 @@ namespace DATN.Aplication.Services
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
+                    var search=(from productTable in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where productTable.IdBrand == productView.IdBrand
+                               && productTable.IdCategoryProduct == productView.IdCategoryProduct 
+                               && productTable.Name == productView.Name
+                               select productTable).FirstOrDefault();
+                    if (productView.lstPD.Count() > 0)
+                    {
+                        foreach (var item in productView.lstPD)
+                        {
+                            var productDT = new ProductDetail()
+                            {
+                                IdProduct = search.Id,
+                                Name = productView.Name,
+                                Amount = item.Amount,
+                                Price = item.Price,
+                                IsDeleted = false,
+                            };
+                            await _unitOfWork.ProductDetailRepository.AddAsync(productDT);
+                        }
+                        await _unitOfWork.SaveChangeAsync();
+                         return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
+                    }
+                    return new ResponseData<string> { IsSuccess = false, Error = "Phải có ít nhất 1 biến thể" };
                 }
                 else
                     return new ResponseData<string> { IsSuccess = false, Error = "Tên sản phẩm bị trùng" };
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> UpdateProduct(CreateProductView productView)
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductRepository.GetAllAsync()
-                               where cate.Id == productView.Id
-                               select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == productView.Name
-                               select cate;
+                var product = (from pro in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where pro.Id == productView.Id
+                               select pro).FirstOrDefault();
+                var checkdup = from pro in await _unitOfWork.ProductRepository.GetAllAsync()
+                               where pro.Name == productView.Name.Trim().TrimStart().TrimEnd()
+                               select pro;
                 if (checkdup.Count() > 0)
                 {
                     if (product.Id == checkdup.FirstOrDefault().Id)
@@ -86,7 +109,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> RemoveProduct(int id)
@@ -109,7 +132,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<string>> ActiveProduct(int id)
@@ -132,7 +155,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
         public async Task<ResponseData<List<ProductView>>> ListProduct()
@@ -140,17 +163,20 @@ namespace DATN.Aplication.Services
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
-                        join cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                        on product.IdCategoryProduct equals cate.Id
+                        join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+                        on product.IdCategoryProduct equals cd.Id
+                        join c in await _unitOfWork.CategoryRepository.GetAllAsync()
+                        on cd.IdCategory equals c.Id
                         select new ProductView()
                         {
                             Id = product.Id,
                             Brand = brand.Name,
                             Name = product.Name,
-                            CategoryProduct = cate.Name,
+                            CategoryProduct = c.Name + " > " + cd.Name,
                             Description = product.Description,
                             Status = product.Status,
-                            CategoryProductId=cate.Id,
+                            CategoryProductId = cd.Id,
+                            IdBrand = brand.Id
                         };
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
