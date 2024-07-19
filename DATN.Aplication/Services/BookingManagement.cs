@@ -792,12 +792,31 @@ namespace DATN.Aplication.Services
         {
             var totalprice = 0d;
             var info = new Guest();
+            var queryBooking = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                               join bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                               on booking.Id equals bookingDetail.BookingId
+                               join user in await _userManager.Users.ToListAsync()
+                               on bookingDetail.StaffId equals user.Id
+                               join guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                               on booking.GuestId equals guest.Id
+                               join pet in await _unitOfWork.PetRepository.GetAllAsync()
+                               on guest.Id equals pet.OwnerId
+                               join serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                               on bookingDetail.ServiceDetailId equals serviceDetail.Id
+                               where booking.Id == idBooking.Value
+                               && bookingDetail.Status == BookingDetailStatus.Completed
+                               select new ServiceDetailView
+                               {
+                                   IdServiceDetail = serviceDetail.Id,
+                                   PetName = pet.Name,
+                                   Price = serviceDetail.Price,
+                                   NameStaff = user.FullName,
+                                   ServiceDetailName = serviceDetail.Description
+                               };
             if (idBooking != null)
             {
-                var query = from booking in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                            where booking.BookingId == idBooking.Value
-                            select booking;
-                foreach (var item in query)
+
+                foreach (var item in queryBooking)
                 {
                     totalprice += item.Price;
                 }
@@ -869,6 +888,7 @@ namespace DATN.Aplication.Services
                         GuestName = idBooking != null ? info.Name : "Khách lẻ",
                         Address = idBooking != null ? info.Address : "Không có",
                         PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
+                        ListServiceBooked = queryBooking.ToList(),
                     }
                 };
             }
