@@ -44,6 +44,13 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
+        public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
+        {
+            var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/cancel-booking-details?idBooking={idBooking}", productdes);
+            var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
+            return result;
+        }
+
         public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
             var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/Complete-Booking", actionView);
