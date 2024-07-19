@@ -35,7 +35,10 @@
                     <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
                 </MudText>
 
-                <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
+                @if (guid !=null)
+                {
+                    <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
+                }
                 <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
                     <HeaderContent>
                         <MudTh>Dịch vụ sử dụng</MudTh>
@@ -50,7 +53,7 @@
                         <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
                     </RowTemplate>
                 </MudTable>
-                <br/>
+                <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
                 <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
                     <HeaderContent>
@@ -88,12 +91,11 @@
                             <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
-                        <MudButton OnClick="Payment">Thanh toán thử</MudButton>
+                        <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán thử</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
-                           <QRVietQRBankking/>
+                            <QRVietQRBankking />
                         }
-                        <MudButton Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                     </div>
                 </div>
             }
@@ -116,14 +118,25 @@
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
     private int selectedPaymentMethod;
+
     private async Task LoadData()
     {
         var respone = await _client.GetBillOfGuest(guid.Value, date);
-        bill = respone.Data;
+        if (respone.IsSuccess)
+        {
+            bill = respone.Data;
+        }
+        else
+        {
+            bill = new Bill();
+        }
     }
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        if (guid != null)
+        {
+            await LoadData();
+        }
     }
     protected async Task Payment()
     {
@@ -157,7 +170,7 @@
                 };
             DialogParameters parameter = new DialogParameters();
             parameter.Add("linkqr", result.data.qrDataURL);
-            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog,parameter, options);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
             var result1 = await createUpdateDialog.Result;
             if (!result1.Canceled)
             {
@@ -172,7 +185,7 @@
 
         string nameDialog = "Chọn sản phẩm";
         DialogParameters parameter = new DialogParameters();
-        parameter.Add("guid",guid);
+        parameter.Add("guid", guid);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -182,7 +195,7 @@
                 FullWidth = false,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog,parameter, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog, parameter, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
