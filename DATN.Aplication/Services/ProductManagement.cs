@@ -81,6 +81,7 @@ namespace DATN.Aplication.Services
                         on product.IdCategoryProduct equals cate.Id
                         join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
                         on product.Id equals img.ProductID
+                        where product.Status == true
                         group new { product, brand, cate, img }
                         by new { product, brand, cate, img }
                         into view
@@ -104,6 +105,5 @@ namespace DATN.Aplication.Services
 
             return new ResponseData<List<ProductSelect>>() { IsSuccess = true, Data = query.ToList() };
         }
-
     }
 }
