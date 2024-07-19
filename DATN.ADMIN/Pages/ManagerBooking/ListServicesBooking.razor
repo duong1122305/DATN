@@ -284,6 +284,7 @@
         parameters.Add("date", date);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
+        ClearProductRequests();
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -391,6 +392,10 @@
     private void ClearBookingRequests()
     {
         bookingService.lstBooking.Clear();
+    }
+    private void ClearProductRequests()
+    {
+        bookingService.ListProductDetail.Clear();
     }
 
     private async Task OpenDialogCreateBooking()

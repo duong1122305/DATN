@@ -103,7 +103,7 @@
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
                         <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
-                        <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Tính tiền</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Tính tiền</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
                             <QRVietQRBankking />
