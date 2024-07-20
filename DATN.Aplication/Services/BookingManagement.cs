@@ -813,9 +813,9 @@ namespace DATN.Aplication.Services
                                 where booking.Id == payment.IdBooking
                                 select booking).FirstOrDefault();
             var bill = await CheckBill(payment.IdBooking, payment.LstProducts);
+
             if (queryBooking != null)
             {
-                var listProduct = new List<BuyProduct>();
                 if (!queryBooking.IsPayment)
                 {
                     if (payment.TypePaymenId == 1)
@@ -825,18 +825,15 @@ namespace DATN.Aplication.Services
                         queryBooking.ReducedAmount = bill.Data.ReducePrice;
                         queryBooking.IsPayment = true;
                         queryBooking.VoucherId = bill.Data.IdVoucher;
+                        var listProduct = (from buypro in payment.LstProducts
+                                           select new BuyProduct
+                                           {
+                                               IdBooking = payment.IdBooking,
+                                               IdProductDetail = buypro.IdProductDetail,
+                                               Quantity = buypro.Quantity,
+                                               Price = buypro.Price,
+                                           }).ToList();
 
-                        foreach (var item in payment.LstProducts)
-                        {
-                            var buy = new BuyProduct()
-                            {
-                                IdBooking = item.IdBooking,
-                                IdProductDetail = item.IdProductDetail,
-                                Price = item.Price,
-                                Quantity = item.Quantity,
-                            };
-                            listProduct.Add(buy);
-                        }
                         await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
                         await _productManagement.BuyProduct(listProduct);
                         await _unitOfWork.SaveChangeAsync();
