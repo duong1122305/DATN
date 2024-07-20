@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DATN.ViewModels.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,6 @@ namespace DATN.ViewModels.DTOs.ProductDetail
         public string Name { get; set; }
         public double Price { get; set; }
         public int Amount { get; set; }
-        public bool IsDeleted { get; set; }
+        public ProductDetailStatus Status { get; set; }
     }
 }
