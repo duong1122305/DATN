@@ -4,6 +4,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
+using DATN.ViewModels.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,16 +38,16 @@ namespace DATN.Aplication.Services
                         Status = true,
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
-					await _unitOfWork.SaveChangeAsync();
-					var img = new ImageProduct()
+                    await _unitOfWork.SaveChangeAsync();
+                    var img = new ImageProduct()
                     {
                         ProductID = product.Id,
                         UrlImage = productView.ImgUrl,
-                        ImgKey= productView.ImgID
+                        ImgKey = productView.ImgID
 
                     };
-					await _unitOfWork.ImageProductRepository.AddAsync(img);
-					if (productView.lstPD.Count() > 0)
+                    await _unitOfWork.ImageProductRepository.AddAsync(img);
+                    if (productView.lstPD.Count() > 0)
                     {
                         foreach (var item in productView.lstPD)
                         {
@@ -56,12 +57,12 @@ namespace DATN.Aplication.Services
                                 Name = item.Name,
                                 Amount = item.Amount,
                                 Price = item.Price,
-                                IsDeleted = false,
+                                Status = ProductDetailStatus.Stocking,
                             };
                             await _unitOfWork.ProductDetailRepository.AddAsync(productDT);
                         }
                         await _unitOfWork.SaveChangeAsync();
-                         return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
+                        return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
                     }
                     return new ResponseData<string> { IsSuccess = false, Error = "Phải có ít nhất 1 biến thể" };
                 }
@@ -93,26 +94,26 @@ namespace DATN.Aplication.Services
                         product.IdCategoryProduct = productView.IdCategoryProduct;
                         await _unitOfWork.ProductRepository.UpdateAsync(product);
 
-                        var imgPro=await _unitOfWork.ImageProductRepository.FindAsync(p=>p.ProductID==product.Id);
-                        if (imgPro == null|| !imgPro.Any())
+                        var imgPro = await _unitOfWork.ImageProductRepository.FindAsync(p => p.ProductID == product.Id);
+                        if (imgPro == null || !imgPro.Any())
                         {
                             var newImg = new ImageProduct
                             {
                                 ProductID = product.Id,
-                                ImgKey= productView.ImgID,
-                                UrlImage=productView.ImgUrl,
+                                ImgKey = productView.ImgID,
+                                UrlImage = productView.ImgUrl,
 
                             };
-							await _unitOfWork.ImageProductRepository.AddAsync(newImg);
-						}
+                            await _unitOfWork.ImageProductRepository.AddAsync(newImg);
+                        }
                         else
                         {
                             var imgU = imgPro.First();
                             imgU.ImgKey = productView.ImgID;
                             imgU.UrlImage = productView.ImgUrl;
-							await _unitOfWork.ImageProductRepository.UpdateAsync(imgU);
-						}
-						await _unitOfWork.SaveChangeAsync();
+                            await _unitOfWork.ImageProductRepository.UpdateAsync(imgU);
+                        }
+                        await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                     }
                     else
@@ -185,11 +186,11 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var img= await _unitOfWork.ImageProductRepository.FindAsync(p=>p.ProductID == idProduct);
-                if (img==null | !img.Any())
+                var img = await _unitOfWork.ImageProductRepository.FindAsync(p => p.ProductID == idProduct);
+                if (img == null | !img.Any())
                 {
                     return new ResponseData<ImageProduct>(false, "Không có ảnh");
-				}
+                }
                 else
                 {
                     return new ResponseData<ImageProduct>(img.First());
@@ -198,19 +199,19 @@ namespace DATN.Aplication.Services
             catch (Exception)
             {
 
-				return new ResponseData<ImageProduct>(false, "Lỗi lấy ảnh");
-			}
-        } 
+                return new ResponseData<ImageProduct>(false, "Lỗi lấy ảnh");
+            }
+        }
         public async Task<ResponseData<List<ProductView>>> ListProduct()
         {
-            var productDT =await _unitOfWork.ProductDetailRepository.FindAsync(p=>!p.IsDeleted);
+            var productDT = await _unitOfWork.ProductDetailRepository.FindAsync(p => p.Status == ProductDetailStatus.Stocking);
 
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
                         join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
-						on product.Id equals img.ProductID
-						join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+                        on product.Id equals img.ProductID
+                        join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                         on product.IdCategoryProduct equals cd.Id
                         join c in await _unitOfWork.CategoryRepository.GetAllAsync()
                         on cd.IdCategory equals c.Id
@@ -219,16 +220,16 @@ namespace DATN.Aplication.Services
                             Id = product.Id,
                             Brand = brand.Name,
                             Name = product.Name,
-                            CategoryProduct =  cd.Name,
+                            CategoryProduct = cd.Name,
                             Description = product.Description,
                             Status = product.Status,
                             CategoryProductId = cd.Id,
                             IdBrand = brand.Id,
-                            Url= img.UrlImage,
-                            IdImg= img.ImgKey,
-                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString() + " - " + product.ProductDetails.Max(x => x.Price).ToString() : product.ProductDetails != null&& product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString() : "Không có biến thể nào sẵn sàng"
+                            Url = img.UrlImage,
+                            IdImg = img.ImgKey,
+                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString() + " - " + product.ProductDetails.Max(x => x.Price).ToString() : product.ProductDetails != null && product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString() : "Không có biến thể nào sẵn sàng"
 
-						};
+                        };
             if (query.Count() > 0)
                 return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
             else

@@ -3,6 +3,7 @@ using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
+using DATN.ViewModels.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace DATN.Aplication.Services
                         Name = productView.Name,
                         Amount = productView.Amount,
                         IdProduct = productView.IdProduct,
-                        IsDeleted = false,
+                        Status = ProductDetailStatus.Stocking,
                         Price = productView.Price,
                     };
                     await _unitOfWork.ProductDetailRepository.AddAsync(product);
@@ -55,23 +56,23 @@ namespace DATN.Aplication.Services
                                where cate.Id == productView.Id
                                select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                               where cate.Name == productView.Name.Trim() && cate.Id!=productView.Id && cate.IdProduct== productView.IdProduct
+                               where cate.Name == productView.Name.Trim() && cate.Id != productView.Id && cate.IdProduct == productView.IdProduct
                                select cate;
-               
-                    if (checkdup == null || checkdup.FirstOrDefault() == null )
-                    {
-                        product.Name = productView.Name;
-                        product.Price = productView.Price;
-                        product.Amount = productView.Amount;
-                        await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
-                        await _unitOfWork.SaveChangeAsync();
-                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
-                    }
-                    else
-                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
-                
 
-             
+                if (checkdup == null || checkdup.FirstOrDefault() == null)
+                {
+                    product.Name = productView.Name;
+                    product.Price = productView.Price;
+                    product.Amount = productView.Amount;
+                    await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
+                    await _unitOfWork.SaveChangeAsync();
+                    return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
+                }
+                else
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+
+
+
             }
             catch (Exception)
             {
@@ -87,7 +88,7 @@ namespace DATN.Aplication.Services
                                select cate).FirstOrDefault();
                 if (product != null)
                 {
-                    product.IsDeleted = true;
+                    product.Status = ProductDetailStatus.Deleted;
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
@@ -110,7 +111,7 @@ namespace DATN.Aplication.Services
                                select cate).FirstOrDefault();
                 if (product != null)
                 {
-                    product.IsDeleted = false;
+                    product.Status = ProductDetailStatus.Stocking;
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
@@ -135,15 +136,15 @@ namespace DATN.Aplication.Services
                         {
                             Id = productDetail.Id,
                             Amount = productDetail.Amount,
-                            IsDeleted = productDetail.IsDeleted,
+                            Status = productDetail.Status,
                             Name = productDetail.Name,
                             ProductId = productDetail.IdProduct,
                             Product = product.Name,
                             Price = productDetail.Price,
                         };
-            if (query.Count()>0)
+            if (query.Count() > 0)
             {
-                return new ResponseData<List<ProductDetaiView>> { IsSuccess=true,Data=query.ToList() };
+                return new ResponseData<List<ProductDetaiView>> { IsSuccess = true, Data = query.ToList() };
             }
             return new ResponseData<List<ProductDetaiView>> { IsSuccess = false, Error = "Chưa có sản phẩm chi tiết của sản phẩm" };
         }
@@ -156,7 +157,7 @@ namespace DATN.Aplication.Services
                         {
                             Id = product.Id,
                             Amount = productde.Amount,
-                            IsDeleted = productde.IsDeleted,
+                            Status = productde.Status,
                             Name = productde.Name,
                             Price = productde.Price,
                             Product = product.Name,
