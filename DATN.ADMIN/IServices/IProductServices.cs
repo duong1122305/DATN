@@ -18,5 +18,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> RemoveProductDetails(int id);
         Task<ResponseData<string>> ActiveProductDetails(int id);
         Task<ResponseData<List<ProductDetaiView>>> ListProductDetails();
+        Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id);
     }
 }

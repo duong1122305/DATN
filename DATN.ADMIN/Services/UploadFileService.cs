@@ -46,6 +46,7 @@ namespace DATN.ADMIN.Services
 				return new ResponseData<string>(false, "Thất bại" + ex); ;
 			}
 		}
+		
 		public async Task<ResponseData<string[]>> UploadFile(IBrowserFile file)
 		{
 			try
@@ -54,7 +55,7 @@ namespace DATN.ADMIN.Services
 				{
 					return new ResponseData<string[]>(false, "File chỉ nhận dưới 5mb");
 				}
-				string[] imageFormats = { "jpg", "png", "gif", "bmp", "tif" };
+				string[] imageFormats = { "jpg", "png", "gif", "bmp", "tif","webp","jpeg" };
 				if (!imageFormats.Contains(file.Name.Split('.').Last()))
 				{
 					return new ResponseData<string[]>(false, "Hãy chọn file ảnh");

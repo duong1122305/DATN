@@ -13,9 +13,10 @@ namespace DATN.Data.Entities
         public string Name { get; set; }
         public double Price { get; set; }
         public int Amount { get; set; }
+        public int AmountUsed { get; set; }
         public bool IsDeleted { get; set; }
         public virtual Product Product { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-      
+
     }
 }
