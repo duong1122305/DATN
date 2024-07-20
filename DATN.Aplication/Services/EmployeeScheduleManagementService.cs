@@ -443,7 +443,6 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = e.Message };
             }
         }
-
         public async Task<ResponseData<List<ScheduleView>>> GetAll()
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
@@ -473,7 +472,6 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
-
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleFromMonthToMonth(ScheduleMonthToMonthView scheduleMonthToMonthView)
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
@@ -500,7 +498,6 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<List<ScheduleView>> { IsSuccess = false, Error = "Không có dữ liệu!" };
         }
-
         public async Task<ResponseData<List<ScheduleView>>> GetScheduleForShift(int shift)
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
@@ -596,7 +593,7 @@ namespace DATN.Aplication.Services
                                               on workshift.ShiftId equals shift.Id
                                               where bookingDetail.StaffId == item.IdStaff
                                               select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
-                        if (queryCheckUser.Count()==0)
+                        if (queryCheckUser.Count() == 0)
                         {
                             staffFree.Add(item.IdStaff.Value);
                             continue;
@@ -692,6 +689,24 @@ namespace DATN.Aplication.Services
                         workShift.WorkDate.Year == changeShiftView.Date.Year && workShift.WorkDate.Month == changeShiftView.Date.Month
                         && workShift.WorkDate.Day == changeShiftView.Date.Day
                         select schedule;
+            var checkShift = (from shiftTable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                              where shiftTable.Id == changeShiftView.ShiftId
+                              select shiftTable).FirstOrDefault();
+            var queryBookingDetail = from booking in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                     where booking.StaffId == Guid.Parse(changeShiftView.UserIdFirst)
+                                     && booking.StartDateTime.Date == changeShiftView.Date.Date
+                                     && booking.StartDateTime.TimeOfDay.CompareTo(checkShift.From) >= 0
+                                     && booking.EndDateTime.TimeOfDay.CompareTo(checkShift.To) <= 0
+                                     select booking;
+            if (queryBookingDetail.Count() > 0)
+            {
+                List<BookingDetail> listUpdate = new List<BookingDetail>();
+                foreach (var bookingDetail in queryBookingDetail)
+                {
+                    bookingDetail.StaffId = Guid.Parse(changeShiftView.UserIdSecond);
+                }
+                await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(listUpdate);
+            }
             if (query.ToList().Count == 1)
             {
 
