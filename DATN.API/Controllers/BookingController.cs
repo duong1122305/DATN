@@ -1,5 +1,4 @@
-﻿using DATN.Aplication.Services;
-using DATN.Aplication.Services.IServices;
+﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;

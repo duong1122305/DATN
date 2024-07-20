@@ -2,7 +2,7 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
 
-namespace DATN.Aplication.Services
+namespace DATN.Aplication.Services.IServices
 {
     public interface IProductManagement
     {
