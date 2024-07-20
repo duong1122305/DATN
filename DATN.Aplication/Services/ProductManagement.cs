@@ -2,6 +2,7 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
+using DATN.ViewModels.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,12 +71,37 @@ namespace DATN.Aplication.Services
                 return new ResponseData<BillProduct> { IsSuccess = false, Error = e.Message };
             }
         }
+        public async Task CheckStatusProduct()
+        {
+            var queryDetail = await _unitOfWork.ProductDetailRepository.GetAllAsync();
+            var queryOrder = await _unitOfWork.OrderDetailRepository.GetAllAsync();
+            if (queryDetail.Count() > 0 && queryOrder.Count() > 0)
+            {
+                List<ProductDetail> lstSuccess = new List<ProductDetail>();
+                foreach (var item in queryDetail)
+                {
+                    var count = 0;
+                    foreach (var item1 in queryOrder)
+                    {
+                        if (item.Id == item1.IdProductDetail)
+                        {
+                            count += item1.Quantity;
+                        }
+                    }
+                    if (item.Amount >= count)
+                    {
+                        item.Status = ProductDetailStatus.OutOfStock;
+                        lstSuccess.Add(item);
+                    }
+                }
+                await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(lstSuccess);
+            }
+        }
         public async Task<ResponseData<List<ProductSelect>>> ListProductViewSale()
         {
             var queryDetail = await _unitOfWork.ProductDetailRepository.GetAllAsync();
+            await CheckStatusProduct();
             var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
-                        join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                        on product.Id equals productDetail.IdProduct
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
                         join cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
@@ -94,12 +120,14 @@ namespace DATN.Aplication.Services
                             CateName = view.Key.cate.Name,
                             ListProductDetail = (from tetsa in queryDetail
                                                  where tetsa.IdProduct == view.Key.product.Id
+                                                 && tetsa.Status == ProductDetailStatus.Stocking
                                                  select new ProductDetailView
                                                  {
                                                      IdProductDetail = tetsa.Id,
                                                      Name = tetsa.Name,
                                                      Price = tetsa.Price,
-                                                     Quantity = tetsa.Amount
+                                                     Quantity = tetsa.Amount,
+                                                     Status = tetsa.Status,
                                                  }).ToList(),
                             LinkImg = view.Key.img.UrlImage,
                         };
