@@ -40,8 +40,63 @@ namespace DATN.Aplication.Services
             _productManagement = productManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
         }
+        public async Task ChangeStatusBooking()
+        {
+            var querybooking = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                               select booking;
+            List<Booking> lstBookingCancel = new List<Booking>();
+
+            List<BookingDetail> lstBookingDetailCancel = new List<BookingDetail>();
+            List<HistoryAction> lstAction = new List<HistoryAction>();
+            foreach (var item in querybooking)
+            {
+                if (item.Status == BookingStatus.Confirmed || item.Status == BookingStatus.PendingConfirmation)
+                {
+                    var queryBookingDetail = from detail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                             where detail.BookingId == item.Id
+                                             select detail;
+                    int count = 0;
+                    foreach (var item1 in queryBookingDetail)
+                    {
+                        if (item1.Status != BookingDetailStatus.Cancelled)
+                        {
+                            if (item1.EndDateTime.CompareTo(DateTime.Now) < 0)
+                            {
+                                item1.Status = BookingDetailStatus.Cancelled;
+                                lstBookingDetailCancel.Add(item1);
+                                count++;
+                            }
+                        }
+                    }
+                    if (count == queryBookingDetail.Count())
+                    {
+                        item.Status = BookingStatus.AdminCancelled;
+                        lstBookingCancel.Add(item);
+                        HistoryAction action = new HistoryAction()
+                        {
+                            ActionID = 14,
+                            ActionTime = DateTime.Now,
+                            Description = "Hệ thống hủy lịch đặt do quá hạn mà đơn chưa xác nhận hoặc khách chưa đến sử dụng dịch vụ",
+                            BookingID = item.Id,
+                        };
+                        lstAction.Add(action);
+                    }
+                }
+            }
+            if (lstBookingCancel.Count > 0)
+            {
+                await _unitOfWork.BookingRepository.UpdateRangeAsync(lstBookingCancel);
+                await _unitOfWork.HistoryActionRepository.AddRangeAsync(lstAction);
+
+            }
+            if (lstBookingDetailCancel.Count > 0)
+            {
+                await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(lstBookingDetailCancel);
+            }
+        }
         public async Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek()
         {
+            await ChangeStatusBooking();
             var query = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
                         join bookingdetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                         on booking.Id equals bookingdetail.BookingId
@@ -741,7 +796,7 @@ namespace DATN.Aplication.Services
                                     return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
                                 }
                             }
-                            return new ResponseData<string> {IsSuccess=false,Error="Chưa đến giờ mà khách đặt dịch vụ" };
+                            return new ResponseData<string> { IsSuccess = false, Error = "Chưa đến giờ mà khách đặt dịch vụ" };
                         }
                     }
                 }
