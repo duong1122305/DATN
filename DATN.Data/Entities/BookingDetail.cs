@@ -20,12 +20,11 @@ namespace DATN.Data.Entities
 
         public Guid? StaffId { get; set; } // Khóa ngoại đến ID đặt lịch
 
-        public int? PetId { get; set; } = 1;
+        public int? PetId { get; set; }
 
         public int? ComboId { get; set; }
 
         public int? ServiceDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
-
         public DateTime StartDateTime { get; set; } // Thời gian bắt đầu
 
         public DateTime EndDateTime { get; set; } // Thời gian kết thúc

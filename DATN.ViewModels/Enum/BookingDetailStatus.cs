@@ -8,8 +8,10 @@ namespace DATN.ViewModels.Enum
 {
 	public enum BookingDetailStatus
 	{
-		IsActive,      // Đã hoàn thành
-		Cancelled       // Đã huỷ
+		Completed,
+        Unfulfilled,
+        Processing,
+		Cancelled       
 	}
 
 }

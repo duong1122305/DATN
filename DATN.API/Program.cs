@@ -1,4 +1,4 @@
-using DATN.Aplication.Extentions;
+﻿using DATN.Aplication.Extentions;
 using DATN.Aplication.System;
 using DATN.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,7 +24,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSignalR();
+builder.Services.AddSignalRCore();
 builder.Services.AddDbContext<DATNDbContext>(options =>
 {
     options.UseSqlServer(
@@ -89,6 +90,9 @@ builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection
 builder.Services.AddScoped<IAttendanteMangarService, AttendanteMangarService>();
 
 // Add auto mapper
+builder.Services.AddScoped<IBookingManagement, BookingManagement>();
+builder.Services.AddScoped<IProductManagement, ProductManagement>();
+builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
@@ -123,5 +127,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapHub<NotificationHub>("/notificationHub");
 app.Run();

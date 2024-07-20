@@ -13,6 +13,8 @@ namespace DATN.Aplication
     public interface IUnitOfWork
     {
         IServiceRepository ServiceRepository { get; }
+        IActionBookingRepository ActionBookingRepository { get; }
+        IHistoryActionRepository HistoryActionRepository { get; }
         IBookingRepository BookingRepository { get; }
         IBookingDetailRepository BookingDetailRepository { get; }
         IComboDetailRepository ComboDetailRepository { get; }

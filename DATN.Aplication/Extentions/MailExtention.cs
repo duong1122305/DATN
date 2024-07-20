@@ -1,6 +1,7 @@
 ﻿using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
+using NetTopologySuite.Index.HPRtree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,47 @@ namespace DATN.Aplication.Extentions
                 client.Credentials = new NetworkCredential("shoppet79@gmail.com", "tznx twfq hclm ysok");
                 await client.SendMailAsync(message);
                 return $"Mã xác thực đã gửi tới email của bạn!!";
+            }
+            catch (Exception e)
+            {
+
+                return e.Message;
+            }
+        }
+        public async Task<string> SendMailNotificationAddStaffInShift(List<string> email, DateTime dateWoking, string shiftName)
+        {
+            try
+            {
+                foreach (string s in email)
+                {
+                    MailAddress mailFrom = new MailAddress("shoppet79@gmail.com", "MewShop");
+                    MailAddress mailTo = new MailAddress(s);
+                    MailMessage message = new MailMessage(mailFrom, mailTo);
+                    message.Subject = "Thông báo bạn vừa được thêm ca khẩn cấp";
+                    message.Body = $"" +
+                        $"<body style=\"font-family: Arial, sans-serif;\">\r\n\r\n" +
+                        $"<p>Cuộc sống vốn có rất nhiều lựa chọn, cảm ơn bạn vì đã chọn làm việc với chúng tôi.<br> " +
+                        $"Chúc bạn đồng hành vui vẻ cùng MewShop.\n" +
+                        $"Dưới đây là thông tin về lịch làm việc được thêm khẩn cấp:</p>\r\n\r\n " +
+                        $"<b>Vui lòng liên hệ chủ cửa hàng để đổi ca nếu ngày ca này bạn không thể đi làm.</b>\n " +
+                        $"<p>Nếu bạn có bất kỳ thắc mắc hãy liên hệ qua: <b>shoppet79@gmail.com</b>, <br>\r\n    " +
+                        $"Hoặc liên hệ qua fanpage của chúng tôi [Địa chỉ fanpage]</p>\r\n    " +
+                        $"<p>Trân trọng,<br>\r\n    " +
+                        $"MewShop</p>\r\n" +
+                        $"</body>";
+                    message.IsBodyHtml = true;
+                    message.Priority = MailPriority.High;
+                    SmtpClient client = new SmtpClient();
+                    client.Host = "smtp.gmail.com";
+                    client.Port = 587;
+                    client.EnableSsl = true;
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = new NetworkCredential("shoppet79@gmail.com", "tznx twfq hclm ysok");
+                    await client.SendMailAsync(message);
+                }
+                return $"Mail thông báo thêm ca khẩn cấp đã được gửi đi!!";
+
             }
             catch (Exception e)
             {

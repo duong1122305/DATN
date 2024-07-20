@@ -1,22 +1,22 @@
-﻿
-@using DATN.Aplication.CustomProvider
+﻿@using DATN.Aplication.CustomProvider
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Security.Claims
 @using System.IdentityModel.Tokens.Jwt
+@using Microsoft.AspNetCore.SignalR.Client
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
-           
-                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
-                    <Authorizing>
-                        <h3>Authorizing...</h3>
-                    </Authorizing>
-                    <NotAuthorized>
-                        <h3>Not authorized</h3>
-                    </NotAuthorized>
-                </AuthorizeRouteView>
-            
+
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
+                <Authorizing>
+                    <h3>Authorizing...</h3>
+                </Authorizing>
+                <NotAuthorized>
+                    <h3>Not authorized</h3>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+
         </Found>
         <NotFound>
             <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
@@ -33,28 +33,23 @@
 
     [Inject]
     protected NavigationManager navigationManager { get; set; }
+    HubConnection hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
-        string url = httpContextAccessor.HttpContext!.Request.Path;
-        if (url == "/_blazor")
-        {
-            url = "/";
-        }
-
         var key = httpContextAccessor.HttpContext.Session.GetString("Key");
-            if (key != null)
+        if (key != null)
+        {
+            var authenState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (!authenState.User.Identity.IsAuthenticated)
             {
-                var authenState = await authenticationStateProvider.GetAuthenticationStateAsync();
-                if (!authenState.User.Identity.IsAuthenticated)
-                {
-                    navigationManager.NavigateTo($"/dangnhap/?returnUrl={url}");
-                }
+                navigationManager.NavigateTo($"/dangnhap");
             }
-            else
-            {
-                navigationManager.NavigateTo($"/dangnhap/?returnUrl={url}");
-            }
-        
+        }
+        else
+        {
+            navigationManager.NavigateTo($"/dangnhap");
+        }
+       
     }
 }

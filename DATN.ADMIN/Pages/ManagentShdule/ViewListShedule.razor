@@ -8,14 +8,9 @@
 @inject IDialogService _dialogservice;
 <PageTitle>Lịch làm việc</PageTitle>
 <MudText Typo="Typo.h3" Style="text-align:center;margin-bottom:10px;">Danh sách ca làm</MudText>
-
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await CreateCa())" title="Thêm ca 1 tháng tiếp theo">Thêm ca 1 tháng tiếp theo</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async()=>await CreateMonthNow())" Color="Color.Primary" title="Danh sách nhân viên">Thêm ca cho tháng hiện tại</MudButton>
 <MudButton Variant="Variant.Filled" Style="margin-bottom:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
-
-
-
-
 @if (lstUser.Count > 0 && lstUser != null)
 {
     <MudDataGrid @ref="dataGrid" MultiSelection="true" Items="@lstUser" Filterable="true"
@@ -212,18 +207,18 @@ else
         await LoadData();
     }
 
-    private MudTable<ViewModels.DTOs.Authenticate.ScheduleView> _tableRef;
+    // private MudTable<ViewModels.DTOs.Authenticate.ScheduleView> _tableRef;
 
 
 
-    private TableGroupDefinition<ViewModels.DTOs.Authenticate.ScheduleView> _groupDefinition = new()
-        {
-            GroupName = "Ngày làm",
-            Indentation = false,
-            Expandable = true,
-            IsInitiallyExpanded = false,
-            Selector = (e) => e.WorkDate
-        };
+    // private TableGroupDefinition<ViewModels.DTOs.Authenticate.ScheduleView> _groupDefinition = new()
+    // {
+    //         GroupName = "Ngày làm",
+    //         Indentation = false,
+    //         Expandable = true,
+    //         IsInitiallyExpanded = false,
+    //         Selector = (e) => e.WorkDate
+    // };
 
 
 

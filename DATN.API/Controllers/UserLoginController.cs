@@ -119,6 +119,13 @@ namespace DATN.API.Controllers
             return result;
         }
 
+        [HttpPost("create-schedule-oneday-suddenly")]
+        public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
+        {
+            var result = await _employeeSchedule.InsertOneDayScheduleForStaffSuddenly(listUser, shift, dateTime);
+            return result;
+        }
+
         //api xoá chuyển trạng thái của nhân viên
         [HttpGet("remove")]
         public async Task<ResponseData<string>> RemoveEmployee(string id)
@@ -150,7 +157,7 @@ namespace DATN.API.Controllers
 
         //api lấy chức vụ
         [HttpGet("List-Position")]
-        public async Task<ResponseData<List<string>>> ListPosition()
+        public async Task<ResponseData<List<RoleView>>> ListPosition()
         {
             return await _userrepo.ListPosition();
         }
@@ -198,7 +205,7 @@ namespace DATN.API.Controllers
         [HttpGet("Get-user-inf-by-token/{id}")]
         public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
-            return await _userrepo.GetInfByToken(id);
+            return await _userrepo.GetInfById(id);
         }
         [HttpPost("Create-Voucher")]
         public async Task<ResponseData<string>> CreateVoucher(VoucherView voucherView)
@@ -254,9 +261,19 @@ namespace DATN.API.Controllers
             return await _vouchermanagement.ExpiresVoucher(id);
         }
         [HttpGet("Check-Otp")]
-        public async Task<ResponseData<string>> CheckCode(string username,string code)
+        public async Task<ResponseData<string>> CheckCode(string username, string code)
         {
-            return await _userrepo.CheckCodeConfirm(username,code);
+            return await _userrepo.CheckCodeConfirm(username, code);
+        }
+        [HttpGet("Get-inf-by-token")]
+        public async Task<ResponseData<string>> GetUserByToken(string token)
+        {
+            return await _userrepo.GetUserByToken(token);
+        }
+        [HttpGet("Get-all-voucher-can-apply")]
+        public async Task<ResponseData<List<VoucherView>>> GetAllVoucherCanApply(double totalPrice)
+        {
+            return await _vouchermanagement.GetAllVoucherCanApply(totalPrice);
         }
         [HttpGet("update-url")]
         public async Task<ResponseData<string>> UpdateUrl(string url, string imgId,string id)

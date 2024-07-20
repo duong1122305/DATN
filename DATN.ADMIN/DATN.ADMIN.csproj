@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="Pages\ManagerBooking\ScheduleView.razor" />
     <Content Remove="wwwroot\LoadingIndicator.razor" />
   </ItemGroup>
 
@@ -28,12 +27,13 @@
     <PackageReference Include="EFCore.BulkExtensions" Version="7.8.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.19">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.19">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -50,13 +50,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="Pages\ManagerBooking\ScheduleView.razor" />
     <_ContentIncludedByDefault Remove="wwwroot\LoadingIndicator.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Components\LoadingIndicator.razor" />
-    <None Include="Pages\ManagerBooking\ScheduleView.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,7 +64,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Remove="Pages\ManagerBooking\ScheduleView.razor" />
+    <Content Update="Pages\ManagentStaff\AddStaffSuddenly.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>

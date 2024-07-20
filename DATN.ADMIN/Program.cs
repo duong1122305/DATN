@@ -16,6 +16,7 @@ using System.Net;
 using Syncfusion.Blazor;
 using DATN.Aplication.Services.IServices;
 using DATN.Aplication.Services;
+using DATN.ViewModels.DTOs.Booking;
 var builder = WebApplication.CreateBuilder(args);
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
@@ -23,6 +24,8 @@ builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection
 builder.Services.AddSyncfusionBlazor();
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/"), Timeout = TimeSpan.FromMinutes(30) });
@@ -87,6 +90,8 @@ builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
 builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
+builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
+builder.Services.AddSingleton<BookingService>();
 builder.Services.AddMudServices(config =>
 {
 	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
@@ -124,6 +129,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapBlazorHub();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/notification");
+});
 app.MapFallbackToPage("/_Host");
 
 app.Run();

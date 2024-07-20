@@ -38,6 +38,8 @@ namespace DATN.Aplication
         IOrderDetailRepository _orderDetailRepository;
         IProductRepository _productRepository;
         IProductDetailRepository _productDetailRepository;
+        IActionBookingRepository _actionBookingRepository;
+        IHistoryActionRepository _historyActionRepository;
 
         public UnitOfWork(DATNDbContext context)
         {
@@ -252,7 +254,7 @@ namespace DATN.Aplication
         {
             get
             {
-                if (_brandRepository==null)
+                if (_brandRepository == null)
                 {
                     _brandRepository = new BrandRepository(_context);
                 }
@@ -331,12 +333,36 @@ namespace DATN.Aplication
             }
         }
 
+        public IActionBookingRepository ActionBookingRepository
+        {
+            get
+            {
+                if (_actionBookingRepository == null)
+                {
+                    _actionBookingRepository = new ActionBookingRepository(_context);
+                }
+                return _actionBookingRepository;
+            }
+        }
+
+        public IHistoryActionRepository HistoryActionRepository
+        {
+            get
+            {
+                if (_historyActionRepository == null)
+                {
+                    _historyActionRepository = new HistoryActionRepository(_context);
+                }
+                return _historyActionRepository;
+            }
+        }
+
         public async Task<int> SaveChangeAsync()
         {
             return await _context.SaveChangesAsync();
         }
 
-    
+
     }
 
 }

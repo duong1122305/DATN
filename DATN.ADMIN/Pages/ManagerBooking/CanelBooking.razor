@@ -1,0 +1,60 @@
+﻿@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.ActionBooking
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
+        <MudButton Color="Color.Error" OnClick="@(async()=>await ConfirmCancel())">Xác nhận</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private string CancellationReason { get; set; }
+
+    [Inject]
+    private IHttpContextAccessor _httpContextAccessor { get; set; }
+
+
+    [Inject]
+    IBookingViewServices _client { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    public async Task ConfirmCancel()
+    {
+        ActionView actionView = new ActionView()
+            {
+                IdBokingOrDetail = id,
+                Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
+                Reason = CancellationReason
+            };
+        var respone = await _client.CancelBooking(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            _dialogBox.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+    }
+    public async Task Canel()
+    {
+        _dialogBox.Close(DialogResult.Ok(true));
+    }
+
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
+}
+

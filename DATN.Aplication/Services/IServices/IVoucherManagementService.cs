@@ -9,5 +9,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView);
         public Task<ResponseData<List<VoucherView>>> GetAllVoucher();
         public Task<ResponseData<string>> ExpiresVoucher(int id);
+        public Task<ResponseData<List<VoucherView>>> GetAllVoucherCanApply(double totalPrice);
     }
 }

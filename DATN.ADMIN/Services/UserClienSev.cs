@@ -1,11 +1,13 @@
 ﻿using Azure;
 using DATN.ADMIN.IServices;
 using DATN.ADMIN.Pages;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
@@ -14,9 +16,12 @@ namespace DATN.ADMIN.Services
     public class UserClienSev : IUserClientSev
     {
         private readonly HttpClient _client;
-        public UserClienSev(HttpClient client)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserClienSev(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _client = client;
+            _httpContextAccessor = httpContextAccessor;
+            //_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
 
         }
 
@@ -78,11 +83,6 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
-        public Task<ResponseData<string>> UpdateCaNhanVien(List<string> lstStaff, int idShift)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView, string id)
         {
             var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
@@ -119,10 +119,29 @@ namespace DATN.ADMIN.Services
                 return result;
         }
 
-		public async Task<ResponseData<string>> UpdateImg(string url, string imgId, string id)
-		{
-			var result = _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/update-url?url={url}&imgId={imgId}&id={id}").GetAwaiter().GetResult();
-			return result;
-		}
-	}
+        public async Task<ResponseData<List<RoleView>>> ListPosition()
+        {
+            return await _client.GetFromJsonAsync<ResponseData<List<RoleView>>>("api/UserLogin/List-Position");
+        }
+
+        public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
+        {
+            var lst = await _client.PostAsJsonAsync<AddRoleForUserView>("api/UserLogin/Add-role-user", addRoleForUserView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
+        }
+
+        public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
+        {
+            var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/create-schedule-oneday-suddenly?shift={shift}&dateTime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}", listUser);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
+            return result;
+        }
+
+        public async Task<ResponseData<string>> UpdateImg(string url, string imgId, string id)
+        {
+            var result = _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/update-url?url={url}&imgId={imgId}&id={id}").GetAwaiter().GetResult();
+            return result;
+        }
+    }
 }

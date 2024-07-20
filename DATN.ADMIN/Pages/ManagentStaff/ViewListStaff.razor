@@ -16,6 +16,7 @@
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng sau">Thêm vào ca làm tháng sau</MudButton>
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await AddToShift2())" Style="margin-bottom: 10px" title="Thêm vào ca làm tháng hiện tại">Thêm ca làm tháng hiện tại</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" OnClick="@(async()=>await StaffSuddenly())" Style="margin-bottom: 10px" title="Thêm vào ca khẩn cấp">Thêm vào ca khẩn cấp</MudButton>
 
 
 
@@ -68,6 +69,18 @@
             <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Chức vụ" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (context.Item.Position == "ServiceStaff")
+                    {
+                        <span>Nhân viên dịch vụ</span>
+                    }
+                    else
+                    {
+                        <span>Lễ tân</span>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn Title="Giới tính" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (context.Item.Gender == "Nam")
@@ -172,7 +185,7 @@ else
     protected async Task LoadData()
     {
         var user = await _client.GetAll();
-        lstUser = user.Data.OrderByDescending(x => x.UserName).ToList();
+        lstUser = user.Data.Select((item, index) => new { Item = item, Index = index }).OrderBy(x => x.Index).Select(c => c.Item).ToList();
         switch (selectedStatus)
         {
             case UserStatus.All:
@@ -248,12 +261,12 @@ else
         var repon = await _client.activeUser(username);
         if (repon.IsSuccess)
         {
-            Message("Đã kích hoạt trạng thái", Severity.Success);
+            Message(repon.Data, Severity.Success);
             await LoadData();
         }
         else
         {
-            Message("Chưa kích hoạt", Severity.Success);
+            Message(repon.Error, Severity.Success);
         }
     }
 
@@ -348,7 +361,7 @@ else
             }
             else
             {
-                Message("Thêm hông thành công", Severity.Error);
+                Message("Thêm không thành công", Severity.Error);
             }
         }
         else
@@ -358,7 +371,44 @@ else
         }
 
     }
+    //thêm vào ca khẩn cấp
+    private async Task StaffSuddenly()
+    {
+        var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
+        var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
+        var selectedShiftId = this.selectedShiftId;
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm nhân viên vào ca khẩn cấp";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("lstUser", selectedUser1s);
+        if (selectedShiftId == null || selectedShiftId ==0)
+        {
+            Message("Vui lòng chọn ca làm", Severity.Warning);
+        }else
+        {
+        parameters.Add("idShift", selectedShiftId);
+            var createUpdateDialog = await _dialogservice.ShowAsync<AddStaffSuddenly>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            isEditing = false;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+                StateHasChanged();
+            }
+        }
+       
+        
 
+    }
     //thêm nhân viên vào ca làm tháng hiện tại
     private async Task AddToShift2()
     {

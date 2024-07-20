@@ -179,7 +179,19 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<List<VoucherView>> { IsSuccess = false, Data = new List<VoucherView>(), Error = "Chưa có voucher nào" };
         }
-
+        public async Task<ResponseData<List<VoucherView>>> GetAllVoucherCanApply(double totalPrice)
+        {
+            var listVoucher = (await GetAllVoucher()).Data;
+            if (listVoucher.Count>0)
+            {
+                var list = listVoucher.Where(c => c.MinMoneyApplicable <= totalPrice && c.Status == VoucherStatus.GoingOn).ToList();
+                return new ResponseData<List<VoucherView>>{ IsSuccess = true, Data = list };
+            }
+            else
+            {
+                return new ResponseData<List<VoucherView>>() { IsSuccess = false, Error = "Không có voucher nào có thể áp dụng" };
+            }
+        }
         public async Task<ResponseData<string>> ExpiresVoucher(int id)
         {
             var query = (from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()

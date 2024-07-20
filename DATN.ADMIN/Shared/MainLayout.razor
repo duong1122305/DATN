@@ -3,6 +3,7 @@
     @using DATN.Aplication.CustomProvider
     @using System.IdentityModel.Tokens.Jwt
     @using System.Security.Claims
+@using Microsoft.AspNetCore.SignalR.Client
 @using DATN.Utilites
     @inject IDialogService _dialogservice
     @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -17,6 +18,7 @@
         <MudAvatar>
             <MudImage Src="@urlImg"></MudImage>
         </MudAvatar>
+        <p>@mess</p>
         <MudMenu Label="@name" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
             <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
             <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
@@ -36,12 +38,14 @@
     [Inject]
     protected NavigationManager navigationManager { get; set; }
     [Inject]
-    protected IHttpContextAccessor httpContextAccessor { get; set; } 
+    protected IHttpContextAccessor httpContextAccessor { get; set; }
+    protected HubConnection hubConnection;
     [Inject]
     protected IUserClientSev _ser { get; set; }
 
     bool _drawerOpen = true;
     private string name = "";
+    private string mess = "";
     private string urlImg = Contant.ImgUser;
     void DrawerToggle()
     {
@@ -75,7 +79,7 @@
         if (string.IsNullOrEmpty(session))
         {
             // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
-            navigationManager.NavigateTo($"/dangnhap/?returnUrl={url}", true);
+            navigationManager.NavigateTo($"/dangnhap", true);
 
         }
         else
@@ -95,7 +99,15 @@
         }
 
         navigationManager.LocationChanged += HandleLocationChanged;
-
+        hubConnection = new HubConnectionBuilder()
+       .WithUrl(navigationManager.ToAbsoluteUri("https://localhost:7259/notification"))
+       .WithAutomaticReconnect()
+       .Build();
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            mess = user + message;
+        });
+        // await hubConnection.StartAsync();
     }
     private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
     {
@@ -115,4 +127,19 @@
         return confirm;
     }
 }
+@*
+<script src="~\lib\microsoft\signalr\dist\browser\signalr.js"></script>
+<script>
 
+    var connection = new signalR.HubConnectionBuilder().withUrl("/notification").build();
+
+    connection.on("ReceiveMessage", function (user, message) {
+        alert("So key");
+    });
+
+    connection.start().then(function () {
+        alert("connected");
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+</script> *@

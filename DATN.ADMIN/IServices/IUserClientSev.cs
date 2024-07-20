@@ -18,13 +18,15 @@ namespace DATN.ADMIN.IServices
 
         Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift);
         Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien();
-        Task<ResponseData<string>> UpdateCaNhanVien(List<string> lstStaff, int idShift);
 
         //Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest);
         Task<ResponseData<UserInfView>> GetInfoUser(string id);
         Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView);
         Task<ResponseData<string>> CheckCodeOtp(string username, string code);
         Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView);
+        Task<ResponseData<List<RoleView>>> ListPosition();
+        Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView);
+        Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime);
 		Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
 	}
 }

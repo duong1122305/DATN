@@ -1,0 +1,287 @@
+﻿@page "/viewbill"
+@using DATN.ADMIN.IServices
+@using DATN.ADMIN.Pages.ManagerGuest
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
+@using DATN.ViewModels.DTOs.Payment
+@using DATN.ViewModels.DTOs.Product
+@using Newtonsoft.Json
+@inject IAddressService _addressServive;
+@inject IDialogService _dialogservice;
+@inject ISnackbar Snackbar
+<style>
+    .mud-dialog-width-lg {
+        height: 680px;
+        min-height: 680px;
+    }
+
+</style>
+<MudContainer Class="invoice-container" Style="margin-top: 20px">
+    <MudPaper Elevation="3" Class="invoice-paper">
+        <div class="invoice-body">
+            @if (bill != null)
+            {
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-center flex-grow-1">
+                        <MudText Typo="Typo.h3" Class="invoice-label" Style="color: hotpink;text-align:center;">THÔNG TIN HOÁ ĐƠN</MudText>
+                    </div>
+                    <div class="text-right">
+                        <MudButton Class="invoice-label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Style="margin:15px">In</MudButton>
+                    </div>
+                </div>
+                <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
+                    <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
+                    <span><b>Khách hàng:</b> @bill.GuestName</span><br />
+                    <span><b>Số điện thoại:</b> @bill.PhoneNumber</span><br />
+                    <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
+                </MudText>
+
+                @if (guid != null)
+                {
+                    <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
+                }
+                <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
+                    <HeaderContent>
+                        <MudTh>Dịch vụ sử dụng</MudTh>
+                        <MudTh>Tên thú cưng</MudTh>
+                        <MudTh>Nhân viên làm dịch vụ</MudTh>
+                        <MudTh>Đơn giá</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.ServiceDetailName</MudTd>
+                        <MudTd>@context.PetName</MudTd>
+                        <MudTd>@context.NameStaff</MudTd>
+                        <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                    </RowTemplate>
+                </MudTable>
+                <br />
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
+                <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
+                    <HeaderContent>
+                        <MudTh>Tên sản phẩm</MudTh>
+                        <MudTh>Số lượng</MudTh>
+                        <MudTh>Đơn giá</MudTh>
+                        <MudTh>Hành động</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Name</MudTd>
+                        <MudTd>
+                            <div class="quantity-input">
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
+                                <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+
+                            </div>
+                        </MudTd>
+                        <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                        <MudTd>
+                            <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+                <style>
+                    .outer-div {
+                        display: flex;
+                        justify-content: flex-end; /* Đẩy div ngoài về bên phải */
+                        width: 100%;
+                    }
+
+                    .inner-div {
+                        text-align: left; /* Căn trái nội dung trong div */
+                    }
+                </style>
+                <div class="outer-div">
+                    <div class="inner-div">
+                        <br />
+                        <span><b>Tạm tính: </b>@CurrencyHelper.FormatCurrency((float)@bill.TotalPrice)</span><br />
+                        <br />
+                        <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
+                        <br />
+                        <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
+
+                        <MudRadioGroup T="int" @bind-Checked="@selectedPaymentMethod">
+                            <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
+                            <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
+                        </MudRadioGroup>
+                        <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
+                        @if (selectedPaymentMethod == 2)
+                        {
+                            <QRVietQRBankking />
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="no-invoice">
+                    <MudTypography Typo="Typo.body2">Không có hóa đơn nào được chọn.</MudTypography>
+                </div>
+            }
+        </div>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public Guid? guid { get; set; }
+    [Parameter]
+    public DateTime date { get; set; }
+    [Parameter]
+    public int? idBooking{ get; set; }
+    [Inject]
+    private IBookingViewServices _client { get; set; }
+    private Bill bill = new Bill();
+    private int selectedPaymentMethod;
+    [Inject] private BookingService bookingService { get; set; }
+
+    private async Task LoadData()
+    {
+        // var respone = await _client.GetBillOfGuest(guid.Value, date);
+        // if (respone.IsSuccess)
+        // {
+        //     bill = respone.Data;
+        // }
+        // else
+        // {
+        //     bill = new Bill();
+        // }
+        await OpenDialogReload();
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (guid != null)
+        {
+            await LoadData();
+        }
+    }
+    protected async Task Payment()
+    {
+        APIRequest request = new APIRequest()
+            {
+                accountName = "Meo Shop",
+                accountNo = 37110001031335,
+                acqId = 970418,
+                addInfo = $"Thanh toán hóa đơn chăm sóc thú cưng ngày {date.ToString("dd/MM/yyyy")}",
+                amount = bill.TotalPayment,
+                format = "text",
+                template = "compact2"
+            };
+        HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.Add("x-client-id", "c43d080b-f369-4700-bd96-f96d79bcd172");
+        client.DefaultRequestHeaders.Add("x-api-key", "26b18710-94ae-4c9c-8d22-a6880a530924");
+        var response = await client.PostAsJsonAsync<APIRequest>("https://api.vietqr.io/v2/generate", request);
+        var result = JsonConvert.DeserializeObject<APIResponse>(await response.Content.ReadAsStringAsync());
+        if (result.code == "00")
+        {
+            string nameDialog = "Thanh toán";
+
+            DialogOptions options = new DialogOptions()
+                {
+                    CloseOnEscapeKey = true,
+                    Position = DialogPosition.Center,
+                    MaxWidth = MaxWidth.Large,
+                    CloseButton = true,
+                    FullWidth = true,
+                    DisableBackdropClick = true
+                };
+            DialogParameters parameter = new DialogParameters();
+            parameter.Add("linkqr", result.data.qrDataURL);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
+            var result1 = await createUpdateDialog.Result;
+            if (!result1.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
+        }
+    }
+
+    public async Task OpenDialog()
+    {
+
+        string nameDialog = "Chọn sản phẩm";
+        DialogParameters parameter = new DialogParameters();
+        parameter.Add("guid", guid);
+        parameter.Add("IdBooking", idBooking);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = false,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog, parameter, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+    public async Task OpenDialogReload()
+    {
+
+        var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking).ToList());
+        if (respone2.IsSuccess)
+        {
+            bill = respone2.Data;
+            StateHasChanged();
+        }
+    }
+
+    private async void RemoveProduct(ProductDetailView product)
+    {
+        // Gọi phương thức từ BookingService để xóa booking
+        if (await Confirm() == true)
+        {
+            bookingService.RemoveProduct(product);
+            await LoadData();
+            Message("Đã xoá thành công.", Severity.Success);
+        }
+        // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
+    }
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+                    "Xác nhận xóa dịch vụ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+
+
+    //thêm sản phẩm
+    async void IncrementQuantity(ProductDetailView product)
+    {
+        if (product.SelectQuantityProduct < product.Quantity)
+        {
+            product.SelectQuantityProduct++;
+            await LoadData();
+        }
+    }
+
+    //trừ sản phẩm
+    async void DecrementQuantity(ProductDetailView product)
+    {
+        if (product.SelectQuantityProduct > 1)
+        {
+            product.SelectQuantityProduct--;
+            await LoadData();
+        }
+    }
+
+
+}
+
+
