@@ -85,7 +85,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		var dataSpecies = await _petClient.GetAll();
-		lstPetSpecies = dataSpecies.Data!;
+		lstPetSpecies = dataSpecies.Data!.Where(p => !p.IsDelete.HasValue || !p.IsDelete.Value).ToList();
 		selectedSpecies = lstPetSpecies.First();
 		if (!string.IsNullOrEmpty(pet.Name))
 		{
