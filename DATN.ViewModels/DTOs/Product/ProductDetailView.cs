@@ -14,7 +14,7 @@ namespace DATN.ViewModels.DTOs.Product
         public int Quantity { get; set; }
         public double Price { get; set; }
         public int SelectQuantityProduct { get; set; } = 1;
-        public int? IdBooking { get; set; }
+        public int IdBooking { get; set; }
         public ProductDetailStatus Status { get; set; }
     }
 }

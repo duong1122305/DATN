@@ -91,6 +91,7 @@ namespace DATN.Aplication.Services
                     if (item.Amount >= count)
                     {
                         item.Status = ProductDetailStatus.OutOfStock;
+                        item.AmountUsed = count;
                         lstSuccess.Add(item);
                     }
                 }
@@ -126,7 +127,7 @@ namespace DATN.Aplication.Services
                                                      IdProductDetail = tetsa.Id,
                                                      Name = tetsa.Name,
                                                      Price = tetsa.Price,
-                                                     Quantity = tetsa.Amount,
+                                                     Quantity = tetsa.Amount - tetsa.AmountUsed,
                                                      Status = tetsa.Status,
                                                  }).ToList(),
                             LinkImg = view.Key.img.UrlImage,

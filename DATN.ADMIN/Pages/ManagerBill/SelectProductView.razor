@@ -68,7 +68,7 @@
     } 
     private async Task ChooseProduct(ProductDetailView productDV)
     {
-        productDV.IdBooking = IdBooking;
+        productDV.IdBooking = IdBooking.Value;
         _tempLstProductDetail.AddProduct(productDV);
         _dialogBox.Close();
     }

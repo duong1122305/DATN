@@ -557,36 +557,47 @@ namespace DATN.Aplication.Services
                          select bookingDetail).FirstOrDefault();
             if (query != null)
             {
-                if (query.Status == BookingDetailStatus.Processing || query.Status == BookingDetailStatus.Completed)
+                int count = 0;
+                foreach (var item in (await _unitOfWork.BookingDetailRepository.GetAllAsync()).Where(c => c.BookingId == query.BookingId && c.Status != BookingDetailStatus.Cancelled))
                 {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Trang thái của dịch vụ hiện tại không cho phép hủy " };
+                    count++;
                 }
-                else
+                if (count > 1)
                 {
-                    try
+
+                    if (query.Status == BookingDetailStatus.Processing || query.Status == BookingDetailStatus.Completed)
                     {
-                        var queryBoking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                                           where booking.Id == query.BookingId
-                                           select booking).FirstOrDefault();
-                        query.Status = BookingDetailStatus.Cancelled;
-                        HistoryAction historyAction = new HistoryAction()
+                        return new ResponseData<string> { IsSuccess = false, Error = "Trang thái của dịch vụ hiện tại không cho phép hủy " };
+                    }
+                    else
+                    {
+                        try
                         {
-                            BookingID = queryBoking.Id,
-                            ActionTime = DateTime.Now,
-                            Description = actionView.Reason + " (Đây là hủy 1 dịch vụ con)",
-                            ActionID = 14,
-                            ActionByID = Guid.Parse(idUserAction.Data)
-                        };
-                        await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
-                        await _unitOfWork.HistoryActionRepository.UpdateAsync(historyAction);
-                        await _unitOfWork.SaveChangeAsync();
-                        return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                            var queryBoking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                               where booking.Id == query.BookingId
+                                               select booking).FirstOrDefault();
+                            query.Status = BookingDetailStatus.Cancelled;
+                            HistoryAction historyAction = new HistoryAction()
+                            {
+                                BookingID = queryBoking.Id,
+                                ActionTime = DateTime.Now,
+                                Description = actionView.Reason + " (Đây là hủy 1 dịch vụ con)",
+                                ActionID = 14,
+                                ActionByID = Guid.Parse(idUserAction.Data)
+                            };
+                            await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
+                            await _unitOfWork.HistoryActionRepository.UpdateAsync(historyAction);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                        }
+                        catch (Exception)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
+                        }
                     }
-                    catch (Exception)
-                    {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
-                    }
+
                 }
+                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ hủy thì ra booking mà hủy hẳn :)))" };
             }
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
@@ -680,13 +691,26 @@ namespace DATN.Aplication.Services
                     else
                     {
                         query.Status = BookingStatus.InProgress;
-                        var queryBooking = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                                            where bookingDetail.BookingId == query.Id
-                                            && bookingDetail.Status == BookingDetailStatus.Unfulfilled
-                                            select bookingDetail).FirstOrDefault();
-                        queryBooking.Status = BookingDetailStatus.Processing;
+                        var queryBooking = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                           where bookingDetail.BookingId == query.Id
+                                           && bookingDetail.Status != BookingDetailStatus.Cancelled
+                                           select bookingDetail;
+                        int count = 0;
+                        foreach (var bookingDetail in queryBooking)
+                        {
+                            if (bookingDetail.Status == BookingDetailStatus.Unfulfilled)
+                            {
+                                count++;
+                            }
+                        }
+                        if (queryBooking != null)
+                        {
+
+                            queryBooking.FirstOrDefault().Status = BookingDetailStatus.Processing;
+                            await _unitOfWork.BookingDetailRepository.UpdateAsync(queryBooking.FirstOrDefault());
+
+                        }
                         await _unitOfWork.BookingRepository.UpdateAsync(query);
-                        await _unitOfWork.BookingDetailRepository.UpdateAsync(queryBooking);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
                     }
@@ -786,21 +810,35 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<string>> PaymentInStore(Payment payment)
         {
             var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                                where booking.GuestId == payment.IdGuest &&
-                                booking.BookingTime.Date.CompareTo(payment.DateBooking.Date) == 0
+                                where booking.Id == payment.IdBooking
                                 select booking).FirstOrDefault();
+            var bill = await CheckBill(payment.IdBooking, payment.LstProducts);
             if (queryBooking != null)
             {
+                var listProduct = new List<BuyProduct>();
                 if (!queryBooking.IsPayment)
                 {
                     if (payment.TypePaymenId == 1)
                     {
-                        queryBooking.TotalPrice = payment.TotalPrice;
+                        queryBooking.TotalPrice = bill.Data.TotalPayment;
                         queryBooking.PaymentTypeId = payment.TypePaymenId;
-                        queryBooking.ReducedAmount = payment.Reduce;
+                        queryBooking.ReducedAmount = bill.Data.ReducePrice;
                         queryBooking.IsPayment = true;
-                        queryBooking.VoucherId = payment.VoucherId;
+                        queryBooking.VoucherId = bill.Data.IdVoucher;
+
+                        foreach (var item in payment.LstProducts)
+                        {
+                            var buy = new BuyProduct()
+                            {
+                                IdBooking = item.IdBooking,
+                                IdProductDetail = item.IdProductDetail,
+                                Price = item.Price,
+                                Quantity = item.Quantity,
+                            };
+                            listProduct.Add(buy);
+                        }
                         await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
+                        await _productManagement.BuyProduct(listProduct);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
                     }
