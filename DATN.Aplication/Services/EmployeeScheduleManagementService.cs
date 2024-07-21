@@ -581,6 +581,7 @@ namespace DATN.Aplication.Services
                         {
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
                         }
+
                         var response = await GetListStaffInDay(queryShift.Id, dateTime);
                         List<Guid> staffFree = new List<Guid>();
                         foreach (var item in response.Data)
@@ -626,12 +627,14 @@ namespace DATN.Aplication.Services
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                         else
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
+                       
                     }
                     else
                     {
                         return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Con người sống trong hiện tại và tương lai chọn ngày quá khứ ăn db à :))))" };
                     }
                 }
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Dev cũng chịu không biết ở đây sao lỗi được luôn" };
             }
             catch (Exception e)
             {
