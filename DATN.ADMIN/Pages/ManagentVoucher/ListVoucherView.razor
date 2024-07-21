@@ -17,6 +17,7 @@
             <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
             <MudSelectItem Value="Status.GoingOn">Hoạt động</MudSelectItem>
             <MudSelectItem Value="Status.NotOccur">Chưa bắt đầu</MudSelectItem>
+            <MudSelectItem Value="Status.OutOfStock">Đã hết voucher</MudSelectItem>
             <MudSelectItem Value="Status.Expired">Hết hạn</MudSelectItem>
         </MudSelect>
     </div>
@@ -93,6 +94,12 @@
                         <MudChip Color="Color.Error" title="Đã quá hạn">Đã kết thúc</MudChip>
                     </span>
                 }
+                else if (context.Item.Status == VoucherStatus.OutOfStock)
+                {
+                    <span>
+                        <MudChip Color="Color.Error" title="Đã hết hạn">Đã hết voucher</MudChip>
+                    </span>
+                }
                 else
                 {
                     <span>
@@ -151,7 +158,8 @@
         Expired = -1,
         All = 0, //hết hạn
         GoingOn = 1, //còn hạn
-        NotOccur = 2 //chưa bắt đầu
+        NotOccur = 2, //chưa bắt đầu
+    OutOfStock = 3
     }
 
     private Status selectedStatus = Status.All;
@@ -182,6 +190,10 @@
         else if (selectedStatus == Status.GoingOn)
         {
             lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.GoingOn).ToList();
+        }
+        else if (selectedStatus == Status.OutOfStock)
+        {
+            lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.OutOfStock).ToList();
         }
         else
         {
