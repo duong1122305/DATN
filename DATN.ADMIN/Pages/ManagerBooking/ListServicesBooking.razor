@@ -122,9 +122,11 @@
                     }
                     @if (context.Item.Status == BookingStatus.Confirmed)
                     {
-                    }@if (context.Item.Status == BookingStatus.Arrived)
+                    }
+                    @if (context.Item.Status == BookingStatus.Arrived)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" Title="Quét qr checkin">Quét QR</MudIconButton>
 
                     }@if (context.Item.Status == BookingStatus.InProgress)
                     {
@@ -136,7 +138,12 @@
                         {
                             <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
                         }
-                    }@if (context.Item.Status == BookingStatus.NoShow)
+                        else
+                        {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
+                        }
+                    }
+                    @if (context.Item.Status == BookingStatus.NoShow)
                     {
                         @* <MudChip Color="Color.Surface">Khách không đến</MudChip> *@
 
