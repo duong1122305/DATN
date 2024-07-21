@@ -174,10 +174,11 @@ namespace DATN.Aplication.Services
                     var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
                                        && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
-                                       && bookingTable.Status == BookingStatus.InProgress
-                                       || bookingTable.Status == BookingStatus.Confirmed
-                                       || bookingTable.Status == BookingStatus.PendingConfirmation
-                                       || bookingTable.Status == BookingStatus.Arrived
+                                       && bookingTable.Status != BookingStatus.StaffCancelled
+                                       && bookingTable.Status != BookingStatus.AdminCancelled
+                                       && bookingTable.Status != BookingStatus.CustomerCancelled
+                                       && bookingTable.Status != BookingStatus.NoShow
+                                       && bookingTable.Status != BookingStatus.Confirmed
                                        select bookingTable;
                     if (queryBooking.Count() == 0)
                     {
@@ -198,10 +199,11 @@ namespace DATN.Aplication.Services
                         queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
                                        && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
-                                       && bookingTable.Status == BookingStatus.InProgress
-                                       || bookingTable.Status == BookingStatus.Confirmed
-                                       || bookingTable.Status == BookingStatus.PendingConfirmation
-                                       || bookingTable.Status == BookingStatus.Arrived
+                                       && bookingTable.Status != BookingStatus.StaffCancelled
+                                       && bookingTable.Status != BookingStatus.AdminCancelled
+                                       && bookingTable.Status != BookingStatus.CustomerCancelled
+                                       && bookingTable.Status != BookingStatus.NoShow
+                                       && bookingTable.Status != BookingStatus.Confirmed
                                        select bookingTable;
                     }
                     else
