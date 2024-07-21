@@ -139,7 +139,12 @@ namespace DATN.Aplication.Services
                 {
                     if (item.DeleteAt == null)
                     {
+                       
                         item.Status = VoucherStatus.GoingOn;
+                        if (item.Quantity == item.AmountUsed)
+                        {
+                            item.Status = VoucherStatus.OutOfStock;
+                        }
                         listcheck.Add(item);
                     }
                 }
@@ -151,11 +156,7 @@ namespace DATN.Aplication.Services
                         listcheck.Add(item);
                     }
                 }
-                if (item.Quantity == item.AmountUsed)
-                {
-                    item.Status = VoucherStatus.OutOfStock;
-                    listcheck.Add(item);
-                }
+                
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
 
