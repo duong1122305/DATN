@@ -21,8 +21,16 @@ namespace DATN.ViewModels.DTOs.Booking
         }
         public void AddProduct(ProductDetailView product)
         {
-            ListProductDetail.Add(product);
-            NotifyStateChanged();
+            var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && product.IdBooking == product.IdBooking);
+            if (check != null)
+            {
+                check.SelectQuantityProduct++;
+            }
+            else
+            {
+                ListProductDetail.Add(product);
+                NotifyStateChanged();
+            }
         }
 
         public void RemoveProduct(ProductDetailView product)
