@@ -85,11 +85,11 @@
                 {
                     @if (context.Item.IsPayment)
                     {
-                    <MudChip Color="Color.Success">Đã thanh toán</MudChip>
+                        <MudChip Color="Color.Success">Đã thanh toán</MudChip>
                     }
                     else
                     {
-                    <MudChip Color="Color.Success">Hoàn thành</MudChip>
+                        <MudChip Color="Color.Success">Hoàn thành</MudChip>
                     }
                 }
                 @if (context.Item.Status == BookingStatus.NoShow)
@@ -126,7 +126,7 @@
                     @if (context.Item.Status == BookingStatus.Arrived)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" Title="Quét qr checkin">Quét QR</MudIconButton>
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
 
                     }@if (context.Item.Status == BookingStatus.InProgress)
                     {
@@ -140,7 +140,7 @@
                         }
                         else
                         {
-                            <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
+                            <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" OnClick="@(async()=>await CheckOut(context.Item.IdBooking.Value))" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
                         }
                     }
                     @if (context.Item.Status == BookingStatus.NoShow)
@@ -253,6 +253,52 @@
         AdminCancelled    // Admin huỷ
     }
 
+    private async Task CheckIn(int idBooking)
+    {
+        var response = await _client.QrCodeCheckIn(idBooking);
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết khách đặt lịch";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("linkqr", response.Data);
+        var createUpdateDialog = await _dialogservice.ShowAsync<QRVietQRBankking>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+    private async Task CheckOut(int idBooking)
+    {
+        var response = await _client.QrCodeCheckIn(idBooking);
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết khách đặt lịch";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("linkqr", response.Data);
+        var createUpdateDialog = await _dialogservice.ShowAsync<QRVietQRBankking>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
     private Func<BookingView, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(searchString))

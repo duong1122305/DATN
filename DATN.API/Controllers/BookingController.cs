@@ -108,5 +108,20 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.PaymentInStore(payment);
         }
+        [HttpGet("QrCode-CheckOut")]
+        public async Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail)
+        {
+            return await _bookingManagement.QrCodeCheckOut(idBookingDetail);
+        }
+        [HttpGet("QrCode-CheckIn")]
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        {
+            return await _bookingManagement.QrCodeCheckIn(idBooking);
+        }
+        [HttpGet("Payment-Qr")]
+        public async Task<ResponseData<string>> PaymentQr(string totalPrice)
+        {
+            return await _bookingManagement.PaymentQr(totalPrice);
+        }
     }
 }

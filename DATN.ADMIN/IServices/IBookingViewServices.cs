@@ -24,6 +24,9 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<List<ProductSelect>>> ListProductViewSale();
         public Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes);
         public Task<ResponseData<string>> PaymentInStore(Payment payment);
+        public Task<ResponseData<string>> QrCodeCheckIn(int idBooking);
+        public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
+        public Task<ResponseData<string>> PaymentQr(string totalPrice);
 
     }
 }

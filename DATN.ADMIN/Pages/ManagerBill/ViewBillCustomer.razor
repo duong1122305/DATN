@@ -56,7 +56,7 @@
                 </MudTable>
                 <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-               @if (idBooking !=null)
+                @if (idBooking != null)
                 {
                     <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
                         <HeaderContent>
@@ -81,7 +81,8 @@
                             </MudTd>
                         </RowTemplate>
                     </MudTable>
-                }else
+                }
+                else
                 {
                     <MudTable Items="@bookingService.ListProductDetail" Class="invoice-table">
                         <HeaderContent>
@@ -128,7 +129,7 @@
                         <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
 
                         <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
-                            <MudRadio Value="1" Color="Color.Primary"   >Tiền mặt</MudRadio>
+                            <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
                         @if (selectedPaymentMethod == 2)
@@ -140,7 +141,7 @@
                             <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                         }
 
-
+                        <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
                     </div>
                 </div>
             }
@@ -171,6 +172,8 @@
     private int selectedPaymentMethod { get; set; } = 1;
     [Inject] private BookingService bookingService { get; set; }
 
+    [Inject]
+    NavigationManager navigationManager { get; set; }
     private async Task LoadData()
     {
         await OpenDialogReload();
@@ -225,7 +228,11 @@
             }
         }
     }
-
+    public async Task PayMentQr()
+    {
+        var response = await _client.PaymentQr(bill.TotalPayment.ToString());
+        navigationManager.NavigateTo(response.Data);
+    }
 
     public async Task PayMentInStore()
     {
@@ -245,7 +252,7 @@
                 LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
                 DateBooking = date,
                 Reduce = bill.ReducePrice,
-                VoucherId =bill.IdVoucher
+                VoucherId = bill.IdVoucher
             };
         var respone = await _client.PaymentInStore(payment);
         if (respone.IsSuccess)
@@ -311,9 +318,9 @@
             return;
         }
         // Gọi phương thức từ BookingService để xóa booking
-            bookingService.RemoveProduct(product);
-            await LoadData();
-            Message("Đã xoá thành công.", Severity.Success);
+        bookingService.RemoveProduct(product);
+        await LoadData();
+        Message("Đã xoá thành công.", Severity.Success);
         // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
     }
     private async Task<bool> Confirm(string text)

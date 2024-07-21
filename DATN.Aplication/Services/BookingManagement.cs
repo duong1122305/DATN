@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Index.HPRtree;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
+using System.IO;
 using RTools_NTS.Util;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,16 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using MessagingToolkit.QRCode.Codec;
+using System.Drawing.Imaging;
+using ZXing;
+using ZXing.QrCode.Internal;
+using ZXing.Common;
+using static System.Net.WebRequestMethods;
+using DATN.ViewModels.DTOs.Payment.DATN.ViewModels.DTOs.Payment;
+using DATN.ViewModels.DTOs.Payment;
 
 namespace DATN.Aplication.Services
 {
@@ -1102,6 +1114,133 @@ namespace DATN.Aplication.Services
             }
             else
                 return new ResponseData<Bill> { IsSuccess = false, Error = "Tông tiền ko có gì" };
+        }
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        {
+            if (idBooking != null)
+            {
+                try
+                {
+                    BarcodeWriter<Bitmap> barcodeWriter = new BarcodeWriter<Bitmap>();
+                    barcodeWriter.Format = BarcodeFormat.QR_CODE;
+                    barcodeWriter.Options = new EncodingOptions { Height = 200, Width = 200 };
+                    var qrCodeImage = barcodeWriter.Write("https://localhost:7039/swagger/index.html");
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        qrCodeImage.Save(ms, ImageFormat.Png);
+                        byte[] imageBytes = ms.ToArray();
+                        string base64String = Convert.ToBase64String(imageBytes);
+
+                        // Tạo chuỗi HTML chứa mã QR
+                        string html = $"<img src=\"data:image/png;base64,{base64String}\" alt=\"QR Code\" />";
+
+                        // Hiển thị chuỗi HTML trên trang web (ví dụ: Response.Write(html) trong ASP.NET)
+                        return new ResponseData<string> { IsSuccess = true, Data = html };
+                    }
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Data = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
+            }
+        }
+        public async Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail)
+        {
+            if (idBookingDetail != null)
+            {
+                try
+                {
+                    BarcodeWriter<Bitmap> barcodeWriter = new BarcodeWriter<Bitmap>();
+                    barcodeWriter.Format = BarcodeFormat.QR_CODE;
+                    barcodeWriter.Options = new EncodingOptions { Height = 200, Width = 200 };
+
+                    Bitmap qrCodeImage = barcodeWriter.Write("https://localhost:7039/swagger/index.html");
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        qrCodeImage.Save(ms, ImageFormat.Png);
+                        byte[] imageBytes = ms.ToArray();
+                        string base64String = Convert.ToBase64String(imageBytes);
+
+                        // Tạo chuỗi HTML chứa mã QR
+                        string html = $"<img src=\"data:image/png;base64,{base64String}\" alt=\"QR Code\" />";
+
+                        // Hiển thị chuỗi HTML trên trang web (ví dụ: Response.Write(html) trong ASP.NET)
+                        return new ResponseData<string> { IsSuccess = true, Data = html };
+                    }
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Data = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
+            }
+        }
+        public async Task<ResponseData<string>> PaymentQr(string totalPrice)
+        {
+            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+            string partnerCode = "MOMO5RGX20191128";
+            string accessKey = "M8brj9K6E22vXoDB";
+            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
+            string orderInfo = "Chuyển khoản thanh toán đặt lịch";
+            string redirectUrl = "https://localhost:7259/ListServicesBooking";
+            string ipnUrl = "https://localhost:7259/ListServicesBooking";
+            string requestType = "captureWallet";
+
+            string amount = totalPrice;
+            string orderId = Guid.NewGuid().ToString();
+            string requestId = Guid.NewGuid().ToString();
+            string extraData = "";
+
+            //Before sign HMAC SHA256 signature
+            string rawHash = "accessKey=" + accessKey +
+                "&amount=" + amount +
+                "&extraData=" + extraData +
+                "&ipnUrl=" + ipnUrl +
+                "&orderId=" + orderId +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + partnerCode +
+                "&redirectUrl=" + redirectUrl +
+                "&requestId=" + requestId +
+                "&requestType=" + requestType
+                ;
+
+
+            MoMoSecurity moMoSecurity = new MoMoSecurity();
+            //sign signature SHA256
+            string signature = moMoSecurity.signSHA256(rawHash, serectkey);
+
+
+            //build body json request
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "partnerName", "Test" },
+                { "storeId", "MomoTestStore" },
+                { "requestId", requestId },
+                { "amount", amount },
+                { "orderId", orderId },
+                { "orderInfo", orderInfo },
+                { "redirectUrl", redirectUrl },
+                { "ipnUrl", ipnUrl },
+                { "lang", "en" },
+                { "extraData", extraData },
+                { "requestType", requestType },
+                { "signature", signature }
+
+            };
+            string responseFromMomo = PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
+
+            JObject jmessage = JObject.Parse(responseFromMomo);
+            return new ResponseData<string> { IsSuccess = true, Data = jmessage.GetValue("payUrl").ToString() };
         }
     }
 }
