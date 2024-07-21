@@ -125,7 +125,10 @@
 
                     }@if (context.Item.Status == BookingStatus.Completed)
                     {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
+                        if (!context.Item.IsPayment)
+                        {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
+                        }
 
                     }@if (context.Item.Status == BookingStatus.NoShow)
                     {
@@ -351,20 +354,20 @@
         {
             return;
         }
-            ActionView actionView = new ActionView()
-                {
-                    IdBokingOrDetail = id,
-                };
-            var respone = await _client.StartBooking(actionView);
-            if (respone.IsSuccess)
+        ActionView actionView = new ActionView()
             {
-                Message(respone.Data, Severity.Success);
-                await LoadData();
-            }
-            else
-            {
-                Message(respone.Error, Severity.Error);
-            }
+                IdBokingOrDetail = id,
+            };
+        var respone = await _client.StartBooking(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
     }
     private async Task CompleteBooking(int id)
     {
