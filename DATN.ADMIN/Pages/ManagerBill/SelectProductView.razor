@@ -68,9 +68,18 @@
     } 
     private async Task ChooseProduct(ProductDetailView productDV)
     {
-        productDV.IdBooking = IdBooking.Value;
-        _tempLstProductDetail.AddProduct(productDV);
-        _dialogBox.Close();
+       @if (IdBooking !=null)
+        {
+            productDV.IdBooking = IdBooking.Value;
+            _tempLstProductDetail.AddProduct(productDV);
+            _dialogBox.Close();
+        }
+        else
+        {
+            productDV.Term = 1;
+            _tempLstProductDetail.AddProduct(productDV);
+            _dialogBox.Close();
+        }
     }
     protected override async Task OnInitializedAsync()
     {

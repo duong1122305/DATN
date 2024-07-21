@@ -111,8 +111,8 @@
                         {
 
                         }
-                      
-                      
+
+
                     </div>
                 </div>
             }
@@ -132,7 +132,7 @@
     [Parameter]
     public DateTime date { get; set; }
     [Parameter]
-    public int? idBooking{ get; set; }
+    public int? idBooking { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
@@ -159,6 +159,7 @@
         {
             await LoadData();
         }
+
     }
     protected async Task Payment()
     {
@@ -229,13 +230,25 @@
     }
     public async Task OpenDialogReload()
     {
-
-        var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking).ToList());
-        if (respone2.IsSuccess)
+        if (idBooking != null)
         {
-            bill = respone2.Data;
-            StateHasChanged();
+            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
+            if (respone2.IsSuccess)
+            {
+                bill = respone2.Data;
+                StateHasChanged();
+            }
         }
+        else
+        {
+            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == 1).ToList());
+            if (respone2.IsSuccess)
+            {
+                bill = respone2.Data;
+                StateHasChanged();
+            }
+        }
+
     }
 
     private async void RemoveProduct(ProductDetailView product)
