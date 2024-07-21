@@ -933,6 +933,15 @@ namespace DATN.Aplication.Services
                 {
                     if (payment.TypePaymenId == 1)
                     {
+                        if (queryBooking.VoucherId!=null)
+                        {
+                            var checkVoucher=(from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                             where dis.Id==queryBooking.VoucherId
+                                             select dis).FirstOrDefault();
+                            checkVoucher.AmountUsed++;
+                            await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
+
+                        }
                         queryBooking.TotalPrice = bill.Data.TotalPayment;
                         queryBooking.PaymentTypeId = payment.TypePaymenId;
                         queryBooking.ReducedAmount = bill.Data.ReducePrice;
