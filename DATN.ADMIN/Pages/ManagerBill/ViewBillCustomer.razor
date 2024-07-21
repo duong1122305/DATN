@@ -109,7 +109,7 @@
                         }
                         else
                         {
-                            <MudButton OnClick="PayMentInStore" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
+                            <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                         }
 
 
@@ -200,23 +200,26 @@
 
     public async Task PayMentInStore()
     {
+        var reduce = bill.ReducePrice;
+        var totalBill = bill.TotalPrice;
+        var paymen = selectedPaymentMethod;
+        var voucher = bill.IdVoucher;
         Payment payment = new Payment()
             {
                 IdBooking = idBooking.Value,
                 IdGuest = guid.Value,
-                TotalPrice = bill.TotalPrice,
-                TypePaymenId = selectedPaymentMethod,
+                TotalPrice = totalBill,
+                TypePaymenId = paymen,
                 Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
                 LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
                 DateBooking = date,
-                Reduce = bill.ReducePrice,
-                VoucherId = bill.IdVoucher.Value
+                Reduce = reduce,
+                VoucherId = voucher.Value
             };
         var respone = await _client.PaymentInStore(payment);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);
-            _dialogBox.Close();
         }
     }
 
