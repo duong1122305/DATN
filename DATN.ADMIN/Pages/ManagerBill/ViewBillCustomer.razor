@@ -128,12 +128,12 @@
                         <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
 
                         <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
-                            <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
+                            <MudRadio Value="1" Color="Color.Primary"   >Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
                         @if (selectedPaymentMethod == 2)
                         {
-                            <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
+                            <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
                         }
                         else
                         {
@@ -168,7 +168,7 @@
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     [Inject]
     private IHttpContextAccessor httpContextAccessor { get; set; }
-    private int selectedPaymentMethod;
+    private int selectedPaymentMethod { get; set; } = 1;
     [Inject] private BookingService bookingService { get; set; }
 
     private async Task LoadData()
@@ -229,6 +229,12 @@
 
     public async Task PayMentInStore()
     {
+
+        var confirm = await Confirm("thanh toán");
+        if (!confirm)
+        {
+            return;
+        }
         Payment payment = new Payment()
             {
                 IdBooking = idBooking.Value,
@@ -299,24 +305,29 @@
 
     private async void RemoveProduct(ProductDetailView product)
     {
-        // Gọi phương thức từ BookingService để xóa booking
-        if (await Confirm() == true)
+        var confirm = await Confirm("xoá");
+        if (!confirm)
         {
+            return;
+        }
+        // Gọi phương thức từ BookingService để xóa booking
             bookingService.RemoveProduct(product);
             await LoadData();
             Message("Đã xoá thành công.", Severity.Success);
-        }
         // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
     }
-    private async Task<bool?> Confirm()
+    private async Task<bool> Confirm(string text)
     {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận xóa dịch vụ?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();
-        return confirm;
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
+
+
     private void Message(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
