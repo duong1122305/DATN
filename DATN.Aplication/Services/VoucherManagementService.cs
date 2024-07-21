@@ -168,7 +168,8 @@ namespace DATN.Aplication.Services
                     MinMoneyApplicable = c.MinMoneyApplicable,
                     Description = c.Description,
                     Quantity = c.Quantity,
-                    Status = c.Status
+                    Status = c.Status,
+                    AmountUsed= c.AmountUsed,
                 });
                 return new ResponseData<List<VoucherView>>
                 {
