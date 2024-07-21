@@ -103,5 +103,10 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.CheckBill(idBooking ?? null, productdes);
         }
+        [HttpPost("Payment-In-Store")]
+        public async Task<ResponseData<string>> PaymentInStore(Payment payment)
+        {
+            return await _bookingManagement.PaymentInStore(payment);
+        }
     }
 }

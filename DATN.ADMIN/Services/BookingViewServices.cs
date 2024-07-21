@@ -46,9 +46,18 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
         {
-            var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes);
-            var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
-            return result;
+            if (idBooking!=null)
+            {
+                var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes);
+                var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+            else
+            {
+                var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill", productdes);
+                var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
         }
 
         public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
@@ -116,6 +125,12 @@ namespace DATN.ADMIN.Services
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
 
+        }
+        public async Task<ResponseData<string>> PaymentInStore(Payment payment)
+        {
+            var response = await _httpClient.PostAsJsonAsync<Payment>($"/api/Booking/Payment-In-Store", payment);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
     }
 }

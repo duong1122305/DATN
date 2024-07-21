@@ -23,6 +23,7 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts);
         public Task<ResponseData<List<ProductSelect>>> ListProductViewSale();
         public Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes);
+        public Task<ResponseData<string>> PaymentInStore(Payment payment);
 
     }
 }
