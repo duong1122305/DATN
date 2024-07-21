@@ -346,23 +346,33 @@
     }
     private async Task StartBooking(int id)
     {
-        ActionView actionView = new ActionView()
+        var confirm = await Confirm("bắt đầu");
+        if (!confirm)
+        {
+            return;
+        }
+            ActionView actionView = new ActionView()
+                {
+                    IdBokingOrDetail = id,
+                };
+            var respone = await _client.StartBooking(actionView);
+            if (respone.IsSuccess)
             {
-                IdBokingOrDetail = id,
-            };
-        var respone = await _client.StartBooking(actionView);
-        if (respone.IsSuccess)
-        {
-            Message(respone.Data, Severity.Success);
-            await LoadData();
-        }
-        else
-        {
-            Message(respone.Error, Severity.Error);
-        }
+                Message(respone.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
     }
     private async Task CompleteBooking(int id)
     {
+        var confirm = await Confirm("hoàn thành");
+        if (!confirm)
+        {
+            return;
+        }
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
@@ -452,6 +462,16 @@
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
+    }
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
 
 }
