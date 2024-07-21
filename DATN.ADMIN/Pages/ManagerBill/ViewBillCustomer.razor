@@ -245,6 +245,7 @@
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);
+            _dialogBox.Close();
         }
     }
 
