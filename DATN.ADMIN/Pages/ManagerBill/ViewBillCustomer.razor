@@ -166,7 +166,8 @@
     private Bill bill = new Bill();
 
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-    IHttpContextAccessor httpContextAccessor { get; set; }
+    [Inject]
+    private IHttpContextAccessor httpContextAccessor { get; set; }
     private int selectedPaymentMethod;
     [Inject] private BookingService bookingService { get; set; }
 
@@ -240,15 +241,14 @@
                 TotalPrice = totalBill,
                 TypePaymenId = paymen,
                 Token = token,
+                TotalPrice = bill.TotalPrice,
+                TypePaymenId = selectedPaymentMethod,
+                Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
                 LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
                 DateBooking = date,
-                Reduce = reduce,
-                VoucherId = voucher.Value
+                Reduce = bill.ReducePrice,
+                VoucherId =bill.IdVoucher
             };
-        if (payment != null)
-        {
-            Message("đối tượn trống", Severity.Error);
-        }
         var respone = await _client.PaymentInStore(payment);
         if (respone.IsSuccess)
         {
