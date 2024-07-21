@@ -18,7 +18,7 @@ namespace DATN.ViewModels.DTOs.Booking
         public int? IdVoucher { get; set; }
         public double ReducePrice { get; set; }
         public double TotalPayment { get; set; }
-        public List<ServiceDetailView> ListServiceBooked { get; set; }
-        public List<ProductDetailView> ListProductDetail { get; set; }
+        public List<ServiceDetailView>? ListServiceBooked { get; set; }
+        public List<ProductDetailView>? ListProductDetail { get; set; }
     }
 }

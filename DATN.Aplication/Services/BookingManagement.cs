@@ -970,30 +970,30 @@ namespace DATN.Aplication.Services
         {
             var totalprice = 0d;
             var info = new Guest();
-            var queryBooking = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                               join bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                               on booking.Id equals bookingDetail.BookingId
-                               join user in await _userManager.Users.ToListAsync()
-                               on bookingDetail.StaffId equals user.Id
-                               join guest in await _unitOfWork.GuestRepository.GetAllAsync()
-                               on booking.GuestId equals guest.Id
-                               join pet in await _unitOfWork.PetRepository.GetAllAsync()
-                               on guest.Id equals pet.OwnerId
-                               join serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
-                               on bookingDetail.ServiceDetailId equals serviceDetail.Id
-                               where booking.Id == idBooking.Value
-                               && bookingDetail.Status == BookingDetailStatus.Completed
-                               select new ServiceDetailView
-                               {
-                                   IdServiceDetail = serviceDetail.Id,
-                                   PetName = pet.Name,
-                                   Price = serviceDetail.Price,
-                                   NameStaff = user.FullName,
-                                   ServiceDetailName = serviceDetail.Description
-                               };
+            var queryBooking = new List<ServiceDetailView>();
             if (idBooking != null)
             {
-
+                queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                join bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                on booking.Id equals bookingDetail.BookingId
+                                join user in await _userManager.Users.ToListAsync()
+                                on bookingDetail.StaffId equals user.Id
+                                join guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                                on booking.GuestId equals guest.Id
+                                join pet in await _unitOfWork.PetRepository.GetAllAsync()
+                                on guest.Id equals pet.OwnerId
+                                join serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                on bookingDetail.ServiceDetailId equals serviceDetail.Id
+                                where booking.Id == idBooking.Value
+                                && bookingDetail.Status == BookingDetailStatus.Completed
+                                select new ServiceDetailView
+                                {
+                                    IdServiceDetail = serviceDetail.Id,
+                                    PetName = pet.Name,
+                                    Price = serviceDetail.Price,
+                                    NameStaff = user.FullName,
+                                    ServiceDetailName = serviceDetail.Description
+                                }).ToList();
                 foreach (var item in queryBooking)
                 {
                     totalprice += item.Price;
@@ -1052,23 +1052,45 @@ namespace DATN.Aplication.Services
                 var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
                 var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
                 var reduce = voucherWillUse != 0 ? (double)discount * totalprice / 100 >= maxMoney ? maxMoney : (double)discount * totalprice / 100 : 0;
-                return new ResponseData<Bill>
+                if (queryBooking.Count > 0)
                 {
-                    IsSuccess = true,
-                    Data = new Bill()
+                    return new ResponseData<Bill>
                     {
-                        TotalPrice = totalprice,
-                        DateBooking = DateTime.Now,
-                        IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
-                        ReducePrice = reduce.Value,
-                        TotalPayment = totalprice - reduce.Value,
-                        ListProductDetail = productdes,
-                        GuestName = idBooking != null ? info.Name : "Khách lẻ",
-                        Address = idBooking != null ? info.Address : "Không có",
-                        PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
-                        ListServiceBooked = queryBooking.ToList(),
-                    }
-                };
+                        IsSuccess = true,
+                        Data = new Bill()
+                        {
+                            TotalPrice = totalprice,
+                            DateBooking = DateTime.Now,
+                            IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
+                            ReducePrice = reduce.Value,
+                            TotalPayment = totalprice - reduce.Value,
+                            ListProductDetail = productdes,
+                            GuestName = idBooking != null ? info.Name : "Khách lẻ",
+                            Address = idBooking != null ? info.Address : "Không có",
+                            PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
+                            ListServiceBooked = queryBooking.ToList(),
+                        }
+                    };
+                }
+                else
+                {
+                    return new ResponseData<Bill>
+                    {
+                        IsSuccess = true,
+                        Data = new Bill()
+                        {
+                            TotalPrice = totalprice,
+                            DateBooking = DateTime.Now,
+                            IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
+                            ReducePrice = reduce.Value,
+                            TotalPayment = totalprice - reduce.Value,
+                            ListProductDetail = productdes,
+                            GuestName = idBooking != null ? info.Name : "Khách lẻ",
+                            Address = idBooking != null ? info.Address : "Không có",
+                            PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
+                        }
+                    };
+                }
             }
             else
                 return new ResponseData<Bill> { IsSuccess = false, Error = "Tông tiền ko có gì" };
