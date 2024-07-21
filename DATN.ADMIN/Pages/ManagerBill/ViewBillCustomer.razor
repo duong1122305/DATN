@@ -204,13 +204,14 @@
         var totalBill = bill.TotalPrice;
         var paymen = selectedPaymentMethod;
         var voucher = bill.IdVoucher;
+        var token = httpContextAccessor.HttpContext.Session.GetString("Key");
         Payment payment = new Payment()
             {
                 IdBooking = idBooking.Value,
                 IdGuest = guid.Value,
                 TotalPrice = totalBill,
                 TypePaymenId = paymen,
-                Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                Token = token,
                 LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
                 DateBooking = date,
                 Reduce = reduce,
