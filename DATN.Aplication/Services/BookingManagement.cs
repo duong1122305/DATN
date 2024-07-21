@@ -103,7 +103,7 @@ namespace DATN.Aplication.Services
                         join guest in await _unitOfWork.GuestRepository.GetAllAsync()
                         on booking.GuestId equals guest.Id
                         group new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
-                        by new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime, booking.Status, bookingdetail.BookingId }
+                        by new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime, booking.Status, bookingdetail.BookingId, booking.IsPayment }
                         into view
                         select new BookingView
                         {
@@ -114,7 +114,8 @@ namespace DATN.Aplication.Services
                             Email = view.Key.Email,
                             NameGuest = view.Key.Name,
                             PhoneNumber = view.Key.PhoneNumber,
-                            Status = view.Key.Status
+                            Status = view.Key.Status,
+                            IsPayment = view.Key.IsPayment
                         };
             if (query.Count() > 0)
             {

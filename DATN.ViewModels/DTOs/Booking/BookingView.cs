@@ -17,5 +17,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public string Address { get; set; }
         public BookingStatus Status { get; set; }
         public DateTime BookingTime { get; set; }
+        public bool IsPayment { get; set; }
     }
 }
