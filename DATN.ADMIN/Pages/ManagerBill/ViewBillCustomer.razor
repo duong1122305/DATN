@@ -109,7 +109,7 @@
                         }
                         else
                         {
-
+                            <MudButton OnClick="PayMentInStore" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                         }
 
 
@@ -136,20 +136,14 @@
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
+
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+    IHttpContextAccessor httpContextAccessor { get; set; }
     private int selectedPaymentMethod;
     [Inject] private BookingService bookingService { get; set; }
 
     private async Task LoadData()
     {
-        // var respone = await _client.GetBillOfGuest(guid.Value, date);
-        // if (respone.IsSuccess)
-        // {
-        //     bill = respone.Data;
-        // }
-        // else
-        // {
-        //     bill = new Bill();
-        // }
         await OpenDialogReload();
         StateHasChanged();
     }
@@ -200,6 +194,29 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+        }
+    }
+
+
+    public async Task PayMentInStore()
+    {
+        Payment payment = new Payment()
+            {
+                IdBooking = idBooking.Value,
+                IdGuest = guid.Value,
+                TotalPrice = bill.TotalPrice,
+                TypePaymenId = selectedPaymentMethod,
+                Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
+                DateBooking = date,
+                Reduce = bill.ReducePrice,
+                VoucherId = bill.IdVoucher.Value
+            };
+        var respone = await _client.PaymentInStore(payment);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            _dialogBox.Close();
         }
     }
 
