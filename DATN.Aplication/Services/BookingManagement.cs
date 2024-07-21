@@ -174,7 +174,10 @@ namespace DATN.Aplication.Services
                     var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                        where bookingTable.GuestId == createBookingRequest.GuestId
                                        && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
-                                       && bookingTable.Status != BookingStatus.StaffCancelled && bookingTable.Status != BookingStatus.AdminCancelled && bookingTable.Status != BookingStatus.CustomerCancelled
+                                       && bookingTable.Status == BookingStatus.InProgress
+                                       || bookingTable.Status == BookingStatus.Confirmed
+                                       || bookingTable.Status == BookingStatus.PendingConfirmation
+                                       || bookingTable.Status == BookingStatus.Arrived
                                        select bookingTable;
                     if (queryBooking.Count() == 0)
                     {
@@ -186,7 +189,7 @@ namespace DATN.Aplication.Services
                             TotalPrice = 0,
                             PaymentTypeId = 1,
                             ReducedAmount = 0,
-                            Status = BookingStatus.Confirmed,
+                            Status = BookingStatus.Arrived,
                             IsPayment = false,
                             IsAddToSchedule = true,
                         };

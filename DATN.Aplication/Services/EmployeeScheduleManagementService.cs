@@ -136,7 +136,7 @@ namespace DATN.Aplication.Services
                         }
                         else
                         {
-                            return new ResponseData<string> { IsSuccess = false, Error = $"Vui lòng không thêm ca khi thời gian vào ca còn không quá nửa ngày!!!" };
+                            return new ResponseData<string> { IsSuccess = false, Error = $"Vui lòng không thêm ca khi thời gian vào ca còn không quá 6 tiếng!!!" };
                         }
                     }
                 }
