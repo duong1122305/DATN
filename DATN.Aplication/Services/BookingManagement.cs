@@ -31,7 +31,8 @@ namespace DATN.Aplication.Services
         private readonly IAuthenticate _user;
         private readonly IProductManagement _productManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
-        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate, IProductManagement productManagement, IEmployeeScheduleManagementService employeeScheduleManagementService)
+        private readonly IVoucherManagementService _voucherManagementService;
+        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate, IProductManagement productManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IVoucherManagementService voucherManagementService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -39,6 +40,7 @@ namespace DATN.Aplication.Services
             _user = authenticate;
             _productManagement = productManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
+            _voucherManagementService = voucherManagementService;
         }
         public async Task ChangeStatusBooking()
         {
@@ -933,11 +935,11 @@ namespace DATN.Aplication.Services
                 {
                     if (payment.TypePaymenId == 1)
                     {
-                        if (queryBooking.VoucherId!=null)
+                        if (queryBooking.VoucherId != null)
                         {
-                            var checkVoucher=(from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                             where dis.Id==queryBooking.VoucherId
-                                             select dis).FirstOrDefault();
+                            var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                                where dis.Id == queryBooking.VoucherId
+                                                select dis).FirstOrDefault();
                             checkVoucher.AmountUsed++;
                             await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
 
@@ -1023,15 +1025,11 @@ namespace DATN.Aplication.Services
             }
             if (totalprice != 0)
             {
-                var queryCheckVoucherCanApply = from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                where totalprice >= voucher.MinMoneyApplicable
-                                                && voucher.AmountUsed < voucher.Quantity
-                                                && voucher.Status == VoucherStatus.GoingOn
-                                                select voucher;
+                var queryCheckVoucherCanApply = (await _voucherManagementService.GetAllVoucherCanApply(totalprice)).Data;
                 int voucherWillUse = 0;
-                if (queryCheckVoucherCanApply.Count() > 1)
+                if (queryCheckVoucherCanApply.Count > 1)
                 {
-                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
                     foreach (var item in queryCheckVoucherCanApply)
                     {
                         var reducedAmount1 = totalprice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalprice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
@@ -1046,7 +1044,7 @@ namespace DATN.Aplication.Services
                                 var reducedAmount2 = totalprice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalprice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
                                 if (reducedAmount1 < reducedAmount2)
                                 {
-                                    voucherWillUse = item2.Id;
+                                    voucherWillUse = item2.Id.Value;
                                 }
                             }
                         }
@@ -1056,7 +1054,7 @@ namespace DATN.Aplication.Services
                 {
                     if (queryCheckVoucherCanApply.Count() == 1)
                     {
-                        voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id;
+                        voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
                     }
                 }
                 var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;

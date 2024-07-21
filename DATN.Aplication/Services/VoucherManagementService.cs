@@ -139,7 +139,12 @@ namespace DATN.Aplication.Services
                 {
                     if (item.DeleteAt == null)
                     {
+                       
                         item.Status = VoucherStatus.GoingOn;
+                        if (item.Quantity == item.AmountUsed)
+                        {
+                            item.Status = VoucherStatus.OutOfStock;
+                        }
                         listcheck.Add(item);
                     }
                 }
@@ -151,11 +156,7 @@ namespace DATN.Aplication.Services
                         listcheck.Add(item);
                     }
                 }
-                if (item.Quantity==item.AmountUsed)
-                {
-                    item.Status = VoucherStatus.OutOfStock;
-                    listcheck.Add(item);
-                }
+                
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
 
@@ -174,7 +175,7 @@ namespace DATN.Aplication.Services
                     Description = c.Description,
                     Quantity = c.Quantity,
                     Status = c.Status,
-                    AmountUsed= c.AmountUsed,
+                    AmountUsed = c.AmountUsed,
                 });
                 return new ResponseData<List<VoucherView>>
                 {
@@ -188,10 +189,10 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<List<VoucherView>>> GetAllVoucherCanApply(double totalPrice)
         {
             var listVoucher = (await GetAllVoucher()).Data;
-            if (listVoucher.Count>0)
+            if (listVoucher.Count > 0)
             {
-                var list = listVoucher.Where(c => c.MinMoneyApplicable <= totalPrice && c.Status == VoucherStatus.GoingOn).ToList();
-                return new ResponseData<List<VoucherView>>{ IsSuccess = true, Data = list };
+                var list = listVoucher.Where(c => c.MinMoneyApplicable <= totalPrice && c.Status == VoucherStatus.GoingOn && c.AmountUsed < c.Quantity).ToList();
+                return new ResponseData<List<VoucherView>> { IsSuccess = true, Data = list };
             }
             else
             {
