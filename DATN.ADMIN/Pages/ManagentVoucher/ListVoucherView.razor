@@ -116,7 +116,7 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
                         <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa"></MudIconButton>
                     }
-                    else if (context.Item.Status==VoucherStatus.GoingOn)
+                    else if (context.Item.Status == VoucherStatus.GoingOn)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
                         <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa" Disabled></MudIconButton>
@@ -159,7 +159,7 @@
         All = 0, //hết hạn
         GoingOn = 1, //còn hạn
         NotOccur = 2, //chưa bắt đầu
-    OutOfStock = 3
+        OutOfStock = 3// hết voucher
     }
 
     private Status selectedStatus = Status.All;
