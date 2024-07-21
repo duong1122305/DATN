@@ -151,6 +151,11 @@ namespace DATN.Aplication.Services
                         listcheck.Add(item);
                     }
                 }
+                if (item.Quantity==item.AmountUsed)
+                {
+                    item.Status = VoucherStatus.OutOfStock;
+                    listcheck.Add(item);
+                }
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
 

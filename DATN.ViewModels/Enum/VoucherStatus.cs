@@ -10,6 +10,7 @@ namespace DATN.ViewModels.Enum
     {
         Expired = 0, //hết hạn 
         GoingOn = 1, //còn hạn
-        NotOccur = 2 //chưa bắt đầu
+        NotOccur = 2, //chưa bắt đầu
+        OutOfStock = 3
     }
 }
