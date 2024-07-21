@@ -32,6 +32,7 @@ using ZXing.Common;
 using static System.Net.WebRequestMethods;
 using DATN.ViewModels.DTOs.Payment.DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Payment;
+using System.Buffers.Text;
 
 namespace DATN.Aplication.Services
 {
@@ -1184,7 +1185,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
             }
         }
-        public async Task<ResponseData<string>> PaymentQr(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
         {
             string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
             string partnerCode = "MOMO5RGX20191128";
@@ -1198,7 +1199,8 @@ namespace DATN.Aplication.Services
             string amount = totalPrice;
             string orderId = Guid.NewGuid().ToString();
             string requestId = Guid.NewGuid().ToString();
-            string extraData = "";
+
+            string extraData = "{username:Tên la gi}";
 
             //Before sign HMAC SHA256 signature
             string rawHash = "accessKey=" + accessKey +
@@ -1237,10 +1239,7 @@ namespace DATN.Aplication.Services
                 { "signature", signature }
 
             };
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
-
-            JObject jmessage = JObject.Parse(responseFromMomo);
-            return new ResponseData<string> { IsSuccess = true, Data = jmessage.GetValue("payUrl").ToString() };
+            return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
         }
     }
 }

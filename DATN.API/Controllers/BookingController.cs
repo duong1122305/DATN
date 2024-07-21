@@ -3,6 +3,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Microsoft.AspNetCore.Mvc;
 
@@ -119,7 +120,7 @@ namespace DATN.API.Controllers
             return await _bookingManagement.QrCodeCheckIn(idBooking);
         }
         [HttpGet("Payment-Qr")]
-        public async Task<ResponseData<string>> PaymentQr(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
         {
             return await _bookingManagement.PaymentQr(totalPrice);
         }

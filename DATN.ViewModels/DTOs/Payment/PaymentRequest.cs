@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DATN.ViewModels.Common;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,51 +14,21 @@ namespace DATN.ViewModels.DTOs.Payment
         public PaymentRequest()
         {
         }
-        public static string sendPaymentRequest(string endpoint, string postJsonString)
+        public static async Task<ResponseData<ResponseMomo>> sendPaymentRequest(string endpoint, string postJsonString)
         {
 
             try
             {
-                HttpWebRequest httpWReq = (HttpWebRequest)WebRequest.Create(endpoint);
-
-                var postData = postJsonString;
-
-                var data = Encoding.UTF8.GetBytes(postData);
-
-                httpWReq.ProtocolVersion = HttpVersion.Version11;
-                httpWReq.Method = "POST";
-                httpWReq.ContentType = "application/json";
-
-                httpWReq.ContentLength = data.Length;
-                httpWReq.ReadWriteTimeout = 30000;
-                httpWReq.Timeout = 15000;
-                Stream stream = httpWReq.GetRequestStream();
-                stream.Write(data, 0, data.Length);
-                stream.Close();
-
-                HttpWebResponse response = (HttpWebResponse)httpWReq.GetResponse();
-
-                string jsonresponse = "";
-
-                using (var reader = new StreamReader(response.GetResponseStream()))
-                {
-
-                    string temp = null;
-                    while ((temp = reader.ReadLine()) != null)
-                    {
-                        jsonresponse += temp;
-                    }
-                }
-
-
-                //todo parse it
-                return jsonresponse;
-                //return new MomoResponse(mtid, jsonresponse);
+                HttpClient client = new HttpClient();
+                StringContent content = new StringContent(postJsonString, Encoding.UTF8, "application/json");
+                var request = await client.PostAsync(endpoint, content);
+                var response = JsonConvert.DeserializeObject<ResponseMomo>(await request.Content.ReadAsStringAsync());
+                return new ResponseData<ResponseMomo> { IsSuccess = true, Data = response };
 
             }
             catch (WebException e)
             {
-                return e.Message;
+                return new ResponseData<ResponseMomo> { IsSuccess = false, Error = e.Message };
             }
         }
     }

@@ -231,7 +231,21 @@
     public async Task PayMentQr()
     {
         var response = await _client.PaymentQr(bill.TotalPayment.ToString());
-        navigationManager.NavigateTo(response.Data);
+        if (response.IsSuccess)
+        {
+            if (response.Data.resultCode == 0)
+            {
+                navigationManager.NavigateTo(response.Data.payUrl);
+            }
+            else
+            {
+                Message(response.Data.message, Severity.Warning);
+            }
+        }
+        else
+        {
+            Message(response.Error, Severity.Warning);
+        }
     }
 
     public async Task PayMentInStore()

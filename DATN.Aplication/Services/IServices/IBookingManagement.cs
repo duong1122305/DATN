@@ -1,6 +1,7 @@
 ﻿using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 
 namespace DATN.Aplication.Services.IServices
@@ -23,6 +24,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes);
         public Task<ResponseData<string>> QrCodeCheckIn(int idBooking);
         public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
-        public Task<ResponseData<string>> PaymentQr(string totalPrice);
+        public Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice);
     }
 }

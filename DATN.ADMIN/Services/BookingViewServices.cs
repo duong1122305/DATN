@@ -5,6 +5,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
 using Syncfusion.Blazor.Gantt.Internal;
@@ -137,9 +138,9 @@ namespace DATN.ADMIN.Services
 
         }
 
-        public async Task<ResponseData<string>> PaymentQr(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/Payment-Qr?totalPrice={totalPrice}");
+            return await _httpClient.GetFromJsonAsync<ResponseData<ResponseMomo>>($"/api/Booking/Payment-Qr?totalPrice={totalPrice}");
         }
     }
 }
