@@ -16,7 +16,7 @@ namespace DATN.ADMIN.Services
         }
         public async Task<ResponseData<string>> Create(CreateServiceDetailVM serviceDetail)
         {
-            var response = await _client.PostAsJsonAsync("api/ServicesDetail/createServiceDetail", serviceDetail);
+            var response = await _client.PostAsJsonAsync("/api/ServicesDetail/createServiceDetail", serviceDetail);
             var result = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(result);
 

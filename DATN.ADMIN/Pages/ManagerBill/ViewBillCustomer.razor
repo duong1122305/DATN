@@ -99,15 +99,20 @@
                         <br />
                         <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
 
-                        <MudRadioGroup T="int" @bind-Checked="@selectedPaymentMethod">
+                        <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
                             <MudRadio Value="1" Color="Color.Primary" UnCheckedColor="Color.Default">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
                         </MudRadioGroup>
-                        <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                         @if (selectedPaymentMethod == 2)
                         {
-                            <QRVietQRBankking />
+                            <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
                         }
+                        else
+                        {
+
+                        }
+                      
+                      
                     </div>
                 </div>
             }
