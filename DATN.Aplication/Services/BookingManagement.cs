@@ -765,7 +765,7 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
-                    if (query.Status != BookingStatus.Confirmed)
+                    if (query.Status != BookingStatus.Arrived)
                     {
                         return new ResponseData<string> { IsSuccess = false, Error = "Không thể bắt đầu dịch vụ trong trạng thái này" };
                     }
