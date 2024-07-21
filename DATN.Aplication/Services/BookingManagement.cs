@@ -193,7 +193,7 @@ namespace DATN.Aplication.Services
                             TotalPrice = 0,
                             PaymentTypeId = 1,
                             ReducedAmount = 0,
-                            Status = BookingStatus.Arrived,
+                            Status = BookingStatus.Confirmed,
                             IsPayment = false,
                             IsAddToSchedule = true,
                         };
