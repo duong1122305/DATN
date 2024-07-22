@@ -16,11 +16,13 @@ namespace DATN.API.Controllers
         private readonly IBookingManagement _bookingManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
         private readonly IProductManagement _productManagement;
-        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement)
+        private readonly IVoucherManagementService _voucherManagementService;
+        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement, IVoucherManagementService voucherManagementService)
         {
             _bookingManagement = bookingManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
             _productManagement = productManagement;
+            _voucherManagementService = voucherManagementService;
         }
         [HttpGet("List")]
         public Task<ResponseData<List<BookingView>>> Index()
@@ -123,6 +125,11 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
         {
             return await _bookingManagement.PaymentQr(totalPrice);
+        }
+        [HttpGet("List-Voucher-Can-Apply")]
+        public async Task<ResponseData<List<VoucherView>>> ListVoucherCanApply(double totalPrice)
+        {
+            return await _voucherManagementService.GetAllVoucherCanApply(totalPrice);
         }
     }
 }
