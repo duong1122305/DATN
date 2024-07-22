@@ -1,9 +1,9 @@
-﻿using DATN.Data.Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿using DATN.Aplication.Services.IServices;
 using DATN.Aplication.System;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
-using DATN.Aplication.Services.IServices;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
 {
@@ -276,9 +276,9 @@ namespace DATN.API.Controllers
             return await _vouchermanagement.GetAllVoucherCanApply(totalPrice);
         }
         [HttpGet("update-url")]
-        public async Task<ResponseData<string>> UpdateUrl(string url, string imgId,string id)
+        public async Task<ResponseData<string>> UpdateUrl(string url, string imgId, string id)
         {
-            return await _userrepo.UpdateImg(url, imgId,id);
+            return await _userrepo.UpdateImg(url, imgId, id);
         }
     }
 }

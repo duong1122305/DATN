@@ -16,7 +16,7 @@ namespace DATN.Aplication.Services.IServices
         Task<ResponseData<AttendancePersonal>> GetPersonalShift(Guid id);
         Task<ResponseData<string>> CheckOutPersonal(AttendancePersonal atendance);
         Task<ResponseData<string>> CheckInPersonal(AttendancePersonal atendance);
-		Task<ResponseData<List<AttendanceMonth>>> GetAllAttandanceMonth(int month = 0, int year = 0, int isDelete = -1);
-        Task<ResponseData<ListPerAttenMonth>> GetAttandanceMonth(Guid idUser, int month =0, int year = 0,int typeAttendance= Contant.AllAttendance);
-	}
+        Task<ResponseData<List<AttendanceMonth>>> GetAllAttandanceMonth(int month = 0, int year = 0, int isDelete = -1);
+        Task<ResponseData<ListPerAttenMonth>> GetAttandanceMonth(Guid idUser, int month = 0, int year = 0, int typeAttendance = Contant.AllAttendance);
+    }
 }

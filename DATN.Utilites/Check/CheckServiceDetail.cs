@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DATN.Utilites.Check
+﻿namespace DATN.Utilites.Check
 {
     public static class CheckServiceDetail
     {

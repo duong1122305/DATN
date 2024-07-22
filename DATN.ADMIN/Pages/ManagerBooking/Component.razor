@@ -1,0 +1,23 @@
+﻿@page "/public/{idBooking}"
+@using DATN.ADMIN.IServices
+@layout LayoutNoAuth
+@code {
+    [Inject]
+    public IBookingViewServices _booking { get; set; }
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+    [Parameter]
+    public string idBooking { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _booking.CheckInArrive(Convert.ToInt32(idBooking));
+        if (response.IsSuccess)
+        {
+            navigationManager.NavigateTo("http://localhost:5173/");
+        }
+        else
+        {
+            //thông báo
+        }
+    }
+}

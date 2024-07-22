@@ -1,9 +1,7 @@
-﻿using DATN.Aplication.Services;
-using DATN.Aplication.Services.IServices;
+﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.CategoryProduct;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers

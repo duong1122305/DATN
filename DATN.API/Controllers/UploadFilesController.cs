@@ -1,10 +1,5 @@
-﻿using CloudinaryDotNet.Actions;
-using CloudinaryDotNet;
-using DATN.Data.Entities;
+﻿using DATN.API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using DATN.Data.EF;
-using DATN.API.Services;
 
 namespace DATN.API.Controllers
 {

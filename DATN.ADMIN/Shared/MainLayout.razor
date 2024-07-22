@@ -34,6 +34,7 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+
 @code {
     [Inject]
     protected NavigationManager navigationManager { get; set; }
@@ -71,7 +72,7 @@
     {
         var session = httpContextAccessor.HttpContext!.Session.GetString("Key");
 
-        var url= httpContextAccessor.HttpContext!.Request.Path;
+        var url = httpContextAccessor.HttpContext!.Request.Path;
         if (url == "/_blazor")
         {
             url = "/";
@@ -90,11 +91,11 @@
             name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value!;
             string idUser = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
             string fullName = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.UserData).FirstOrDefault()?.Value!;
-            httpContextAccessor.HttpContext.Session.SetString("id",idUser);
-            httpContextAccessor.HttpContext.Session.SetString("fullName",fullName);
+            httpContextAccessor.HttpContext.Session.SetString("id", idUser);
+            httpContextAccessor.HttpContext.Session.SetString("fullName", fullName);
 
-          
-            var user =await _ser.GetInfoUser(idUser);
+
+            var user = await _ser.GetInfoUser(idUser);
             urlImg = user.Data.ImgUrl;
         }
 

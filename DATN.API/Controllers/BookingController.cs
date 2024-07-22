@@ -122,9 +122,14 @@ namespace DATN.API.Controllers
             return await _bookingManagement.QrCodeCheckIn(idBooking);
         }
         [HttpGet("Payment-Qr")]
-        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice)
         {
-            return await _bookingManagement.PaymentQr(totalPrice);
+            return await _bookingManagement.PaymentQrMomo(totalPrice);
+        }
+        [HttpGet("Payment-Qr-VnPay")]
+        public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
+        {
+            return await _bookingManagement.PaymentQrVnPay(totalPrice);
         }
         [HttpGet("List-Voucher-Can-Apply")]
         public async Task<ResponseData<List<VoucherView>>> ListVoucherCanApply(double totalPrice)

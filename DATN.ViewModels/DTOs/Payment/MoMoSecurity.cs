@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DATN.ViewModels.DTOs.Payment
+﻿namespace DATN.ViewModels.DTOs.Payment
 {
-    using Newtonsoft.Json.Linq;
     using System;
     using System.Security.Cryptography;
     using System.Text;
-    using System.Text.RegularExpressions;
 
     namespace DATN.ViewModels.DTOs.Payment
     {

@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
-using DATN.Aplication.Extentions;
+﻿using DATN.Aplication.Extentions;
 using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.Aplication.Services
 {
@@ -627,7 +619,7 @@ namespace DATN.Aplication.Services
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                         else
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
-                       
+
                     }
                     else
                     {

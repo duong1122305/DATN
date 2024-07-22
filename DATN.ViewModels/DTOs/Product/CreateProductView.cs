@@ -10,7 +10,7 @@ namespace DATN.ViewModels.DTOs.Product
         public string? Description { get; set; }
         public bool Status { get; set; }
         public int IdBrand { get; set; }
-        public  List<CreateProductDetaiView> lstPD {get;set;}=new List<CreateProductDetaiView>();
+        public List<CreateProductDetaiView> lstPD { get; set; } = new List<CreateProductDetaiView>();
         public string? ImgID { get; set; }
         public string? ImgUrl { get; set; }
     }

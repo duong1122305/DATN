@@ -1,11 +1,7 @@
 ﻿using DATN.ViewModels.Common;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Payment
 {

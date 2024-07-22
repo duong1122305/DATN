@@ -1,7 +1,5 @@
 ﻿using DATN.Aplication.Services.IServices;
-using DATN.Data.Entities;
 using DATN.ViewModels.DTOs.ServiceManager;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
