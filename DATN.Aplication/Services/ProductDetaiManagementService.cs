@@ -64,6 +64,14 @@ namespace DATN.Aplication.Services
                     product.Name = productView.Name;
                     product.Price = productView.Price;
                     product.Amount = productView.Amount;
+                    if (productView.Amount==0)
+                    {
+                        product.Status = ProductDetailStatus.OutOfStock;
+                    }
+                    else
+                    {
+						product.Status = ProductDetailStatus.Stocking;
+					}
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
@@ -91,7 +99,7 @@ namespace DATN.Aplication.Services
                     product.Status = ProductDetailStatus.Deleted;
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thay đổi thành công " };
                 }
                 else
                     return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy sản phẩm cần xóa" };
@@ -112,6 +120,10 @@ namespace DATN.Aplication.Services
                 if (product != null)
                 {
                     product.Status = ProductDetailStatus.Stocking;
+                    if (product.Amount==0)
+                    {
+						product.Status = ProductDetailStatus.OutOfStock;
+					}
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };

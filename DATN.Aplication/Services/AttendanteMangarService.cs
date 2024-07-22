@@ -263,7 +263,7 @@ namespace DATN.Aplication.Services
 
 				var lstShiftString = "Bạn không có ca hôm nay";
 				int scheduleID = 0;
-				string shiftNow = "Không trong ca làm";
+				string shiftNow = "Không trong thời gian điểm danh";
 				bool? typeAttendance = null;
 				string attendanceShift = "";
 				int shiftId = 0;
@@ -279,6 +279,8 @@ namespace DATN.Aplication.Services
 
 					foreach (var item in lstCheckin.OrderBy(p => p.Start))
 					{
+						
+
 						if ((item.Start.Add(TimeSpan.FromMinutes(-30)) <= now && item.Start.Add(TimeSpan.FromMinutes(30)) >= now && !item.IsCheckined) //kiểm tra xem có đủ ko
 							|| (item.IsCheckined && !item.IsCheckouted && item.End.Add(TimeSpan.FromMinutes(-30)) <= now && item.End.Add(TimeSpan.FromMinutes(30)) >= now))
 						{
@@ -288,7 +290,7 @@ namespace DATN.Aplication.Services
 							shiftNow = item.Name;
 							if (!item.IsCheckined) typeAttendance = true;
 							else if (!item.IsCheckouted) typeAttendance = false;
-
+							break;
 						}
 
 					}
