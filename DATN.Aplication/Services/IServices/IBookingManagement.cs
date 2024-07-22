@@ -25,5 +25,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> QrCodeCheckIn(int idBooking);
         public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
         public Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice);
+        public Task<ResponseData<string>> CheckInArrive(int idBooking);
     }
 }

@@ -122,11 +122,11 @@
                     }
                     @if (context.Item.Status == BookingStatus.Confirmed)
                     {
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
                     }
                     @if (context.Item.Status == BookingStatus.Arrived)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
 
                     }@if (context.Item.Status == BookingStatus.InProgress)
                     {
@@ -268,7 +268,7 @@
                 DisableBackdropClick = true
             };
         parameters.Add("linkqr", response.Data);
-        var createUpdateDialog = await _dialogservice.ShowAsync<QRVietQRBankking>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -291,7 +291,7 @@
                 DisableBackdropClick = true
             };
         parameters.Add("linkqr", response.Data);
-        var createUpdateDialog = await _dialogservice.ShowAsync<QRVietQRBankking>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {

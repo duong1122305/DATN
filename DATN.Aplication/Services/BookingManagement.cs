@@ -9,30 +9,15 @@ using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ServiceDetail;
 using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
-using System.IO;
-using RTools_NTS.Util;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using MessagingToolkit.QRCode.Codec;
 using System.Drawing.Imaging;
 using ZXing;
-using ZXing.QrCode.Internal;
 using ZXing.Common;
-using static System.Net.WebRequestMethods;
 using DATN.ViewModels.DTOs.Payment.DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Payment;
-using System.Buffers.Text;
+using ZXing.Rendering;
 
 namespace DATN.Aplication.Services
 {
@@ -725,6 +710,48 @@ namespace DATN.Aplication.Services
                 }
             }
         }
+        public async Task<ResponseData<string>> CheckInArrive(int idBooking)
+        {
+            var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                         where booking.Id == idBooking
+                         select booking).FirstOrDefault();
+            if (query != null)
+            {
+                try
+                {
+                    if (query.Status != BookingStatus.Confirmed)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Không thể bắt đầu dịch vụ trong trạng thái này" };
+                    }
+                    else
+                    {
+                        query.Status = BookingStatus.Arrived;
+                        var queryBooking = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                           where bookingDetail.BookingId == query.Id
+                                           && bookingDetail.Status == BookingDetailStatus.Unfulfilled
+                                           select bookingDetail;
+                        var listBookingInDay = queryBooking.Where(c => c.StartDateTime.Date.CompareTo(DateTime.Now.Date) == 0);
+                        if (listBookingInDay.Count() == 0)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Khách đặt dịch vụ không phải hôm nay ko thể bắt đầu" };
+                        }
+                        else
+                        {
+                            await _unitOfWork.BookingRepository.UpdateAsync(query);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
+                }
+
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "không tìm thấy" };
+        }
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
             var idUserAction = await _user.GetUserByToken(actionView.Token);
@@ -808,9 +835,16 @@ namespace DATN.Aplication.Services
                                     {
                                         foreach (var item2 in queryBooking)
                                         {
-                                            if (item2.StartDateTime.CompareTo(item1.StartDateTime) < 0)
+                                            if (item1.Id==item2.Id)
                                             {
                                                 update = item2;
+                                            }
+                                            else
+                                            {
+                                                if (item2.StartDateTime.CompareTo(item1.StartDateTime) < 0)
+                                                {
+                                                    update = item2;
+                                                }
                                             }
                                         }
                                     }
@@ -1122,21 +1156,30 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
-                    BarcodeWriter<Bitmap> barcodeWriter = new BarcodeWriter<Bitmap>();
-                    barcodeWriter.Format = BarcodeFormat.QR_CODE;
-                    barcodeWriter.Options = new EncodingOptions { Height = 200, Width = 200 };
-                    var qrCodeImage = barcodeWriter.Write("https://localhost:7039/swagger/index.html");
+                    var barcodeWriter = new BarcodeWriter<Bitmap>()
+                    {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new EncodingOptions
+                        {
+                            Height = 200,
+                            Width = 200,
+                            Margin = 0,
+                            // Chọn renderer để tạo ảnh màu
+                            PureBarcode = false
+                        }
+                    };
 
+                    // Sử dụng renderer để tạo ảnh màu
+                    barcodeWriter.Renderer = new MyBitmapRenderer();
+
+                    using (var bitmap = barcodeWriter.Write($"https://localhost:7039/api/Booking/CheckIn-Booking?idBooking={idBooking}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        qrCodeImage.Save(ms, ImageFormat.Png);
+                        bitmap.Save(ms, ImageFormat.Png);
                         byte[] imageBytes = ms.ToArray();
                         string base64String = Convert.ToBase64String(imageBytes);
 
-                        // Tạo chuỗi HTML chứa mã QR
-                        string html = $"<img src=\"data:image/png;base64,{base64String}\" alt=\"QR Code\" />";
-
-                        // Hiển thị chuỗi HTML trên trang web (ví dụ: Response.Write(html) trong ASP.NET)
+                        string html = $"data:image/png;base64,{base64String}";
                         return new ResponseData<string> { IsSuccess = true, Data = html };
                     }
                 }
@@ -1156,22 +1199,30 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
-                    BarcodeWriter<Bitmap> barcodeWriter = new BarcodeWriter<Bitmap>();
-                    barcodeWriter.Format = BarcodeFormat.QR_CODE;
-                    barcodeWriter.Options = new EncodingOptions { Height = 200, Width = 200 };
+                    var barcodeWriter = new BarcodeWriter<Bitmap>()
+                    {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new EncodingOptions
+                        {
+                            Height = 200,
+                            Width = 200,
+                            Margin = 0,
+                            // Chọn renderer để tạo ảnh màu
+                            PureBarcode = false
+                        }
+                    };
 
-                    Bitmap qrCodeImage = barcodeWriter.Write("https://localhost:7039/swagger/index.html");
+                    // Sử dụng renderer để tạo ảnh màu
+                    barcodeWriter.Renderer = new MyBitmapRenderer();
 
+                    using (var bitmap = barcodeWriter.Write("https://localhost:7259/ListServicesBooking"))
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        qrCodeImage.Save(ms, ImageFormat.Png);
+                        bitmap.Save(ms, ImageFormat.Png);
                         byte[] imageBytes = ms.ToArray();
                         string base64String = Convert.ToBase64String(imageBytes);
 
-                        // Tạo chuỗi HTML chứa mã QR
-                        string html = $"<img src=\"data:image/png;base64,{base64String}\" alt=\"QR Code\" />";
-
-                        // Hiển thị chuỗi HTML trên trang web (ví dụ: Response.Write(html) trong ASP.NET)
+                        string html = $"data:image/png;base64,{base64String}";
                         return new ResponseData<string> { IsSuccess = true, Data = html };
                     }
                 }
@@ -1242,4 +1293,54 @@ namespace DATN.Aplication.Services
             return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
         }
     }
+    public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
+    {
+        public Bitmap Render(BitMatrix matrix, BarcodeFormat format, string content, EncodingOptions options)
+        {
+            var width = matrix.Width;
+            var height = matrix.Height;
+            var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            using (var g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White);
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        if (matrix[i, j])
+                        {
+                            g.FillRectangle(Brushes.Black, i, j, 1, 1);
+                        }
+                    }
+                }
+            }
+            return bitmap;
+        }
+
+        public Bitmap Render(BitMatrix matrix, BarcodeFormat format, string content)
+        {
+
+            var width = matrix.Width;
+            var height = matrix.Height;
+            var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            using (var g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White);
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        if (matrix[i, j])
+                        {
+                            g.FillRectangle(Brushes.Black, i, j, 1, 1);
+                        }
+                    }
+                }
+            }
+            return bitmap;
+        }
+    }
+
 }
