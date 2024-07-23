@@ -18,6 +18,7 @@
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Bán sản phẩm tại quầy</MudButton>
 </div>
 
 <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" QuickFilter="@_quickFilter" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
@@ -82,9 +83,16 @@
 
                 }@if (context.Item.Status == BookingStatus.Completed)
                 {
-                    <MudChip Color="Color.Success">Hoàn thành</MudChip>
-
-                }@if (context.Item.Status == BookingStatus.NoShow)
+                    @if (context.Item.IsPayment)
+                    {
+                        <MudChip Color="Color.Success">Đã thanh toán</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Success">Hoàn thành</MudChip>
+                    }
+                }
+                @if (context.Item.Status == BookingStatus.NoShow)
                 {
                     <MudChip Color="Color.Surface">Khách không đến</MudChip>
 
@@ -105,12 +113,53 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))">Chi tiết</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteBooking(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
-                    <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime))">Thanh toán</MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))"></MudIconButton>
+                    @if (context.Item.Status == BookingStatus.PendingConfirmation)
+                    {
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
+                        <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
+
+                    }
+                    @if (context.Item.Status == BookingStatus.Confirmed)
+                    {
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
+                    }
+                    @if (context.Item.Status == BookingStatus.Arrived)
+                    {
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
+
+                    }@if (context.Item.Status == BookingStatus.InProgress)
+                    {
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteBooking(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
+
+                    }@if (context.Item.Status == BookingStatus.Completed)
+                    {
+                        if (!context.Item.IsPayment)
+                        {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
+                        }
+                        else
+                        {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" OnClick="@(async()=>await CheckOut(context.Item.IdBooking.Value))" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
+                        }
+                    }
+                    @if (context.Item.Status == BookingStatus.NoShow)
+                    {
+                        @* <MudChip Color="Color.Surface">Khách không đến</MudChip> *@
+
+                    }@if (context.Item.Status == BookingStatus.CustomerCancelled)
+                    {
+                        @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
+                    }@if (context.Item.Status == BookingStatus.StaffCancelled)
+                    {
+                        @* <MudChip Color="Color.Error">Nhân viên huỷ</MudChip> *@
+
+                    }@if (context.Item.Status == BookingStatus.AdminCancelled)
+                    {
+                        @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
+
+                    }
+
                 </MudButtonGroup>
             </CellTemplate>
         </TemplateColumn>
@@ -204,6 +253,52 @@
         AdminCancelled    // Admin huỷ
     }
 
+    private async Task CheckIn(int idBooking)
+    {
+        var response = await _client.QrCodeCheckIn(idBooking);
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết khách đặt lịch";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("linkqr", response.Data);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+    private async Task CheckOut(int idBooking)
+    {
+        var response = await _client.QrCodeCheckIn(idBooking);
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết khách đặt lịch";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("linkqr", response.Data);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
     private Func<BookingView, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(searchString))
@@ -265,7 +360,7 @@
         }
     }
     //bill
-    private async Task OpenDialogBill(Guid? id, DateTime date)
+    private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
     {
         var parameters = new DialogParameters();
         string nameDialog = "";
@@ -281,6 +376,7 @@
             };
         parameters.Add("guid", id);
         parameters.Add("date", date);
+        parameters.Add("idBooking", idBooking);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
@@ -290,8 +386,33 @@
         }
     }
 
+    private async Task OpenDialogBillInStore(Guid? id, DateTime date)
+    {
+        string nameDialog = "Bán hàng tại quầy";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
     private async Task StartBooking(int id)
     {
+        var confirm = await Confirm("bắt đầu");
+        if (!confirm)
+        {
+            return;
+        }
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
@@ -309,6 +430,11 @@
     }
     private async Task CompleteBooking(int id)
     {
+        var confirm = await Confirm("hoàn thành");
+        if (!confirm)
+        {
+            return;
+        }
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
@@ -398,6 +524,16 @@
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
+    }
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
 
 }

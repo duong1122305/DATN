@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DATN.ViewModels.Enum;
 
 namespace DATN.Data.Entities
 {
@@ -13,10 +9,10 @@ namespace DATN.Data.Entities
         public string Name { get; set; }
         public double Price { get; set; }
         public int Amount { get; set; }
-        public bool IsDeleted { get; set; }
+        public int AmountUsed { get; set; }
+        public ProductDetailStatus Status { get; set; }
         public virtual Product Product { get; set; }
-        public virtual PetType PetType { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<ImageProduct> ImageProducts { get; set; }
+
     }
 }

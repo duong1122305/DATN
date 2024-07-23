@@ -4,7 +4,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" />
+        <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" Required/>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
@@ -27,22 +27,29 @@
 
     public async Task ConfirmCancel()
     {
-        ActionView actionView = new ActionView()
+        if (CancellationReason.Trim() != null)
+        {
+            ActionView actionView = new ActionView()
+                {
+                    IdBokingOrDetail = id,
+                    Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    Reason = CancellationReason
+                };
+            var respone = await _client.CancelBookingDetail(actionView);
+            if (respone.IsSuccess)
             {
-                IdBokingOrDetail = id,
-                Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
-                Reason = CancellationReason
-            };
-        var respone = await _client.CancelBookingDetail(actionView);
-        if (respone.IsSuccess)
+                Message(respone.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
+        }else
         {
-            Message(respone.Data, Severity.Success);
-            _dialogBox.Close(DialogResult.Ok(true));
+            Message("Vui lòng nhập lý do huỷ", Severity.Warning);
         }
-        else
-        {
-            Message(respone.Error, Severity.Error);
-        }
+
     }
     public async Task Canel()
     {

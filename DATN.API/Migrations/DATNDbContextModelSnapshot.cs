@@ -506,11 +506,15 @@ namespace DATN.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdProductDetail")
-                        .HasColumnType("int");
+                    b.Property<string>("ImgKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
 
                     b.Property<string>("UrlImage")
                         .IsRequired()
@@ -518,7 +522,7 @@ namespace DATN.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdProductDetail");
+                    b.HasIndex("ProductID");
 
                     b.ToTable("ImageProducts");
                 });
@@ -689,27 +693,25 @@ namespace DATN.API.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdProduct")
+                    b.Property<int>("AmountUsed")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<int>("IdProduct")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PetTypeId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdProduct");
-
-                    b.HasIndex("PetTypeId");
 
                     b.ToTable("ProductDetails");
                 });
@@ -1273,13 +1275,13 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.ImageProduct", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.ProductDetail", "ProductDetail")
+                    b.HasOne("DATN.Data.Entities.Product", "Product")
                         .WithMany("ImageProducts")
-                        .HasForeignKey("IdProductDetail")
+                        .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProductDetail");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.OrderDetail", b =>
@@ -1357,14 +1359,6 @@ namespace DATN.API.Migrations
                         .HasForeignKey("IdProduct")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("DATN.Data.Entities.PetType", "PetType")
-                        .WithMany("ProductDetails")
-                        .HasForeignKey("PetTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PetType");
 
                     b.Navigation("Product");
                 });
@@ -1532,20 +1526,18 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.PetType", b =>
                 {
-                    b.Navigation("ProductDetails");
-
                     b.Navigation("Species");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.Product", b =>
                 {
+                    b.Navigation("ImageProducts");
+
                     b.Navigation("ProductDetails");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ProductDetail", b =>
                 {
-                    b.Navigation("ImageProducts");
-
                     b.Navigation("OrderDetails");
                 });
 

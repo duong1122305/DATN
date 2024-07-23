@@ -1,9 +1,4 @@
 ﻿using DATN.ViewModels.DTOs.Product;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Booking
 {
@@ -13,11 +8,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public List<ProductDetailView> ListProductDetail { get; set; } = new List<ProductDetailView>();
 
         public event Action OnChange;
-        //private readonly IJSRuntime _jsRuntime;
-        // public BookingService(IJSRuntime jsRuntime)
-        //{
-        //    _jsRuntime = jsRuntime;
-        //}
 
         public void AddBooking(CreateBookingDetailRequest booking)
         {
@@ -26,8 +16,16 @@ namespace DATN.ViewModels.DTOs.Booking
         }
         public void AddProduct(ProductDetailView product)
         {
-            ListProductDetail.Add(product);
-            NotifyStateChanged();
+            var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && c.IdBooking == product.IdBooking && c.IdBooking != 0);
+            if (check != null)
+            {
+                check.SelectQuantityProduct++;
+            }
+            else
+            {
+                ListProductDetail.Add(product);
+                NotifyStateChanged();
+            }
         }
 
         public void RemoveProduct(ProductDetailView product)
@@ -57,6 +55,10 @@ namespace DATN.ViewModels.DTOs.Booking
         private void NotifyStateChanged()
         {
             OnChange?.Invoke();
+        }
+        public void RemoveProductAll(ProductDetailView product)
+        {
+            ListProductDetail.Remove(product);
         }
 
     }

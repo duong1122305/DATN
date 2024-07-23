@@ -17,6 +17,7 @@
             <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
             <MudSelectItem Value="Status.GoingOn">Hoạt động</MudSelectItem>
             <MudSelectItem Value="Status.NotOccur">Chưa bắt đầu</MudSelectItem>
+            <MudSelectItem Value="Status.OutOfStock">Đã hết voucher</MudSelectItem>
             <MudSelectItem Value="Status.Expired">Hết hạn</MudSelectItem>
         </MudSelect>
     </div>
@@ -61,6 +62,7 @@
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x=>x.Quantity" Title="Số lượng" Sortable="false" Filterable="false" style="text-align:center;" />
+        <PropertyColumn Property="x=>x.AmountUsed" Title="Đã sử dụng" Sortable="false" Filterable="false" style="text-align:center;" />
         <PropertyColumn Property="x=>x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
         <TemplateColumn Title="Bắt đầu" Sortable="false" Filterable="false">
             <CellTemplate>
@@ -92,6 +94,12 @@
                         <MudChip Color="Color.Error" title="Đã quá hạn">Đã kết thúc</MudChip>
                     </span>
                 }
+                else if (context.Item.Status == VoucherStatus.OutOfStock)
+                {
+                    <span>
+                        <MudChip Color="Color.Error" title="Đã hết hạn">Đã hết voucher</MudChip>
+                    </span>
+                }
                 else
                 {
                     <span>
@@ -108,7 +116,7 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
                         <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa"></MudIconButton>
                     }
-                    else if (context.Item.Status==VoucherStatus.GoingOn)
+                    else if (context.Item.Status == VoucherStatus.GoingOn)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" title="Xoá" OnClick="@(async()=>await ChangeStatus(Convert.ToInt32(context.Item.Id)))"></MudIconButton>
                         <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Item.Id))" Title="Sửa" Disabled></MudIconButton>
@@ -150,7 +158,8 @@
         Expired = -1,
         All = 0, //hết hạn
         GoingOn = 1, //còn hạn
-        NotOccur = 2 //chưa bắt đầu
+        NotOccur = 2, //chưa bắt đầu
+        OutOfStock = 3// hết voucher
     }
 
     private Status selectedStatus = Status.All;
@@ -181,6 +190,10 @@
         else if (selectedStatus == Status.GoingOn)
         {
             lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.GoingOn).ToList();
+        }
+        else if (selectedStatus == Status.OutOfStock)
+        {
+            lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.OutOfStock).ToList();
         }
         else
         {

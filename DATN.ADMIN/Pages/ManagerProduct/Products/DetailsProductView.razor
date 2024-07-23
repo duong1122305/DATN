@@ -1,0 +1,295 @@
+﻿@page "/DetailsProductView"
+
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.DTOs.Category
+@using DATN.ViewModels.DTOs.CategoryProduct
+@using DATN.ViewModels.DTOs.ProductDetail
+@using DATN.ViewModels.DTOs.ServiceManager
+@using DATN.ViewModels.Enum
+@using MudBlazor
+@using System.Globalization
+@inject ISnackbar Snackbar
+@inject IDialogService _diagService
+@if (lstCateProduct != null)
+{
+    <MudDataGrid Items="@lstCateProduct" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true">
+        <ToolBarContent>
+            <div style="width:200px">
+                <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" Style="width: 200px; margin-bottom: 10px;" ValueChanged="HandleStatusChange">
+                    <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
+                    <MudSelectItem Value="Status.Stocking">Còn hàng</MudSelectItem>
+                    <MudSelectItem Value="Status.OutOfStock">Hết hàng</MudSelectItem>
+                    <MudSelectItem Value="Status.Deleted">Đã xóa</MudSelectItem>
+                </MudSelect>
+            </div>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog())" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+        </ToolBarContent>
+        <Columns>
+            <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <span>@(lstCateProduct.IndexOf(context.Item) + 1)</span>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.Product" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm chi tiết" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Amount" Title="Số lượng" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Price" Title="Giá" Sortable="false" Filterable="false" />
+            <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @if (context.Item.Status == ProductDetailStatus.Stocking)
+                    {
+                        <MudChip Color="Color.Success" title="Hoạt động">Còn hàng</MudChip>
+
+                    }
+                    else if (context.Item.Status == ProductDetailStatus.OutOfStock)
+                    {
+                        <MudChip Color="Color.Warning" title="Hoạt động">Hết hàng</MudChip>
+
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Error" title="Hoạt động">Đã xóa</MudChip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <MudButtonGroup Variant="Variant.Filled">
+                        @if (context.Item.Status != ProductDetailStatus.Deleted)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async()=>await DeleteCateDetails(context.Item.Id))" title="Xoá"></MudIconButton>
+
+                        }
+                        else
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveCateDetails(context.Item.Id))"></MudIconButton>
+
+                        }
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(context.Item.Id))" title="Sửa"></MudIconButton>
+                    </MudButtonGroup>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+
+    </MudDataGrid>
+
+}
+else
+{
+    <div style="text-align:center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+    </div>
+}
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    public List<ProductDetaiView> lstCateProduct = new List<ProductDetaiView>();
+    string _nameButton = "";
+    [Inject]
+    private IProductServices _client { get; set; }
+
+    public CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
+    string searchString = "";
+
+    private enum Status
+    {
+        All,
+        Stocking,
+        OutOfStock,
+        Deleted, //(IsDeleted = true)
+    }
+
+    private Status selectedStatus = Status.All;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+
+    }
+    // load lai du lieu
+    protected async Task LoadData()
+    {
+
+
+        Search();
+
+    }
+
+    private async Task HandleStatusChange(Status e)
+    {
+        selectedStatus = e;
+        await LoadData();
+    }
+    private async Task Search()
+    {
+        var response = await _client.ListProductDetailForProduct(id);
+        if (response.IsSuccess)
+        {
+            var byId = response.Data;
+
+            if (selectedStatus == Status.All)
+            {
+                lstCateProduct = byId.ToList();
+            }
+            else if (selectedStatus == Status.Stocking)
+            {
+                lstCateProduct = byId.Where(x => x.Status == ProductDetailStatus.Stocking).ToList();
+            }
+            else if (selectedStatus == Status.OutOfStock)
+            {
+                lstCateProduct = byId.Where(x => x.Status == ProductDetailStatus.OutOfStock).ToList();
+            }
+            else if (selectedStatus == Status.Deleted)
+            {
+                lstCateProduct = byId.Where(x => x.Status == ProductDetailStatus.Deleted).ToList();
+            }
+            if (!lstCateProduct.Any())
+            {
+
+                Message("Danh sách lọc bị trống", Severity.Warning);
+            }
+        }
+        else
+        {
+            lstCateProduct = new List<ProductDetaiView>();
+        }
+        StateHasChanged();
+    }
+    private Func<ProductDetaiView, bool> _quickFilter => x =>
+     {
+         if (selectedStatus == Status.All && x.Status == ProductDetailStatus.Stocking || selectedStatus == Status.All && x.Status == ProductDetailStatus.OutOfStock || selectedStatus == Status.All && x.Status == ProductDetailStatus.Deleted)
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+         }
+         else if (selectedStatus == Status.Stocking && x.Status == ProductDetailStatus.Stocking)
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+         }
+         else if (selectedStatus == Status.OutOfStock && x.Status == ProductDetailStatus.OutOfStock)
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+         }
+         else
+         {
+             if (string.IsNullOrWhiteSpace(searchString))
+                 return true;
+
+             if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                 return true;
+
+
+         }
+         return false;
+     };
+
+    //hoi truoc khi xoa
+    private async Task<bool?> Confirm()
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo",
+                    "Xác nhận cập nhật trạng thái san phẩm chi tiết này?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
+
+    //Thông báo hỏi khi xoá
+    private async Task DeleteCateDetails(int id)
+    {
+        if (await Confirm() == true)
+        {
+            var response2 = await _client.RemoveProductDetails(id);
+            if (response2.IsSuccess)
+            {
+                Message(response2.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(response2.Error, Severity.Error);
+            }
+        }
+    }
+
+    private async Task ActiveCateDetails(int id)
+    {
+        var repon = await _client.ActiveProductDetails(id);
+        if (repon.IsSuccess)
+        {
+            Message(repon.Data, Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            Message(repon.Error, Severity.Success);
+        }
+    }
+
+    //thêm sửa !
+    private async Task OpenDialog(int idPD = 0)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "Thêm mới sản phẩm chi tiết";
+        parameters.Add("id", id);
+        if (idPD != 0)
+        {
+            var pd = lstCateProduct.FirstOrDefault(p => p.Id == idPD);
+            parameters.Add("product", pd);
+            nameDialog = "Sửa sản phẩm chi tiết";
+        }
+
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _diagService.ShowAsync<CreateUpdateProductDetails>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+    //messenge
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
+    }
+}

@@ -3,6 +3,7 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.DTOs.ServiceDetail
 @using Microsoft.JSInterop
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject IDialogService _diagService
 <EditForm Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
@@ -12,20 +13,22 @@
                 @if (id == null || id == 0)
                 {
                     <div class="mud-select">
+                        <label class="mud-input-label">Chọn dịch vụ</label>
                         <select @bind="createServiceDetailVM.ServiceId" required>
                             @foreach (var i in lstService)
                             {
                                 <option value="@i.Id">@i.Name</option>
                             }
                         </select>
-                        <label class="mud-input-label">Chọn dịch vụ</label>
                     </div>
-                    <MudTextField T="double" Label="Thời gian làm" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
-                    <MudTextField T="float" Label="Cân nặng tối thiểu" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
-                    <MudTextField T="float" Label="Cân nặng tối đa" @bind-Value="@createServiceDetailVM.MaxWeight" For="@(() => createServiceDetailVM.MaxWeight)" />
-                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => createServiceDetailVM.Price)" />
+                        <MudTextField T="double" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
+                    <MudTextField T="float" Label="Cân nặng tối thiểu(KG)" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
+                    <MudTextField T="float" Label="Cân nặng tối đa(KG)" @bind-Value="@createServiceDetailVM.MaxWeight" For="@(() => createServiceDetailVM.MaxWeight)" />
+                    <MudNumericField T="float" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
+                    <div hidden>
                     <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                    <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
+                    </div>
+                        <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
                 }
                 else
                 {
@@ -77,6 +80,7 @@
 
     private string formattedPrice = string.Empty;
     private float tempPrice;
+    CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
 
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
@@ -202,3 +206,42 @@
         Snackbar.Add(message, severity);
     }
 }
+<style>
+    .mud-select {
+        display: inline-block;
+        position: relative;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .mud-input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #495057; /* màu chữ */
+    }
+
+    .mud-select select {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+        /* hiệu ứng khi hover */
+        .mud-select select:hover {
+            border-color: #b3b3b3;
+        }
+
+        .mud-select select:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+</style>

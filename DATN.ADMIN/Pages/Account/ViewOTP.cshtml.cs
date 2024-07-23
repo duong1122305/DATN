@@ -1,6 +1,4 @@
-using Azure;
 using DATN.ADMIN.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -33,24 +31,24 @@ namespace DATN.ADMIN.Pages.Account
         {
             try
             {
-               
-                    if (code != null)
+
+                if (code != null)
+                {
+                    var username = _httpContextAccessor.HttpContext.Session.GetString("username");
+                    var result = await _userClientSev.CheckCodeOtp(username, code);
+                    if (result.IsSuccess)
                     {
-                        var username = _httpContextAccessor.HttpContext.Session.GetString("username");
-                        var result = await _userClientSev.CheckCodeOtp(username, code);
-                        if (result.IsSuccess)
-                        {
-                        TempData["er"] = null ;
+                        TempData["er"] = null;
                         _httpContextAccessor.HttpContext.Session.SetString("otp", code);
-                            _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/changePass"));
+                        _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/changePass"));
                     }
                     else
-                        {
-                            TempData["er"] = result.Error;
-                            return RedirectToPage("/OTP");
-                        }
+                    {
+                        TempData["er"] = result.Error;
+                        return RedirectToPage("/OTP");
                     }
-                
+                }
+
             }
             catch (Exception)
             {

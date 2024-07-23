@@ -1,13 +1,8 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DATN.ViewModels.Enum;
 
 namespace DATN.Aplication.Services
 {
@@ -18,24 +13,24 @@ namespace DATN.Aplication.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
+        public async Task<ResponseData<string>> CreateProductDetail(CreateProductDetaiView productView)
         {
-            var check = (from product in await _unitOfWork.ProductRepository.GetAllAsync()
-                         where product.Name == productView.Name
+            var check = (from product in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                         where product.Name == productView.Name.Trim().TrimStart().TrimEnd()
                          select product).FirstOrDefault();
             try
             {
-                if (productView == null)
+                if (check == null)
                 {
-                    var product = new Product()
+                    var product = new ProductDetail()
                     {
-                        IdBrand = productView.IdBrand,
                         Name = productView.Name,
-                        Description = productView.Description,
-                        IdCategoryProduct = productView.IdCategoryProduct,
-                        Status = true,
+                        Amount = productView.Amount,
+                        IdProduct = productView.IdProduct,
+                        Status = ProductDetailStatus.Stocking,
+                        Price = productView.Price,
                     };
-                    await _unitOfWork.ProductRepository.AddAsync(product);
+                    await _unitOfWork.ProductDetailRepository.AddAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
                 }
@@ -44,62 +39,51 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
-        public async Task<ResponseData<string>> UpdateProduct(CreateProductView productView)
+        public async Task<ResponseData<string>> UpdateProductDetail(CreateProductDetaiView productView)
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductRepository.GetAllAsync()
+                var product = (from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                                where cate.Id == productView.Id
                                select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == productView.Name
+                var checkdup = from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                               where cate.Name == productView.Name.Trim() && cate.Id != productView.Id && cate.IdProduct == productView.IdProduct
                                select cate;
-                if (checkdup.Count() > 0)
-                {
-                    if (product.Id == checkdup.FirstOrDefault().Id)
-                    {
-                        product.Name = productView.Name;
-                        product.Description = productView.Description;
-                        product.IdBrand = productView.IdBrand;
-                        product.IdCategoryProduct = productView.IdCategoryProduct;
-                        await _unitOfWork.ProductRepository.UpdateAsync(product);
-                        await _unitOfWork.SaveChangeAsync();
-                        return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
-                    }
-                    else
-                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
-                }
-                else
+
+                if (checkdup == null || checkdup.FirstOrDefault() == null)
                 {
                     product.Name = productView.Name;
-                    product.Description = productView.Description;
-                    product.IdBrand = productView.IdBrand;
-                    product.IdCategoryProduct = productView.IdCategoryProduct;
-                    await _unitOfWork.ProductRepository.UpdateAsync(product);
+                    product.Price = productView.Price;
+                    product.Amount = productView.Amount;
+                    await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
+                else
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+
+
 
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
-        public async Task<ResponseData<string>> RemoveProduct(int id)
+        public async Task<ResponseData<string>> RemoveProductDetail(int id)
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductRepository.GetAllAsync()
+                var product = (from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                                where cate.Id == id
                                select cate).FirstOrDefault();
                 if (product != null)
                 {
-                    product.Status = false;
-                    await _unitOfWork.ProductRepository.UpdateAsync(product);
+                    product.Status = ProductDetailStatus.Deleted;
+                    await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
@@ -109,20 +93,20 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
-        public async Task<ResponseData<string>> ActiveProduct(int id)
+        public async Task<ResponseData<string>> ActiveProductDetail(int id)
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductRepository.GetAllAsync()
+                var product = (from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                                where cate.Id == id
                                select cate).FirstOrDefault();
                 if (product != null)
                 {
-                    product.Status = true;
-                    await _unitOfWork.ProductRepository.UpdateAsync(product);
+                    product.Status = ProductDetailStatus.Stocking;
+                    await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
                 }
@@ -132,10 +116,33 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi liên quan đến server vui lòng liên hệ dev để fix" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Lỗi hệ thống! Vui lòng liên hệ nhà phát triển" };
             }
         }
-        public async Task<ResponseData<List<ProductDetaiView>>> ListProduct()
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetailForProduct(int id)
+        {
+            var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
+                        join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                        on product.Id equals productDetail.IdProduct
+                        where productDetail.IdProduct == id
+                        orderby productDetail.Price
+                        select new ProductDetaiView
+                        {
+                            Id = productDetail.Id,
+                            Amount = productDetail.Amount,
+                            Status = productDetail.Status,
+                            Name = productDetail.Name,
+                            ProductId = productDetail.IdProduct,
+                            Product = product.Name,
+                            Price = productDetail.Price,
+                        };
+            if (query.Count() > 0)
+            {
+                return new ResponseData<List<ProductDetaiView>> { IsSuccess = true, Data = query.ToList() };
+            }
+            return new ResponseData<List<ProductDetaiView>> { IsSuccess = false, Error = "Chưa có sản phẩm chi tiết của sản phẩm" };
+        }
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetail()
         {
             var query = from productde in await _unitOfWork.ProductDetailRepository.GetAllAsync()
                         join product in await _unitOfWork.ProductRepository.GetAllAsync()
@@ -144,7 +151,7 @@ namespace DATN.Aplication.Services
                         {
                             Id = product.Id,
                             Amount = productde.Amount,
-                            IsDeleted = productde.IsDeleted,
+                            Status = productde.Status,
                             Name = productde.Name,
                             Price = productde.Price,
                             Product = product.Name,

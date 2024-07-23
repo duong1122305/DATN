@@ -1,10 +1,5 @@
 ﻿using DATN.ViewModels.Enum;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Authenticate
 {
@@ -32,6 +27,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
         [Required(ErrorMessage = "Vui lòng nhập vào trường này")]
         [Range(0, int.MaxValue, ErrorMessage = "Số tiền nhập vào phải lớn hơn 0")]
         public double MinMoneyApplicable { get; set; }
+        public int? AmountUsed { get; set; }
         public VoucherStatus Status { get; set; }
 
     }

@@ -1,13 +1,6 @@
 ﻿using DATN.Aplication.Services.IServices;
-using DATN.Data.Entities;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.CategoryProduct;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
@@ -23,8 +16,8 @@ namespace DATN.Aplication.Services
 
             try
             {
-                var check = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
-                            where cate.Name == categoryView.Name
+                var check = from cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+                            where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                             select cate;
                 if (check.Count() == 0)
                 {
@@ -34,7 +27,7 @@ namespace DATN.Aplication.Services
                         IdCategory = categoryView.IdCategory,
                         IsDeleted = false,
                     };
-                    await _unitOfWork.CategoryProductRepository.AddAsync(category);
+                    await _unitOfWork.CategoryDetailRepository.AddAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Thêm thành công " };
                 }
@@ -51,11 +44,11 @@ namespace DATN.Aplication.Services
 
             try
             {
-                var category = (from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                                 where cate.Id == categoryView.Id
                                 select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
+                var checkdup = from cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+                               where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() != 0)
                 {
@@ -63,7 +56,7 @@ namespace DATN.Aplication.Services
                     {
                         category.Name = categoryView.Name;
                         category.IdCategory = categoryView.IdCategory;
-                        await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
+                        await _unitOfWork.CategoryDetailRepository.UpdateAsync(category);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                     }
@@ -74,7 +67,7 @@ namespace DATN.Aplication.Services
                 {
                     category.Name = categoryView.Name;
                     category.IdCategory = categoryView.IdCategory;
-                    await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
+                    await _unitOfWork.CategoryDetailRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
@@ -90,19 +83,19 @@ namespace DATN.Aplication.Services
 
             try
             {
-                var category = (from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                                 where cate.Id == id
                                 select cate).FirstOrDefault();
                 if (category != null)
                 {
 
                     category.IsDeleted = true;
-                    await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
+                    await _unitOfWork.CategoryDetailRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
@@ -114,29 +107,29 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var category = (from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
+                var category = (from cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                                 where cate.Id == id
                                 select cate).FirstOrDefault();
                 if (category != null)
                 {
 
                     category.IsDeleted = false;
-                    await _unitOfWork.CategoryProductRepository.UpdateAsync(category);
+                    await _unitOfWork.CategoryDetailRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Kích hoạt thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Active không thành công " };
+                return new ResponseData<string> { IsSuccess = false, Error = "Kích hoạt không thành công " };
             }
         }
         public async Task<ResponseData<List<CategoryProductView>>> ListCategory()
         {
-            var list = from cate in await _unitOfWork.CategoryProductRepository.GetAllAsync()
+            var list = from cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
                        join catepro in await _unitOfWork.CategoryRepository.GetAllAsync()
                        on cate.IdCategory equals catepro.Id
                        select new CategoryProductView()
@@ -145,7 +138,7 @@ namespace DATN.Aplication.Services
                            Name = cate.Name,
                            Category = catepro.Name,
                            IsDeleted = cate.IsDeleted,
-                           CategoryId=catepro.Id,
+                           CategoryId = catepro.Id,
                        };
             if (list.Count() > 0)
                 return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.ToList() };

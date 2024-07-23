@@ -1,6 +1,7 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
+using DATN.ViewModels.DTOs.ProductDetail;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
@@ -10,9 +11,11 @@ namespace DATN.API.Controllers
     public class ProductController : Controller
     {
         IProductManagementService _productManagementServicel;
-        public ProductController(IProductManagementService productManagementService)
+        IProductDetaiManagementService _productDetaiManagementServicel;
+        public ProductController(IProductManagementService productManagementService, IProductDetaiManagementService productDetaiManagementService)
         {
             _productManagementServicel = productManagementService;
+            _productDetaiManagementServicel = productDetaiManagementService;
         }
         [HttpPost("Create-Product")]
         public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
@@ -40,6 +43,40 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<List<ProductView>>> ListProduct()
         {
             return await _productManagementServicel.ListProduct();
+        }
+
+        //product details
+        [HttpPost("Create-Product-Details")]
+        public async Task<ResponseData<string>> CreateProductDetails(CreateProductDetaiView productView)
+        {
+            return await _productDetaiManagementServicel.CreateProductDetail(productView);
+        }
+        [HttpPut("Update-Product-Details")]
+        public async Task<ResponseData<string>> UpdateProductDetails(CreateProductDetaiView productView)
+        {
+            return await _productDetaiManagementServicel.UpdateProductDetail(productView);
+        }
+        [HttpGet("Remove-Product-Details")]
+        public async Task<ResponseData<string>> RemoveProductDetails(int id)
+        {
+            return await _productDetaiManagementServicel.RemoveProductDetail(id);
+
+        }
+        [HttpGet("Active-Product-Details")]
+        public async Task<ResponseData<string>> ActiveProductDetails(int id)
+        {
+            return await _productDetaiManagementServicel.ActiveProductDetail(id);
+
+        }
+        [HttpGet("List-Product-Details")]
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetails()
+        {
+            return await _productDetaiManagementServicel.ListProductDetail();
+        }
+        [HttpGet("list-product-details-by-id")]
+        public async Task<ResponseData<List<ProductDetaiView>>> ListProductDetailsByID(int id)
+        {
+            return await _productDetaiManagementServicel.ListProductDetailForProduct(id);
         }
     }
 }

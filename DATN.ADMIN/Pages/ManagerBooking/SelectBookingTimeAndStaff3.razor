@@ -136,9 +136,9 @@
             Message("Vui lòng chọn thú cưng trước khi tìm nhân viên.", Severity.Warning);
             return;
         }
-        if (timeStart == null)
+        if (timeStart == null || bookingDate == null)
         {
-            Message("Vui lòng chọn giờ.", Severity.Warning);
+            Message("Vui lòng chọn ngày giờ.", Severity.Warning);
             return;
         }
         //gọi api thêm

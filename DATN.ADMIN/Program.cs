@@ -3,20 +3,16 @@ using DATN.ADMIN.Services;
 using DATN.Aplication.CustomProvider;
 using DATN.Data.EF;
 using DATN.Data.Entities;
+using DATN.ViewModels.DTOs.Booking;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using MudBlazor.Services;
-using Microsoft.JSInterop;
 using MudBlazor;
-using System.Net;
+using MudBlazor.Services;
 using Syncfusion.Blazor;
-using DATN.Aplication.Services.IServices;
-using DATN.Aplication.Services;
-using DATN.ViewModels.DTOs.Booking;
+using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
@@ -75,16 +71,17 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<IAddressService,AddressService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IServiceManagermentService, ServiceManagermentService>();
 builder.Services.AddScoped<IServiceDetailServices, ServiceDetailServices>();
-builder.Services.AddScoped<IGuestManagerClient,GuestManagerClient>();
-builder.Services.AddScoped<IEmployeeScheduleSer,EmployeeScheduleSer>();
-builder.Services.AddScoped<IPetSpeciesServiceClient,PetSpeciesServiceClient>();
-builder.Services.AddScoped<IPetServiceClient,PetServiceClient>();
-builder.Services.AddScoped<ICategoryServices,CategoryServices>();
-builder.Services.AddScoped<IProductServices,ProductServices>();
-builder.Services.AddScoped<IBrandServices,BrandServices>();
+builder.Services.AddScoped<IGuestManagerClient, GuestManagerClient>();
+builder.Services.AddScoped<IEmployeeScheduleSer, EmployeeScheduleSer>();
+builder.Services.AddScoped<IPetSpeciesServiceClient, PetSpeciesServiceClient>();
+builder.Services.AddScoped<IPetServiceClient, PetServiceClient>();
+builder.Services.AddScoped<IPetManagerServices, PetManagerServices>();
+builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+builder.Services.AddScoped<IProductServices, ProductServices>();
+builder.Services.AddScoped<IBrandServices, BrandServices>();
 builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddResponseCaching(); // Adds response caching, which also enables buffering
 builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
@@ -93,16 +90,16 @@ builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
 builder.Services.AddSingleton<BookingService>();
 builder.Services.AddMudServices(config =>
 {
-	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
 
-	config.SnackbarConfiguration.PreventDuplicates = false;
-	config.SnackbarConfiguration.NewestOnTop = false;
-	config.SnackbarConfiguration.ShowCloseIcon = true;
-	config.SnackbarConfiguration.VisibleStateDuration = 2000;
-	config.SnackbarConfiguration.HideTransitionDuration = 100;
-	config.SnackbarConfiguration.ShowTransitionDuration = 100;
-	config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
-	;
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 2000;
+    config.SnackbarConfiguration.HideTransitionDuration = 100;
+    config.SnackbarConfiguration.ShowTransitionDuration = 100;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
+    ;
 });
 
 var app = builder.Build();

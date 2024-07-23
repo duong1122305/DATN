@@ -1,9 +1,4 @@
 ﻿using DATN.Data.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Booking
 {
@@ -17,5 +12,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public string Address { get; set; }
         public BookingStatus Status { get; set; }
         public DateTime BookingTime { get; set; }
+        public bool IsPayment { get; set; }
     }
 }

@@ -1,9 +1,9 @@
-﻿using DATN.Aplication.Services;
-using DATN.Aplication.Services.IServices;
+﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,11 +16,13 @@ namespace DATN.API.Controllers
         private readonly IBookingManagement _bookingManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
         private readonly IProductManagement _productManagement;
-        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement)
+        private readonly IVoucherManagementService _voucherManagementService;
+        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement, IVoucherManagementService voucherManagementService)
         {
             _bookingManagement = bookingManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
             _productManagement = productManagement;
+            _voucherManagementService = voucherManagementService;
         }
         [HttpGet("List")]
         public Task<ResponseData<List<BookingView>>> Index()
@@ -93,6 +95,51 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
         {
             return await _productManagement.BuyProduct(buyProducts);
+        }
+        [HttpGet("List-Product-View-Sale")]
+        public async Task<ResponseData<List<ProductSelect>>> ListProductViewSale()
+        {
+            return await _productManagement.ListProductViewSale();
+        }
+        [HttpPost("Check-bill")]
+        public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
+        {
+            return await _bookingManagement.CheckBill(idBooking ?? null, productdes);
+        }
+        [HttpPost("Payment-In-Store")]
+        public async Task<ResponseData<string>> PaymentInStore(Payment payment)
+        {
+            return await _bookingManagement.PaymentInStore(payment);
+        }
+        [HttpGet("QrCode-CheckOut")]
+        public async Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail)
+        {
+            return await _bookingManagement.QrCodeCheckOut(idBookingDetail);
+        }
+        [HttpGet("QrCode-CheckIn")]
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        {
+            return await _bookingManagement.QrCodeCheckIn(idBooking);
+        }
+        [HttpGet("Payment-Qr")]
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice)
+        {
+            return await _bookingManagement.PaymentQrMomo(totalPrice);
+        }
+        [HttpGet("Payment-Qr-VnPay")]
+        public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
+        {
+            return await _bookingManagement.PaymentQrVnPay(totalPrice);
+        }
+        [HttpGet("List-Voucher-Can-Apply")]
+        public async Task<ResponseData<List<VoucherView>>> ListVoucherCanApply(double totalPrice)
+        {
+            return await _voucherManagementService.GetAllVoucherCanApply(totalPrice);
+        }
+        [HttpGet("CheckIn-Booking")]
+        public async Task<ResponseData<string>> CheckInArrive(int idBooking)
+        {
+            return await _bookingManagement.CheckInArrive(idBooking);
         }
     }
 }

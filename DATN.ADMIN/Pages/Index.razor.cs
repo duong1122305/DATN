@@ -1,7 +1,5 @@
 ﻿using DATN.Aplication.CustomProvider;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
 
 namespace DATN.ADMIN.Pages
 {

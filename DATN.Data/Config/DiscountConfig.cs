@@ -1,11 +1,6 @@
 ﻿using DATN.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Data.Config
 {
@@ -15,7 +10,7 @@ namespace DATN.Data.Config
         {
             builder.HasKey(x => x.Id);
 
-            builder.HasIndex(c=>c.VoucherCode)
+            builder.HasIndex(c => c.VoucherCode)
                 .IsUnique();
 
             builder.Property(c => c.Description)

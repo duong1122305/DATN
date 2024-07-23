@@ -2,11 +2,6 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
@@ -23,7 +18,7 @@ namespace DATN.Aplication.Services
             try
             {
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
+                               where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() == 0)
                 {
@@ -54,7 +49,7 @@ namespace DATN.Aplication.Services
                                 where cate.Id == categoryView.Id
                                 select cate).FirstOrDefault();
                 var checkdup = from cate in await _unitOfWork.CategoryRepository.GetAllAsync()
-                               where cate.Name == categoryView.Name
+                               where cate.Name == categoryView.Name.Trim().TrimStart().TrimEnd()
                                select cate;
                 if (checkdup.Count() != 0)
                 {
@@ -101,7 +96,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
@@ -122,15 +117,15 @@ namespace DATN.Aplication.Services
                     category.IsDeleted = false;
                     await _unitOfWork.CategoryRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Kích hoạt thành công " };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không có category này" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
 
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Active không thành công " };
+                return new ResponseData<string> { IsSuccess = false, Error = "Kích hoạt không thành công " };
             }
         }
         public async Task<ResponseData<List<CategoryView>>> ListCategory()

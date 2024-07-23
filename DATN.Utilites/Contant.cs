@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace DATN.Utilites
+﻿namespace DATN.Utilites
 {
     public static class Contant
     {
@@ -21,11 +14,12 @@ namespace DATN.Utilites
         public static readonly Guid GuestsID = Guid.Parse("CF9FA787-B64C-462A-A3BA-08DC8D178FC0");
         // Thêm ảnh mặc định
         public const string ImgUser = "img/images.jpg";
-		public const int MaxIMGSize = 5*1024*1024;//5mb
-		// gắn giá trị combobox đi điểm danh
-		public const int AllAttendance = -1;//tất cả
-		public const int Present = 1;// có mặt
-		public const int Absent = 0;//vắng mặt
+        public const string ImgDefault = "img/productDefault.png";
+        public const int MaxIMGSize = 5 * 1024 * 1024;//5mb
+                                                      // gắn giá trị combobox đi điểm danh
+        public const int AllAttendance = -1;//tất cả
+        public const int Present = 1;// có mặt
+        public const int Absent = 0;//vắng mặt
 
-	}
+    }
 }

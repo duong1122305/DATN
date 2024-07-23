@@ -1,14 +1,9 @@
 ﻿using DATN.Data.Entities;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Data.Validator
 {
-    public class ComboDetailValidator:AbstractValidator<ComboDetail>
+    public class ComboDetailValidator : AbstractValidator<ComboDetail>
     {
         public ComboDetailValidator()
         {

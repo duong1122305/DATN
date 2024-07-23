@@ -1,12 +1,4 @@
-﻿using DATN.Aplication.Common;
-using DATN.Aplication.Repository;
-using DATN.Aplication.Repository.IRepository;
-using DATN.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DATN.Aplication.Repository.IRepository;
 
 namespace DATN.Aplication
 {
@@ -32,7 +24,7 @@ namespace DATN.Aplication
         ITypePaymentRepository TypePaymentRepository { get; }
         IWorkShiftRepository WorkShiftRepository { get; }
         IBrandRepository BrandRepository { get; }
-        ICategoryProductRepository CategoryProductRepository { get; }
+        ICategoryDetailRepository CategoryDetailRepository { get; }
         ICategoryRepository CategoryRepository { get; }
         IImageProductRepository ImageProductRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
