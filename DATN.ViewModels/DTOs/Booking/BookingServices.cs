@@ -16,7 +16,7 @@ namespace DATN.ViewModels.DTOs.Booking
         }
         public void AddProduct(ProductDetailView product)
         {
-            var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && product.IdBooking == product.IdBooking);
+            var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && c.IdBooking == product.IdBooking && c.IdBooking != 0);
             if (check != null)
             {
                 check.SelectQuantityProduct++;

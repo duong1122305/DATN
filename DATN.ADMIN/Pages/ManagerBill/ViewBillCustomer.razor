@@ -84,7 +84,7 @@
                 }
                 else
                 {
-                    <MudTable Items="@bookingService.ListProductDetail" Class="invoice-table">
+                    <MudTable Items="@bookingService.ListProductDetail.Where(c=>c.Term==termId)" Class="invoice-table">
                         <HeaderContent>
                             <MudTh>Tên sản phẩm</MudTh>
                             <MudTh>Số lượng</MudTh>
@@ -162,6 +162,7 @@
     public DateTime date { get; set; }
     [Parameter]
     public int? idBooking { get; set; }
+    public int? termId { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
@@ -184,6 +185,18 @@
         if (guid != null)
         {
             await LoadData();
+        }
+        if (idBooking == null)
+        {
+            termId = 1;
+            var lst = bookingService.ListProductDetail;
+            foreach (var item in lst)
+            {
+                if (item.Term == termId)
+                {
+                    termId++;
+                }
+            }
         }
 
     }
@@ -283,6 +296,7 @@
         DialogParameters parameter = new DialogParameters();
         parameter.Add("guid", guid);
         parameter.Add("IdBooking", idBooking);
+        parameter.Add("termId", termId);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
