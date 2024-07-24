@@ -12,7 +12,7 @@
 
 <MudDataGrid Items="@bookingService.ListProductDetail" Hover="true" Filterable="true" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
     <Columns>
-        <TemplateColumn Title="ID" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+        <TemplateColumn Title="STT" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
             <GroupTemplate>
                 <span style="font-weight:bold">@context.Grouping.Key</span>
             </GroupTemplate>
@@ -24,7 +24,11 @@
                 <span>   @CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
             </CellTemplate>
         </TemplateColumn>
-        @* <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,Convert.ToInt32(lstBookingServices.l.Grouping.Key.ToString())))">Thanh toán</MudIconButton> *@
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,context.Item.IdBooking))">Thanh toán</MudIconButton>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ProductDetailView" />
