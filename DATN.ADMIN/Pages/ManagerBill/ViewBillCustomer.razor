@@ -316,7 +316,7 @@
     }
     public async Task OpenDialogReload()
     {
-        if (idBooking != 0 || idBooking != null)
+        if (idBooking != 0 && idBooking != null)
         {
             var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
             if (respone2.IsSuccess)

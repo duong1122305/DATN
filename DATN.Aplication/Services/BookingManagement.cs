@@ -1144,9 +1144,9 @@ namespace DATN.Aplication.Services
                             ReducePrice = reduce.Value,
                             TotalPayment = totalprice - reduce.Value,
                             ListProductDetail = productdes,
-                            GuestName = idBooking != null ? info.Name : "Khách lẻ",
-                            Address = idBooking != null ? info.Address : "Không có",
-                            PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
+                            GuestName = idBooking != null && idBooking != 0 ? info.Name : "Khách lẻ",
+                            Address = idBooking != null && idBooking != 0 ? info.Address : "Không có",
+                            PhoneNumber = idBooking != null && idBooking != 0 ? info.PhoneNumber : "Không có",
                         }
                     };
                 }
@@ -1333,7 +1333,7 @@ namespace DATN.Aplication.Services
             //Billing
             vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
             //Billing
-           
+
             //var fullName = "Nguyễn Đức Việt".Trim();
             //if (!String.IsNullOrEmpty(fullName))
             //{
