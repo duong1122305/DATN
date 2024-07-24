@@ -55,7 +55,7 @@
                 </MudTable>
                 <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-                @if (idBooking != null)
+                @if (idBooking != null && idBooking != 0)
                 {
                     <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
                         <HeaderContent>
@@ -164,6 +164,7 @@
     public DateTime date { get; set; }
     [Parameter]
     public int? idBooking { get; set; }
+    [Parameter]
     public int? termId { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
