@@ -130,17 +130,22 @@
                         <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
                             <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
+                            <MudRadio Value="3" Color="Color.Secondary" UnCheckedColor="Color.Default">Momo</MudRadio>
                         </MudRadioGroup>
                         @if (selectedPaymentMethod == 2)
                         {
                             <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
                         }
+                        else if (selectedPaymentMethod == 1)
+                        {
+                            <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
+                        }
                         else
                         {
-                            <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
+                                           <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
                         }
+                    
 
-                        <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
                     </div>
                 </div>
             }
