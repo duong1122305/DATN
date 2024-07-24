@@ -70,7 +70,7 @@
     }
     private async Task ChooseProduct(ProductDetailView productDV)
     {
-        @if (IdBooking != null)
+        @if (IdBooking != 0 && IdBooking != null)
         {
             productDV.IdBooking = IdBooking.Value;
             _tempLstProductDetail.AddProduct(productDV);
