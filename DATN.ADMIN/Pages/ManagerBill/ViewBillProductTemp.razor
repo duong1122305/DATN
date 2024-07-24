@@ -25,11 +25,6 @@
                 <span>   @CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
             </CellTemplate>
         </TemplateColumn>
-        <TemplateColumn>
-            <CellTemplate>
-                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,context.Item.IdBooking,context.Item.Term))">Thanh toán</MudIconButton>
-            </CellTemplate>
-        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ProductDetailView" />
