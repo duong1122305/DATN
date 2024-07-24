@@ -327,7 +327,7 @@
         }
         else
         {
-            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == 1).ToList());
+            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == termId).ToList());
             if (respone2.IsSuccess)
             {
                 bill = respone2.Data;
