@@ -183,7 +183,7 @@ namespace DATN.Aplication.Services
                                        && bookingTable.Status != BookingStatus.AdminCancelled
                                        && bookingTable.Status != BookingStatus.CustomerCancelled
                                        && bookingTable.Status != BookingStatus.NoShow
-                                       && bookingTable.Status != BookingStatus.Confirmed
+                                       && bookingTable.Status != BookingStatus.Completed
                                        select bookingTable;
                     if (queryBooking.Count() == 0)
                     {
@@ -208,7 +208,7 @@ namespace DATN.Aplication.Services
                                        && bookingTable.Status != BookingStatus.AdminCancelled
                                        && bookingTable.Status != BookingStatus.CustomerCancelled
                                        && bookingTable.Status != BookingStatus.NoShow
-                                       && bookingTable.Status != BookingStatus.Confirmed
+                                       && bookingTable.Status != BookingStatus.Completed
                                        select bookingTable;
                     }
                     else
