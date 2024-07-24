@@ -3,11 +3,6 @@ using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
@@ -139,7 +134,7 @@ namespace DATN.Aplication.Services
                 {
                     if (item.DeleteAt == null)
                     {
-                       
+
                         item.Status = VoucherStatus.GoingOn;
                         if (item.Quantity == item.AmountUsed)
                         {
@@ -156,7 +151,7 @@ namespace DATN.Aplication.Services
                         listcheck.Add(item);
                     }
                 }
-                
+
             }
             await _unitOfWork.DiscountRepository.UpdateRangeAsync(listcheck);
 

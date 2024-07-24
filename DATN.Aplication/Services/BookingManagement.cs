@@ -1,25 +1,25 @@
-﻿using DATN.Aplication.Services.IServices;
+﻿using Azure;
+using DATN.Aplication.Services.IServices;
 using DATN.Aplication.System;
 using DATN.Data.Entities;
 using DATN.Data.Enum;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Payment;
+using DATN.ViewModels.DTOs.Payment.DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ServiceDetail;
 using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
+using Microsoft.IdentityModel.Protocols;
 using Newtonsoft.Json.Linq;
-using RTools_NTS.Util;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing.Imaging;
+using ZXing;
+using ZXing.Common;
+using ZXing.Rendering;
 
 namespace DATN.Aplication.Services
 {
@@ -32,7 +32,8 @@ namespace DATN.Aplication.Services
         private readonly IProductManagement _productManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
         private readonly IVoucherManagementService _voucherManagementService;
-        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate, IProductManagement productManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IVoucherManagementService voucherManagementService)
+        private readonly Utils utils;
+        public BookingManagement(IUnitOfWork unitOfWork, UserManager<User> userManager, NotificationHub notificationHub, IAuthenticate authenticate, IProductManagement productManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IVoucherManagementService voucherManagementService, Utils utils)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -41,6 +42,7 @@ namespace DATN.Aplication.Services
             _productManagement = productManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
             _voucherManagementService = voucherManagementService;
+            this.utils = utils;
         }
         public async Task ChangeStatusBooking()
         {
@@ -712,6 +714,48 @@ namespace DATN.Aplication.Services
                 }
             }
         }
+        public async Task<ResponseData<string>> CheckInArrive(int idBooking)
+        {
+            var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                         where booking.Id == idBooking
+                         select booking).FirstOrDefault();
+            if (query != null)
+            {
+                try
+                {
+                    if (query.Status != BookingStatus.Confirmed)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Không thể bắt đầu dịch vụ trong trạng thái này" };
+                    }
+                    else
+                    {
+                        query.Status = BookingStatus.Arrived;
+                        var queryBooking = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                           where bookingDetail.BookingId == query.Id
+                                           && bookingDetail.Status == BookingDetailStatus.Unfulfilled
+                                           select bookingDetail;
+                        var listBookingInDay = queryBooking.Where(c => c.StartDateTime.Date.CompareTo(DateTime.Now.Date) == 0);
+                        if (listBookingInDay.Count() == 0)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Khách đặt dịch vụ không phải hôm nay ko thể bắt đầu" };
+                        }
+                        else
+                        {
+                            await _unitOfWork.BookingRepository.UpdateAsync(query);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
+                }
+
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "không tìm thấy" };
+        }
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
             var idUserAction = await _user.GetUserByToken(actionView.Token);
@@ -795,12 +839,20 @@ namespace DATN.Aplication.Services
                                     {
                                         foreach (var item2 in queryBooking)
                                         {
-                                            if (item2.StartDateTime.CompareTo(item1.StartDateTime) < 0)
+                                            if (item1.Id == item2.Id)
                                             {
                                                 update = item2;
                                             }
+                                            else
+                                            {
+                                                if (item2.StartDateTime.CompareTo(item1.StartDateTime) < 0)
+                                                {
+                                                    update = item2;
+                                                }
+                                            }
                                         }
                                     }
+                                    update.Status = BookingDetailStatus.Processing;
                                     await _unitOfWork.BookingDetailRepository.UpdateAsync(update);
                                     await _unitOfWork.BookingRepository.UpdateAsync(query);
                                     await _unitOfWork.SaveChangeAsync();
@@ -957,7 +1009,6 @@ namespace DATN.Aplication.Services
                                                Quantity = buypro.Quantity,
                                                Price = buypro.Price,
                                            }).ToList();
-
                         await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
                         await _productManagement.BuyProduct(listProduct);
                         await _unitOfWork.SaveChangeAsync();
@@ -1103,5 +1154,256 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<Bill> { IsSuccess = false, Error = "Tông tiền ko có gì" };
         }
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        {
+            if (idBooking != 0)
+            {
+                try
+                {
+                    var barcodeWriter = new BarcodeWriter<Bitmap>()
+                    {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new EncodingOptions
+                        {
+                            Height = 200,
+                            Width = 200,
+                            Margin = 0,
+                            // Chọn renderer để tạo ảnh màu
+                            PureBarcode = false
+                        }
+                    };
+
+                    // Sử dụng renderer để tạo ảnh màu
+                    barcodeWriter.Renderer = new MyBitmapRenderer();
+
+                    using (var bitmap = barcodeWriter.Write($"https://localhost:7259/public/{idBooking}"))
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bitmap.Save(ms, ImageFormat.Png);
+                        byte[] imageBytes = ms.ToArray();
+                        string base64String = Convert.ToBase64String(imageBytes);
+
+                        string html = $"data:image/png;base64,{base64String}";
+                        return new ResponseData<string> { IsSuccess = true, Data = html };
+                    }
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Data = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
+            }
+        }
+        public async Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail)
+        {
+            if (idBookingDetail != 0)
+            {
+                try
+                {
+                    var barcodeWriter = new BarcodeWriter<Bitmap>()
+                    {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new EncodingOptions
+                        {
+                            Height = 200,
+                            Width = 200,
+                            Margin = 0,
+                            // Chọn renderer để tạo ảnh màu
+                            PureBarcode = false
+                        }
+                    };
+
+                    // Sử dụng renderer để tạo ảnh màu
+                    barcodeWriter.Renderer = new MyBitmapRenderer();
+
+                    using (var bitmap = barcodeWriter.Write("https://localhost:7259/ListServicesBooking"))
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bitmap.Save(ms, ImageFormat.Png);
+                        byte[] imageBytes = ms.ToArray();
+                        string base64String = Convert.ToBase64String(imageBytes);
+
+                        string html = $"data:image/png;base64,{base64String}";
+                        return new ResponseData<string> { IsSuccess = true, Data = html };
+                    }
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Data = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
+            }
+        }
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice)
+        {
+            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+            string partnerCode = "MOMO5RGX20191128";
+            string accessKey = "M8brj9K6E22vXoDB";
+            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
+            string orderInfo = "Chuyển khoản thanh toán đặt lịch";
+            string redirectUrl = "https://localhost:7259/ListServicesBooking";
+            string ipnUrl = "https://localhost:7259/ListServicesBooking";
+            string requestType = "captureWallet";
+
+            string amount = totalPrice;
+            string orderId = Guid.NewGuid().ToString();
+            string requestId = Guid.NewGuid().ToString();
+
+            string extraData = "{username:Tên la gi}";
+
+            //Before sign HMAC SHA256 signature
+            string rawHash = "accessKey=" + accessKey +
+                "&amount=" + amount +
+                "&extraData=" + extraData +
+                "&ipnUrl=" + ipnUrl +
+                "&orderId=" + orderId +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + partnerCode +
+                "&redirectUrl=" + redirectUrl +
+                "&requestId=" + requestId +
+                "&requestType=" + requestType
+                ;
+
+
+            MoMoSecurity moMoSecurity = new MoMoSecurity();
+            //sign signature SHA256
+            string signature = moMoSecurity.signSHA256(rawHash, serectkey);
+
+
+            //build body json request
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "partnerName", "Test" },
+                { "storeId", "MomoTestStore" },
+                { "requestId", requestId },
+                { "amount", amount },
+                { "orderId", orderId },
+                { "orderInfo", orderInfo },
+                { "redirectUrl", redirectUrl },
+                { "ipnUrl", ipnUrl },
+                { "lang", "en" },
+                { "extraData", extraData },
+                { "requestType", requestType },
+                { "signature", signature }
+
+            };
+            return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
+        }
+
+        public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
+        {
+            string vnp_Returnurl = "https://localhost:7259/ListServicesBooking"; //URL nhan ket qua tra ve 
+            string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; //URL thanh toan cua VNPAY 
+            string vnp_TmnCode = ""; //Ma định danh merchant kết nối (Terminal Id)
+            string vnp_HashSecret = ""; //Secret Key
+
+            //Get payment input
+            OrderInfo order = new OrderInfo();
+            order.OrderId = DateTime.Now.Ticks; // Giả lập mã giao dịch hệ thống merchant gửi sang VNPAY
+            order.Amount = totalPrice; // Giả lập số tiền thanh toán hệ thống merchant gửi sang VNPAY 100,000 VND
+            order.Status = "0"; //0: Trạng thái thanh toán "chờ thanh toán" hoặc "Pending" khởi tạo giao dịch chưa có IPN
+            order.CreatedDate = DateTime.Now;
+            //Save order to db
+
+            //Build URL for VNPAY
+            VnPayLibrary vnpay = new VnPayLibrary();
+
+            vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
+            vnpay.AddRequestData("vnp_Command", "pay");
+            vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+            vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND (một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần (khử phần thập phân), sau đó gửi sang VNPAY là: 10000000
+            vnpay.AddRequestData("vnp_BankCode", "VNPAYQR");
+            vnpay.AddRequestData("vnp_CreateDate", order.CreatedDate.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CurrCode", "VND");
+            vnpay.AddRequestData("vnp_IpAddr", utils.GetIpAddress());
+            vnpay.AddRequestData("vnp_Locale", "vn");
+            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
+            vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
+            vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+            vnpay.AddRequestData("vnp_TxnRef", order.OrderId.ToString()); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
+
+            //Add Params of 2.1.0 Version
+            //Billing
+            vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
+            //Billing
+           
+            //var fullName = "Nguyễn Đức Việt".Trim();
+            //if (!String.IsNullOrEmpty(fullName))
+            //{
+            //    var indexof = fullName.IndexOf(' ');
+            //    vnpay.AddRequestData("vnp_Bill_FirstName", fullName.Substring(0, indexof));
+            //    vnpay.AddRequestData("vnp_Bill_LastName", fullName.Substring(indexof + 1,
+            //    fullName.Length - indexof - 1));
+            //}
+            //vnpay.AddRequestData("vnp_Bill_Address", "vn".Trim());
+            //vnpay.AddRequestData("vnp_Bill_City", "".Trim());
+            //vnpay.AddRequestData("vnp_Bill_Country", "".Trim());
+            //vnpay.AddRequestData("vnp_Bill_State", "");
+            //// Invoice
+            //vnpay.AddRequestData("vnp_Inv_Phone", "".Trim());
+            //vnpay.AddRequestData("vnp_Inv_Email", "".Trim());
+            //vnpay.AddRequestData("vnp_Inv_Customer", "".Trim());
+            //vnpay.AddRequestData("vnp_Inv_Address", "".Trim());
+            //vnpay.AddRequestData("vnp_Inv_Type", "");
+            string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+            return new ResponseData<string> { IsSuccess = true, Data = paymentUrl };
+        }
     }
+    public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
+    {
+        public Bitmap Render(BitMatrix matrix, BarcodeFormat format, string content, EncodingOptions options)
+        {
+            var width = matrix.Width;
+            var height = matrix.Height;
+            var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            using (var g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White);
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        if (matrix[i, j])
+                        {
+                            g.FillRectangle(Brushes.Black, i, j, 1, 1);
+                        }
+                    }
+                }
+            }
+            return bitmap;
+        }
+
+        public Bitmap Render(BitMatrix matrix, BarcodeFormat format, string content)
+        {
+
+            var width = matrix.Width;
+            var height = matrix.Height;
+            var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            using (var g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White);
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        if (matrix[i, j])
+                        {
+                            g.FillRectangle(Brushes.Black, i, j, 1, 1);
+                        }
+                    }
+                }
+            }
+            return bitmap;
+        }
+    }
+
 }

@@ -1,6 +1,5 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
 using Newtonsoft.Json;

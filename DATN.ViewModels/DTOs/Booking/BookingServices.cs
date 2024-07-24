@@ -1,9 +1,4 @@
 ﻿using DATN.ViewModels.DTOs.Product;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Booking
 {
@@ -21,15 +16,31 @@ namespace DATN.ViewModels.DTOs.Booking
         }
         public void AddProduct(ProductDetailView product)
         {
-            var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && product.IdBooking == product.IdBooking);
-            if (check != null)
+            if (product.Term != 0)
             {
-                check.SelectQuantityProduct++;
+                var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && c.Term==product.Term);
+                if (check != null)
+                {
+                    check.SelectQuantityProduct++;
+                }
+                else
+                {
+                    ListProductDetail.Add(product);
+                    NotifyStateChanged();
+                }
             }
             else
             {
-                ListProductDetail.Add(product);
-                NotifyStateChanged();
+                var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && c.IdBooking == product.IdBooking && c.IdBooking != 0);
+                if (check != null)
+                {
+                    check.SelectQuantityProduct++;
+                }
+                else
+                {
+                    ListProductDetail.Add(product);
+                    NotifyStateChanged();
+                }
             }
         }
 

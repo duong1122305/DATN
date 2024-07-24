@@ -1,6 +1,5 @@
 ﻿using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
-using System.Collections;
 
 namespace DATN.ADMIN.IServices
 {
@@ -27,6 +26,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<RoleView>>> ListPosition();
         Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView);
         Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime);
-		Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
-	}
+        Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
+    }
 }

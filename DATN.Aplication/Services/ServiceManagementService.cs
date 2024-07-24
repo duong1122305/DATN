@@ -2,11 +2,6 @@
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceManager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
@@ -100,9 +95,9 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                foreach(var i in await _unitOfWork.ServiceRepository.GetAllAsync())
+                foreach (var i in await _unitOfWork.ServiceRepository.GetAllAsync())
                 {
-                    if(i.Name == service.Name.TrimStart().TrimEnd())
+                    if (i.Name == service.Name.TrimStart().TrimEnd())
                     {
                         return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại!" };
                     }

@@ -12,5 +12,5 @@ namespace DATN.ADMIN.IServices
         Task<DataAdress> GetFullCodeByWard(string addressCode);
 
 
-	}
+    }
 }
