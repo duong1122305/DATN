@@ -1,5 +1,6 @@
 ﻿@page "/ViewBillProductTemp"
 @using DATN.ADMIN.IServices
+@using DATN.Utilites
 @using DATN.ViewModels.DTOs.Booking
 @inject IDialogService _dialogservice;
 @using DATN.ViewModels.DTOs.Product
@@ -16,14 +17,14 @@
                 <span style="font-weight:bold">@context.Grouping.Key</span>
             </GroupTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x=>x.Name" Title="Tên san pham" Sortable="false" Filterable="false" />
-        <PropertyColumn Property="x=>x.SelectQuantityProduct" Title="So Luong" Sortable="false" Filterable="false" />
-        <PropertyColumn Property="x=>x.Price" Title="Gia" Sortable="false" Filterable="false" />
-        <TemplateColumn Sortable="false" Filterable="false" Title="Hanh dong">
+        <PropertyColumn Property="x=>x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.SelectQuantityProduct" Title="Số Lượng" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,context.Item.IdBooking))">Thanh toán</MudIconButton>
-                </CellTemplate>
-            </TemplateColumn>
+                <span>   @CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
+            </CellTemplate>
+        </TemplateColumn>
+        @* <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,Convert.ToInt32(lstBookingServices.l.Grouping.Key.ToString())))">Thanh toán</MudIconButton> *@
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ProductDetailView" />
