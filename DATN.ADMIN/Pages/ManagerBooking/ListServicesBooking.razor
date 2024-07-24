@@ -118,7 +118,6 @@
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
                         <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
-
                     }
                     @if (context.Item.Status == BookingStatus.Confirmed)
                     {

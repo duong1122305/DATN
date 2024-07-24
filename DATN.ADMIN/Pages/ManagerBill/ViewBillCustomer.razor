@@ -14,7 +14,6 @@
         height: 680px;
         min-height: 680px;
     }
-
 </style>
 <MudContainer Class="invoice-container" Style="margin-top: 20px">
     <MudPaper Elevation="3" Class="invoice-paper">
@@ -317,7 +316,7 @@
     }
     public async Task OpenDialogReload()
     {
-        if (idBooking != null)
+        if (idBooking != 0 || idBooking != null)
         {
             var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
             if (respone2.IsSuccess)
