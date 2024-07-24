@@ -1152,7 +1152,7 @@ namespace DATN.Aplication.Services
                 }
             }
             else
-                return new ResponseData<Bill> { IsSuccess = false, Error = "Tông tiền ko có gì" };
+                return new ResponseData<Bill> { IsSuccess = true, Data = new Bill() };
         }
         public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
         {
