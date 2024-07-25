@@ -13,7 +13,6 @@
         height: 680px;
         min-height: 680px;
     }
-
 </style>
 <MudContainer Class="invoice-container" Style="margin-top: 20px">
     <MudPaper Elevation="3" Class="invoice-paper">
@@ -55,7 +54,7 @@
                 </MudTable>
                 <br />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-                @if (idBooking != null)
+                @if (idBooking != null && idBooking != 0)
                 {
                     <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
                         <HeaderContent>
@@ -130,17 +129,20 @@
                         <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
                             <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
                             <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
+                            <MudRadio Value="3" Color="Color.Secondary" UnCheckedColor="Color.Default">Momo</MudRadio>
                         </MudRadioGroup>
                         @if (selectedPaymentMethod == 2)
                         {
                             <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
                         }
+                        else if (selectedPaymentMethod == 1)
+                        {
+                            <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
+                        }
                         else
                         {
-                            <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán</MudButton>
+                            <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
                         }
-
-                        <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
                     </div>
                 </div>
             }
@@ -161,6 +163,7 @@
     public DateTime date { get; set; }
     [Parameter]
     public int? idBooking { get; set; }
+    [Parameter]
     public int? termId { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
@@ -316,7 +319,7 @@
     }
     public async Task OpenDialogReload()
     {
-        if (idBooking != null)
+        if (idBooking != 0 && idBooking != null)
         {
             var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
             if (respone2.IsSuccess)
@@ -327,7 +330,7 @@
         }
         else
         {
-            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == 1).ToList());
+            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == termId).ToList());
             if (respone2.IsSuccess)
             {
                 bill = respone2.Data;

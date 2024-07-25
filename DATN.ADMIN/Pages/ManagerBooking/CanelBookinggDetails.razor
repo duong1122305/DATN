@@ -4,7 +4,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" Required/>
+        <MudTextField @bind-Value="actionView.Reason" For="@(() => actionView.Reason)" Label="Lý do huỷ" MaxLength="255" Required />
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
@@ -15,11 +15,9 @@
     [Parameter]
     public int id { get; set; }
 
-    private string CancellationReason { get; set; }
-
     [Inject]
     private IHttpContextAccessor _httpContextAccessor { get; set; }
-
+    public ActionView actionView = new ActionView();
 
     [Inject]
     IBookingViewServices _client { get; set; }
@@ -27,14 +25,8 @@
 
     public async Task ConfirmCancel()
     {
-        if (CancellationReason.Trim() != null)
-        {
-            ActionView actionView = new ActionView()
-                {
-                    IdBokingOrDetail = id,
-                    Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
-                    Reason = CancellationReason
-                };
+            actionView.IdBokingOrDetail = id;
+            actionView.Token = _httpContextAccessor.HttpContext.Session.GetString("Key");
             var respone = await _client.CancelBookingDetail(actionView);
             if (respone.IsSuccess)
             {
@@ -45,10 +37,7 @@
             {
                 Message(respone.Error, Severity.Error);
             }
-        }else
-        {
-            Message("Vui lòng nhập lý do huỷ", Severity.Warning);
-        }
+
 
     }
     public async Task Canel()
