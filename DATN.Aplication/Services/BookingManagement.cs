@@ -1355,6 +1355,69 @@ namespace DATN.Aplication.Services
             string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             return new ResponseData<string> { IsSuccess = true, Data = paymentUrl };
         }
+
+        public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest)
+        {
+            try
+            {
+                if (idGuest == Guid.Empty) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Không xác định được danh tính của bạn"
+                };
+
+                var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
+                            join bd in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                            on b.Id equals bd.BookingId
+                            join sd in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                            on bd.ServiceDetailId equals sd.Id
+                            join s in await _unitOfWork.ServiceRepository.GetAllAsync()
+                            on sd.ServiceId equals s.Id
+                            select new
+                            {
+                                BookingId = b.Id,
+                                ServiceId = s.Id,
+                                ServiceName = s.Name,
+                                StartDate = bd.StartDateTime,
+                                EndDate = bd.EndDateTime,
+                                TotalPrice = b.TotalPrice,
+                                Status = bd.Status
+                            })
+                           .GroupBy(c => c.BookingId)
+                           .Select(c => new GetBookingByGuestVM
+                           {
+                               ServiceName = c.Select(c => c.ServiceName).ToList(),
+                               ServiceId = c.Select(c => c.ServiceId).ToList(),
+                               StartDate = c.First().StartDate,
+                               EndDate = c.First().EndDate,
+                               TotalPrice = c.First().TotalPrice,
+                               Status = c.First().Status
+                           }).AsQueryable();
+                if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Có lỗi trong quá trình tìm kiếm"
+                };
+
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = true,
+                    Data = join.ToList(),
+                    Error = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = ex.Message
+                };
+            }
+        }
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
     {
