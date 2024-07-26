@@ -1374,26 +1374,34 @@ namespace DATN.Aplication.Services
                             on bd.ServiceDetailId equals sd.Id
                             join s in await _unitOfWork.ServiceRepository.GetAllAsync()
                             on sd.ServiceId equals s.Id
+                            join p in await _unitOfWork.PetRepository.GetAllAsync()
+                            on bd.PetId equals p.Id
                             select new
                             {
+                                PetName = p.Name,
                                 BookingId = b.Id,
                                 ServiceId = s.Id,
                                 ServiceName = s.Name,
+                                BookingTime = b.BookingTime,
                                 StartDate = bd.StartDateTime,
                                 EndDate = bd.EndDateTime,
+                                StartTime = bd.StartDateTime,
                                 TotalPrice = b.TotalPrice,
                                 Status = bd.Status
                             })
                            .GroupBy(c => c.BookingId)
                            .Select(c => new GetBookingByGuestVM
                            {
+                               PetName = c.First().PetName,
                                ServiceName = c.Select(c => c.ServiceName).ToList(),
                                ServiceId = c.Select(c => c.ServiceId).ToList(),
-                               StartDate = c.First().StartDate,
-                               EndDate = c.First().EndDate,
+                               BookingTime = new DateOnly(c.First().BookingTime.Year, c.First().BookingTime.Month, c.First().BookingTime.Day).ToString("dd/MM/yyyy"),
+                               StartDate = new DateOnly(c.First().StartDate.Year, c.First().StartDate.Month, c.First().StartDate.Day).ToString("dd/MM/yyyy"),
+                               EndDate = new DateOnly(c.First().EndDate.Year, c.First().EndDate.Month, c.First().EndDate.Day).ToString("dd/MM/yyyy"),
+                               StartTime = new TimeOnly(c.First().StartTime.Hour, c.First().StartTime.Minute).ToString("HH:mm"),
                                TotalPrice = c.First().TotalPrice,
                                Status = c.First().Status
-                           }).AsQueryable();
+                           }).OrderByDescending(c => c.BookingTime).AsQueryable();
                 if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
                 {
                     IsSuccess = false,
