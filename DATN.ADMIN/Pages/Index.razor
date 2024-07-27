@@ -1,77 +1,166 @@
 ﻿@page "/trangchu"
+@using DATN.Utilites
+<link rel="stylesheet" href="/css/Statical.css">
 <PageTitle>Trang chủ</PageTitle>
 <AuthorizeView Roles="Admin">
-    <Authorized>
-        <MudGrid>
-            <MudItem xs="12" sm="6" md="6">
-                <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
-                    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
-                        <CustomGraphics>
-                            <style>
-                                .heavy {
-                                    font: bold 30px Helvetica;
-                                }
+	<Authorized>
+		<MudGrid>
+			<MudItem sm="12">
+				<MudToggleGroup T="int?" SelectionMode="SelectionMode.SingleSelection" Value="type" ValueChanged="(e)=>LoadData(e)" Color="Color.Tertiary" Style="height: 100px" CheckMark>
+					<MudToggleItem Value="@((int?)1)" Text="Ngày" />
+					<MudToggleItem Value="@((int?)2)" Text="Tuần" />
+					<MudToggleItem Value="@((int?)3)" Text="Tháng" />
+				</MudToggleGroup>
+				<br />
+				<MudText Typo="Typo.h4" HtmlTag="h2">Thống kê doanh thu cửa hàng</MudText>
 
-                                .Rrrrr {
-                                    font: italic 40px Helvetica;
-                                    fill: rgb(62,44,221);
-                                }
-                            </style>
-                        </CustomGraphics>
-                    </MudChart>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="6">
-                <MudPaper Elevation="2" Class="pa-4" Style="height: 450px;">
-                    <MudChart ChartType="ChartType.Donut" Width="100%" Height="350px" InputData="@data" InputLabels="@labels">
-                        <CustomGraphics>
-                            <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Doanh thu</text>
-                            <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
-                        </CustomGraphics>
-                    </MudChart>
+			</MudItem>
+			<MudItem sm="12" md="7">
+				<MudPaper Elevation="2" Class="pa-4" Style="" Height="550px">
+					<MudChart ChartType="ChartType.Line" hi ChartSeries="@Series" XAxisLabels="@Labelsbar.ToArray()" Width="90%">
+						<CustomGraphics>
+							<style>
+								.heavy {
+									font: bold 30px Helvetica;
+								}
 
-                    @code {
-        public double[] data = { 25, 77, 28 };
-        public string[] labels = { "Tỉa lông", "Cắt móng", "Nhuộm lông" };
-                    }
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudGrid>
-                    <MudItem xs="12">
-                        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-                    </MudItem>
-                </MudGrid>
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4">
-                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4">
-                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="12" md="4">
-                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-            </MudItem>
-        </MudGrid>
-    </Authorized>
-    <NotAuthorized>
-        <h1>Bạn không có quyền truy cập trang này !!!!</h1>
-    </NotAuthorized>
+							</style>
+							<text x="80" y="35" class="heavy">Thống kê lượt khách</text>
+
+						</CustomGraphics>
+					</MudChart>
+				</MudPaper>
+
+			</MudItem>
+			<MudItem sm="12" md="5">
+				<MudPaper Elevation="2" Class="pa-4" Style="height: 550px;">
+
+
+					<MudChart ChartType="ChartType.Donut" Width="100%" Height="350px" InputData="@dataPie" InputLabels="@labelsPie">
+						<CustomGraphics>
+							<text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Doanh thu</text>
+							<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="4">@dataPie.Sum().ToString("N0")đ</text>
+						</CustomGraphics>
+					</MudChart>
+
+
+				</MudPaper>
+			</MudItem>
+			<MudItem sm="12" md="6">
+
+				<MudPaper Elevation="2" Class="pa-4" Style="height: fit-content;">
+					@if (top3ProductReven != null && top3ProductReven.Count > 0)
+					{
+						<div class="custom-container">
+							<h1>Top 3 sản phẩm doanh thu cao nhất</h1>
+							@foreach (var item in top3ProductReven)
+							{
+								if (top3ProductReven.IndexOf(item)==3)
+								{
+									break;
+								}
+								<div class="custom-product">
+									<img src="@item.ImgUrl" alt="Sản phẩm">
+									<div class="custom-product-info">
+										<h3 class="text-info">@item.Name</h3>
+										<p> <b>Số lượng bán ra: @item.TotalAmount.ToString("N0") </b></p>
+										<p class="custom-price"> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</p>
+									</div>
+								</div>
+							}
+						</div>
+					}
+
+				</MudPaper>
+
+			</MudItem>
+			<MudItem sm="12" md="6">
+				<MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+					@if (top3ServiceReven != null && top3ServiceReven.Count > 0)
+					{
+						<div class="custom-container">
+							<h1>Top 3 dịch vụ doanh thu cao nhất</h1>
+							@foreach (var item in top3ServiceReven)
+							{
+								if (top3ServiceReven.IndexOf(item) == 3)
+								{
+									break;
+								}
+								<div class="custom-product">
+									<img src="/img/service.jpg" alt="Dịch vụ">
+									<div class="custom-product-info">
+										<h3 class="text-info">@item.Name</h3>
+										<p> <b>Số lượng bán ra: @item.TotalAmount.ToString("N0") </b></p>
+										<p class="custom-price"> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</p>
+									</div>
+								</div>
+							}
+						</div>
+					}
+					
+				</MudPaper>
+			</MudItem>
+			<MudItem sm="12" md="6">
+
+				<MudPaper Elevation="2" Class="pa-4" Style="height: fit-content;">
+					@if (top3ProductQuantity != null && top3ProductQuantity.Count > 0)
+					{
+						<div class="custom-container">
+							<h1>Top 3 sản phẩm bán chạy</h1>
+							@foreach (var item in top3ProductQuantity)
+							{
+								if (top3ProductReven.IndexOf(item) == 3)
+								{
+									break;
+								}
+								<div class="custom-product">
+									<img src="@item.ImgUrl" alt="Sản phẩm">
+									<div class="custom-product-info">
+										<h3 class="text-info">@item.Name</h3>
+										<p class="custom-price">Số lượng bán ra: @item.TotalAmount.ToString("N0")</p>
+										<p><b> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</b></p>
+									</div>
+								</div>
+							}
+						</div>
+					}
+
+				</MudPaper>
+
+			</MudItem>
+			<MudItem sm="12" md="6">
+				<MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+					@if (top3ServiceQuantity != null && top3ServiceQuantity.Count > 0)
+					{
+						<div class="custom-container">
+							<h1>Top 3 dịch vụ làm nhiều nhất</h1>
+							@foreach (var item in top3ServiceQuantity)
+							{
+								if (top3ServiceReven.IndexOf(item) == 3)
+								{
+									break;
+								}
+								<div class="custom-product">
+									<img src="/img/service.jpg" alt="Dịch vụ">
+									<div class="custom-product-info">
+										<h3 class="text-info">@item.Name</h3>
+										<p class="custom-price">Số lượng bán ra: @item.TotalAmount.ToString("N0")</p>
+										<p><b>Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND </b> </p>
+									</div>
+								</div>
+							}
+						</div>
+					}
+
+				</MudPaper>
+			</MudItem>
+		</MudGrid>
+	</Authorized>
+	<NotAuthorized>
+		<h1>Bạn không có quyền truy cập trang này !!!!</h1>
+	</NotAuthorized>
 </AuthorizeView>
 @code {
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "cắt tóc", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 16,23,30 } },
-        new ChartSeries() { Name = "Nhuộm", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
-        new ChartSeries() { Name = "Cắt móng", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
-    };
-    public string[] XAxisLabels = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
 
-    // code biểu đồ chứng khoán như sóng
+
 }
