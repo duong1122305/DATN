@@ -1376,6 +1376,7 @@ namespace DATN.Aplication.Services
                             on sd.ServiceId equals s.Id
                             join p in await _unitOfWork.PetRepository.GetAllAsync()
                             on bd.PetId equals p.Id
+                            where b.GuestId == idGuest
                             select new
                             {
                                 PetName = p.Name,
@@ -1389,17 +1390,23 @@ namespace DATN.Aplication.Services
                                 TotalPrice = b.TotalPrice,
                                 Status = bd.Status
                             })
-                           .GroupBy(c => c.BookingId)
+                           .GroupBy(c => new
+                           {
+                               c.BookingId,
+                               c.PetName,
+                               c.BookingTime,
+                               c.StartDate,
+                               c.StartTime
+                           })
                            .Select(c => new GetBookingByGuestVM
                            {
-                               PetName = c.First().PetName,
-                               ServiceName = c.Select(c => c.ServiceName).ToList(),
-                               ServiceId = c.Select(c => c.ServiceId).ToList(),
-                               BookingTime = new DateOnly(c.First().BookingTime.Year, c.First().BookingTime.Month, c.First().BookingTime.Day).ToString("dd/MM/yyyy"),
-                               StartDate = new DateOnly(c.First().StartDate.Year, c.First().StartDate.Month, c.First().StartDate.Day).ToString("dd/MM/yyyy"),
-                               EndDate = new DateOnly(c.First().EndDate.Year, c.First().EndDate.Month, c.First().EndDate.Day).ToString("dd/MM/yyyy"),
-                               StartTime = new TimeOnly(c.First().StartTime.Hour, c.First().StartTime.Minute).ToString("HH:mm"),
-                               TotalPrice = c.First().TotalPrice,
+                               PetName = c.Key.PetName,
+                               ServiceName = c.Select(x => x.ServiceName).ToList(), // Danh sách tên dịch vụ
+                               ServiceId = c.Select(x => x.ServiceId).ToList(),    // Danh sách ID dịch vụ
+                               BookingTime = new DateOnly(c.Key.BookingTime.Year, c.Key.BookingTime.Month, c.Key.BookingTime.Day).ToString("dd/MM/yyyy"),
+                               StartDate = new DateOnly(c.Key.StartDate.Year, c.Key.StartDate.Month, c.Key.StartDate.Day).ToString("dd/MM/yyyy"),
+                               StartTime = new TimeOnly(c.Key.StartTime.Hour, c.Key.StartTime.Minute).ToString("HH:mm"),
+                               TotalPrice = c.Sum(x => x.TotalPrice), // Tổng giá của các dịch vụ
                                Status = c.First().Status
                            }).OrderByDescending(c => c.BookingTime).AsQueryable();
                 if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
