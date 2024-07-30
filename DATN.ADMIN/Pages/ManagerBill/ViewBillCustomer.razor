@@ -57,29 +57,58 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
                 @if (idBooking != null && idBooking != 0)
                 {
-                    <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
-                        <HeaderContent>
-                            <MudTh>Tên sản phẩm</MudTh>
-                            <MudTh>Số lượng</MudTh>
-                            <MudTh>Đơn giá</MudTh>
-                            <MudTh>Hành động</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.Name</MudTd>
-                            <MudTd>
-                                <div class="quantity-input">
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
-                                    <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                    if (bill.IsPayment)
+                    {
+                        <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
+                            <HeaderContent>
+                                <MudTh>Tên sản phẩm</MudTh>
+                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Đơn giá</MudTh>
+                                <MudTh>Hành động</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.Name</MudTd>
+                                <MudTd>
+                                    <div class="quantity-input">
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
+                                        <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
 
-                                </div>
-                            </MudTd>
-                            <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
-                            <MudTd>
-                                <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
+                                    </div>
+                                </MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <MudTd>
+                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                    else
+                    {
+                        <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
+                            <HeaderContent>
+                                <MudTh>Tên sản phẩm</MudTh>
+                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Đơn giá</MudTh>
+                                <MudTh>Hành động</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.Name</MudTd>
+                                <MudTd>
+                                    <div class="quantity-input">
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
+                                        <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+
+                                    </div>
+                                </MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <MudTd>
+                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
                 }
                 else
                 {
@@ -272,18 +301,35 @@
         {
             return;
         }
-        Payment payment = new Payment()
-            {
-                IdBooking = idBooking.Value,
-                IdGuest = guid.Value,
-                TotalPrice = bill.TotalPrice,
-                TypePaymenId = selectedPaymentMethod,
-                Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
-                LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
-                DateBooking = date,
-                Reduce = bill.ReducePrice,
-                VoucherId = bill.IdVoucher
-            };
+        DATN.ViewModels.DTOs.Booking.Payment payment;
+        if (idBooking != 0 && idBooking != null)
+        {
+            payment = new Payment()
+                {
+                    IdBooking = idBooking.Value,
+                    IdGuest = guid.Value,
+                    TotalPrice = bill.TotalPrice,
+                    TypePaymenId = selectedPaymentMethod,
+                    Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
+                    DateBooking = date,
+                    Reduce = bill.ReducePrice,
+                    VoucherId = bill.IdVoucher
+                };
+        }else
+        {
+            payment = new Payment()
+                {
+                    IdGuest = Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0"),
+                    TotalPrice = bill.TotalPrice,
+                    TypePaymenId = selectedPaymentMethod,
+                    Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    LstProducts = bookingService.ListProductDetail.Where(x => x.Term == termId).ToList(),
+                    DateBooking = date,
+                    Reduce = bill.ReducePrice,
+                    VoucherId = bill.IdVoucher
+                };
+        }
         var respone = await _client.PaymentInStore(payment);
         if (respone.IsSuccess)
         {

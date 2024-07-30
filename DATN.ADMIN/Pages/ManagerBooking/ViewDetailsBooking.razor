@@ -79,7 +79,7 @@ else
 }
 @code {
     [Parameter]
-    public string id { get; set; }
+    public int id { get; set; }
     [Parameter]
     public DateTime dateBooking { get; set; }
     [Inject]
@@ -97,7 +97,7 @@ else
 
     protected async Task LoadData()
     {
-        var respone = await _client.ListBookingDetailInDay(id, dateBooking);
+        var respone = await _client.ListBookingDetailInDay(id);
         if (respone.IsSuccess)
         {
             lstBooking = respone.Data;
