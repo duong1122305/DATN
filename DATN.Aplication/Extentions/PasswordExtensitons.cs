@@ -1,13 +1,7 @@
 ﻿using DATN.ViewModels.Common;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Extentions
 {
@@ -40,7 +34,7 @@ namespace DATN.Aplication.Extentions
                     }
                 }
             }
-        }  
+        }
 
 
         public string Decrypt(string cipherText)
@@ -159,7 +153,7 @@ namespace DATN.Aplication.Extentions
             return new string(array);
         }
 
-        public  ResponseData<string> ValidatePassword(string password)
+        public ResponseData<string> ValidatePassword(string password)
         {
             if (password.Length <= 6)
             {

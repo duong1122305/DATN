@@ -3,12 +3,6 @@ using DATN.Data.Entities;
 using DATN.Utilites.Check;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceDetail;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
@@ -45,7 +39,8 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
                 }
 
-                if(CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false){
+                if (CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false)
+                {
                     return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
                 }
 

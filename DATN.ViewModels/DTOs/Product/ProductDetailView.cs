@@ -1,9 +1,4 @@
 ﻿using DATN.ViewModels.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Product
 {
@@ -16,5 +11,6 @@ namespace DATN.ViewModels.DTOs.Product
         public int SelectQuantityProduct { get; set; } = 1;
         public int IdBooking { get; set; }
         public ProductDetailStatus Status { get; set; }
+        public int? Term { get; set; }
     }
 }

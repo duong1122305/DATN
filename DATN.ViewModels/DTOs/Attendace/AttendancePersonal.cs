@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DATN.ViewModels.DTOs.Attendace
+﻿namespace DATN.ViewModels.DTOs.Attendace
 {
-	public class AttendancePersonal
-	{
-        public string ListShift{ get; set; }
-		public string ShiftNow { get; set; }
+    public class AttendancePersonal
+    {
+        public string ListShift { get; set; }
+        public string ShiftNow { get; set; }
         public string ShiftAttendance { get; set; } = "";
         public int ShiftID { get; set; }
         public int ScheduleID { get; set; }

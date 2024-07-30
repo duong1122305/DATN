@@ -1,5 +1,4 @@
 ﻿using DATN.Data.EF;
-using DATN.Data.Entities;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +24,7 @@ public class NotificationHub : Hub
         {
 
         };
-        await _notification.Clients.All.SendAsync("ReceiveMessage","Server",message);
+        await _notification.Clients.All.SendAsync("ReceiveMessage", "Server", message);
 
     }
 }

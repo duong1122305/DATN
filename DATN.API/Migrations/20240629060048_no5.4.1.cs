@@ -10,7 +10,7 @@ namespace DATN.API.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-           
+
 
             migrationBuilder.AddColumn<string>(
                 name: "VerifyCode",
@@ -18,7 +18,7 @@ namespace DATN.API.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-          
+
         }
 
         /// <inheritdoc />

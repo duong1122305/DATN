@@ -1,10 +1,8 @@
-﻿using Azure;
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.CategoryProduct;
 using Newtonsoft.Json;
-using System.Net.Http.Json;
 
 namespace DATN.ADMIN.Services
 {
@@ -13,7 +11,7 @@ namespace DATN.ADMIN.Services
         private readonly HttpClient _httpClient;
         public CategoryServices(HttpClient client)
         {
-                _httpClient = client;
+            _httpClient = client;
         }
         public async Task<ResponseData<string>> ActiveCategory(int id)
         {

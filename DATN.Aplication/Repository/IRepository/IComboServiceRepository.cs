@@ -3,7 +3,7 @@ using DATN.Data.Entities;
 
 namespace DATN.Aplication.Repository.IRepository
 {
-    public interface IComboServiceRepository:IGenericRepository<ComboService>
+    public interface IComboServiceRepository : IGenericRepository<ComboService>
     {
     }
 }

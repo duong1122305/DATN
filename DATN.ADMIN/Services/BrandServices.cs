@@ -1,7 +1,6 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Brand;
-using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
 
 namespace DATN.ADMIN.Services
@@ -11,7 +10,7 @@ namespace DATN.ADMIN.Services
         private readonly HttpClient _httpClient;
         public BrandServices(HttpClient client)
         {
-            _httpClient = client;   
+            _httpClient = client;
         }
         public async Task<ResponseData<string>> Active(int id)
         {

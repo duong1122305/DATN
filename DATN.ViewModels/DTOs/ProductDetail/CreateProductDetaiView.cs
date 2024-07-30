@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DATN.ViewModels.DTOs.ProductDetail
 {
@@ -18,8 +12,8 @@ namespace DATN.ViewModels.DTOs.ProductDetail
         [Range(1000,double.MaxValue, ErrorMessage = "Giá trên 1000 vnđ")]
         public double Price { get; set; }
         [Required]
-        [Range(0,int.MaxValue,ErrorMessage ="Số lượng từ 0 trở lên")]
+        [Range(1,int.MaxValue)]
         public int Amount { get; set; }
-      
+
     }
 }

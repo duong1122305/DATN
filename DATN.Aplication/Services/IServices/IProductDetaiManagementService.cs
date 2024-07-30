@@ -1,5 +1,4 @@
 ﻿using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
 
 namespace DATN.Aplication.Services.IServices

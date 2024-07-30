@@ -1,12 +1,7 @@
 ﻿using DATN.Data.EF;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Common
 {
@@ -27,7 +22,7 @@ namespace DATN.Aplication.Common
         }
         public virtual async Task AddRangeAsync(List<T> entities)
         {
-           await _context.BulkInsertAsync(entities);
+            await _context.BulkInsertAsync(entities);
         }
         public virtual async Task UpdateRangeAsync(List<T> entities)
         {

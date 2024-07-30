@@ -1,5 +1,4 @@
-﻿using Azure;
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

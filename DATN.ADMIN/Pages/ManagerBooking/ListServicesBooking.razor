@@ -83,9 +83,16 @@
 
                 }@if (context.Item.Status == BookingStatus.Completed)
                 {
-                    <MudChip Color="Color.Success">Hoàn thành</MudChip>
-
-                }@if (context.Item.Status == BookingStatus.NoShow)
+                    @if (context.Item.IsPayment)
+                    {
+                        <MudChip Color="Color.Success">Đã thanh toán</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Success">Hoàn thành</MudChip>
+                    }
+                }
+                @if (context.Item.Status == BookingStatus.NoShow)
                 {
                     <MudChip Color="Color.Surface">Khách không đến</MudChip>
 
@@ -111,11 +118,12 @@
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
                         <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
-
                     }
                     @if (context.Item.Status == BookingStatus.Confirmed)
                     {
-                    }@if (context.Item.Status == BookingStatus.Arrived)
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
+                    }
+                    @if (context.Item.Status == BookingStatus.Arrived)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
 
@@ -125,9 +133,16 @@
 
                     }@if (context.Item.Status == BookingStatus.Completed)
                     {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
-
-                    }@if (context.Item.Status == BookingStatus.NoShow)
+                        if (!context.Item.IsPayment)
+                        {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
+                        }
+                        else
+                        {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" OnClick="@(async()=>await CheckOut(context.Item.IdBooking.Value))" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
+                        }
+                    }
+                    @if (context.Item.Status == BookingStatus.NoShow)
                     {
                         @* <MudChip Color="Color.Surface">Khách không đến</MudChip> *@
 
@@ -180,46 +195,46 @@
     private async Task LoadData()
     {
         var respone = await _client.GetAll();
-        lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime).ToList();
+        lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
         if (selectedStatus == Status.All)
         {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
         }
         else if (selectedStatus == Status.PendingConfirmation)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x=> x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
         }
         else if (selectedStatus == Status.Confirmed)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.Confirmed).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Confirmed).ToList();
         }
         else if (selectedStatus == Status.Arrived)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.Arrived).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Arrived).ToList();
         }
         else if (selectedStatus == Status.InProgress)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.InProgress).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.InProgress).ToList();
         }
         else if (selectedStatus == Status.Completed)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.Completed).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Completed).ToList();
         }
         else if (selectedStatus == Status.NoShow)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.NoShow).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.NoShow).ToList();
         }
         else if (selectedStatus == Status.CustomerCancelled)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
         }
         else if (selectedStatus == Status.StaffCancelled)
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
         }
         else
         {
-            lstBookingServices = respone.Data.Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
         }
         StateHasChanged();
     }
@@ -237,6 +252,52 @@
         AdminCancelled    // Admin huỷ
     }
 
+    private async Task CheckIn(int idBooking)
+    {
+        var response = await _client.QrCodeCheckIn(idBooking);
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết khách đặt lịch";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("linkqr", response.Data);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+    private async Task CheckOut(int idBooking)
+    {
+        var response = await _client.QrCodeCheckIn(idBooking);
+        var parameters = new DialogParameters();
+        string nameDialog = "Chi tiết khách đặt lịch";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("linkqr", response.Data);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
     private Func<BookingView, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(searchString))
@@ -346,6 +407,11 @@
     }
     private async Task StartBooking(int id)
     {
+        var confirm = await Confirm("bắt đầu");
+        if (!confirm)
+        {
+            return;
+        }
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
@@ -363,6 +429,11 @@
     }
     private async Task CompleteBooking(int id)
     {
+        var confirm = await Confirm("hoàn thành");
+        if (!confirm)
+        {
+            return;
+        }
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
@@ -452,6 +523,16 @@
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
+    }
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
     }
 
 }
