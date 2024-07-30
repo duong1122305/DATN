@@ -50,6 +50,10 @@ namespace DATN.Aplication.Repository
         public async Task<Guest> FindByEmail(string email)
         {
             return await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.IsComfirm == false);
+        }  
+        public async Task<Guest> FindByEmailAll(string email)
+        {
+            return await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() &&( !x.IsDeleted.HasValue||!x.IsDeleted.Value));
         }
 
 	

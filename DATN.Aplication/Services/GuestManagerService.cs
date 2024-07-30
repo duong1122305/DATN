@@ -425,7 +425,7 @@ namespace DATN.Aplication.Services
             try
             {
 
-                var guest = await _unitOfWork.GuestRepository.FindByEmail(mail.Trim());
+                var guest = await _unitOfWork.GuestRepository.FindByEmailAll(mail.Trim());
 
                 if (guest != null)
                 {

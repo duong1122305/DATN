@@ -157,8 +157,8 @@ namespace DATN.Aplication.Services
 							  select new Top3Statistical
 							  {
 								  Name = g.Key.ServiceName,
-								  TotalAmount = g.Sum(x => x.Quantity+1),
-								  TotalRevenue = g.Sum(x =>  x.Price)
+								  TotalAmount = g.Sum(x => x.Quantity),
+								  TotalRevenue = g.Sum(x => x.Quantity* x.Price)
 							  }).ToList();
 
 				return new ResponseData<Statistical>() 
