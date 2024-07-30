@@ -25,7 +25,7 @@
             </div>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
             <MudSpacer />
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog())" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
         </ToolBarContent>
@@ -53,7 +53,7 @@
                     }
                     else
                     {
-                        <MudChip Color="Color.Error" title="Hoạt động">Đã xóa</MudChip>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng bán</MudChip>
                     }
                 </CellTemplate>
             </TemplateColumn>

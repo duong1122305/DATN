@@ -8,7 +8,7 @@
     <MudTable Items="@lst" Dense="true" Filter="new Func<UserInfView,bool>(FilterFunc)" onchange="_tableRef">
         <ToolBarContent>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="text-align:center;">Họ và tên</MudTh>
