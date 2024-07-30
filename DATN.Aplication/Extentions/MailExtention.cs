@@ -1,14 +1,7 @@
-﻿using DATN.Data.Entities;
-using DATN.ViewModels.Common;
+﻿using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
-using NetTopologySuite.Index.HPRtree;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace DATN.Aplication.Extentions

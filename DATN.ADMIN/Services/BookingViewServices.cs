@@ -1,17 +1,11 @@
-﻿using Azure;
-using DATN.ADMIN.IServices;
-using DATN.Data.Entities;
+﻿using DATN.ADMIN.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
+using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
-using Syncfusion.Blazor.Gantt.Internal;
-using Syncfusion.Blazor.Schedule.Internal;
-using System.Collections.Generic;
-using System.Threading.Channels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.ADMIN.Services
 {
@@ -46,9 +40,11 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
         {
+
             var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes);
             var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
             return result;
+
         }
 
         public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
@@ -98,7 +94,7 @@ namespace DATN.ADMIN.Services
             return await _httpClient.GetFromJsonAsync<ResponseData<List<ProductSelect>>>("/api/Booking/List-Product-View-Sale");
         }
 
-        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to,DateTime dateTime)
+        public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to, DateTime dateTime)
         {
             return _httpClient.GetFromJsonAsync<ResponseData<List<NumberOfScheduleView>>>($"/api/Booking/List-Staff-Free-In-Time?from={from}&to={to}&datetime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}").GetAwaiter().GetResult();
         }
@@ -116,6 +112,36 @@ namespace DATN.ADMIN.Services
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
 
+        }
+        public async Task<ResponseData<string>> PaymentInStore(Payment payment)
+        {
+            var response = await _httpClient.PostAsJsonAsync<Payment>($"/api/Booking/Payment-In-Store", payment);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+            return result;
+        }
+
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        {
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/QrCode-CheckIn?idBooking={idBooking}");
+        }
+
+        public async Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail)
+        {
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/QrCode-CheckOut?idBooking={idBookingDetail}");
+
+        }
+
+        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
+        {
+            return await _httpClient.GetFromJsonAsync<ResponseData<ResponseMomo>>($"/api/Booking/Payment-Qr?totalPrice={totalPrice}");
+        }
+        public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
+        {
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/Payment-Qr-VnPay?totalPrice={totalPrice}");
+        }
+        public async Task<ResponseData<string>> CheckInArrive(int idBooking)
+        {
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/Booking/CheckIn-Booking?idBooking={idBooking}");
         }
     }
 }

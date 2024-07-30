@@ -1,20 +1,9 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using DATN.Aplication.Extentions;
-using DATN.Aplication.Repository;
-using DATN.Aplication.Repository.IRepository;
-using DATN.Data.EF;
 using DATN.Data.Entities;
 using DATN.Utilites;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Services
 {
@@ -233,7 +222,7 @@ namespace DATN.Aplication.Services
                         PasswordHash = !hasEmail ? null : _passwordExtensitons.HashPassword(request.Password),
                         IsComfirm = !hasEmail,
                     };
-                   await _unitOfWork.GuestRepository.AddAsync(guest);
+                    await _unitOfWork.GuestRepository.AddAsync(guest);
                 }
                 else
                 {
@@ -245,7 +234,7 @@ namespace DATN.Aplication.Services
                     guest.PasswordHash = _passwordExtensitons.HashPassword(request.Password);
                     await _unitOfWork.GuestRepository.UpdateAsync(guest);
                 }
-          
+
                 if (hasEmail)
                 {
                     var verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình

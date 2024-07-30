@@ -1,8 +1,6 @@
 ﻿using DATN.Aplication.Services;
-using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
@@ -21,20 +19,20 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> RegisterWithUser(GuestRegisterUserRequest request)
         {
             return await _guestManagerService.RegisterWithUser(request);
-        }  
-        
-  
+        }
+
+
         [HttpGet("GetGuest")]
-        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging( )
+        public async Task<ResponseData<List<GuestViewModel>>> GetGuestPaging()
         {
-            var response= await _guestManagerService.GetGuest();
+            var response = await _guestManagerService.GetGuest();
             return response;
-        } 
+        }
         [HttpGet("find-by-id")]
         public async Task<ResponseData<GuestViewModel>> FindByID(Guid id)
         {
             return await _guestManagerService.FindGuestByID(id);
-        }  
+        }
         [HttpGet("verify-cus")]//////////////đây là để xác minh khi đăng ký
         public async Task<ResponseData<string>> VerifyCode(string verifyCode)
         {
@@ -48,24 +46,24 @@ namespace DATN.API.Controllers
         [HttpPost("change-status")]
         public async Task<ResponseData<string>> ChangStatus(DeleteRequest<Guid> request)
         {
-             return await _guestManagerService.SoftDelete(request);
-        }  
+            return await _guestManagerService.SoftDelete(request);
+        }
         [HttpPost("update-pass-by-verifyCode")]
         public async Task<ResponseData<string>> UpdatePassByCode(string verifyCode, string newPass)
         {
-             return await _guestManagerService.ChangPassWithVerifyCode(verifyCode,newPass);
-        }  
+            return await _guestManagerService.ChangPassWithVerifyCode(verifyCode, newPass);
+        }
         [HttpPost("forgot-pass")]
         public async Task<ResponseData<string>> SendForgotMail(string email)
         {
-             return await _guestManagerService.SendForgotMail(email);
+            return await _guestManagerService.SendForgotMail(email);
         }
-	
+
         [HttpPost("register-by-guest")]///////////////// đây là đăng ký mới
-		public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterByGuestRequest request)
-		{
+        public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterByGuestRequest request)
+        {
             return await _guestManagerService.RegisterByCustomer(request);
         }
 
-	}
+    }
 }

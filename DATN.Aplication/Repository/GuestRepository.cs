@@ -4,11 +4,6 @@ using DATN.Data.EF;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DATN.Aplication.Repository
 {
@@ -29,12 +24,12 @@ namespace DATN.Aplication.Repository
             return result != null;
         }
 
-		public Task<bool> CheckEmailExist(string email, Guid id)
-		{
-			throw new NotImplementedException();
-		}
+        public Task<bool> CheckEmailExist(string email, Guid id)
+        {
+            throw new NotImplementedException();
+        }
 
-		public async Task<bool> CheckPhoneNumberExist(string phoneNumber)
+        public async Task<bool> CheckPhoneNumberExist(string phoneNumber)
         {
             var result = await _context.Guests.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
             return result != null;
@@ -43,8 +38,8 @@ namespace DATN.Aplication.Repository
         public async Task<bool> CheckUserExist(string user)
         {
             var result = await _context.Guests.FirstOrDefaultAsync(x => x.UserName == user);
-          
-            return result!=null;
+
+            return result != null;
         }
 
         public async Task<Guest> FindByEmail(string email)
@@ -56,23 +51,23 @@ namespace DATN.Aplication.Repository
             return await _context.Guests.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() &&( !x.IsDeleted.HasValue||!x.IsDeleted.Value));
         }
 
-	
 
-		public async Task RemoveGuestByEmail(string email, Guid id)
+
+        public async Task RemoveGuestByEmail(string email, Guid id)
         {
-            var result =  _context.Guests.Where(x => x.Email == email && x.IsComfirm == false&& x.Id!=id);
+            var result = _context.Guests.Where(x => x.Email == email && x.IsComfirm == false && x.Id != id);
             if (result != null)
             {
                 _context.Guests.RemoveRange(result);
                 await _context.SaveChangesAsync();
-              
+
             }
-           
+
         }
 
 
 
-		public async Task<bool> SoftDelete(DeleteRequest<Guid> request)
+        public async Task<bool> SoftDelete(DeleteRequest<Guid> request)
         {
             try
             {

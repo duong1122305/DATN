@@ -1,19 +1,19 @@
-﻿using DATN.Aplication.Extentions;
+﻿using DATN.Aplication;
+using DATN.Aplication.Extentions;
+using DATN.Aplication.Mapping;
+using DATN.Aplication.Services;
+using DATN.Aplication.Services.IServices;
 using DATN.Aplication.System;
+using DATN.Data.EF;
 using DATN.Data.Entities;
+using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Payment;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DATN.Data.EF;
-using DATN.Aplication.Services;
-using DATN.Aplication;
-using DATN.Aplication.Services.IServices;
-using System.Net;
-using DATN.Aplication.Mapping;
-using Microsoft.AspNetCore.Mvc;
-using DATN.ViewModels.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +94,7 @@ builder.Services.AddScoped<IStatisticalService, StatisticalService>();
 builder.Services.AddScoped<IBookingManagement, BookingManagement>();
 builder.Services.AddScoped<IProductManagement, ProductManagement>();
 builder.Services.AddScoped<NotificationHub>();
+builder.Services.AddScoped<Utils>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 

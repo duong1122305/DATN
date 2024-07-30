@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DATN.ViewModels.DTOs.ServiceDetail
 {
@@ -12,10 +7,10 @@ namespace DATN.ViewModels.DTOs.ServiceDetail
         [Required(ErrorMessage = "Chưa chọn dịch vụ")]
         public int ServiceId { get; set; } // Khóa ngoại đến ID dịch vụ
 
-        [Required(ErrorMessage = "Bắt buộc nhập tên dịch vụ chi tiết")]
-        [MaxLength(100, ErrorMessage = "Tối đa 100 ký tự")]
-        [MinLength(5, ErrorMessage = "Tối thiểu 5 ký tự")]
-        public string Name { get; set; } // Tên chi tiết dịch vụ
+        //[Required(ErrorMessage = "Bắt buộc nhập tên dịch vụ chi tiết")]
+        //[MaxLength(100, ErrorMessage = "Tối đa 100 ký tự")]
+        //[MinLength(5, ErrorMessage = "Tối thiểu 5 ký tự")]
+        //public string Name { get; set; } // Tên chi tiết dịch vụ
 
         [Range(1000, 9999999, ErrorMessage = "Giá không được nhỏ hơn 100 hoặc lớn hơn 9999999")]
         public float Price { get; set; } // Giá tiền

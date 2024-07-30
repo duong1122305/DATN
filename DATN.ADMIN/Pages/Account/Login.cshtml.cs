@@ -1,19 +1,8 @@
 ﻿using DATN.ADMIN.IServices;
-using DATN.ADMIN.Services;
-using DATN.Aplication.CustomProvider;
-using DATN.Data.Entities;
 using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Reflection.Metadata;
-using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.ADMIN.Pages.Account
 {
@@ -33,7 +22,7 @@ namespace DATN.ADMIN.Pages.Account
         }
         public async Task HandleLogin()
         {
-            
+
             if (_contextAccessor.HttpContext.Session.GetString("Key") != null)
             {
                 _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));

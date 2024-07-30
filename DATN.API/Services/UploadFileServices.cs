@@ -4,7 +4,6 @@ using CloudinaryDotNet.Actions;
 using DATN.Aplication;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
-using DATN.ViewModels.DTOs.Guest;
 using Microsoft.Extensions.Options;
 
 namespace DATN.API.Services
@@ -50,7 +49,7 @@ namespace DATN.API.Services
                 {
                     return new ResponseData<string> { IsSuccess = true, Data = "Tải ảnh đại diện thành công", Error = null };
                 }
-                return new ResponseData<string> { IsSuccess = false, Data = null, Error = "Tải ảnh đại diện thất bại"};
+                return new ResponseData<string> { IsSuccess = false, Data = null, Error = "Tải ảnh đại diện thất bại" };
             }
             catch (Exception ex)
             {

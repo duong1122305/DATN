@@ -21,7 +21,7 @@
                 <MudImage Src="@context.Item.LinkImg" Height="150" />
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x=>x.Name" Title="Tên SP" Sortable="false" Filterable="false" Style="width:200px"/>
+        <PropertyColumn Property="x=>x.Name" Title="Tên SP" Sortable="false" Filterable="false" Style="width:200px" />
         <PropertyColumn Property="x=>x.CateName" Title="Danh mục" Sortable="false" Filterable="false" />
         <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
         <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
@@ -45,8 +45,10 @@
     public Guid? guid { get; set; }
     [Parameter]
     public int? IdBooking { get; set; }
+    [Parameter]
+    public int termId { get; set; }
     [Inject]
-    private IBookingViewServices _ClientProduct { get; set; } 
+    private IBookingViewServices _ClientProduct { get; set; }
     [Inject]
     private BookingService _tempLstProductDetail { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
@@ -65,15 +67,25 @@
         {
             lstProductDetaiView = new List<ProductSelect>();
         }
-    } 
+    }
     private async Task ChooseProduct(ProductDetailView productDV)
     {
-        productDV.IdBooking = IdBooking.Value;
-        _tempLstProductDetail.AddProduct(productDV);
-        _dialogBox.Close();
+        @if (IdBooking != 0 && IdBooking != null)
+        {
+            productDV.IdBooking = IdBooking.Value;
+            _tempLstProductDetail.AddProduct(productDV);
+            _dialogBox.Close();
+        }
+        else
+        {
+            productDV.Term = termId;
+            _tempLstProductDetail.AddProduct(productDV);
+            _dialogBox.Close();
+        }
     }
     protected override async Task OnInitializedAsync()
     {
+        
         await LoadData();
     }
     private Func<ProductSelect, bool> _quickFilter => x =>

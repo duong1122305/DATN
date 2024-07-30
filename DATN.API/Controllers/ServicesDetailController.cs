@@ -1,8 +1,5 @@
-﻿using DATN.Aplication.Services;
-using DATN.Aplication.Services.IServices;
-using DATN.Data.Entities;
+﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.DTOs.ServiceDetail;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
@@ -92,7 +89,7 @@ namespace DATN.API.Controllers
         public async Task<IActionResult> GetServiceName()
         {
             var result = await _serviceDetailManagementService.GetServiceName();
-            if(result != null) return Ok(result);
+            if (result != null) return Ok(result);
 
             return BadRequest();
         }

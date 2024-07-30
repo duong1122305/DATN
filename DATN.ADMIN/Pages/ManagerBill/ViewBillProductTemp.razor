@@ -1,0 +1,90 @@
+﻿@page "/ViewBillProductTemp"
+@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
+@inject IDialogService _dialogservice;
+@using DATN.ViewModels.DTOs.Product
+<PageTitle>Danh sách đặt dịch vụ</PageTitle>
+<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
+<div style="display: flex; justify-content: flex-end;">
+    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+</div>
+
+<MudDataGrid Items="@bookingService.ListProductDetail" Hover="true" Filterable="true" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
+    <Columns>
+        <TemplateColumn Title="STT" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+            <GroupTemplate>
+                <span style="font-weight:bold">@context.Grouping.Key</span>
+                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,0,Convert.ToInt32(context.Grouping.Key.ToString())))">Thanh toán</MudIconButton>
+            </GroupTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+        <PropertyColumn Property="x=>x.SelectQuantityProduct" Title="Số Lượng" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <span>   @CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="ProductDetailView" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<ProductDetailView> lstBookingServices = new List<ProductDetailView>();
+    [Inject] private BookingService bookingService { get; set; }
+
+
+    static bool _customizeGroupBy;
+    MudDataGrid<ProductDetailView> dataGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private async Task LoadData()
+    {
+    }
+    private Func<ProductDetailView, string> _groupBy = x =>
+       {
+           if (_customizeGroupBy)
+           {
+               return x.Term.ToString();
+           }
+           else
+           {
+               return x.Term.ToString();
+           }
+       };
+    void ExpandAllGroups()
+    {
+        dataGrid?.ExpandAllGroups();
+    }
+    private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking,int? idterm)
+    {
+        var parameters = new DialogParameters();
+        string nameDialog = "";
+
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        parameters.Add("guid", id);
+        parameters.Add("date", date);
+        parameters.Add("idBooking", idBooking);
+        parameters.Add("termId", idterm);
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
+    }
+}

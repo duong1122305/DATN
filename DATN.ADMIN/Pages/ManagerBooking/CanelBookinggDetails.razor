@@ -4,7 +4,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" />
+        <MudTextField @bind-Value="actionView.Reason" For="@(() => actionView.Reason)" Label="Lý do huỷ" MaxLength="255" Required />
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
@@ -15,11 +15,9 @@
     [Parameter]
     public int id { get; set; }
 
-    private string CancellationReason { get; set; }
-
     [Inject]
     private IHttpContextAccessor _httpContextAccessor { get; set; }
-
+    public ActionView actionView = new ActionView();
 
     [Inject]
     IBookingViewServices _client { get; set; }
@@ -27,22 +25,20 @@
 
     public async Task ConfirmCancel()
     {
-        ActionView actionView = new ActionView()
+            actionView.IdBokingOrDetail = id;
+            actionView.Token = _httpContextAccessor.HttpContext.Session.GetString("Key");
+            var respone = await _client.CancelBookingDetail(actionView);
+            if (respone.IsSuccess)
             {
-                IdBokingOrDetail = id,
-                Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
-                Reason = CancellationReason
-            };
-        var respone = await _client.CancelBookingDetail(actionView);
-        if (respone.IsSuccess)
-        {
-            Message(respone.Data, Severity.Success);
-            _dialogBox.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            Message(respone.Error, Severity.Error);
-        }
+                Message(respone.Data, Severity.Success);
+                _dialogBox.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
+
+
     }
     public async Task Canel()
     {

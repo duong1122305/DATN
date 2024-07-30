@@ -1,13 +1,5 @@
-﻿using DATN.Data.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DATN.Aplication.Extentions
 {
@@ -15,7 +7,7 @@ namespace DATN.Aplication.Extentions
     {
         public static string CutName(string name)
         {
-            name = name.Replace("Đ","D").Replace("đ","d");
+            name = name.Replace("Đ", "D").Replace("đ", "d");
             var normalizedString = name.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();
 
