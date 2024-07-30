@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DATN.ViewModels.Common.Location;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +10,7 @@ namespace DATN.ViewModels.DTOs.Statistical
 	public class CustomerStatistical
 	{
 		public string Name { get; set; }
-		public List<double> Amount { get; set; }
-		public List<string> Label { get; set; }
+		public List<ChartData> Data { get; set; }
 
 	}
 }

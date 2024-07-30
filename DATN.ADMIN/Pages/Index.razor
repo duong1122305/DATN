@@ -6,7 +6,7 @@
 	<Authorized>
 		<MudGrid>
 			<MudItem sm="12">
-				<MudToggleGroup T="int?" SelectionMode="SelectionMode.SingleSelection" Value="type" ValueChanged="(e)=>LoadData(e)" Color="Color.Tertiary" Style="height: 100px" CheckMark>
+				<MudToggleGroup T="int?" SelectionMode="MudBlazor.SelectionMode.SingleSelection" Value="type" ValueChanged="(e)=>LoadData(e)" Color="Color.Tertiary" Style="height: 100px" CheckMark>
 					<MudToggleItem Value="@((int?)1)" Text="Ngày" />
 					<MudToggleItem Value="@((int?)2)" Text="Tuần" />
 					<MudToggleItem Value="@((int?)3)" Text="Tháng" />
@@ -16,33 +16,36 @@
 
 			</MudItem>
 			<MudItem sm="12" md="7">
-				<MudPaper Elevation="2" Class="pa-4" Style="" Height="550px">
-					<MudChart ChartType="ChartType.Line" hi ChartSeries="@Series" XAxisLabels="@Labelsbar.ToArray()" Width="90%">
-						<CustomGraphics>
-							<style>
-								.heavy {
-									font: bold 30px Helvetica;
-								}
+				@if (customerData != null && customerData.Data != null && customerData.Data.Count()>0)
+				{
+					<MudPaper Elevation="2" Class="pa-4" Style="" Height="350px">
 
-							</style>
-							<text x="80" y="35" class="heavy">Thống kê lượt khách</text>
+						<SfChart Title="@customerData.Name"  Width="@width">
+							<ChartPrimaryXAxis Title="" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+							<ChartPrimaryYAxis></ChartPrimaryYAxis>
+							<ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+							<ChartSeriesCollection>
+								<ChartSeries DataSource="@customerData.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
+								</ChartSeries>
+							</ChartSeriesCollection>
+						</SfChart>
 
-						</CustomGraphics>
-					</MudChart>
-				</MudPaper>
+
+					</MudPaper>
+				}
+				
 
 			</MudItem>
 			<MudItem sm="12" md="5">
-				<MudPaper Elevation="2" Class="pa-4" Style="height: 550px;">
+				<MudPaper Elevation="2" Class="pa-4" Style="height: 350px;">
 
 
-					<MudChart ChartType="ChartType.Donut" Width="100%" Height="350px" InputData="@dataPie" InputLabels="@labelsPie">
+					<MudChart ChartType="ChartType.Donut" Width="100%" Height="200px" InputData="@dataPie" InputLabels="@labelsPie">
 						<CustomGraphics>
-							<text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Doanh thu</text>
+							<text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3" font-weight="300">Doanh thu</text>
 							<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="4">@dataPie.Sum().ToString("N0")đ</text>
 						</CustomGraphics>
 					</MudChart>
-
 
 				</MudPaper>
 			</MudItem>

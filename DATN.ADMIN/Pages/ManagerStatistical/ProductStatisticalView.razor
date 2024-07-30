@@ -1,0 +1,43 @@
+﻿@page "/statisticalProduct"
+<h2>Thống kê sản phẩm</h2>
+<MudCard Style="padding:20px">
+	<h3>Hóa đơn sản phẩm đã bán</h3>
+
+	<MudGrid>
+		<MudItem sm="12" md="4">
+
+			<MudDateRangePicker @ref="_picker" Variant="Variant.Outlined" PickerClosed="ChangeDate" Label="Chọn khoảng thời gian" @bind-DateRange="_dateRange"></MudDateRangePicker>
+		</MudItem>
+	</MudGrid>
+</MudCard>
+<SfChart Title="Sales Analysis">
+    <ChartPrimaryXAxis Title="" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+    <ChartPrimaryYAxis Title="Số lượt khách"></ChartPrimaryYAxis>
+    <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@Sales" XName="Label" YName="Value" Type="ChartSeriesType.Column">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
+@code {
+    public class SalesInfo
+    {
+        public string Label { get; set; }
+        public double Value { get; set; }
+    }
+
+    public List<SalesInfo> Sales = new List<SalesInfo>
+    {
+        new SalesInfo { Label = "Tháng 1", Value = 35 },
+        new SalesInfo { Label = "Feb", Value = 28 },
+    };
+
+	private MudDateRangePicker _picker;
+	private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.Date);
+	public async Task ChangeDate()
+	{
+		var start = _dateRange.Start;
+		var end = _dateRange.End;
+	}
+}

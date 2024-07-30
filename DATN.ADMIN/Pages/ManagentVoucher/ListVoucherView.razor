@@ -42,7 +42,7 @@
 <MudDataGrid Items="@lstVoucher" Hover="true" QuickFilter="@_quickFilter" Filterable="true">
     <ToolBarContent>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
     </ToolBarContent>
     <Columns>

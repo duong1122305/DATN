@@ -4,6 +4,7 @@ using DATN.ViewModels.DTOs.Statistical;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using MudBlazor;
 
 namespace DATN.ADMIN.Pages
@@ -20,16 +21,16 @@ namespace DATN.ADMIN.Pages
 		protected ISnackbar Snackbar { get; set; }
 
 		int type = 1;
+		CustomerStatistical customerData = new CustomerStatistical();
 		List<Top3Statistical> top3ProductReven;
 		List<Top3Statistical> top3ServiceReven;
 		List<Top3Statistical> top3ProductQuantity;
 		List<Top3Statistical> top3ServiceQuantity;
 		public double[] dataPie = { 0, 0 };
 		public string[] labelsPie = { "Dịch vụ", "Sản phẩm" };
-		public List<ChartSeries> Series = new List<ChartSeries>();
-		public List<string> Labelsbar = new List<string>();
+		string width = "99%";
 
-		protected override async Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
 		{
 			type = 3;
 			await LoadData(type);
@@ -45,23 +46,20 @@ namespace DATN.ADMIN.Pages
 			if (response.IsSuccess&& response.Data.ProductRevenueStatistical.Count()>0)
 			{
 				dataPie = response.Data.DataPiceRevenue;
-				Labelsbar = response.Data.CustomerStatistical.Label;
-				Series.Clear();
-				Series.Add(
-					new ChartSeries() { Name = response.Data.CustomerStatistical.Name, Data = response.Data.CustomerStatistical.Amount.ToArray() }
-					);
-				top3ProductReven = response.Data.ProductRevenueStatistical;
+				customerData= response.Data.CustomerStatistical;
+					top3ProductReven = response.Data.ProductRevenueStatistical;
 				top3ServiceReven = response.Data.ServiceRevenueStatistical;
 				top3ProductQuantity = response.Data.ProductQuantityStatistical;
 				top3ServiceQuantity = response.Data.ServiceQuantityStatistical;
-			}
+                width = "99%";
+            }
             else
             {
 				Snackbar.Add("Chưa có data nhé b!");
 				type=oldType;
             }
             StateHasChanged();
-
-		}
+            width = "100%";
+        }
 	}
 }
