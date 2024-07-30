@@ -7,6 +7,7 @@ using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -14,6 +15,7 @@ namespace DATN.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowSpecificOrigin")]
     public class BookingController : Controller
     {
         private readonly IBookingManagement _bookingManagement;
@@ -100,7 +102,12 @@ namespace DATN.API.Controllers
         [HttpPost("Guest-Booking")]
         public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest)
         {
-            return await _bookingManagement.GuestCreateBooking(createBookingRequest);
+            var result =  await _bookingManagement.GuestCreateBooking(createBookingRequest);
+            if (result.IsSuccess)
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Booking đã được tạo thành công bởi ID: {createBookingRequest.GuestId}!");
+            }
+            return result;
         }
 
         [HttpPost("Add-Product-For-Bill")]
