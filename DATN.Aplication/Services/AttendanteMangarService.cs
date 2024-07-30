@@ -247,35 +247,37 @@ namespace DATN.Aplication.Services
                                      ShiftId = s.Id,
                                  };
 
-                var lstShiftString = "Bạn không có ca hôm nay";
-                int scheduleID = 0;
-                string shiftNow = "Không trong ca làm";
-                bool? typeAttendance = null;
-                string attendanceShift = "";
-                int shiftId = 0;
-                if (lstCheckin.Count() > 0)
-                {
-                    lstShiftString = "";
-                    foreach (var item in lstCheckin)
-                    {
-                        lstShiftString += item.Name.ToString() + ", ";
-                    }
+				var lstShiftString = "Bạn không có ca hôm nay";
+				int scheduleID = 0;
+				string shiftNow = "Không trong thời gian điểm danh";
+				bool? typeAttendance = null;
+				string attendanceShift = "";
+				int shiftId = 0;
+				if (lstCheckin.Count() > 0)
+				{
+					lstShiftString = "";
+					foreach (var item in lstCheckin)
+					{
+						lstShiftString += item.Name.ToString() + ", ";
+					}
 
                     lstShiftString = lstShiftString.Substring(0, lstShiftString.Length - 2);
 
-                    foreach (var item in lstCheckin.OrderBy(p => p.Start))
-                    {
-                        if ((item.Start.Add(TimeSpan.FromMinutes(-30)) <= now && item.Start.Add(TimeSpan.FromMinutes(30)) >= now && !item.IsCheckined) //kiểm tra xem có đủ ko
-                            || (item.IsCheckined && !item.IsCheckouted && item.End.Add(TimeSpan.FromMinutes(-30)) <= now && item.End.Add(TimeSpan.FromMinutes(30)) >= now))
-                        {
-                            scheduleID = item.ID;
-                            shiftId = item.ShiftId;
-                            attendanceShift = item.Name.ToString();
-                            shiftNow = item.Name;
-                            if (!item.IsCheckined) typeAttendance = true;
-                            else if (!item.IsCheckouted) typeAttendance = false;
+					foreach (var item in lstCheckin.OrderBy(p => p.Start))
+					{
+						
 
-                        }
+						if ((item.Start.Add(TimeSpan.FromMinutes(-30)) <= now && item.Start.Add(TimeSpan.FromMinutes(30)) >= now && !item.IsCheckined) //kiểm tra xem có đủ ko
+							|| (item.IsCheckined && !item.IsCheckouted && item.End.Add(TimeSpan.FromMinutes(-30)) <= now && item.End.Add(TimeSpan.FromMinutes(30)) >= now))
+						{
+							scheduleID = item.ID;
+							shiftId = item.ShiftId;
+							attendanceShift = item.Name.ToString();
+							shiftNow = item.Name;
+							if (!item.IsCheckined) typeAttendance = true;
+							else if (!item.IsCheckouted) typeAttendance = false;
+							break;
+						}
 
                     }
                 }

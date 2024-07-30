@@ -87,6 +87,7 @@ builder.Services.AddResponseCaching(); // Adds response caching, which also enab
 builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
 builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
+builder.Services.AddScoped<IStatiscalClient, StatiscalClient>();
 builder.Services.AddSingleton<BookingService>();
 builder.Services.AddMudServices(config =>
 {
