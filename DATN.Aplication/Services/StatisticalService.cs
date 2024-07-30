@@ -152,7 +152,7 @@ namespace DATN.Aplication.Services
 							  join serviceDetail in lstServiceDetails on service.Id equals serviceDetail.ServiceId   
 							  join bookingDetail in lstBookingDetails on serviceDetail.Id equals bookingDetail.ServiceDetailId into bdGroup
 							  from bookingDetail in bdGroup.DefaultIfEmpty()
-							  group new { ServiceName = service.Name, Price = serviceDetail.Price, Quantity = bookingDetail?.Quantity ?? 0 }
+							  group new { ServiceName = service.Name, Price = serviceDetail.Price, Quantity = bookingDetail?.Quantity??0 }
 							  by new { ServiceName = service.Name } into g
 							  select new Top3Statistical
 							  {

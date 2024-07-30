@@ -52,33 +52,35 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var product = (from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                               where cate.Id == productView.Id
-                               select cate).FirstOrDefault();
-                var checkdup = from cate in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                               where cate.Name == productView.Name.Trim() && cate.Id != productView.Id && cate.IdProduct == productView.IdProduct
-                               select cate;
+                var product = (from pd in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                               where pd.Id == productView.Id
+                               select pd).FirstOrDefault();
+                var checkdup = from pd in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                               where pd.Name == productView.Name.Trim() && pd.Id != productView.Id && pd.IdProduct == productView.IdProduct
+                               select pd;
 
-                if (checkdup == null || checkdup.FirstOrDefault() == null)
+                if (checkdup != null && checkdup.FirstOrDefault() != null)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+
+                }
+                else
                 {
                     product.Name = productView.Name;
                     product.Price = productView.Price;
                     product.Amount = productView.Amount;
-                    if (productView.Amount==0)
+                    if (productView.Amount == 0)
                     {
                         product.Status = ProductDetailStatus.OutOfStock;
                     }
                     else
                     {
-						product.Status = ProductDetailStatus.Stocking;
-					}
+                        product.Status = ProductDetailStatus.Stocking;
+                    }
                     await _unitOfWork.ProductDetailRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                 }
-                else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
-
 
 
             }

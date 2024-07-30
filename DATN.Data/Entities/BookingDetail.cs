@@ -32,7 +32,11 @@ namespace DATN.Data.Entities
         public BookingDetailStatus Status { get; set; } // Trạng thái đặt lịch
 
         public double Price { get; set; } // Giá tiền
-        public int Quantity { get; set; } // Số lượng
+        public int Quantity { get; set 
+            {
+                return 1;
+            }
+            ; } // Số lượng
 
         public virtual Booking Booking { get; set; } // Đặt lịch
         public virtual Pet Pet { get; set; }
