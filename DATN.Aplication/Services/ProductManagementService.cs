@@ -224,7 +224,7 @@ namespace DATN.Aplication.Services
 
                         };
             if (query.Count() > 0)
-                return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
+                return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.OrderBy(p=>p.Id).ToList() };
             else
                 return new ResponseData<List<ProductView>> { IsSuccess = false, Error = "Chưa có dữ liệu", Data = new List<ProductView>() };
         }

@@ -1410,6 +1410,84 @@ namespace DATN.Aplication.Services
             string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             return new ResponseData<string> { IsSuccess = true, Data = paymentUrl };
         }
+
+        public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest)
+        {
+            try
+            {
+                if (idGuest == Guid.Empty) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Không xác định được danh tính của bạn"
+                };
+
+                var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
+                            join bd in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                            on b.Id equals bd.BookingId
+                            join sd in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                            on bd.ServiceDetailId equals sd.Id
+                            join s in await _unitOfWork.ServiceRepository.GetAllAsync()
+                            on sd.ServiceId equals s.Id
+                            join p in await _unitOfWork.PetRepository.GetAllAsync()
+                            on bd.PetId equals p.Id
+                            where b.GuestId == idGuest
+                            select new
+                            {
+                                PetName = p.Name,
+                                BookingId = b.Id,
+                                ServiceId = s.Id,
+                                ServiceName = s.Name,
+                                BookingTime = b.BookingTime,
+                                StartDate = bd.StartDateTime,
+                                EndDate = bd.EndDateTime,
+                                StartTime = bd.StartDateTime,
+                                TotalPrice = b.TotalPrice,
+                                Status = bd.Status
+                            })
+                           .GroupBy(c => new
+                           {
+                               c.BookingId,
+                               c.PetName,
+                               c.BookingTime,
+                               c.StartDate,
+                               c.StartTime
+                           })
+                           .Select(c => new GetBookingByGuestVM
+                           {
+                               PetName = c.Key.PetName,
+                               ServiceName = c.Select(x => x.ServiceName).ToList(), // Danh sách tên dịch vụ
+                               ServiceId = c.Select(x => x.ServiceId).ToList(),    // Danh sách ID dịch vụ
+                               BookingTime = new DateOnly(c.Key.BookingTime.Year, c.Key.BookingTime.Month, c.Key.BookingTime.Day).ToString("dd/MM/yyyy"),
+                               StartDate = new DateOnly(c.Key.StartDate.Year, c.Key.StartDate.Month, c.Key.StartDate.Day).ToString("dd/MM/yyyy"),
+                               StartTime = new TimeOnly(c.Key.StartTime.Hour, c.Key.StartTime.Minute).ToString("HH:mm"),
+                               TotalPrice = c.Sum(x => x.TotalPrice), // Tổng giá của các dịch vụ
+                               Status = c.First().Status
+                           }).OrderByDescending(c => c.BookingTime).AsQueryable();
+                if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Có lỗi trong quá trình tìm kiếm"
+                };
+
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = true,
+                    Data = join.ToList(),
+                    Error = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = ex.Message
+                };
+            }
+        }
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
     {

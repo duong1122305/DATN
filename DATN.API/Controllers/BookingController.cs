@@ -1,4 +1,5 @@
 ﻿using DATN.Aplication.Services.IServices;
+using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Authenticate;
@@ -140,6 +141,12 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> CheckInArrive(int idBooking)
         {
             return await _bookingManagement.CheckInArrive(idBooking);
+        }
+
+        [HttpGet("GetBookingByGuest")]
+        public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest)
+        {
+            return await _bookingManagement.GetBookingByGuest(idGuest);
         }
     }
 }

@@ -8,7 +8,7 @@
 <MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="width:1200px;min-width:1200px">
     <ToolBarContent>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
     </ToolBarContent>
     <Columns>
         <TemplateColumn Title="STT" Sortable="false" Filterable="false">

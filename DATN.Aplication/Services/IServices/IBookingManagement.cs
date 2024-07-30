@@ -1,4 +1,5 @@
-﻿using DATN.ViewModels.Common;
+﻿using DATN.Data.Entities;
+using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
@@ -27,5 +28,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice);
         public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
         public Task<ResponseData<string>> CheckInArrive(int idBooking);
+        public Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest);
     }
 }
