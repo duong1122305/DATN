@@ -67,9 +67,13 @@
 
 							<AccumulationChartSeriesCollection>
 								<AccumulationChartSeries DataSource="@revenuePieDatas.Data" XName="Label" YName="Value" Name="Browser">
-									<AccumulationDataLabelSettings Visible="true" Name="Text" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+									<AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
 								</AccumulationChartSeries>
 							</AccumulationChartSeriesCollection>
+							<AccumulationChartTooltipSettings 	 Format="${point.x} - <b>${point.y}đ</b>" Header="Doanh thu" Enable="true">
+								
+							</AccumulationChartTooltipSettings>
+							
 						</SfAccumulationChart>
 					}
 				</MudPaper>

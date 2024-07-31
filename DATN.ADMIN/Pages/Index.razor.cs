@@ -44,7 +44,6 @@ namespace DATN.ADMIN.Pages
 		async Task LoadData(int? value = 1)
 		{
 			if (value == null) return;
-			var oldType = type;
 			type = value.Value;
 			var response = await statiscalClient.StatisticalIndex(type);
 			if (response.IsSuccess)
@@ -62,7 +61,6 @@ namespace DATN.ADMIN.Pages
 			else
 			{
 				Snackbar.Add("Chưa có data nhé b!");
-				type = oldType;
 			}
 			StateHasChanged();
 			width = "100%";

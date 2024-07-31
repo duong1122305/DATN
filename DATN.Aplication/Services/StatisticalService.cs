@@ -202,7 +202,7 @@ namespace DATN.Aplication.Services
 					Text = $"Sản phẩm : {dataSP.Sum(p => p.TotalRevenue).ToString("N0")}đ"
 				};
 				pieData.Data.Add(pieSP);
-				pieData.Name= "Tổng doanh thu: "+ revStatistical.Data.Sum(p=>p.Value).ToString("N0")+ "đ";
+				pieData.Name= "Tổng doanh thu: "+ (dataSP.Sum(p => p.TotalRevenue)+ dataDV.Sum(p => p.TotalRevenue)).ToString("N0")+ "đ";
 				///
 
 				return new ResponseData<Statistical>()
