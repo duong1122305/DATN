@@ -141,7 +141,7 @@ namespace DATN.Aplication.Services
                            CategoryId = catepro.Id,
                        };
             if (list.Count() > 0)
-                return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.ToList() };
+                return new ResponseData<List<CategoryProductView>> { IsSuccess = true, Data = list.OrderByDescending(p => p.Id).ToList() };
             else
                 return new ResponseData<List<CategoryProductView>> { IsSuccess = false, Data = new List<CategoryProductView>(), Error = "Chưa có dữ liệu" };
         }

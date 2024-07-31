@@ -43,7 +43,7 @@ namespace DATN.ADMIN.Pages
 			var oldType = type;
 			type = value.Value;
 			var response = await statiscalClient.StatisticalIndex(type);
-			if (response.IsSuccess&& response.Data.ProductRevenueStatistical.Count()>0)
+			if (response.IsSuccess)
 			{
 				dataPie = response.Data.DataPiceRevenue;
 				customerData= response.Data.CustomerStatistical;

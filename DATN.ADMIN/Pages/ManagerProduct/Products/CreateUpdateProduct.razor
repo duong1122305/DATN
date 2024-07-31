@@ -10,10 +10,12 @@
 @using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ProductDetail
 @using DATN.ViewModels.DTOs.ServiceManager
+@using DATN.ADMIN.Pages.ManagerProduct.Brand
+@using DATN.ADMIN.Pages.ManagerProduct.Category
 @using MudBlazor
 @using System.Globalization
 @inject ISnackbar Snackbar
-@inject IDialogService _diagService
+@inject IDialogService _dialogService
 <EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
 	<MudGrid>
 
@@ -155,29 +157,35 @@
 	private string url = Contant.ImgDefault;
 	protected async override Task OnInitializedAsync()
 	{
+		await LoadData();
+
+		if (product.Id != null && product.Id != 0)
+		{
+			selectedBrand = lstBrand.First(x => x.Id == product.IdBrand);
+			selectedCate = lstCate.First(x => x.Id == product.CategoryProductId);
+			col_img = 5;
+			col_pro = 7;
+			url = product.Url!;
+			_nameButton = "Cập nhật";
+			nameCU = "Sửa";
+		}
+		else
+		{
+			_nameButton = "Thêm mới";
+		}
+
+		AddItem();
+
+	}
+	async Task LoadData()
+	{
 		var brand = await _brandClient.ListBrand();
 		var cate = await _cateClient.ListCategoryProduct();
 		if (brand.IsSuccess && cate.IsSuccess)
 		{
 			lstBrand = brand.Data;
 			lstCate = cate.Data;
-			if (product.Id != null && product.Id != 0)
-			{
-				selectedBrand = lstBrand.First(x => x.Id == product.IdBrand);
-				selectedCate = lstCate.First(x => x.Id == product.CategoryProductId);
-				col_img = 5;
-				col_pro = 7;
-				url = product.Url!;
-				_nameButton = "Cập nhật";
-				nameCU = "Sửa";
-			}
-			else
-			{
-				_nameButton = "Thêm mới";
-			}
 		}
-		AddItem();
-
 	}
 	void AddItem()
 	{
@@ -348,7 +356,7 @@
 					Name = product.Name,
 					Description = product.Description,
 					IdBrand = selectedBrand.Id.Value,
-					IdCategoryProduct =selectedCate.Id,
+					IdCategoryProduct = selectedCate.Id,
 					ImgUrl = _product.ImgUrl,
 					ImgID = _product.ImgID
 				});
@@ -384,7 +392,7 @@
 
 	private async Task<bool> Confirm(string text)
 	{
-		var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
+		var confirm = await _dialogService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
 		yesText: "Xác nhận",
 		cancelText: "Hủy", noText: null,
 		options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
@@ -440,11 +448,47 @@
 	}
 	private async Task QuickCreateBrand()
 	{
-		var x = 1;
+		string nameDialog = "Thêm nhanh nhãn hiệu";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<CreateUpdateBrand>(nameDialog, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+		selectedBrand = lstBrand.First();
 	}
 	private async Task QuickCreateCate()
 	{
-		var x = 1;
+		string nameDialog = "Thêm nhanh danh mục";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<CreateUpdateCateDetails>(nameDialog, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+		selectedCate = lstCate.First();
 	}
 }
 <style>
