@@ -1,9 +1,11 @@
 ﻿@page "/trangchu"
 @using DATN.Utilites
+@using DATN.ViewModels.DTOs.Statistical
 <link rel="stylesheet" href="/css/Statical.css">
 <PageTitle>Trang chủ</PageTitle>
 <AuthorizeView Roles="Admin">
 	<Authorized>
+
 		<MudGrid>
 			<MudItem sm="12">
 				<MudToggleGroup T="int?" SelectionMode="MudBlazor.SelectionMode.SingleSelection" Value="type" ValueChanged="(e)=>LoadData(e)" Color="Color.Tertiary" Style="height: 100px" CheckMark>
@@ -15,14 +17,34 @@
 				<MudText Typo="Typo.h4" HtmlTag="h2">Thống kê doanh thu cửa hàng</MudText>
 
 			</MudItem>
+			<MudItem md="12">
+				@if (revenueDatas != null && revenueDatas.Data != null && revenueDatas.Data.Count() > 0)
+				{
+					<MudPaper Elevation="2" Class="pa-4" Style="" Height="400px">
+						<SfChart Title="@revenueDatas.Name" Width="@width">
+							<ChartPrimaryXAxis Format="N0" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+							<ChartPrimaryYAxis Visible=true LabelFormat="N0"></ChartPrimaryYAxis>
+							<ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+							<ChartSeriesCollection>
+								<ChartSeries DataSource="@revenueDatas.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
+									<ChartMarker>
+										<ChartDataLabel Visible="true" Format="N0" />
+									</ChartMarker>
+								</ChartSeries>
+							</ChartSeriesCollection>
+						</SfChart>
+					</MudPaper>
+				}
+
+			</MudItem>
 			<MudItem sm="12" md="7">
-				@if (customerData != null && customerData.Data != null && customerData.Data.Count()>0)
+				@if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
 				{
 					<MudPaper Elevation="2" Class="pa-4" Style="" Height="350px">
 
-						<SfChart Title="@customerData.Name"  Width="@width">
+						<SfChart Title="@customerData.Name" Width="@width">
 							<ChartPrimaryXAxis Title="" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-							<ChartPrimaryYAxis></ChartPrimaryYAxis>
+							<ChartPrimaryYAxis Interval="1"></ChartPrimaryYAxis>
 							<ChartTooltipSettings Enable="true"></ChartTooltipSettings>
 							<ChartSeriesCollection>
 								<ChartSeries DataSource="@customerData.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
@@ -33,74 +55,27 @@
 
 					</MudPaper>
 				}
-				
+
 
 			</MudItem>
 			<MudItem sm="12" md="5">
 				<MudPaper Elevation="2" Class="pa-4" Style="height: 350px;">
-
-
-					<MudChart ChartType="ChartType.Donut" Width="100%" Height="200px" InputData="@dataPie" InputLabels="@labelsPie">
-						<CustomGraphics>
-							<text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3" font-weight="300">Doanh thu</text>
-							<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="4">@dataPie.Sum().ToString("N0")đ</text>
-						</CustomGraphics>
-					</MudChart>
-
-				</MudPaper>
-			</MudItem>
-			<MudItem sm="12" md="6">
-
-				<MudPaper Elevation="2" Class="pa-4" Style="height: fit-content;">
-					@if (top3ProductReven != null && top3ProductReven.Count > 0)
+					@if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
 					{
-						<div class="custom-container">
-							<h1>Top 3 sản phẩm doanh thu cao nhất</h1>
-							@foreach (var item in top3ProductReven)
-							{
-								if (top3ProductReven.IndexOf(item)==3)
-								{
-									break;
-								}
-								<div class="custom-product">
-									<img src="@item.ImgUrl" alt="Sản phẩm">
-									<div class="custom-product-info">
-										<h3 class="text-info">@item.Name</h3>
-										<p> <b>Số lượng bán ra: @item.TotalAmount.ToString("N0") </b></p>
-										<p class="custom-price"> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</p>
-									</div>
-								</div>
-							}
-						</div>
-					}
+						<SfAccumulationChart Title="@revenuePieDatas.Name">
+							<AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
 
-				</MudPaper>
-
-			</MudItem>
-			<MudItem sm="12" md="6">
-				<MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
-					@if (top3ServiceReven != null && top3ServiceReven.Count > 0)
-					{
-						<div class="custom-container">
-							<h1>Top 3 dịch vụ doanh thu cao nhất</h1>
-							@foreach (var item in top3ServiceReven)
-							{
-								if (top3ServiceReven.IndexOf(item) == 3)
-								{
-									break;
-								}
-								<div class="custom-product">
-									<img src="/img/service.jpg" alt="Dịch vụ">
-									<div class="custom-product-info">
-										<h3 class="text-info">@item.Name</h3>
-										<p> <b>Số lượng bán ra: @item.TotalAmount.ToString("N0") </b></p>
-										<p class="custom-price"> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</p>
-									</div>
-								</div>
-							}
-						</div>
+							<AccumulationChartSeriesCollection>
+								<AccumulationChartSeries DataSource="@revenuePieDatas.Data" XName="Label" YName="Value" Name="Browser">
+									<AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+								</AccumulationChartSeries>
+							</AccumulationChartSeriesCollection>
+							<AccumulationChartTooltipSettings 	 Format="${point.x} - <b>${point.y}đ</b>" Header="Doanh thu" Enable="true">
+								
+							</AccumulationChartTooltipSettings>
+							
+						</SfAccumulationChart>
 					}
-					
 				</MudPaper>
 			</MudItem>
 			<MudItem sm="12" md="6">
@@ -112,7 +87,7 @@
 							<h1>Top 3 sản phẩm bán chạy</h1>
 							@foreach (var item in top3ProductQuantity)
 							{
-								if (top3ProductReven.IndexOf(item) == 3)
+								if (top3ProductQuantity.IndexOf(item) == 3)
 								{
 									break;
 								}
@@ -139,7 +114,7 @@
 							<h1>Top 3 dịch vụ làm nhiều nhất</h1>
 							@foreach (var item in top3ServiceQuantity)
 							{
-								if (top3ServiceReven.IndexOf(item) == 3)
+								if (top3ServiceQuantity.IndexOf(item) == 3)
 								{
 									break;
 								}
@@ -147,7 +122,7 @@
 									<img src="/img/service.jpg" alt="Dịch vụ">
 									<div class="custom-product-info">
 										<h3 class="text-info">@item.Name</h3>
-										<p class="custom-price">Số lượng bán ra: @item.TotalAmount.ToString("N0")</p>
+										<p class="custom-price">Số lượt sử dụng: @item.TotalAmount.ToString("N0")</p>
 										<p><b>Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND </b> </p>
 									</div>
 								</div>
@@ -157,13 +132,64 @@
 
 				</MudPaper>
 			</MudItem>
+
+			<MudItem sm="12" md="12">
+
+				<MudPaper Elevation="2" Class="pa-4">
+
+					@if (lstProductOutStock != null && lstProductOutStock.Count > 0)
+					{
+						<MudDataGrid Items="@lstProductOutStock" Groupable="false" Hover="true" Filterable="true">
+
+							<ToolBarContent>
+								<div style="width:200px">
+									<MudSelect T="int" Value=-1 Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="ChangStatus">
+										<MudSelectItem  Value="-1">Tất cả</MudSelectItem>
+										<MudSelectItem Value="0">Hết hàng</MudSelectItem>
+										<MudSelectItem Value="1">Sắp hết</MudSelectItem>
+									</MudSelect>
+								</div>
+								<MudSpacer />
+
+							</ToolBarContent>
+							<Columns>
+								<TemplateColumn Title="STT" Sortable="false" Filterable="false">
+									<CellTemplate Context="data">
+										<span>@(lstProductOutStock.IndexOf(data.Item) + 1)</span>
+									</CellTemplate>
+								</TemplateColumn>
+								<PropertyColumn Property="x => x.FullName" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+								<PropertyColumn Property="x => x.Category" Title="Tên danh mục" Sortable="false" Filterable="false" />
+								<PropertyColumn Property="x => x.Brand" Title="Thương hiệu" Sortable="false" Filterable="false" />
+								<PropertyColumn Property="x => x.Quantity" Title="Số lượng tồn kho" Sortable="false" Filterable="false" />
+								<TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+									<CellTemplate Context="data">
+										@if (!data.Item.Status)
+										{
+											<MudChip Color="Color.Error" title="Ngưng hoạt động">Hết hàng</MudChip>
+										}
+										else
+										{
+											<MudChip Color="Color.Warning" title="Hoạt động">Sắp hết</MudChip>
+
+										}
+									</CellTemplate>
+								</TemplateColumn>
+
+							</Columns>
+							<PagerContent>
+								<MudDataGridPager T="ProductOutStock" />
+							</PagerContent>
+						</MudDataGrid>
+					}
+
+
+				</MudPaper>
+
+			</MudItem>
 		</MudGrid>
 	</Authorized>
 	<NotAuthorized>
 		<h1>Bạn không có quyền truy cập trang này !!!!</h1>
 	</NotAuthorized>
 </AuthorizeView>
-@code {
-
-
-}
