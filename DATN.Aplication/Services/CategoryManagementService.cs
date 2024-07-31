@@ -139,7 +139,7 @@ namespace DATN.Aplication.Services
                            IsDeleted = cate.IsDeleted
                        };
             if (list.Count() > 0)
-                return new ResponseData<List<CategoryView>> { IsSuccess = true, Data = list.ToList() };
+                return new ResponseData<List<CategoryView>> { IsSuccess = true, Data = list.OrderByDescending(p => p.Id).ToList() };
             else
                 return new ResponseData<List<CategoryView>> { IsSuccess = false, Data = new List<CategoryView>(), Error = "Chưa có dữ liệu" };
         }

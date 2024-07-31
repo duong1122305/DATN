@@ -10,10 +10,12 @@
 @using DATN.ViewModels.DTOs.Product
 @using DATN.ViewModels.DTOs.ProductDetail
 @using DATN.ViewModels.DTOs.ServiceManager
+@using DATN.ADMIN.Pages.ManagerProduct.Brand
+@using DATN.ADMIN.Pages.ManagerProduct.Category
 @using MudBlazor
 @using System.Globalization
 @inject ISnackbar Snackbar
-@inject IDialogService _diagService
+@inject IDialogService _dialogService
 <EditForm Model="@product" OnValidSubmit="@(async () => await Submit())">
 	<MudGrid>
 
@@ -23,7 +25,7 @@
 			<div style="display: flex; justify-content: center; margin-top: 20px;">
 				<MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="ChooseFile" Style="width:100px; padding: 15px 2px">
 					<ButtonTemplate>
-						<MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" Style="width:45px" for="@fileInput">Sửa</MudButton>
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" Style="width:45px" for="@fileInput">@nameCU</MudButton>
 					</ButtonTemplate>
 				</MudFileUpload>
 
@@ -36,58 +38,20 @@
 			<MudItem xs="12" sm="12">
 				<MudCard>
 					<MudCardContent>
-						@if (product.Id == 0 || product.Id == null)
-						{
+						<MudAutocomplete Required="true" T="BrandView" Label="Thương hiệu" @bind-Value="selectedBrand" SearchFunc="@SearchBrand"
+										 ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Variant="Variant.Outlined"
+										 ResetValueOnEmptyText="false" Text="@selectedBrand.Name"
+										 CoerceText="true" CoerceValue="false" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.AddBox" OnAdornmentClick="QuickCreateBrand" AdornmentAriaLabel="Thêm nhanh hãng" />
 
-							<div class="mud-select">
-								<label class="mud-input-label">Chọn thương hiệu</label>
-								<select @bind="_product.IdBrand" required>
-									<option value="0">Chọn thương hiệu</option>
-									@foreach (var i in lstBrand)
-									{
-										<option value="@i.Id">@i.Name</option>
-									}
-								</select>
-							</div>
-							<div class="mud-select">
-								<label class="mud-input-label">Chọn danh mục</label>
-								<select @bind="_product.IdCategoryProduct" required>
-									<option value="0">Chọn danh mục</option>
-									@foreach (var i in lstCate)
-									{
-										<option value="@i.Id">@i.Name</option>
-									}
-								</select>
-							</div>
-							<MudTextField T="string" Variant="Variant.Outlined" Label="Tên" @bind-Value="@_product.Name" For="@(() => _product.Name)" />
-							<MudTextField Lines="10" T="string" Variant="Variant.Outlined" Label="Mô Tả" @bind-Value="@_product.Description" For="@(() => _product.Description)" />
-						}
-						else
-						{
-							
-							<div class="mud-select">
-								<label class="mud-input-label">Chọn thương hiệu</label>
-								<select @bind="product.IdBrand" required>
-									<option value="0">Chọn thương hiệu</option>
-									@foreach (var i in lstBrand)
-									{
-										<option value="@i.Id">@i.Name</option>
-									}
-								</select>
-							</div>
-							<div class="mud-select">
-								<label class="mud-input-label">Chọn danh mục</label>
-								<select @bind="product.CategoryProductId" required>
-									<option value="0">Chọn danh mục</option>
-									@foreach (var i in lstCate)
-									{
-										<option value="@i.Id">@i.Name</option>
-									}
-								</select>
-							</div>
-							<MudTextField T="string" Variant="Variant.Outlined" Label="Tên danh mục" @bind-Value="@product.Name" For="@(() => product.Name)" />
-							<MudTextField Lines="10" T="string" Variant="Variant.Outlined" Label="Mô tả" @bind-Value="@product.Description" For="@(() => product.Description)" />
-						}
+						<MudAutocomplete Required="true" T="CategoryProductView" Label="Danh mục" @bind-Value="selectedCate" SearchFunc="@SearchCate"
+										 ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Variant="Variant.Outlined"
+										 ResetValueOnEmptyText="false" Text="@selectedCate.Name"
+										 CoerceText="true" CoerceValue="false" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.AddBox" OnAdornmentClick="QuickCreateCate" AdornmentAriaLabel="Thêm nhanh danh mục" />
+
+
+
+						<MudTextField T="string" Variant="Variant.Outlined" Label="Tên danh mục" @bind-Value="@product.Name" For="@(() => product.Name)" />
+						<MudTextField Style="margin-top: 30px" Lines="10" T="string" Variant="Variant.Outlined" Label="Mô tả" @bind-Value="@product.Description" For="@(() => product.Description)" />
 						<hr class="hr" />
 						<div class="mt-5" style="text-align: end;">
 							<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
@@ -175,21 +139,45 @@
 	[Inject]
 	private IBrandServices _brandClient { get; set; }
 	private List<BrandView> lstBrand = new List<BrandView>();
-
+	private BrandView selectedBrand = new BrandView();
 	[Inject]
 	private ICategoryServices _cateClient { get; set; }
 	[Inject]
 	private IUpLoadFileService _upFile { get; set; }
 	private List<CategoryProductView> lstCate = new List<CategoryProductView>();
+	private CategoryProductView selectedCate = new CategoryProductView();
 	private IBrowserFile browerFile;
 	// biến thể sản phẩm,
 	private HashSet<CreateProductDetaiView> selectedItems = new HashSet<CreateProductDetaiView>();
 	public List<CreateProductDetaiView> lstPD = new List<CreateProductDetaiView>();
+	private string nameCU = "Thêm";
 
 	CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
 	int col_img = 3, col_pro = 4, col_detail = 5;
 	private string url = Contant.ImgDefault;
 	protected async override Task OnInitializedAsync()
+	{
+		await LoadData();
+
+		if (product.Id != null && product.Id != 0)
+		{
+			selectedBrand = lstBrand.First(x => x.Id == product.IdBrand);
+			selectedCate = lstCate.First(x => x.Id == product.CategoryProductId);
+			col_img = 5;
+			col_pro = 7;
+			url = product.Url!;
+			_nameButton = "Cập nhật";
+			nameCU = "Sửa";
+		}
+		else
+		{
+			_nameButton = "Thêm mới";
+		}
+
+		AddItem();
+
+	}
+	async Task LoadData()
 	{
 		var brand = await _brandClient.ListBrand();
 		var cate = await _cateClient.ListCategoryProduct();
@@ -197,20 +185,7 @@
 		{
 			lstBrand = brand.Data;
 			lstCate = cate.Data;
-			if (product.Id != null && product.Id != 0)
-			{
-				col_img = 5;
-				col_pro = 7;
-				url = product.Url!;
-				_nameButton = "Cập nhật";
-			}
-			else
-			{
-				_nameButton = "Thêm mới";
-			}
 		}
-		AddItem();
-
 	}
 	void AddItem()
 	{
@@ -268,6 +243,19 @@
 	{
 		if (await Confirm("thêm mới") == true)
 		{
+
+			if (selectedBrand == null || selectedBrand.Id == null)
+			{
+
+				Message("Vui lòng chọn thương hiệu", Severity.Warning);
+				return;
+			}
+			if (selectedCate == null || selectedCate.Id == null)
+			{
+
+				Message("Vui lòng chọn danh mục", Severity.Warning);
+				return;
+			}
 			if (url == Contant.ImgDefault)
 			{
 				Message("Hãy chọn ảnh cho sản phầm", Severity.Warning);
@@ -284,17 +272,12 @@
 				Message(fileRes.Error!, Severity.Warning);
 				return;
 			}
-			if (_product.IdCategoryProduct == 0 || _product.IdCategoryProduct == null)
-			{
-				Message("Vui lòng chọn danh mục", Severity.Warning);
-				if (_product.IdBrand == 0 || _product.IdBrand == null)
-				{
-					Message("Vui lòng chọn thương hiệu", Severity.Warning);
-				}
-			}
-			else
+
+
 			{
 				_product.lstPD = lstPD;
+				_product.IdBrand = selectedBrand.Id.Value;
+				_product.IdCategoryProduct = selectedCate.Id;
 				var result = await _client.CreateProduct(_product);
 				if (result.IsSuccess)
 				{
@@ -323,9 +306,21 @@
 		{
 			return;
 		}
+		if (selectedBrand == null || selectedBrand.Id == null)
+		{
+
+			Message("Vui lòng chọn thương hiệu", Severity.Warning);
+			return;
+		}
+		if (selectedCate == null || selectedCate.Id == null)
+		{
+
+			Message("Vui lòng chọn danh mục", Severity.Warning);
+			return;
+		}
 		if (url != Contant.ImgDefault)
 		{
-			if (browerFile!=null&& browerFile.Size>1000)
+			if (browerFile != null && browerFile.Size > 1000)
 			{
 
 				var fileRes = await _upFile.UploadFile(browerFile);
@@ -336,20 +331,20 @@
 				}
 				else
 				{
-					Snackbar.Add(fileRes.Error,Severity.Warning);
+					Snackbar.Add(fileRes.Error, Severity.Warning);
 					return;
 				}
 			}
 			else
 			{
-				_product.ImgUrl=product.Url;
+				_product.ImgUrl = product.Url;
 				_product.ImgID = product.IdImg;
 			}
 
 		}
 		else
 		{
-			Snackbar.Add("Thêm ảnh đi b ê", Severity.Warning);
+			Snackbar.Add("Cần thêm ảnh sản phẩm", Severity.Warning);
 			return;
 		}
 
@@ -360,8 +355,8 @@
 					Id = product.Id,
 					Name = product.Name,
 					Description = product.Description,
-					IdBrand = product.IdBrand.Value,
-					IdCategoryProduct = product.CategoryProductId,
+					IdBrand = selectedBrand.Id.Value,
+					IdCategoryProduct = selectedCate.Id,
 					ImgUrl = _product.ImgUrl,
 					ImgID = _product.ImgID
 				});
@@ -397,7 +392,7 @@
 
 	private async Task<bool> Confirm(string text)
 	{
-		var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
+		var confirm = await _dialogService.ShowMessageBox("Thông báo", $"Xác nhận {text} sản phẩm?",
 		yesText: "Xác nhận",
 		cancelText: "Hủy", noText: null,
 		options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
@@ -425,13 +420,75 @@
 			var buffer = ms.ToArray();
 			browerFile = file;
 			url = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+			nameCU = "Sửa";
 			StateHasChanged();
 		}
 	}
 	private async Task RemoveImg()
 	{
+		nameCU = "Thêm";
 		url = Contant.ImgDefault;
 		browerFile = null;
+	}
+	private async Task<IEnumerable<BrandView>> SearchBrand(string value)
+	{
+
+		if (string.IsNullOrEmpty(value))
+			return lstBrand;
+
+		return lstBrand.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+	}
+	private async Task<IEnumerable<CategoryProductView>> SearchCate(string value)
+	{
+
+		if (string.IsNullOrEmpty(value))
+			return lstCate;
+
+		return lstCate.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+	}
+	private async Task QuickCreateBrand()
+	{
+		string nameDialog = "Thêm nhanh nhãn hiệu";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<CreateUpdateBrand>(nameDialog, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+		selectedBrand = lstBrand.First();
+	}
+	private async Task QuickCreateCate()
+	{
+		string nameDialog = "Thêm nhanh danh mục";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<CreateUpdateCateDetails>(nameDialog, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+		selectedCate = lstCate.First();
 	}
 }
 <style>
