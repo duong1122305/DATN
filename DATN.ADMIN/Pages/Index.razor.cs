@@ -1,4 +1,5 @@
-﻿using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.Components;
+using DATN.ADMIN.IServices;
 using DATN.Aplication.CustomProvider;
 using DATN.ViewModels.DTOs.Statistical;
 using Microsoft.AspNetCore.Components;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using MudBlazor;
+using Syncfusion.Blazor.PdfViewer;
 
 namespace DATN.ADMIN.Pages
 {
@@ -40,13 +42,17 @@ namespace DATN.ADMIN.Pages
 			await LoadData(type);
 			StateHasChanged();
 			lstProductOutStock = lstProductDataRaw;
-		}
-		async Task LoadData(int? value = 1)
+        }
+        async Task LoadData(int? value = 1)
 		{
-			if (value == null) return;
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+            var dialog = await DialogService.ShowAsync<LoadingIndicator>("", options);
+            StateHasChanged();
+            if (value == null) return;
 			type = value.Value;
 			var response = await statiscalClient.StatisticalIndex(type);
-			if (response.IsSuccess)
+            dialog.Close();
+            if (response.IsSuccess)
 			{
 				revenuePieDatas = response.Data.DataPiceRevenue;
 				customerData = response.Data.CustomerStatistical;
@@ -64,7 +70,8 @@ namespace DATN.ADMIN.Pages
 			}
 			StateHasChanged();
 			width = "100%";
-		}
+           
+        }
 		async void ChangStatus(int value)
 		{
 
