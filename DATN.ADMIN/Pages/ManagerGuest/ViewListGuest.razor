@@ -11,8 +11,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
-<PageTitle>Danh sách nhân viên</PageTitle>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách nhân viên</MudText>
 @if (lstGuest != null && lstGuest.Count > 0)
 {
 
@@ -20,7 +19,8 @@
 
 		<MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
 			<ToolBarContent>
-				<MudText Typo="Typo.h6">Danh sách khách hàng</MudText>
+				<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
+
 				<MudSpacer />
 				<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
 			</ToolBarContent>
