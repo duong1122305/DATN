@@ -68,11 +68,11 @@
 			<MudItem md="@col_detail" Style="max-height: ">
 
 				<MudTable MultiSelection="true" SelectOnRowClick="false" Items="@lstPD" Dense="true" Hover="true" CanCancelEdit="true"
-						  SortLabel="Sort By" CommitEditTooltip="Commit Edit" Bordered="true" @bind-SelectedItems="selectedItems"
-						  OnCommitEditClick="@(() => Snackbar.Add("Thêm thành công"))" RowEditPreview="BackupProductDetails" RowEditCancel="ResetProductDetails"
+						  SortLabel="Sort By" CommitEditTooltip="Xác nhận" CancelEditTooltip="Hủy" Bordered="true" @bind-SelectedItems="selectedItems"
+						   RowEditPreview="BackupProductDetails" RowEditCancel="ResetProductDetails"
 						  RowEditCommit="EditProductDetails" IsEditRowSwitchingBlocked="false" ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End" EditTrigger="TableEditTrigger.RowClick">
 					<ToolBarContent>
-						<MudButton OnClick="@AddItem" Color="@Color.Success" Class="add-item-btn">Thêm biến thể</MudButton>
+						<MudButton  OnClick="@AddItem" Color="@Color.Success" Class="add-item-btn">Thêm biến thể</MudButton>
 						<MudButton OnClick="@RemoveItem" Color="@Color.Error" Class="remove-item-btn">Xoá biến thể</MudButton>
 						<MudSpacer />
 					</ToolBarContent>
@@ -97,13 +97,13 @@
 					</RowTemplate>
 					<RowEditingTemplate Context="productd">
 						<MudTd DataLabel="Name">
-							<MudTextField @bind-Value="productd.Name" Required RequiredError="Phải bắt buộc nhập trường này" />
+							<MudTextField @bind-Value="productd.Name" For="@(() => productd.Name)" Required RequiredError="Phải bắt buộc nhập trường này" />
 						</MudTd>
 						<MudTd DataLabel="Position">
-							<MudNumericField Immediate="true" Culture="@nrDisplay" @bind-Value="productd.Price" Required Min="1000" ErrorText="Giá trên 1000" />
+							<MudTextField T="double" Immediate="true" For="@(() => productd.Price)" Culture="@nrDisplay" @bind-Value="productd.Price" Required Error=true ErrorText="Định dạng số sai" />
 						</MudTd>
 						<MudTd DataLabel="Molar mass">
-							<MudNumericField Immediate="true" Culture="@nrDisplay" @bind-Value="productd.Amount" Required Min="1" ErrorText="Số lượng phải trên 1" />
+							<MudTextField T="int" Immediate="true" For="@(() => productd.Amount)" Culture="@nrDisplay" @bind-Value="productd.Amount" Required Error=true ErrorText="Định dạng số sai" />
 						</MudTd>
 					</RowEditingTemplate>
 					<PagerContent>
@@ -151,10 +151,10 @@
 	private HashSet<CreateProductDetaiView> selectedItems = new HashSet<CreateProductDetaiView>();
 	public List<CreateProductDetaiView> lstPD = new List<CreateProductDetaiView>();
 	private string nameCU = "Thêm";
-
 	CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
 	int col_img = 3, col_pro = 4, col_detail = 5;
 	private string url = Contant.ImgDefault;
+	private bool IsWritting = false;
 	protected async override Task OnInitializedAsync()
 	{
 		await LoadData();
@@ -189,6 +189,11 @@
 	}
 	void AddItem()
 	{
+		if (IsWritting)
+		{
+			Snackbar.Add("Hãy hoàn thành biến thể trước khi thêm", Severity.Warning);
+			return;
+		}
 		if (lstPD.Count() > 9)
 		{
 			Snackbar.Add("Chỉ được thêm tối đa 10 biến thể", Severity.Warning);
@@ -205,18 +210,24 @@
 	}
 	void EditProductDetails(object data)
 	{
-
+		IsWritting = false;
 	}
 	void BackupProductDetails(object data)
 	{
-
+		IsWritting = true;
 	}
 	void ResetProductDetails(object data)
 	{
+		IsWritting = false;
 
 	}
 	void RemoveItem()
 	{
+		if (IsWritting)
+		{
+			Snackbar.Add("Hãy hoàn thành biến thể hiện tại trước khi xóa", Severity.Warning);
+			return;
+		}
 		if (selectedItems == null || selectedItems.Count() == 0)
 		{
 			Snackbar.Add("Bạn phải chọn biến thể cần xoá", Severity.Warning);
@@ -259,6 +270,10 @@
 			if (url == Contant.ImgDefault)
 			{
 				Message("Hãy chọn ảnh cho sản phầm", Severity.Warning);
+				return;
+			}
+			if (!Validate())
+			{
 				return;
 			}
 			var fileRes = await _upFile.UploadFile(browerFile);
@@ -489,6 +504,43 @@
 			StateHasChanged();
 		}
 		selectedCate = lstCate.First();
+	}
+	private bool Validate()
+	{
+		var result = true;
+		if (lstPD.Count() == 0)
+			{
+				Snackbar.Add("Phải có ít nhất 1 biến thể", Severity.Warning);
+				result = false;
+			}
+			else
+			{
+				for (int i = 0; i < lstPD.Count(); i++)
+				{
+					if (string.IsNullOrEmpty(lstPD[i].Name.Trim()))
+					{
+						Snackbar.Add($"Biến thể {i + 1}: Tên không được để trống", Severity.Warning);
+						result = false;
+					}
+					if (lstPD[i].Name.Length >= 15)
+					{
+					Snackbar.Add($"Biến thể {i + 1}: Tên biến thể không được quá 15 ký tự", Severity.Warning);
+						result = false;
+					}
+					if (lstPD[i].Price <= 1000 || lstPD[i].Price >= 100000000)
+					{
+						Snackbar.Add($"Biến thể {i + 1}: Giá phải từ 1.000đ-100.000.000đ ", Severity.Warning);
+						result = false;
+					}
+					if (lstPD[i].Amount <= 1 || lstPD[i].Price >= 100000)
+					{
+						Snackbar.Add($"Biến thể {i + 1}: Số lượng phải từ 1-10.000 ", Severity.Warning);
+						result = false;
+					}
+				}
+			}
+		
+		return result;
 	}
 }
 <style>

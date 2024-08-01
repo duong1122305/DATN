@@ -40,6 +40,7 @@ namespace DATN.Aplication.Services
 					startDate = new DateTime(today.Year, today.Month, 1);
 
 				}
+				var lstHistory = await _ufw.HistoryActionRepository.FindAsync(p => p.ActionID == 15);
 				var lstBooking = await _ufw.BookingRepository.FindAsync(p => p.BookingTime.Date >= startDate && p.BookingTime.Date <= today&& p.Status==BookingStatus.Completed&& p.IsPayment);
 				var bookingIds = lstBooking.Select(x => x.Id).ToList();
 				var lstOrderDetails = await _ufw.OrderDetailRepository.FindAsync(p => bookingIds.Contains(p.IdBooking));
