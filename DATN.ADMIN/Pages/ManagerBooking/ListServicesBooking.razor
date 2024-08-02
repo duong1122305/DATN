@@ -113,7 +113,7 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                                       <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
                     <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
                     @if (context.Item.Status == BookingStatus.PendingConfirmation)
                     {
@@ -162,7 +162,7 @@
                         @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
 
                     }
-                   
+
                 </MudButtonGroup>
             </CellTemplate>
         </TemplateColumn>
@@ -206,7 +206,7 @@
         }
         else if (selectedStatus == Status.PendingConfirmation)
         {
-            lstBookingServices = respone.Data.OrderByDescending(x=> x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
         }
         else if (selectedStatus == Status.Confirmed)
         {
@@ -352,14 +352,6 @@
                 DisableBackdropClick = true
             };
         parameters.Add("id", id);
-            var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
-            var result = await createUpdateDialog.Result;
-            if (!result.Canceled)
-            {
-                createUpdateDialog.Close();
-                await LoadData();
-            }
-        parameters.Add("id", id);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
@@ -478,7 +470,7 @@
             Message(respone.Error, Severity.Error);
         }
     }
-    
+
     private async Task CheckInArrive(int id)
     {
         var respone = await _client.CheckInArrive(id);

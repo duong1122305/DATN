@@ -1176,7 +1176,7 @@ namespace DATN.Aplication.Services
                 var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
                 var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
                 var reduce = voucherWillUse != 0 ? (double)discount * totalprice / 100 >= maxMoney ? maxMoney : (double)discount * totalprice / 100 : 0;
-                if (queryBooking.Count > 0 || idBooking.Value != null)
+                if (queryBooking.Count > 0 || idBooking.Value != null && idBooking.Value != 0)
                 {
                     return new ResponseData<Bill>
                     {
