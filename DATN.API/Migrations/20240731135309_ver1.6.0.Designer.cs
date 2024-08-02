@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    [Migration("20240720073809_ver1.5.9")]
-    partial class ver159
+    [Migration("20240731135309_ver1.6.0")]
+    partial class ver160
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -315,6 +315,9 @@ namespace DATN.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status1")
                         .HasColumnType("int");
 
                     b.Property<string>("VoucherCode")
