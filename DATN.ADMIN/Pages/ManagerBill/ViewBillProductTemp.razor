@@ -14,7 +14,7 @@
     <Columns>
         <TemplateColumn Title="STT" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
             <GroupTemplate>
-                <span style="font-weight:bold">@context.Grouping.Key</span>
+                <span style="font-weight:bold">Hóa đơn - @context.Grouping.Key</span>
                 <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,0,Convert.ToInt32(context.Grouping.Key.ToString())))">Thanh toán</MudIconButton>
             </GroupTemplate>
         </TemplateColumn>

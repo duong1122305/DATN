@@ -590,8 +590,12 @@ namespace DATN.Aplication.Services
                                                   select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                             if (queryCheckUser.Count() == 0)
                             {
-                                staffFree.Add(item.IdStaff.Value);
-                                continue;
+                                var role = string.Join("", (await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(item.IdStaff.Value.ToString()))));
+                                if (role == "ServiceStaff")
+                                {
+                                    staffFree.Add(item.IdStaff.Value);
+                                    continue;
+                                }
                             }
                             var count = 0;
                             foreach (var item1 in queryCheckUser)

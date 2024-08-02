@@ -18,7 +18,7 @@
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
-    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Bán sản phẩm tại quầy</MudButton>
+    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
 </div>
 
 <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" QuickFilter="@_quickFilter" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
@@ -113,7 +113,7 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
+                                       <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
                     @if (context.Item.Status == BookingStatus.PendingConfirmation)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -141,6 +141,7 @@
                         }
                         else
                         {
+                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem hóa đơn đã mua" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Xem hóa đơn</MudIconButton>
                             <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" OnClick="@(async()=>await CheckOut(context.Item.IdBooking.Value))" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
                         }
                     }
@@ -160,7 +161,7 @@
                         @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
 
                     }
-
+                   
                 </MudButtonGroup>
             </CellTemplate>
         </TemplateColumn>
@@ -340,6 +341,7 @@
     {
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
+        string id2 = Convert.ToString(id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -349,7 +351,8 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("id", id);
+        parameters.Add("id", id2);
+        parameters.Add("dateBooking", dateBooking);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
