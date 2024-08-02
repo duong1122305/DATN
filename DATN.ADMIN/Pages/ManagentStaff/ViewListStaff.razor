@@ -20,7 +20,7 @@
 
 
 
-@if (lstUser.Count > 0 && lstUser != null)
+@if ( lstUser != null && lstUser.Count() > 0 )
 {
     <MudDataGrid Items="@lstUser" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true" Style="margin-top:5px">
         <ToolBarContent>
