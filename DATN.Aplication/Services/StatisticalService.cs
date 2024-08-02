@@ -41,19 +41,6 @@ namespace DATN.Aplication.Services
 
 				}
 				var lstBooking = await _ufw.BookingRepository.FindAsync(p => p.BookingTime.Date >= startDate && p.BookingTime.Date <= today&& p.Status==BookingStatus.Completed&& p.IsPayment);
-
-				if (lstBooking == null || lstBooking.Count() == 0)
-				{
-					return new ResponseData<Statistical>(new Statistical()
-					{
-						DataPiceRevenue = new double[] { 0, 0 },
-						CustomerStatistical=new CustomerStatistical(),
-						ProductRevenueStatistical=new List<Top3Statistical>(),
-						ServiceRevenueStatistical= new List<Top3Statistical>(),
-						ProductQuantityStatistical=new List<Top3Statistical>(),
-						ServiceQuantityStatistical= new List<Top3Statistical>(),
-					});
-				}
 				var bookingIds = lstBooking.Select(x => x.Id).ToList();
 				var lstOrderDetails = await _ufw.OrderDetailRepository.FindAsync(p => bookingIds.Contains(p.IdBooking));
 				var lstProductDetail = await _ufw.ProductDetailRepository.GetAllAsync();
@@ -152,13 +139,13 @@ namespace DATN.Aplication.Services
 							  join serviceDetail in lstServiceDetails on service.Id equals serviceDetail.ServiceId   
 							  join bookingDetail in lstBookingDetails on serviceDetail.Id equals bookingDetail.ServiceDetailId into bdGroup
 							  from bookingDetail in bdGroup.DefaultIfEmpty()
-							  group new { ServiceName = service.Name, Price = serviceDetail.Price, Quantity = bookingDetail?.Quantity ?? 0 }
+							  group new { ServiceName = service.Name, Price = serviceDetail.Price, Quantity = bookingDetail?.Quantity??0 }
 							  by new { ServiceName = service.Name } into g
 							  select new Top3Statistical
 							  {
 								  Name = g.Key.ServiceName,
-								  TotalAmount = g.Sum(x => x.Quantity+1),
-								  TotalRevenue = g.Sum(x =>  x.Price)
+								  TotalAmount = g.Sum(x => x.Quantity),
+								  TotalRevenue = g.Sum(x => x.Quantity* x.Price)
 							  }).ToList();
 
 				return new ResponseData<Statistical>() 

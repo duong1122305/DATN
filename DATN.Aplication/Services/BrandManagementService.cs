@@ -137,7 +137,7 @@ namespace DATN.Aplication.Services
                            Status = cate.Status
                        };
             if (list.Count() > 0)
-                return new ResponseData<List<BrandView>> { IsSuccess = true, Data = list.ToList() };
+                return new ResponseData<List<BrandView>> { IsSuccess = true, Data = list.OrderByDescending(p=>p.Id).ToList() };
             else
                 return new ResponseData<List<BrandView>> { IsSuccess = false, Data = new List<BrandView>(), Error = "Chưa có dữ liệu!" };
         }

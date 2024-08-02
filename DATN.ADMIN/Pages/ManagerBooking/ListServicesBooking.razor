@@ -121,7 +121,9 @@
                     }
                     @if (context.Item.Status == BookingStatus.Confirmed)
                     {
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
+
                     }
                     @if (context.Item.Status == BookingStatus.Arrived)
                     {

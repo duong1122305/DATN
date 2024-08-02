@@ -279,6 +279,7 @@ namespace DATN.Aplication.Services
                             StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
+                            Quantity = 1,
                         };
                         list.Add(bookingDetail);
                     }
@@ -291,7 +292,7 @@ namespace DATN.Aplication.Services
                             ActionByID = Guid.Parse(idUserAction.Data),
                             ActionTime = DateTime.Now,
                             ActionID = 12,
-                            Description = "Đây là tạo lịch chăm sóc tại quầy",
+                            Description = "Tạo mới hóa đơn tại quầy",
                             BookingID = queryBooking.FirstOrDefault().Id,
                         };
                         await _unitOfWork.HistoryActionRepository.AddAsync(history);
@@ -456,6 +457,7 @@ namespace DATN.Aplication.Services
                             StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
+                            Quantity = 1
                         };
                         list.Add(bookingDetail);
                     }
