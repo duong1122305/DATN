@@ -65,19 +65,16 @@
                                 <MudTh>Đơn giá</MudTh>
                                 <MudTh>Hành động</MudTh>
                             </HeaderContent>
-                            <RowTemplate>
-                                <MudTd>@context.Name</MudTd>
+                            <RowTemplate Context="bill2">
+                                <MudTd>@bill2.Name</MudTd>
                                 <MudTd>
                                     <div class="quantity-input">
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
-                                        <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                                        <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
 
                                     </div>
                                 </MudTd>
-                                <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
                                 <MudTd>
-                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
@@ -154,7 +151,7 @@
                         <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
                         <br />
                         <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
-                        @if (bill.IsPayment)
+                        @if (!bill.IsPayment)
                         {
                             <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
                                 <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
@@ -174,7 +171,7 @@
                                 <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
                             }
                         }
-                     
+
                     </div>
                 </div>
             }
@@ -318,7 +315,8 @@
                     Reduce = bill.ReducePrice,
                     VoucherId = bill.IdVoucher
                 };
-        }else
+        }
+        else
         {
             payment = new Payment()
                 {

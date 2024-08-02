@@ -41,7 +41,7 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
         {
 
-            var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes);
+            var response = _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes).GetAwaiter().GetResult();
             var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
             return result;
 

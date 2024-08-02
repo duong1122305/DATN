@@ -993,7 +993,7 @@ namespace DATN.Aplication.Services
                                            {
                                                IdBooking = payment.IdBooking,
                                                IdProductDetail = buypro.IdProductDetail,
-                                               Quantity = buypro.Quantity,
+                                               Quantity = buypro.SelectQuantityProduct,
                                                Price = buypro.Price,
                                            }).ToList();
                         var user = await _user.GetUserByToken(payment.Token);
@@ -1176,7 +1176,7 @@ namespace DATN.Aplication.Services
                 var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
                 var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
                 var reduce = voucherWillUse != 0 ? (double)discount * totalprice / 100 >= maxMoney ? maxMoney : (double)discount * totalprice / 100 : 0;
-                if (queryBooking.Count > 0)
+                if (queryBooking.Count > 0 || idBooking.Value != null)
                 {
                     return new ResponseData<Bill>
                     {
