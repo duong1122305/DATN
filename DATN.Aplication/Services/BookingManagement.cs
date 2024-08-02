@@ -105,7 +105,7 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek()
         {
             await ChangeStatusBooking();
-            var query=await _unitOfWork.BookingRepository.CallProcedure();
+            var query = await _unitOfWork.BookingRepository.CallProcedure();
             if (query.Count > 0)
             {
                 return new ResponseData<List<BookingView>>() { IsSuccess = true, Data = query };
@@ -996,8 +996,18 @@ namespace DATN.Aplication.Services
                                                Quantity = buypro.Quantity,
                                                Price = buypro.Price,
                                            }).ToList();
+                        var user = await _user.GetUserByToken(payment.Token);
+                        HistoryAction action = new HistoryAction()
+                        {
+                            ActionID = 16,
+                            ActionByID = Guid.Parse(user.Data),
+                            ActionTime = DateTime.Now,
+                            BookingID = payment.IdBooking,
+                            Description = "Đây là nhân viên thanh toán cho khách nhé :)))",
+                        };
                         await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
                         await _productManagement.BuyProduct(listProduct);
+                        await _unitOfWork.HistoryActionRepository.AddAsync(action);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
                     }
