@@ -1,6 +1,7 @@
 ﻿@inject ISnackbar Snackbar
 @inject IDialogService _diagService;
 @inject HttpClient httpClient
+@using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
@@ -58,7 +59,10 @@
                 }
             if (idShift > 0)
                 {
+                var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+                var dialog = await _diagService.ShowAsync<LoadingIndicator>("", options);
                     var repo = await _client.InsertOneDayScheduleForStaffSuddenly(listIdUser,idShift,time.Value);
+                dialog.Close();
                     if (repo.IsSuccess)
                     {
                         Message(repo.Data, Severity.Success);
