@@ -1,11 +1,13 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.DTOs.ServiceDetail;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class ServicesDetailController : ControllerBase
     {
         private readonly IServiceDetailManagementService _serviceDetailManagementService;
