@@ -113,7 +113,7 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdGuest.Value,context.Item.BookingTime))"></MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
                     @if (context.Item.Status == BookingStatus.PendingConfirmation)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -336,11 +336,10 @@
         dataGrid?.ExpandAllGroups();
     }
 
-    private async Task OpenDialog(Guid id, DateTime dateBooking)
+    private async Task OpenDialog(int id)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
-        string id2 = Convert.ToString(id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -350,8 +349,7 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("id", id2);
-        parameters.Add("dateBooking", dateBooking);
+        parameters.Add("id", id);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)

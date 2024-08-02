@@ -84,9 +84,9 @@ namespace DATN.ADMIN.Services
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<Bill>>($"/api/Booking/Get-Bill-Of-Guest?idguest={idguest}&dateBooking={dateBooking.Year}-{dateBooking.Month}-{dateBooking.Day}");
         }
-        public async Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id, DateTime date)
+        public async Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(int id)
         {
-            return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}&date={date.Year}-{date.Month}-{date.Day}").GetAwaiter().GetResult();
+            return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}").GetAwaiter().GetResult();
         }
 
         public async Task<ResponseData<List<ProductSelect>>> ListProductViewSale()
