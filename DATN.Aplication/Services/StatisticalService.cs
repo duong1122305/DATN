@@ -44,9 +44,9 @@ namespace DATN.Aplication.Services
 					startDate = new DateTime(today.Year, today.Month, 1);
 					endDate = today;
 				}
-                var lstHistory = await _ufw.HistoryActionRepository.FindAsync(p => p.ActionID == 15);
-				var lstBooking = await _ufw.BookingRepository.FindAsync(p => p.BookingTime.Date >= startDate && p.BookingTime.Date <= endDate&& p.Status==BookingStatus.Completed&& p.IsPayment);
-				var bookingIds = lstBooking.Select(x => x.Id).ToList();
+                var lstHistory = await _ufw.HistoryActionRepository.FindAsync(p => p.ActionID == 16 && p.ActionTime.Date >= startDate && p.ActionTime.Date <= endDate);
+				var bookingIds = lstHistory.Select(x => x.BookingID).ToList();
+				var lstBooking = await _ufw.BookingRepository.FindAsync(p => bookingIds.Contains(p.Id));
 				var lstOrderDetails = await _ufw.OrderDetailRepository.FindAsync(p => bookingIds.Contains(p.IdBooking));
 				var lstProductDetail = await _ufw.ProductDetailRepository.GetAllAsync();
 				var lstProduct = await _ufw.ProductRepository.GetAllAsync();

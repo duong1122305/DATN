@@ -15,6 +15,7 @@ namespace DATN.Aplication.Services
         Task<ResponseData<string>> SendForgotMail(string mail);
         Task<ResponseData<string>> ChangPassWithVerifyCode(string verifyCode, string newPass);
         Task<ResponseData<string>> RegisterNoUser(GuestRegisterByGuestRequest request);
+		 Task<ResponseData<List<GuestViewModel>>> GetAllGuest();
 
     }
 }
