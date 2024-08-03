@@ -35,7 +35,7 @@ namespace DATN.Aplication.Services
                 foreach (var item in orderDetails)
                 {
                     var update = query.FirstOrDefault(c => c.Id == item.IdProductDetail);
-                    if (update.Amount > item.Quantity)
+                    if (update.Amount >= item.Quantity)
                     {
                         update.AmountUsed += item.Quantity;
                         update.Amount -= item.Quantity;
