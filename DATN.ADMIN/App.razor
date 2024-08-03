@@ -8,12 +8,10 @@
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
-            @if (httpContextAccessor.HttpContext.Request.Path == "/public/{idBooking}")
+           @if (httpContextAccessor.HttpContext.Request.Path.Value.StartsWith("/public/",StringComparison.OrdinalIgnoreCase))
             {
                 <RouteView RouteData="@routeData" DefaultLayout="typeof(LayoutNoAuth)" />
             }
-            else
-            {
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
                     <Authorizing>
                         <h3>Authorizing...</h3>
@@ -22,7 +20,6 @@
                         <h3>Not Authorized</h3>
                     </NotAuthorized>
                 </AuthorizeRouteView>
-            }
         </Found>
         <NotFound>
             <DATN.ADMIN.Components.NotFound></DATN.ADMIN.Components.NotFound>
@@ -43,7 +40,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (httpContextAccessor.HttpContext.Request.Path != "/public/{idBooking}")
+        var path = httpContextAccessor.HttpContext.Request.Path.Value;
+        if (!path.StartsWith("/public/", StringComparison.OrdinalIgnoreCase))
         {
             var key = httpContextAccessor.HttpContext.Session.GetString("Key");
             if (key != null)

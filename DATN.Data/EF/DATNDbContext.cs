@@ -1,5 +1,6 @@
 ﻿using DATN.Data.Config;
 using DATN.Data.Entities;
+using DATN.ViewModels.DTOs.Booking;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,9 +37,11 @@ namespace DATN.Data.EF
             builder.ApplyConfiguration(new OrderDetailConfig());
             builder.ApplyConfiguration(new ProductConfig());
             builder.ApplyConfiguration(new ProductDetailConfig());
+            builder.Entity<BookingView>().HasNoKey();
         }
 
         public DbSet<ActionBooking> ActionBookings { get; set; }
+        public DbSet<BookingView> BookingViews { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> bookingDetails { get; set; }
         public DbSet<ComboDetail> comboDetails { get; set; }
