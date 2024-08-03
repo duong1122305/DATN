@@ -1023,7 +1023,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                if (payment.LstProducts.Count>0)
+                if (payment.LstProducts.Count > 0)
                 {
                     var booking = new Booking()
                     {
@@ -1042,39 +1042,32 @@ namespace DATN.Aplication.Services
                     queryBooking = (from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                     where bookingTable.Id == booking.Id
                                     select bookingTable).FirstOrDefault();
-                    if (payment.TypePaymenId == 1)
+                    if (queryBooking.VoucherId != null)
                     {
-                        if (queryBooking.VoucherId != null)
-                        {
-                            var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                where dis.Id == queryBooking.VoucherId
-                                                select dis).FirstOrDefault();
-                            checkVoucher.AmountUsed++;
-                            await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
+                        var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                            where dis.Id == queryBooking.VoucherId
+                                            select dis).FirstOrDefault();
+                        checkVoucher.AmountUsed++;
+                        await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
 
-                        }
-                        queryBooking.TotalPrice = bill.Data.TotalPayment;
-                        queryBooking.PaymentTypeId = payment.TypePaymenId;
-                        queryBooking.ReducedAmount = bill.Data.ReducePrice;
-                        queryBooking.IsPayment = true;
-                        queryBooking.VoucherId = bill.Data.IdVoucher;
-                        var listProduct = (from buypro in payment.LstProducts
-                                           select new BuyProduct
-                                           {
-                                               IdBooking = queryBooking.Id,
-                                               IdProductDetail = buypro.IdProductDetail,
-                                               Quantity = buypro.SelectQuantityProduct,
-                                               Price = buypro.Price,
-                                           }).ToList();
-                        await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
-                        await _productManagement.BuyProduct(listProduct);
-                        await _unitOfWork.SaveChangeAsync();
-                        return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
                     }
-                    else
-                    {
-                        return new ResponseData<string> { IsSuccess = true, Data = "Chưa biết làm chuyển khoản" };
-                    }
+                    queryBooking.TotalPrice = bill.Data.TotalPayment;
+                    queryBooking.PaymentTypeId = payment.TypePaymenId;
+                    queryBooking.ReducedAmount = bill.Data.ReducePrice;
+                    queryBooking.IsPayment = true;
+                    queryBooking.VoucherId = bill.Data.IdVoucher;
+                    var listProduct = (from buypro in payment.LstProducts
+                                       select new BuyProduct
+                                       {
+                                           IdBooking = queryBooking.Id,
+                                           IdProductDetail = buypro.IdProductDetail,
+                                           Quantity = buypro.SelectQuantityProduct,
+                                           Price = buypro.Price,
+                                       }).ToList();
+                    await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
+                    await _productManagement.BuyProduct(listProduct);
+                    await _unitOfWork.SaveChangeAsync();
+                    return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
                 }
                 else
                 {

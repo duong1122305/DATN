@@ -361,6 +361,10 @@
             }
             _dialogBox.Close();
         }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
     }
 
     public async Task OpenDialog()
