@@ -45,7 +45,7 @@
 
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
         </ToolBarContent>
         <Columns>
             <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
@@ -332,7 +332,7 @@ else
         var listIdUser = new List<string>();
         if (await Confirm2() == true)
         {
-            // nứng à
+            
             if (selectedUser1s.Count > 0 && selectedUser1s != null)
             {
                 foreach (var user2 in selectedUser1s)
@@ -342,7 +342,10 @@ else
                 }
                 if (selectedShiftId > 0)
                 {
+                    var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+                    var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
                     var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
+                    dialog.Close();
                     if (repo.IsSuccess)
                     {
                         Message(repo.Data, Severity.Success);
@@ -420,7 +423,8 @@ else
         var listIdUser = new List<string>();
         if (await Confirm2() == true)
         {
-            // nứng à
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+            var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
             if (selectedUser1s.Count > 0 && selectedUser1s != null)
             {
                 foreach (var user2 in selectedUser1s)
@@ -431,6 +435,7 @@ else
                 if (selectedShiftId > 0)
                 {
                     var repo = await _client2.InsertEmployeeCurrentMonth(listIdUser, selectedShiftId);
+                    dialog.Close();
                     if (repo.IsSuccess)
                     {
                         Message(repo.Data, Severity.Success);

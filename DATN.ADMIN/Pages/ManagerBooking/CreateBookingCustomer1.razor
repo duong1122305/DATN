@@ -19,7 +19,7 @@
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Clear"
                                Color="Color.Error"
-                               Size="Size.Small"
+                               Size="MudBlazor.Size.Small"
                                Disabled="@isEditing"
                                OnClick="ClearGuestSelection"
                                Style="margin-left: 8px;"
@@ -127,7 +127,7 @@
                 value1 = null;
                 return lstGuest;
             }
-            return lstGuest.Where(x => x.Name.Contains(value.TrimStart().TrimEnd(), StringComparison.InvariantCultureIgnoreCase));
+            return lstGuest.Where(x => x.Name.Contains(value.TrimStart().TrimEnd(), StringComparison.InvariantCultureIgnoreCase) || x.PhoneNumber.StartsWith(value.Trim(), StringComparison.InvariantCultureIgnoreCase));
         }
     }
     private async void RemoveBooking(CreateBookingDetailRequest booking)

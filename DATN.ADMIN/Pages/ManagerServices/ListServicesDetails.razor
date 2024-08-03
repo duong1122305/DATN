@@ -7,6 +7,7 @@
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.ServiceDetail
+@using MudBlazor;
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
@@ -18,7 +19,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Danh sách dịch vụ chi tiết</MudText>
         <MudSpacer />
-        <MudTextField T="string" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0"></MudTextField>
+        <MudTextField T="string" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh Style="text-align:center;">STT</MudTh>
@@ -36,7 +37,7 @@
             @(lstServiceName.IndexOf(context) + 1)
         </MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceName</MudTd>
-        <MudTd DataLabel="Name" Style="text-align:center;">@context.ServiceDetailName</MudTd>
+        <MudTd DataLabel="Name" Style="text-align:center;">@context.Description</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@CurrencyHelper.FormatCurrency(context.Price)</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Duration Phút</MudTd>
         <MudTd DataLabel="Name" Style="text-align:center;">@context.Description</MudTd>
@@ -54,14 +55,14 @@
             </MudTd>
         }
         <MudTd Style="text-align:center;">
-            <MudButton IconSize="Size.Large"
+            <MudButton IconSize="MudBlazor.Size.Large"
                        OnClick="async () => await UpdateStatusService(context.ServiceDetailId)"
                        StartIcon="@(context.IsDeleted ? Icons.Material.Filled.Done : Icons.Material.Filled.Delete)"
                        IconColor="@(context.IsDeleted ? Color.Surface : Color.Error)"
                        title="@(context.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
 
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.ServiceDetailId))"></MudButton>
-            <MudButton IconSize="Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(context.ServiceDetailId))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
+            <MudButton IconSize="MudBlazor.Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(context.ServiceDetailId))"></MudButton>
+            <MudButton IconSize="MudBlazor.Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(context.ServiceDetailId))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
         </MudTd>
 
     </RowTemplate>
@@ -106,7 +107,7 @@
     public IServiceDetailServices _serviceDetailService { get; set; }
 
     bool open;
-    Anchor anchor;
+    MudBlazor.Anchor anchor;
     protected override async Task OnInitializedAsync()
     {
         var result = await _serviceDetailService.GetServiceName();
@@ -128,7 +129,7 @@
         else Message(result.Error, Severity.Error);
     }
 
-    void OpenDrawer(Anchor anchor)
+    void OpenDrawer(MudBlazor.Anchor anchor)
     {
         open = true;
         this.anchor = anchor;

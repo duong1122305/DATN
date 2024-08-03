@@ -275,7 +275,7 @@ namespace DATN.Aplication.Services
                 string randomPass = "";
                 bool hasEmail = !string.IsNullOrEmpty(request.Email);
 
-                if (await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
+                if (hasEmail && await _unitOfWork.GuestRepository.CheckEmailExist(request.Email))
                 {
                     return new ResponseData<string>
                     {
@@ -414,7 +414,7 @@ namespace DATN.Aplication.Services
             try
             {
 
-                var guest = await _unitOfWork.GuestRepository.FindByEmail(mail.Trim());
+                var guest = await _unitOfWork.GuestRepository.FindByEmailAll(mail.Trim());
 
                 if (guest != null)
                 {

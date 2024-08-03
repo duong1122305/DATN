@@ -220,11 +220,11 @@ namespace DATN.Aplication.Services
                             IdBrand = brand.Id,
                             Url = img.UrlImage,
                             IdImg = img.ImgKey,
-                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString() + " - " + product.ProductDetails.Max(x => x.Price).ToString() : product.ProductDetails != null && product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString() : "Không có biến thể nào sẵn sàng"
+                            Price = product.ProductDetails != null && product.ProductDetails.Count() >= 2 ? product.ProductDetails.Min(x => x.Price).ToString("N0") + "- " + product.ProductDetails.Max(x => x.Price).ToString("N0") : product.ProductDetails != null && product.ProductDetails!.Count() > 0 ? product.ProductDetails!.First().Price.ToString("N0") : "Không có biến thể nào sẵn sàng"
 
                         };
             if (query.Count() > 0)
-                return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.ToList() };
+                return new ResponseData<List<ProductView>> { IsSuccess = true, Data = query.OrderByDescending(p=>p.Id).ToList() };
             else
                 return new ResponseData<List<ProductView>> { IsSuccess = false, Error = "Chưa có dữ liệu", Data = new List<ProductView>() };
         }

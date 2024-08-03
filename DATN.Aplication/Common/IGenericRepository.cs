@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using DATN.ViewModels.DTOs.Booking;
+using System.Linq.Expressions;
 
 namespace DATN.Aplication.Common
 {
@@ -13,5 +14,7 @@ namespace DATN.Aplication.Common
         Task<int> SaveChangesAsync();
         Task AddRangeAsync(List<T> entities);
         Task UpdateRangeAsync(List<T> entities);
+        Task<List<BookingView>> CallProcedure();
+
     }
 }

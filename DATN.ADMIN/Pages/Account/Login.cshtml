@@ -14,70 +14,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-    <title>Đăng nhập</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<link rel="icon" href="/favicon.ico" type="image/x-icon" />
+	<title>Đăng nhập</title>
 </head>
-@* 
- @{
+
+@*  @{
     Model.email = "namhv1";
     Model.password = "Matkhau1@";
 } *@
 @{
-    Model.email = "binhpt1";
-    Model.password = "Binh123@";
+	Model.email = "binhpt1";
+	Model.password = "Binh123@";
 }
 <body onload="@Model.HandleLogin()">
-    <div class="container">
-        <div class="row justify-content-center align-items-center vh-100">
-            <div class="col-md-6 col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="text-center">
-                            <a href="/trangchu"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="width: 150px; height: 150px;"></a>
-                        </div>
-                        <div>
-                            <form method="post">
-                                <input type="hidden">
-                                <!-- Email Address -->
-                                <div>
-                                    <label class="form-label" for="email">Email</label>
-                                    <input class="form-control"  id="email" name="email"  required="required" autofocus="autofocus">
-                                </div>
-                                <!-- Password -->
-                                <div class="mt-4">
-                                    <label class="form-label" for="password">Mật khẩu</label>
-                                    <input class="form-control" id="password" type="password"  name="password" required="required" autocomplete="current-password">
-                                    @if (TempData["Error"] != null)
-                                    {
-                                        <div style="padding-top: 10px; color:red" id="error-message">
-                                            @TempData["Error"]
-                                        </div>
-                                    }
-                                </div> 
+	<div class="container">
+		<div class="row justify-content-center align-items-center vh-100">
+			<div class="col-md-6 col-sm-12">
+				<div class="card">
+					<div class="card-body">
+						<div class="text-center">
+							<a href="/trangchu"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="width: 150px; height: 150px;"></a>
+						</div>
+						<div>
+							<form method="post">
+								<input type="hidden">
+								<!-- Email Address -->
+								<div>
+									<label class="form-label" for="email">Email</label>
+									<input class="form-control" id="email" name="email" required="required" autofocus="autofocus">
+								</div>
+								<!-- Password -->
+								<div class="mt-4">
+									<label class="form-label" for="password">Mật khẩu</label>
+									<input class="form-control" id="password" type="password" name="password" required="required" autocomplete="current-password">
+									@if (TempData["Error"] != null)
+									{
+										<div style="padding-top: 10px; color:red" id="error-message">
+											@TempData["Error"]
+										</div>
+									}
+								</div>
 
-                                <!-- Remember Me -->
-                                <div class="mt-4">
-                                    <div class="d-flex align-items-center justify-content-between mt-4">
-                                        <label for="remember_me" class="d-inline-flex">
-                                        </label>
-                                        <a class="underline text-sm text-gray-600 hover:text-gray-900" style="text-decoration:none" href="/quenMatKhau">Quên mật khẩu?</a>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mt-4">
-                                    <button type="submit" id="btn" class="btn btn-outline-info">Đăng nhập</button>
-                                </div>
-                            </form>
-                            <div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+								<!-- Remember Me -->
+								<div class="mt-4">
+									<div class="d-flex align-items-center justify-content-between mt-4">
+										<label for="remember_me" class="d-inline-flex">
+										</label>
+										<a class="underline text-sm text-gray-600 hover:text-gray-900" style="text-decoration:none" href="/quenMatKhau">Quên mật khẩu?</a>
+									</div>
+								</div>
+								<div class="d-flex align-items-center justify-content-center mt-4">
+									<button type="submit" id="btn" class="btn btn-outline-info">Đăng nhập</button>
+								</div>
+							</form>
+							<div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

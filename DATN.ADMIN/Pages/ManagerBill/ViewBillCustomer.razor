@@ -56,29 +56,55 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
                 @if (idBooking != null && idBooking != 0)
                 {
-                    <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
-                        <HeaderContent>
-                            <MudTh>Tên sản phẩm</MudTh>
-                            <MudTh>Số lượng</MudTh>
-                            <MudTh>Đơn giá</MudTh>
-                            <MudTh>Hành động</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.Name</MudTd>
-                            <MudTd>
-                                <div class="quantity-input">
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
-                                    <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                    if (bill.IsPayment)
+                    {
+                        <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
+                            <HeaderContent>
+                                <MudTh>Tên sản phẩm</MudTh>
+                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Đơn giá</MudTh>
+                                <MudTh>Hành động</MudTh>
+                            </HeaderContent>
+                            <RowTemplate Context="bill2">
+                                <MudTd>@bill2.Name</MudTd>
+                                <MudTd>
+                                    <div class="quantity-input">
+                                        <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
 
-                                </div>
-                            </MudTd>
-                            <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
-                            <MudTd>
-                                <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
+                                    </div>
+                                </MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
+                                <MudTd>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                    else
+                    {
+                        <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
+                            <HeaderContent>
+                                <MudTh>Tên sản phẩm</MudTh>
+                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Đơn giá</MudTh>
+                                <MudTh>Hành động</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.Name</MudTd>
+                                <MudTd>
+                                    <div class="quantity-input">
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
+                                        <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+
+                                    </div>
+                                </MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <MudTd>
+                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
                 }
                 else
                 {
@@ -125,24 +151,27 @@
                         <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
                         <br />
                         <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
+                        @if (!bill.IsPayment)
+                        {
+                            <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
+                                <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
+                                <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
+                                <MudRadio Value="3" Color="Color.Secondary" UnCheckedColor="Color.Default">Momo</MudRadio>
+                            </MudRadioGroup>
+                            @if (selectedPaymentMethod == 2)
+                            {
+                                <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
+                            }
+                            else if (selectedPaymentMethod == 1)
+                            {
+                                <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
+                            }
+                        }
 
-                        <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
-                            <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
-                            <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
-                            <MudRadio Value="3" Color="Color.Secondary" UnCheckedColor="Color.Default">Momo</MudRadio>
-                        </MudRadioGroup>
-                        @if (selectedPaymentMethod == 2)
-                        {
-                            <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
-                        }
-                        else if (selectedPaymentMethod == 1)
-                        {
-                            <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
-                        }
-                        else
-                        {
-                            <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
-                        }
                     </div>
                 </div>
             }
@@ -271,23 +300,69 @@
         {
             return;
         }
-        Payment payment = new Payment()
-            {
-                IdBooking = idBooking.Value,
-                IdGuest = guid.Value,
-                TotalPrice = bill.TotalPrice,
-                TypePaymenId = selectedPaymentMethod,
-                Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
-                LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
-                DateBooking = date,
-                Reduce = bill.ReducePrice,
-                VoucherId = bill.IdVoucher
-            };
+        DATN.ViewModels.DTOs.Booking.Payment payment;
+        if (idBooking != 0 && idBooking != null)
+        {
+            payment = new Payment()
+                {
+                    IdBooking = idBooking.Value,
+                    IdGuest = guid.Value,
+                    TotalPrice = bill.TotalPrice,
+                    TypePaymenId = selectedPaymentMethod,
+                    Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
+                    DateBooking = date,
+                    Reduce = bill.ReducePrice,
+                    VoucherId = bill.IdVoucher
+                };
+        }
+        else
+        {
+            payment = new Payment()
+                {
+                    TotalPrice = bill.TotalPrice,
+                    TypePaymenId = selectedPaymentMethod,
+                    Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    LstProducts = bookingService.ListProductDetail.Where(x => x.Term == termId).ToList(),
+                    DateBooking = date,
+                    Reduce = bill.ReducePrice,
+                    VoucherId = bill.IdVoucher
+                };
+        }
         var respone = await _client.PaymentInStore(payment);
         if (respone.IsSuccess)
         {
+            var listRemove = new List<ProductDetailView>();
             Message(respone.Data, Severity.Success);
+            if (idBooking != 0 && idBooking != null)
+            {
+                foreach (var item in bookingService.ListProductDetail)
+                {
+                    if (item.IdBooking == idBooking.Value)
+                    {
+                        listRemove.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in bookingService.ListProductDetail)
+                {
+                    if (item.Term == termId.Value)
+                    {
+                        listRemove.Add(item);
+                    }
+                }
+            }
+            if (listRemove.Count > 0)
+            {
+                bookingService.RemoveBillTerm(listRemove);
+            }
             _dialogBox.Close();
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
         }
     }
 

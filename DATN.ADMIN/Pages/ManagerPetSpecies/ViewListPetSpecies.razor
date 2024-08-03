@@ -12,7 +12,7 @@
 
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(0))">Thêm</MudButton>
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách loài</MudText>
 @if (lstPetSpecies != null && lstPetSpecies.Count > 0)
 {
 
@@ -22,9 +22,10 @@
 
 	<MudTable Items="@lstPetSpecies" Hover="true" SortLabel="Sort By" Filter="new Func<PetSpeciesVM,bool>(FilterFunc)">
 		<ToolBarContent>
-			<MudText Typo="Typo.h6">Danh sách loài</MudText>
+			<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(0))">Thêm</MudButton>
+			
 			<MudSpacer />
-			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+			<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
 		</ToolBarContent>
 		<HeaderContent>
 			<MudTh>STT</MudTh>

@@ -35,15 +35,23 @@ namespace DATN.Aplication.Services
                 foreach (var item in orderDetails)
                 {
                     var update = query.FirstOrDefault(c => c.Id == item.IdProductDetail);
-                    update.AmountUsed += item.Quantity;
-                    if (update.Amount == update.AmountUsed)
+                    if (update.Amount >= item.Quantity)
                     {
-                        update.Status = ProductDetailStatus.OutOfStock;
+                        update.AmountUsed += item.Quantity;
+                        update.Amount -= item.Quantity;
+                        if (update.Amount == 0)
+                        {
+                            update.Status = ProductDetailStatus.OutOfStock;
+                        }
+                        lstUpdate.Add(update);
                     }
-                    lstUpdate.Add(update);
+                    else
+                    {
+                        return new ResponseData<string> { IsSuccess = false ,Error="Có sản phẩm trong giỏ hàng đã hết hàng trong kho vui lòng chọn sản phẩm khác"};
+                    }
                 }
                 await _unitOfWork.OrderDetailRepository.AddRangeAsync(orderDetails);
-                await _unitOfWork.ProductDetailRepository.AddRangeAsync(lstUpdate);
+                await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(lstUpdate);
                 return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
             }
             catch (Exception e)
@@ -108,7 +116,7 @@ namespace DATN.Aplication.Services
                                                      IdProductDetail = tetsa.Id,
                                                      Name = tetsa.Name,
                                                      Price = tetsa.Price,
-                                                     Quantity = tetsa.Amount - tetsa.AmountUsed,
+                                                     Quantity = tetsa.Amount,
                                                      Status = tetsa.Status,
                                                  }).ToList(),
                             LinkImg = view.Key.img.UrlImage,

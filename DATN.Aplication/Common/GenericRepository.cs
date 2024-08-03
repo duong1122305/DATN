@@ -1,4 +1,6 @@
 ﻿using DATN.Data.EF;
+using DATN.Data.Entities;
+using DATN.ViewModels.DTOs.Booking;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -19,6 +21,11 @@ namespace DATN.Aplication.Common
         {
             var entityEntry = await _context.Set<T>().AddAsync(entity); // Chỉ thêm entity vào context
             return entityEntry.Entity;                                  // Trả về entity đã được thêm
+        }
+        public virtual async Task<List<BookingView>> CallProcedure()
+        {
+            var commandProcedure= await _context.Set<BookingView>().FromSqlRaw("exec GetListBooking").ToListAsync();
+            return commandProcedure;
         }
         public virtual async Task AddRangeAsync(List<T> entities)
         {

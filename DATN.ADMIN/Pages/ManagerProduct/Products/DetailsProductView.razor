@@ -25,7 +25,7 @@
             </div>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
             <MudSpacer />
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog())" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
         </ToolBarContent>
@@ -38,7 +38,7 @@
             <PropertyColumn Property="x => x.Product" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Name" Title="Tên sản phẩm chi tiết" Sortable="false" Filterable="false" />
             <PropertyColumn Property="x => x.Amount" Title="Số lượng" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.Price" Title="Giá" Sortable="false" Filterable="false" />
+            <PropertyColumn Property="x => x.Price" Title="Giá(VNĐ)" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
                 <CellTemplate>
                     @if (context.Item.Status == ProductDetailStatus.Stocking)
@@ -53,7 +53,7 @@
                     }
                     else
                     {
-                        <MudChip Color="Color.Error" title="Hoạt động">Đã xóa</MudChip>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng bán</MudChip>
                     }
                 </CellTemplate>
             </TemplateColumn>

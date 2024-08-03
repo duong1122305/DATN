@@ -41,9 +41,18 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
         {
 
-            var response = await _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes);
-            var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
-            return result;
+            if (idBooking != null)
+            {
+                var response = _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking={idBooking}", productdes).GetAwaiter().GetResult();
+                var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+            else
+            {
+                var response = _httpClient.PostAsJsonAsync<List<ProductDetailView>>($"/api/Booking/Check-bill?idBooking=0", productdes).GetAwaiter().GetResult();
+                var result = JsonConvert.DeserializeObject<ResponseData<Bill>>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
 
         }
 
@@ -84,9 +93,9 @@ namespace DATN.ADMIN.Services
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<Bill>>($"/api/Booking/Get-Bill-Of-Guest?idguest={idguest}&dateBooking={dateBooking.Year}-{dateBooking.Month}-{dateBooking.Day}");
         }
-        public async Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(string id, DateTime date)
+        public async Task<ResponseData<List<ListBokingDetailInDay>>> ListBookingDetailInDay(int id)
         {
-            return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}&date={date.Year}-{date.Month}-{date.Day}").GetAwaiter().GetResult();
+            return _httpClient.GetFromJsonAsync<ResponseData<List<ListBokingDetailInDay>>>($"/api/Booking/List-Booking-Detail-In-Day?id={id}").GetAwaiter().GetResult();
         }
 
         public async Task<ResponseData<List<ProductSelect>>> ListProductViewSale()
