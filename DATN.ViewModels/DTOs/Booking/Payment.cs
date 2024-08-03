@@ -4,7 +4,7 @@ namespace DATN.ViewModels.DTOs.Booking
 {
     public class Payment
     {
-        public Guid IdGuest { get; set; }
+        public Guid? IdGuest { get; set; }
         public int IdBooking { get; set; }
         public string Token { get; set; }
         public DateTime DateBooking { get; set; }
