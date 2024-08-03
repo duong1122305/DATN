@@ -566,7 +566,7 @@ namespace DATN.Aplication.Services
                         else
                         {
                             var queryShift = (from shift in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                              where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To) <= 0
+                                              where from1.CompareTo(shift.From) >= 0 && to.CompareTo(shift.To.Add(new TimeSpan(0, 15, 0))) <= 0
                                               select shift).FirstOrDefault();
                             if (queryShift == null)
                             {
