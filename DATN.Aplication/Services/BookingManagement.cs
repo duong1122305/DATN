@@ -1026,20 +1026,19 @@ namespace DATN.Aplication.Services
                 var booking = new Booking()
                 {
                     GuestId = Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0"),
-                    BookingTime = DateTime.Now.Date,
+                    BookingTime = DateTime.Now,
                     VoucherId = null,
                     TotalPrice = 0,
                     PaymentTypeId = 1,
                     ReducedAmount = 0,
                     Status = BookingStatus.Completed,
-                    IsPayment = false,
+                    IsPayment = true,
                     IsAddToSchedule = true,
                 };
                 await _unitOfWork.BookingRepository.AddAsync(booking);
                 await _unitOfWork.SaveChangeAsync();
                 queryBooking = (from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
-                                where bookingTable.GuestId == Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0") &&
-                                bookingTable.BookingTime.Date == DateTime.Now.Date
+                                where bookingTable.Id == booking.Id
                                 select bookingTable).FirstOrDefault();
                 if (payment.TypePaymenId == 1)
                 {
@@ -1062,7 +1061,7 @@ namespace DATN.Aplication.Services
                                        {
                                            IdBooking = queryBooking.Id,
                                            IdProductDetail = buypro.IdProductDetail,
-                                           Quantity = buypro.Quantity,
+                                           Quantity = buypro.SelectQuantityProduct,
                                            Price = buypro.Price,
                                        }).ToList();
                     await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
