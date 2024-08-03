@@ -45,6 +45,10 @@ namespace DATN.Aplication.Services
                         }
                         lstUpdate.Add(update);
                     }
+                    else
+                    {
+                        return new ResponseData<string> { IsSuccess = false ,Error="Có sản phẩm trong giỏ hàng đã hết hàng trong kho vui lòng chọn sản phẩm khác"};
+                    }
                 }
                 await _unitOfWork.OrderDetailRepository.AddRangeAsync(orderDetails);
                 await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(lstUpdate);

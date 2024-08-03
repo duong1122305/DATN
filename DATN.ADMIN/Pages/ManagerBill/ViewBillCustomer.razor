@@ -355,7 +355,10 @@
                     }
                 }
             }
-            bookingService.RemoveBillTerm(listRemove);
+            if (listRemove.Count > 0)
+            {
+                bookingService.RemoveBillTerm(listRemove);
+            }
             _dialogBox.Close();
         }
     }
