@@ -333,7 +333,29 @@
         var respone = await _client.PaymentInStore(payment);
         if (respone.IsSuccess)
         {
+            var listRemove = new List<ProductDetailView>();
             Message(respone.Data, Severity.Success);
+            if (idBooking != 0 && idBooking != null)
+            {
+                foreach (var item in bookingService.ListProductDetail)
+                {
+                    if (item.IdBooking == idBooking.Value)
+                    {
+                        listRemove.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in bookingService.ListProductDetail)
+                {
+                    if (item.Term == termId.Value)
+                    {
+                        listRemove.Add(item);
+                    }
+                }
+            }
+            bookingService.RemoveBillTerm(listRemove);
             _dialogBox.Close();
         }
     }
