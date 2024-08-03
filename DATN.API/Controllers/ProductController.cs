@@ -2,12 +2,15 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // cấp quyền đê không bị chặn cors khi chạy local
+    [EnableCors("AllowSpecificOrigin")]
     public class ProductController : Controller
     {
         IProductManagementService _productManagementServicel;
