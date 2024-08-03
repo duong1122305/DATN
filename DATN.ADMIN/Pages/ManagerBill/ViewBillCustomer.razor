@@ -320,7 +320,6 @@
         {
             payment = new Payment()
                 {
-                    IdGuest = Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0"),
                     TotalPrice = bill.TotalPrice,
                     TypePaymenId = selectedPaymentMethod,
                     Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
