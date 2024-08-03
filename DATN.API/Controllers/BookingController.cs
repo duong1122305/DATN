@@ -105,7 +105,7 @@ namespace DATN.API.Controllers
             var result =  await _bookingManagement.GuestCreateBooking(createBookingRequest);
             if (result.IsSuccess)
             {
-                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Booking đã được tạo thành công bởi ID: {createBookingRequest.GuestId}!");
+                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Booking đã được tạo thành công bởi ID: {createBookingRequest.GuestName}!");
             }
             return result;
         }
