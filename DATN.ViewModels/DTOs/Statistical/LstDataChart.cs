@@ -7,9 +7,14 @@ using System.Threading.Tasks;
 
 namespace DATN.ViewModels.DTOs.Statistical
 {
-	public class CustomerStatistical
+	public class LstDataChart
 	{
-		public string Name { get; set; }
+        public LstDataChart()
+        {
+			Data = new List<ChartData>();
+
+		}
+        public string Name { get; set; }
 		public List<ChartData> Data { get; set; }
 
 	}

@@ -1,4 +1,5 @@
-﻿using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.Components;
+using DATN.ADMIN.IServices;
 using DATN.Aplication.CustomProvider;
 using DATN.ViewModels.DTOs.Statistical;
 using Microsoft.AspNetCore.Components;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using MudBlazor;
+using Syncfusion.Blazor.PdfViewer;
 
 namespace DATN.ADMIN.Pages
 {
@@ -21,45 +23,74 @@ namespace DATN.ADMIN.Pages
 		protected ISnackbar Snackbar { get; set; }
 
 		int type = 1;
-		CustomerStatistical customerData = new CustomerStatistical();
-		List<Top3Statistical> top3ProductReven;
-		List<Top3Statistical> top3ServiceReven;
+		LstDataChart customerData = new LstDataChart();
+		LstDataChart revenueDatas = new LstDataChart();
+		LstDataChart revenuePieDatas = new LstDataChart();
+		List<ProductOutStock> lstProductOutStock = new List<ProductOutStock>();
+		List<ProductOutStock> lstProductDataRaw = new List<ProductOutStock>();
+		//List<Top3Statistical> top3ProductReven;
+		//List<Top3Statistical> top3ServiceReven;
 		List<Top3Statistical> top3ProductQuantity;
 		List<Top3Statistical> top3ServiceQuantity;
 		public double[] dataPie = { 0, 0 };
 		public string[] labelsPie = { "Dịch vụ", "Sản phẩm" };
 		string width = "99%";
 
-        protected override async Task OnInitializedAsync()
+		protected override async Task OnInitializedAsync()
 		{
 			type = 3;
 			await LoadData(type);
 			StateHasChanged();
-
-		}
-		async Task LoadData(int? value = 1)
+			lstProductOutStock = lstProductDataRaw;
+        }
+        async Task LoadData(int? value = 1)
 		{
-			if (value == null) return;
-			var oldType = type;
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+            var dialog = await DialogService.ShowAsync<LoadingIndicator>("", options);
+            StateHasChanged();
+            if (value == null) return;
 			type = value.Value;
 			var response = await statiscalClient.StatisticalIndex(type);
-			if (response.IsSuccess)
+            dialog.Close();
+            if (response.IsSuccess)
 			{
-				dataPie = response.Data.DataPiceRevenue;
-				customerData= response.Data.CustomerStatistical;
-					top3ProductReven = response.Data.ProductRevenueStatistical;
-				top3ServiceReven = response.Data.ServiceRevenueStatistical;
+				revenuePieDatas = response.Data.DataPiceRevenue;
+				customerData = response.Data.CustomerStatistical;
+				revenueDatas = response.Data.RevenueStatistical;
+				lstProductDataRaw = response.Data.LstProductOutStock;
+				//	top3ProductReven = response.Data.ProductRevenueStatistical;
+				// top3ServiceReven = response.Data.ServiceRevenueStatistical;
 				top3ProductQuantity = response.Data.ProductQuantityStatistical;
 				top3ServiceQuantity = response.Data.ServiceQuantityStatistical;
-                width = "99%";
-            }
-            else
-            {
+				width = "99%";
+			}
+			else
+			{
 				Snackbar.Add("Chưa có data nhé b!");
-				type=oldType;
-            }
-            StateHasChanged();
-            width = "100%";
+			}
+			StateHasChanged();
+			width = "100%";
+           
+        }
+		async void ChangStatus(int value)
+		{
+
+			if (value == -1)
+			{
+				lstProductOutStock = lstProductDataRaw;
+			}
+			else if(value == 1)
+			{
+				lstProductOutStock = lstProductDataRaw.Where(p=>p.Status).ToList();
+			}
+			else if(value == 0)
+			{
+				lstProductOutStock = lstProductDataRaw.Where(p=>!p.Status).ToList();
+			}
+			StateHasChanged();
         }
 	}
+
+
+
 }

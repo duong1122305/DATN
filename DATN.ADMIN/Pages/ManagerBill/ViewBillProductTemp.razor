@@ -16,15 +16,17 @@
             <GroupTemplate>
                 <span style="font-weight:bold">Hóa đơn - @context.Grouping.Key</span>
                 <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(Guid.Empty,DateTime.Now,0,Convert.ToInt32(context.Grouping.Key.ToString())))">Thanh toán</MudIconButton>
+                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xóa hóa đơn tạm" OnClick="@(async()=>await RemoveBill(Convert.ToInt32(context.Grouping.Key.ToString())))">Xóa hóa đơn</MudIconButton>
             </GroupTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x=>x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
-        <PropertyColumn Property="x=>x.SelectQuantityProduct" Title="Số Lượng" Sortable="false" Filterable="false" />
-        <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
-            <CellTemplate>
-                <span>   @CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
-            </CellTemplate>
-        </TemplateColumn>
+        <PropertyColumn Property=" x=>
+                    x.Name" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+                    <PropertyColumn Property="x=>x.SelectQuantityProduct" Title="Số Lượng" Sortable="false" Filterable="false" />
+                    <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
+                        <CellTemplate>
+                            <span>   @CurrencyHelper.FormatCurrency((float)context.Item.Price)</span>
+                        </CellTemplate>
+                    </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ProductDetailView" />
@@ -50,18 +52,18 @@
        {
            if (_customizeGroupBy)
            {
-               return x.Term.ToString();
+               return x.Term.Value.ToString();
            }
            else
            {
-               return x.Term.ToString();
+               return x.Term.Value.ToString();
            }
        };
     void ExpandAllGroups()
     {
         dataGrid?.ExpandAllGroups();
     }
-    private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking,int? idterm)
+    private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking, int? idterm)
     {
         var parameters = new DialogParameters();
         string nameDialog = "";
@@ -86,5 +88,11 @@
             createUpdateDialog.Close();
             await LoadData();
         }
+    }
+    public async Task RemoveBill(int id)
+    {
+        var listRemove = bookingService.ListProductDetail.Where(c => c.Term == id).ToList();
+        bookingService.RemoveBillTerm(listRemove);
+        await Task.Delay(1);
     }
 }

@@ -113,7 +113,7 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                                       <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
                     @if (context.Item.Status == BookingStatus.PendingConfirmation)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -121,7 +121,7 @@
                     }
                     @if (context.Item.Status == BookingStatus.Confirmed)
                     {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
+                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Khách đến" OnClick="@(async()=>await CheckInArrive(context.Item.IdBooking.Value))">Khách đến</MudIconButton>
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
 
                     }
@@ -161,7 +161,7 @@
                         @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
 
                     }
-                   
+
                 </MudButtonGroup>
             </CellTemplate>
         </TemplateColumn>
@@ -205,7 +205,7 @@
         }
         else if (selectedStatus == Status.PendingConfirmation)
         {
-            lstBookingServices = respone.Data.OrderByDescending(x=> x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
         }
         else if (selectedStatus == Status.Confirmed)
         {
@@ -341,7 +341,6 @@
     {
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
-
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -352,13 +351,13 @@
                 DisableBackdropClick = true
             };
         parameters.Add("id", id);
-            var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
-            var result = await createUpdateDialog.Result;
-            if (!result.Canceled)
-            {
-                createUpdateDialog.Close();
-                await LoadData();
-            }
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
     }
     //bill
     private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
@@ -389,7 +388,7 @@
 
     private async Task OpenDialogBillInStore(Guid? id, DateTime date)
     {
-        string nameDialog = "Bán hàng tại quầy";
+        string nameDialog = "";
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -460,6 +459,20 @@
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             };
         var respone = await _client.ConfirmBooking(actionView);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+    }
+
+    private async Task CheckInArrive(int id)
+    {
+        var respone = await _client.CheckInArrive(id);
         if (respone.IsSuccess)
         {
             Message(respone.Data, Severity.Success);

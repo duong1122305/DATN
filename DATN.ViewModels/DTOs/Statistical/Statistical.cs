@@ -8,19 +8,23 @@ namespace DATN.ViewModels.DTOs.Statistical
 {
 	public class Statistical
 	{
-		public double[] DataPiceRevenue { get; set; } = { 0, 0 };
+		public LstDataChart DataPiceRevenue { get; set; }
 		/// <summary>
 		/// Số lượng khách hàng theo thời gian
 		/// </summary>
-		public CustomerStatistical CustomerStatistical { get; set; }
+		public LstDataChart CustomerStatistical { get; set; }
+		///// <summary>
+		///// doanh thu theo thời gian
+		///// </summary>
+		public LstDataChart RevenueStatistical { get; set; }
 		/// <summary>
 		/// Top 3 sản phẩm theo doanh thu
 		/// </summary>
-		public List<Top3Statistical> ProductRevenueStatistical { get; set;}
+	//	public List<Top3Statistical> ProductRevenueStatistical { get; set; }
 		/// <summary>
 		/// Top 3 dịch vụ theo doanh thu
 		/// </summary>
-		public List<Top3Statistical> ServiceRevenueStatistical { get; set;}
+	//	public List<Top3Statistical> ServiceRevenueStatistical { get; set;}
 		/// <summary>
 		/// Top 3 sản phẩm theo số lượng bán ra
 		/// </summary>
@@ -29,5 +33,9 @@ namespace DATN.ViewModels.DTOs.Statistical
 		/// Top 3 dịch vụ theo số lượng khách dùng
 		/// </summary>
 		public List<Top3Statistical> ServiceQuantityStatistical { get; set;}
+		/// <summary>
+		/// danh sách sản phẩm sắp hết và hết
+		/// </summary>
+		public List< ProductOutStock> LstProductOutStock { get; set; }
     }
 }
