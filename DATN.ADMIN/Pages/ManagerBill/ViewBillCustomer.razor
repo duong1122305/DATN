@@ -65,19 +65,19 @@
                                 <MudTh>Đơn giá</MudTh>
                                 <MudTh>Hành động</MudTh>
                             </HeaderContent>
-                            <RowTemplate>
-                                <MudTd>@context.Name</MudTd>
+                            <RowTemplate Context="bill2">
+                                <MudTd>@bill2.Name</MudTd>
                                 <MudTd>
                                     <div class="quantity-input">
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
-                                        <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(bill2) )">-</button>
+                                        <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(bill2) )">+</button>
 
                                     </div>
                                 </MudTd>
-                                <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
                                 <MudTd>
-                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@bill2))" Color="Color.Error">Xoá</MudButton>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>

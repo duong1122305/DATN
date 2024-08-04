@@ -341,7 +341,6 @@
     {
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
-        string id2 = Convert.ToString(id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -351,8 +350,7 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("id", id2);
-        parameters.Add("dateBooking", dateBooking);
+        parameters.Add("id", id);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
