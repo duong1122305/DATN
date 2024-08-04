@@ -1,6 +1,7 @@
 ﻿using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceDetail;
+using DATN.ViewModels.DTOs.ServiceDetailVM;
 
 namespace DATN.Aplication.Services.IServices
 {
@@ -13,5 +14,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> UpdateService(int id, UpdateServiceDetailVM service);
         public Task<ResponseData<string>> RemoveService(int idSer);
         public Task<List<GetServiceNameVM>> GetServiceName();
+        public Task<List<GroupByServiceName>> GroupByServiceNames();
     }
 }

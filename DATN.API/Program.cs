@@ -1,4 +1,5 @@
-﻿using DATN.Aplication;
+﻿using DATN.API.Services;
+using DATN.Aplication;
 using DATN.Aplication.Extentions;
 using DATN.Aplication.Mapping;
 using DATN.Aplication.Services;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -58,13 +60,16 @@ builder.Services.AddAuthentication(options =>
 
     };
 });
-builder.Services.AddCors(otp =>
+builder.Services.AddCors(options =>
 {
-    otp.AddPolicy("cor", options =>
-    options.AllowAnyOrigin()
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    );
+    options.AddPolicy("AllowSpecificOrigin",
+           builder =>
+           {
+               builder.WithOrigins("https://localhost:44305", "http://localhost:5173") // Đổi thành domain của client
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+           });
 });
 
 builder.Services.AddScoped<MailExtention>();
@@ -124,10 +129,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseCors("cor");
+app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<BookingHub>("/bookingHub");
 app.Run();
