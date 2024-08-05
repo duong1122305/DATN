@@ -69,6 +69,9 @@
     private string searchString = "";
 
     private PetVM value2;
+    private IBookingViewServices _BookingSer { get; set; }
+    [Inject]
+    HttpContextAccessor _httpContextAccessor { get; set; }
 
     private List<NumberOfScheduleView> lstFreeTime = new List<NumberOfScheduleView>();
     TimeSpan? timeStart;
@@ -196,11 +199,51 @@
                 DateBooking = bookingDate.Value,
             };
         bookingService.AddBooking(bookingCreate);
+        await CreateBookingInDb();
         // Đóng dialog sau khi thêm xong
         _dialogBox.Close(DialogResult.Ok(true));
         StateHasChanged();
     }
+    public async Task CreateBookingInDb()
+    {
+        try
+        {
+            if (await Confirm2() == true)
+            {
+                CreateBookingRequest createBookingRequest = new CreateBookingRequest()
+                    {
+                        GuestId = idCus,
+                        ListIdServiceDetail = bookingService.lstBooking,
+                        PaymentTypeId = 1,
+                    };
+                var repos = await _BookingSer.CreateBookingStore(createBookingRequest, _httpContextAccessor.HttpContext.Session.GetString("Key"));
+                if (repos.IsSuccess)
+                {
+                    Message(repos.Data, Severity.Success);
+                    StateHasChanged();
+                    _dialogBox.Close();
+                }
+                else
+                {
+                    Message(repos.Error, Severity.Error);
+                }
+            }
+        }
+        catch (Exception)
+        {
 
+            throw;
+        }
+    }
+    private async Task<bool?> Confirm2()
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo",
+                    "Xác nhận thêm dịch vụ?",
+           yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        return confirm;
+    }
     //thông báo
     private void Message(string message, Severity severity)
     {
