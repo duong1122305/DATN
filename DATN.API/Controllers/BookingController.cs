@@ -102,7 +102,7 @@ namespace DATN.API.Controllers
         [HttpPost("Guest-Booking")]
         public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest)
         {
-            var result =  await _bookingManagement.GuestCreateBooking(createBookingRequest);
+            var result = await _bookingManagement.GuestCreateBooking(createBookingRequest);
             if (result.IsSuccess)
             {
                 await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Booking đã được tạo thành công bởi ID: {createBookingRequest.GuestName}!");
@@ -165,6 +165,12 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest)
         {
             return await _bookingManagement.GetBookingByGuest(idGuest);
+        }
+
+        [HttpPost("Add-Service-For-Booking")]
+        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        {
+            return await _bookingManagement.AddService(createBookingDetailRequest);
         }
     }
 }

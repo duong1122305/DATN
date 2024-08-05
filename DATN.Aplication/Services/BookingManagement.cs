@@ -824,7 +824,7 @@ namespace DATN.Aplication.Services
                     {
                         if (item.Status == BookingDetailStatus.Processing)
                         {
-                            item.Status=BookingDetailStatus.Completed;
+                            item.Status = BookingDetailStatus.Completed;
                         }
                     }
                     HistoryAction historyAction = new HistoryAction()
@@ -1317,7 +1317,81 @@ namespace DATN.Aplication.Services
             };
             return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
         }
+        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        {
+            if (createBookingDetailRequest != null)
+            {
+                try
+                {
+                    var query = (from booking in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                 where booking.BookingId == createBookingDetailRequest.BookingId
+                                 select booking).ToList();
 
+                    List<BookingDetail> list = new List<BookingDetail>();
+                    var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                             select detail;
+                    for (global::System.Int32 i = 0; i < query.Count; i++)
+                    {
+                        var term = query[i];
+                        if (term.ServiceDetailId == createBookingDetailRequest.ServiceDetailId && term.PetId == createBookingDetailRequest.PetId)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có 1 dịch vụ sử dùng 2 lần cho 1 bé thú cưng!!!" };
+                        }
+                        else if (term.ServiceDetailId == createBookingDetailRequest.ServiceDetailId && term.StaffId == createBookingDetailRequest.StaffId)
+                        {
+                            if (term.StartDateTime.CompareTo(createBookingDetailRequest.StartDateTime) > 0 && term.StartDateTime.CompareTo(createBookingDetailRequest.EndDateTime) < 0)
+                            {
+                                return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                            }
+                            else if (term.EndDateTime.CompareTo(createBookingDetailRequest.StartDateTime) > 0 && term.EndDateTime.CompareTo(createBookingDetailRequest.EndDateTime) < 0)
+                            {
+                                return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                        var bookingDetail = new BookingDetail()
+                        {
+                            BookingId = createBookingDetailRequest.BookingId,
+                            PetId = createBookingDetailRequest.PetId,
+                            Price = createBookingDetailRequest.Price,
+                            StaffId = createBookingDetailRequest.StaffId,
+                            EndDateTime = createBookingDetailRequest.DateBooking.Date.AddHours(createBookingDetailRequest.EndDateTime.Hours).AddMinutes(createBookingDetailRequest.EndDateTime.Minutes),
+                            StartDateTime = createBookingDetailRequest.DateBooking.Date.AddHours(createBookingDetailRequest.StartDateTime.Hours).AddMinutes(createBookingDetailRequest.StartDateTime.Minutes),
+                            Status = BookingDetailStatus.Unfulfilled,
+                            ServiceDetailId = createBookingDetailRequest.ServiceDetailId,
+                            Quantity = 1,
+                        };
+                    await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
+                    var idUserAction = await _user.GetUserByToken(createBookingDetailRequest.Token);
+                    if (idUserAction.IsSuccess)
+                    {
+                        var history = new HistoryAction()
+                        {
+                            ActionByID = Guid.Parse(idUserAction.Data),
+                            ActionTime = DateTime.Now,
+                            ActionID = 12,
+                            Description = "Tạo mới hóa đơn tại quầy",
+                            BookingID = createBookingDetailRequest.BookingId,
+                        };
+                        await _unitOfWork.HistoryActionRepository.AddAsync(history);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
+            }
+        }
         public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
         {
             string vnp_Returnurl = "https://localhost:7259/ListServicesBooking"; //URL nhan ket qua tra ve 
