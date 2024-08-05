@@ -199,11 +199,11 @@
                 DateBooking = bookingDate.Value,
             };
         bookingService.AddBooking(bookingCreate);
-        await CreateBookingInDb();
         // Đóng dialog sau khi thêm xong
         _dialogBox.Close(DialogResult.Ok(true));
         StateHasChanged();
     }
+
     public async Task CreateBookingInDb()
     {
         try

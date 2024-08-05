@@ -189,6 +189,8 @@
 
     private HubConnection hubConnection;
     private NavigationManager navigation { get; set; }
+    [Parameter]
+    public List<ListBokingDetailInDay> lstBooking { get; set; } = new List<ListBokingDetailInDay>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -241,6 +243,10 @@
         }
         StateHasChanged();
     }
+    public async Task LstBooking()
+    {
+
+    }
     private enum Status
     {
         All,
@@ -259,7 +265,8 @@
     {
         var response = await _client.QrCodeCheckIn(idBooking);
         var parameters = new DialogParameters();
-        string nameDialog = "Chi tiết khách đặt lịch";
+        string nameDialog = "Khách check In";
+
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -282,7 +289,7 @@
     {
         var response = await _client.QrCodeCheckIn(idBooking);
         var parameters = new DialogParameters();
-        string nameDialog = "Chi tiết khách đặt lịch";
+        string nameDialog = "Khách check Out";
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -352,12 +359,21 @@
             };
         parameters.Add("id", id);
         parameters.Add("idGuest", idGuest);
-        var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
+        // check có danh sách ko
+        var respone2 = await _client.ListBookingDetailInDay(id);
+        if (respone2.IsSuccess)
         {
-            createUpdateDialog.Close();
-            await LoadData();
+            var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
+        }
+        else
+        {
+            Message("Không có dữ liệu", Severity.Warning);
         }
     }
     //bill
