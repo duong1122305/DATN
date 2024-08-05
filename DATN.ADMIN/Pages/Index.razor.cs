@@ -35,7 +35,10 @@ namespace DATN.ADMIN.Pages
 		public double[] dataPie = { 0, 0 };
 		public string[] labelsPie = { "Dịch vụ", "Sản phẩm" };
 		string width = "99%";
-
+		// bộ lọc
+		private MudDateRangePicker _picker;
+		private DateRange _dateRange;
+		private bool isDisplayDate = false;
 		protected override async Task OnInitializedAsync()
 		{
 			type = 3;
@@ -45,13 +48,34 @@ namespace DATN.ADMIN.Pages
         }
         async Task LoadData(int? value = 1)
 		{
-            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-            var dialog = await DialogService.ShowAsync<LoadingIndicator>("", options);
+			DateTime? startDate= DateTime.Now;
+			DateTime? endDate= DateTime.Now; 
+			if (value==4|| value==5)
+			{
+				isDisplayDate = true;
+				
+                if (value==4)
+                {
+					type = 4;
+					return;
+                }
+				else{
+					if (_picker != null && _picker.DateRange != null && _picker.DateRange.Start != null && _picker.DateRange.End != null)
+					{
+						startDate = _picker.DateRange.Start;
+						endDate = _picker.DateRange.End;
+					}
+				}
+            }
+            else
+            {
+                isDisplayDate = false;
+            }
             StateHasChanged();
             if (value == null) return;
 			type = value.Value;
-			var response = await statiscalClient.StatisticalIndex(type);
-            dialog.Close();
+			var response = await statiscalClient.StatisticalIndex( startDate.Value,endDate.Value, type);
+			if(type==5)type = 4;
             if (response.IsSuccess)
 			{
 				revenuePieDatas = response.Data.DataPiceRevenue;
@@ -89,7 +113,13 @@ namespace DATN.ADMIN.Pages
 			}
 			StateHasChanged();
         }
-	}
+        // lọc ngày
+        private async Task SearchByDate()
+        {
+            
+        }
+
+    }
 
 
 

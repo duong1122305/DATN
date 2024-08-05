@@ -18,7 +18,7 @@ namespace DATN.ViewModels.DTOs.Booking
         {
             if (product.Term != 0)
             {
-                var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && c.Term==product.Term);
+                var check = ListProductDetail.FirstOrDefault(c => c.IdProductDetail == product.IdProductDetail && c.Term == product.Term);
                 if (check != null)
                 {
                     check.SelectQuantityProduct++;
@@ -46,14 +46,15 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public void RemoveProduct(ProductDetailView product)
         {
-            var productDetailView = ListProductDetail.FirstOrDefault(b => b.IdProductDetail == product.IdProductDetail); // Tìm đối tượng booking cần xoá
-            if (productDetailView != null)
-            {
-                ListProductDetail.Remove(productDetailView); // Xoá đối tượng booking từ danh sách
-                //NotifyStateChanged(); // Thông báo sự thay đổi để giao diện có thể cập nhật
-            }
+            ListProductDetail.Remove(product); // Xoá đối tượng booking từ danh sách
         }
-
+        public void RemoveBillTerm(List<ProductDetailView> products)
+        {
+            foreach (var item in products)
+            {
+                ListProductDetail.Remove(item);
+            } // Xoá đối tượng booking từ danh sách
+        }
 
         public void RemoveBooking(CreateBookingDetailRequest booking)
         {

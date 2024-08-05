@@ -95,6 +95,15 @@ namespace DATN.API.Controllers
 
             return BadRequest();
         }
+
+        [HttpGet("groupByServiceName")]
+        public async Task<IActionResult> GroupByServiceName()
+        {
+            var result = await _serviceDetailManagementService.GroupByServiceNames();
+            if (result != null) return Ok(result);
+
+            return BadRequest();
+        }
     }
 }
 

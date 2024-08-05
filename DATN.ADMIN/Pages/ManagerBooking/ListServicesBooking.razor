@@ -113,7 +113,7 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                                       <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value))"></MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value,context.Item.IdGuest.Value))"></MudIconButton>
                     @if (context.Item.Status == BookingStatus.PendingConfirmation)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -161,7 +161,7 @@
                         @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
 
                     }
-                   
+
                 </MudButtonGroup>
             </CellTemplate>
         </TemplateColumn>
@@ -205,7 +205,7 @@
         }
         else if (selectedStatus == Status.PendingConfirmation)
         {
-            lstBookingServices = respone.Data.OrderByDescending(x=> x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
         }
         else if (selectedStatus == Status.Confirmed)
         {
@@ -337,7 +337,7 @@
         dataGrid?.ExpandAllGroups();
     }
 
-    private async Task OpenDialog(int id)
+    private async Task OpenDialog(int id,Guid idGuest)
     {
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
@@ -351,6 +351,7 @@
                 DisableBackdropClick = true
             };
         parameters.Add("id", id);
+        parameters.Add("idGuest", idGuest);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
@@ -469,7 +470,7 @@
             Message(respone.Error, Severity.Error);
         }
     }
-    
+
     private async Task CheckInArrive(int id)
     {
         var respone = await _client.CheckInArrive(id);
@@ -552,3 +553,4 @@
 
 }
 
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>

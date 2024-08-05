@@ -3,6 +3,7 @@ using DATN.Data.Entities;
 using DATN.Utilites.Check;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceDetail;
+using DATN.ViewModels.DTOs.ServiceDetailVM;
 
 namespace DATN.Aplication.Services
 {
@@ -187,6 +188,28 @@ namespace DATN.Aplication.Services
 
             if (query == null) return new List<GetServiceNameVM>();
 
+            return query.ToList();
+        }
+
+        public async Task<List<GroupByServiceName>> GroupByServiceNames()
+        {
+            var query = from s in await _unitOfWork.ServiceRepository.GetAllAsync()
+                        join sd in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                        on s.Id equals sd.ServiceId
+                        where sd.IsDeleted == false
+                        group new GetServiceDetail
+                        {
+                            Id = sd.Id,
+                            Description = sd.Description,
+                            Price = sd.Price,
+                            Duration = sd.Duration,
+                            IsActive = sd.IsDeleted // Assuming you meant !sd.IsDeleted for IsActive
+                        } by s.Name into grouped
+                        select new GroupByServiceName
+                        {
+                            ServiceName = grouped.Key,
+                            ServiceDetails = grouped.ToList()
+                        };
             return query.ToList();
         }
     }

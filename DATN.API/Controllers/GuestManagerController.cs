@@ -30,6 +30,12 @@ namespace DATN.API.Controllers
             var response = await _guestManagerService.GetGuest();
             return response;
         }
+        [HttpGet("GetAllGuest")]///////////// lấy thông tin tất cả khách hàng đc xác minh và chưa xóa
+        public async Task<ResponseData<List<GuestViewModel>>> GetAllGuest()
+        {
+            var response = await _guestManagerService.GetAllGuest();
+            return response;
+        }
         [HttpGet("find-by-id")]
         public async Task<ResponseData<GuestViewModel>> FindByID(Guid id)
         {

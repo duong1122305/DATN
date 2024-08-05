@@ -8,11 +8,15 @@
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.Enum
-@if (lstBooking.Count > 0 && lstBooking != null)
+@inject IDialogService _dialogservice;
+
+@if (lstBooking != null && lstBooking.Count > 0)
 {
     <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
                  Hideable="true" Groupable="true" GroupExpanded="false">
         <ToolBarContent>
+            <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+
             <MudSpacer />
         </ToolBarContent>
         <Columns>
@@ -82,6 +86,9 @@ else
     public int id { get; set; }
     [Parameter]
     public DateTime dateBooking { get; set; }
+
+    [Parameter]
+    public Guid idGuest { get; set; }
     [Inject]
     IBookingViewServices _client { get; set; }
     [Parameter]
@@ -89,6 +96,9 @@ else
 
     [Inject]
     private IHttpContextAccessor _httpContextAccessor { get; set; }
+
+    [Inject] private BookingService bookingService { get; set; }
+
 
     protected async override Task OnInitializedAsync()
     {
@@ -194,6 +204,29 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
+    }
+    public async Task OpenDialogServices()
+    {
+        string nameDialog = "Danh sách dịch vụ";
+        var parameters = new DialogParameters();
+        parameters.Add("idCustomer", idGuest);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.ExtraLarge,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesBooking2>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Cancelled)
+        {
+            createUpdateDialog.Close();
+            StateHasChanged();
+        }
+
     }
 
 }
