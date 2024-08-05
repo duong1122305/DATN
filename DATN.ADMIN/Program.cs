@@ -102,6 +102,17 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
     ;
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+           builder =>
+           {
+               builder.WithOrigins("https://localhost:44305", "http://localhost:5173") // Đổi thành domain của client
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+           });
+});
 
 var app = builder.Build();
 
@@ -126,10 +137,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapBlazorHub();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<NotificationHub>("/notification");
-});
+app.UseCors("AllowSpecificOrigin"); // Áp dụng CORS
 app.MapFallbackToPage("/_Host");
 
 app.Run();

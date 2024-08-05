@@ -1,4 +1,5 @@
-﻿using DATN.Aplication.Services.IServices;
+﻿using DATN.API.Services;
+using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
@@ -6,24 +7,29 @@ using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DATN.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowSpecificOrigin")]
     public class BookingController : Controller
     {
         private readonly IBookingManagement _bookingManagement;
         private readonly IEmployeeScheduleManagementService _employeeScheduleManagementService;
         private readonly IProductManagement _productManagement;
         private readonly IVoucherManagementService _voucherManagementService;
-        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement, IVoucherManagementService voucherManagementService)
+        private readonly IHubContext<BookingHub> _hubContext;
+        public BookingController(IBookingManagement bookingManagement, IEmployeeScheduleManagementService employeeScheduleManagementService, IProductManagement productManagement, IVoucherManagementService voucherManagementService, IHubContext<BookingHub> hubContext)
         {
             _bookingManagement = bookingManagement;
             _employeeScheduleManagementService = employeeScheduleManagementService;
             _productManagement = productManagement;
             _voucherManagementService = voucherManagementService;
+            _hubContext = hubContext;
         }
         [HttpGet("List")]
         public Task<ResponseData<List<BookingView>>> Index()
@@ -38,7 +44,14 @@ namespace DATN.API.Controllers
         [HttpPost("Create-Booking")]
         public async Task<ResponseData<string>> CreateBookingStore(CreateBookingRequest createBookingRequest, string token)
         {
-            return await _bookingManagement.CreateBookingInStore(createBookingRequest, token);
+            var result = await _bookingManagement.CreateBookingInStore(createBookingRequest, token);
+
+            if (result.IsSuccess)
+            {
+                // Gửi thông báo đến tất cả các client kết nối
+                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", "Booking đã được tạo thành công!");
+            }
+            return result;
         }
         [HttpGet("List-Staff-Free-In-Time")]
         public async Task<ResponseData<List<NumberOfScheduleView>>> ListStaffFreeInTime(string from, string to, DateTime dateTime)
@@ -89,7 +102,12 @@ namespace DATN.API.Controllers
         [HttpPost("Guest-Booking")]
         public async Task<ResponseData<string>> GuestBooking(CreateBookingRequest createBookingRequest)
         {
-            return await _bookingManagement.GuestCreateBooking(createBookingRequest);
+            var result =  await _bookingManagement.GuestCreateBooking(createBookingRequest);
+            if (result.IsSuccess)
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Booking đã được tạo thành công bởi ID: {createBookingRequest.GuestName}!");
+            }
+            return result;
         }
 
         [HttpPost("Add-Product-For-Bill")]

@@ -1,12 +1,14 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.PetSpecies;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class PetSpeciesController : ControllerBase
     {
         private readonly IPetSpeciesManagerService _service;

@@ -1,12 +1,14 @@
 ﻿using DATN.Aplication.Services;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class GuestManagerController : ControllerBase
     {
         private readonly IGuestManagerService _guestManagerService;

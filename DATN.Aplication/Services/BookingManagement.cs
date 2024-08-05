@@ -161,20 +161,20 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
-                        var booking = new Booking()
-                        {
-                            GuestId = createBookingRequest.GuestId,
-                            BookingTime = DateTime.Now,
-                            VoucherId = null,
-                            TotalPrice = 0,
-                            PaymentTypeId = 1,
-                            ReducedAmount = 0,
-                            Status = BookingStatus.Confirmed,
-                            IsPayment = false,
-                            IsAddToSchedule = true,
-                        };
-                        await _unitOfWork.BookingRepository.AddAsync(booking);
-                        await _unitOfWork.SaveChangeAsync();
+                    var booking = new Booking()
+                    {
+                        GuestId = createBookingRequest.GuestId,
+                        BookingTime = DateTime.Now,
+                        VoucherId = null,
+                        TotalPrice = 0,
+                        PaymentTypeId = 1,
+                        ReducedAmount = 0,
+                        Status = BookingStatus.Confirmed,
+                        IsPayment = false,
+                        IsAddToSchedule = true,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(booking);
+                    await _unitOfWork.SaveChangeAsync();
 
                     List<BookingDetail> list = new List<BookingDetail>();
                     var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
@@ -765,12 +765,12 @@ namespace DATN.Aplication.Services
                         {
                             foreach (var item in listBookingInDay.OrderBy(c => c.StartDateTime))
                             {
-                                if (DateTime.Now.TimeOfDay.CompareTo(item.StartDateTime.TimeOfDay) >= 0 && DateTime.Now.TimeOfDay.CompareTo(item.EndDateTime.TimeOfDay) <= 0)
+                                if (DateTime.Now.TimeOfDay.CompareTo(item.StartDateTime.TimeOfDay.Add(new TimeSpan(0, -30, 0))) >= 0 && DateTime.Now.TimeOfDay.CompareTo(item.StartDateTime.TimeOfDay.Add(new TimeSpan(0, 10, 0))) <= 0)
                                 {
                                     var update = new BookingDetail();
-                                    foreach (var item1 in queryBooking)
+                                    foreach (var item1 in listBookingInDay)
                                     {
-                                        foreach (var item2 in queryBooking)
+                                        foreach (var item2 in listBookingInDay)
                                         {
                                             if (item1.Id == item2.Id)
                                             {
@@ -792,7 +792,7 @@ namespace DATN.Aplication.Services
                                     return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
                                 }
                             }
-                            return new ResponseData<string> { IsSuccess = false, Error = "Chưa đến giờ mà khách đặt dịch vụ" };
+                            return new ResponseData<string> { IsSuccess = false, Error = "Chưa đến giờ mà khách đặt dịch vụ hoặc quá giờ bắt đầu dịch vụ" };
                         }
                     }
                 }
@@ -819,15 +819,12 @@ namespace DATN.Aplication.Services
                     var queryBooking = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                                         where bookingDetail.BookingId == query.Id
                                         select bookingDetail).ToList();
+                    var count = 0;
                     foreach (var item in queryBooking)
                     {
-                        if (item.Status != BookingDetailStatus.Cancelled)
+                        if (item.Status == BookingDetailStatus.Processing)
                         {
-                            item.Status = BookingDetailStatus.Completed;
-                        }
-                        if (item.Status == BookingDetailStatus.Unfulfilled)
-                        {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Có dịch vụ chưa được thực hiện không thể hoàn thành" };
+                            item.Status=BookingDetailStatus.Completed;
                         }
                     }
                     HistoryAction historyAction = new HistoryAction()
@@ -986,13 +983,13 @@ namespace DATN.Aplication.Services
                         };
                         await _unitOfWork.BookingRepository.AddAsync(booking);
                         await _unitOfWork.SaveChangeAsync();
-                        if (bill.Data.IdVoucher!=null)
+                        if (bill.Data.IdVoucher != null)
                         {
-                                var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                    where dis.Id == queryBooking.VoucherId
-                                                    select dis).FirstOrDefault();
-                                checkVoucher.AmountUsed++;
-                                await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
+                            var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                                where dis.Id == queryBooking.VoucherId
+                                                select dis).FirstOrDefault();
+                            checkVoucher.AmountUsed++;
+                            await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
                         }
                         booking.TotalPrice = bill.Data.TotalPayment;
                         booking.PaymentTypeId = payment.TypePaymenId;
