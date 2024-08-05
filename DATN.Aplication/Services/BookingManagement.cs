@@ -25,6 +25,9 @@ namespace DATN.Aplication.Services
 {
     public class BookingManagement : IBookingManagement
     {
+        string partnerCode = "MOMO5RGX20191128";
+        string accessKey = "M8brj9K6E22vXoDB";
+        string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly NotificationHub _notificationHub;
@@ -1030,7 +1033,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = e.Message };
             }
         }
-        public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes)
+        public async Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView>? productdes)
         {
             var totalprice = 0d;
             var info = new Guest();
@@ -1261,15 +1264,13 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
             }
         }
-        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int id, string totalPrice)
         {
             string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
-            string partnerCode = "MOMO5RGX20191128";
-            string accessKey = "M8brj9K6E22vXoDB";
-            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
-            string orderInfo = "Chuyển khoản thanh toán đặt lịch";
+
+            string orderInfo = "Chuyển khoản thanh toán làm dịch vụ MewShop";
             string redirectUrl = "https://localhost:7259/ListServicesBooking";
-            string ipnUrl = "https://localhost:7259/ListServicesBooking";
+            string ipnUrl = $"https://localhost:7039/Booking/Check-Status/{id}";
             string requestType = "captureWallet";
 
             string amount = totalPrice;
@@ -1291,11 +1292,10 @@ namespace DATN.Aplication.Services
                 "&requestType=" + requestType
                 ;
 
-
             MoMoSecurity moMoSecurity = new MoMoSecurity();
+
             //sign signature SHA256
             string signature = moMoSecurity.signSHA256(rawHash, serectkey);
-
 
             //build body json request
             JObject message = new JObject
@@ -1317,6 +1317,26 @@ namespace DATN.Aplication.Services
             };
             return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
         }
+        public async Task CheckStatusPayment(int id, MomoResultRequest momoResult)
+        {
+            if (momoResult != null && momoResult.resultCode == 0)
+            {
+                var booking = (from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
+                               where bookingTable.Id == id
+                               select bookingTable).FirstOrDefault();
+                var bill = await CheckBill(id, null);
+                booking.Status = BookingStatus.Completed;
+                booking.IsPayment = true;
+                booking.TotalPrice = bill.Data.TotalPrice;
+                booking.ReducedAmount = bill.Data.ReducePrice;
+                booking.VoucherId = bill.Data.IdVoucher;
+                booking.PaymentTypeId = 2;
+                booking.IsAddToSchedule = true;
+                await _unitOfWork.BookingRepository.UpdateAsync(booking);
+                await _unitOfWork.BookingRepository.SaveChangesAsync();
+            }
+        }
+
         public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
         {
             if (createBookingDetailRequest != null)
@@ -1353,18 +1373,18 @@ namespace DATN.Aplication.Services
                             }
                         }
                     }
-                        var bookingDetail = new BookingDetail()
-                        {
-                            BookingId = createBookingDetailRequest.BookingId,
-                            PetId = createBookingDetailRequest.PetId,
-                            Price = createBookingDetailRequest.Price,
-                            StaffId = createBookingDetailRequest.StaffId,
-                            EndDateTime = createBookingDetailRequest.DateBooking.Date.AddHours(createBookingDetailRequest.EndDateTime.Hours).AddMinutes(createBookingDetailRequest.EndDateTime.Minutes),
-                            StartDateTime = createBookingDetailRequest.DateBooking.Date.AddHours(createBookingDetailRequest.StartDateTime.Hours).AddMinutes(createBookingDetailRequest.StartDateTime.Minutes),
-                            Status = BookingDetailStatus.Unfulfilled,
-                            ServiceDetailId = createBookingDetailRequest.ServiceDetailId,
-                            Quantity = 1,
-                        };
+                    var bookingDetail = new BookingDetail()
+                    {
+                        BookingId = createBookingDetailRequest.BookingId,
+                        PetId = createBookingDetailRequest.PetId,
+                        Price = createBookingDetailRequest.Price,
+                        StaffId = createBookingDetailRequest.StaffId,
+                        EndDateTime = createBookingDetailRequest.DateBooking.Date.AddHours(createBookingDetailRequest.EndDateTime.Hours).AddMinutes(createBookingDetailRequest.EndDateTime.Minutes),
+                        StartDateTime = createBookingDetailRequest.DateBooking.Date.AddHours(createBookingDetailRequest.StartDateTime.Hours).AddMinutes(createBookingDetailRequest.StartDateTime.Minutes),
+                        Status = BookingDetailStatus.Unfulfilled,
+                        ServiceDetailId = createBookingDetailRequest.ServiceDetailId,
+                        Quantity = 1,
+                    };
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
                     var idUserAction = await _user.GetUserByToken(createBookingDetailRequest.Token);
                     if (idUserAction.IsSuccess)

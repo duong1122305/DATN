@@ -141,9 +141,9 @@ namespace DATN.API.Controllers
             return await _bookingManagement.QrCodeCheckIn(idBooking);
         }
         [HttpGet("Payment-Qr")]
-        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int id, string totalPrice)
         {
-            return await _bookingManagement.PaymentQrMomo(totalPrice);
+            return await _bookingManagement.PaymentQrMomo(id, totalPrice);
         }
         [HttpGet("Payment-Qr-VnPay")]
         public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
@@ -171,6 +171,13 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
         {
             return await _bookingManagement.AddService(createBookingDetailRequest);
+        }
+
+        [HttpPost("Check-Status/{id}")]
+        public async Task<IActionResult> Check([FromBody] MomoResultRequest momoResultRequest,int id)
+        {
+            await _bookingManagement.CheckStatusPayment(id,momoResultRequest);
+            return StatusCode(204);
         }
     }
 }

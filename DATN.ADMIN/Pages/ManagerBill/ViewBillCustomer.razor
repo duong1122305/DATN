@@ -52,14 +52,15 @@
                         </RowTemplate>
                     </MudTable>
                 }
-                
+
                 <br />
                 @if (bill.IsPayment)
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px" Disabled>Thêm sản phẩm</MudButton>
-                }else
+                }
+                else
                 {
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px" >Thêm sản phẩm</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
                 }
                 @if (idBooking != null && idBooking != 0)
                 {
@@ -173,7 +174,7 @@
                             else if (selectedPaymentMethod == 1)
                             {
                                 <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
-                                
+
                             }
                             else
                             {
@@ -283,7 +284,7 @@
     }
     public async Task PayMentQr()
     {
-        var response = await _client.PaymentQr(bill.TotalPayment.ToString());
+        var response = await _client.PaymentQr(bill.TotalPayment.ToString(), idBooking.Value);
         if (response.IsSuccess)
         {
             if (response.Data.resultCode == 0)
