@@ -1,0 +1,131 @@
+﻿@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
+@using DATN.ViewModels.DTOs.ServiceDetail
+@inject IDialogService _dialogservice;
+
+<MudDataGrid Items="@lstServiceName" QuickFilter="@_quickFilter" Filterable="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Chọn dịch vụ</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @(lstServiceName.IndexOf(context.Item) + 1)
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.ServiceName" Title="Tên chi dịch vụ" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @(CurrencyHelper.FormatCurrency(context.Item.Price))
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Thời gian làm" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @context.Item.Duration <span>Phút</span>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
+        <TemplateColumn Sortable="false" Filterable="false" Title="Trạng thái">
+            <CellTemplate>
+                @if (!context.Item.IsDeleted)
+                {
+                    <span>
+                        <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+                    </span>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @if (!context.Item.IsDeleted)
+                {
+                    <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price,context.Item.Description))" StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton>
+                }
+                else
+                {
+                    <MudButton OnClick="@(async()=>await OpenDialog(context.Item.Duration,context.Item.ServiceDetailId,context.Item.Price,context.Item.Description))" Disabled StartIcon="@Icons.Material.Filled.Done" Color="Color.Primary">Chọn</MudButton>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="GetServiceNameVM" />
+
+    </PagerContent>
+</MudDataGrid>
+@code {
+    [Parameter]
+    public Guid idCustomer { get; set; }
+    [Parameter]
+    public int idBooking { get; set; }
+    private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
+    [Inject]
+    public IServiceDetailServices _serviceDetailService { get; set; }
+
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    [Inject] private BookingService bookingService { get; set; }
+
+
+    private string searchString = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _serviceDetailService.GetServiceName();
+
+        if (result != null)
+        {
+            lstServiceName = result;
+        }
+    }
+
+    private Func<GetServiceNameVM, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (x.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{x.Duration} {x.Price} {x.Description}".Contains(searchString.Trim()))
+            return true;
+        return false;
+    };
+
+    private async Task OpenDialog(double time, int idDetailsServices, float price, string servicedetailname)
+    {
+        string nameDialog = "Chọn thời gian";
+        var parameters = new DialogParameters();
+        parameters.Add("duration", time);
+        parameters.Add("idCus", idCustomer);
+        parameters.Add("idDetailsServices", idDetailsServices);
+        parameters.Add("priceServicesDetails", price);
+        parameters.Add("servicedetailname", servicedetailname);
+        parameters.Add("idBooking", idBooking);
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Medium,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+        _dialogBox.Close();
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectTimeAndStaff3>(nameDialog, parameters, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Cancelled)
+        {
+            createUpdateDialog.Close();
+            // StateHasChanged();
+        }
+    }
+}
