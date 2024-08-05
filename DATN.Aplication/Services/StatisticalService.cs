@@ -96,11 +96,13 @@ namespace DATN.Aplication.Services
 						if (bookingInHour != null && bookingInHour.Any())
 						{
 							chartData.Value = bookingInHour.Count();
-							dataRevenue.Value= bookingInHour.Sum(p=>p.TotalPrice);
+							dataRevenue.Value = bookingInHour.Sum(p => p.TotalPrice);
 						}
 						else
+						{
 							chartData.Value = 0;
 							dataRevenue.Value = 0;
+						}
 						cusStatistical.Data.Add(chartData);
 						revStatistical.Data.Add(dataRevenue);
 
