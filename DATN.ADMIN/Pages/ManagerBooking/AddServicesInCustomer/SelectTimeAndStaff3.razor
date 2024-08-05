@@ -71,7 +71,7 @@
     private string searchString = "";
 
     private PetVM value2;
-    [Injj]
+    [Inject]
     private IBookingViewServices _BookingSer { get; set; }
     [Inject]
     HttpContextAccessor _httpContextAccessor { get; set; }
@@ -192,7 +192,7 @@
         try
         {
 
-               if (await Confirm2() ==true)
+            if (await Confirm2() ==true)
             {
                 CreateServiceDetail bookingCreate = new CreateServiceDetail()
                     {
@@ -212,6 +212,7 @@
                 if (respone.IsSuccess)
                 {
                     Message(respone.Data, Severity.Success);
+                    StateHasChanged();
                     _dialogBox.Close();
                 }
                 else
