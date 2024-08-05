@@ -9,7 +9,12 @@
 @using System.ComponentModel.DataAnnotations
 @using DATN.ViewModels.DTOs.Pet
 @using DATN.ViewModels.DTOs.PetSpecies
-
+<style>
+	.e-input-group input.e-input, .e-input-group.e-control-wrapper input.e-input {
+		height: 55px;
+		font-size: 16px;
+	}
+</style>
 <EditForm Model="@pet" OnValidSubmit="@(async()=>await Submit())">
 	<DataAnnotationsValidator />
 	<MudItem xs="12" sm="12">
@@ -17,8 +22,10 @@
 			<MudCardContent>
 				<MudTextField @bind-Value="@pet.Name" Label="Tên Pet" For="@(() => pet.Name)" Required=true HelperText="Hãy điền tên pet" />
 				<MudNumericField  Required=true @bind-Value="@pet.Weight" Label="Cân Nặng" For="@(() => pet.Weight)" />
-				<ValidationMessage For="@(() => pet.Weight)" />
-				<MudDatePicker Label="Ngày sinh" Color="Color.Primary" @bind-Date="pet.Birthday" />
+				<SfDatePicker  TValue="DateTime?" Value='pet.Birthday' OnBlur="(e)=>CheckDate(e)" ValueChanged="(e)=>{pet.Birthday=e;}"  Placeholder='Chọn ngày sinh' >
+				</SfDatePicker>
+				<ValidationMessage style="color:red" For="@(() => pet.Birthday)" />
+		@* 		<MudDatePicker Label="Ngày sinh" Color="Color.Primary" @bind-Date="pet.Birthday" /> *@
 				<MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
 					<MudRadioGroup @bind-Value="@pet.Gender" Name="Giới tính" Required=true HelperText="Hãy chọn giới tính">
 						<MudRadio Value="@(true)" Color="Color.Primary">Đực</MudRadio>
@@ -51,135 +58,144 @@
 </EditForm>
 
 @code {
-	[Inject]
-	private IPetServiceClient _client { get; set; }
-	[Inject]
-	private IPetSpeciesServiceClient _petClient { get; set; }
-	[Inject]
-	private ISnackbar snackbar { get; set; }
+    [Inject]
+    private IPetServiceClient _client { get; set; }
+    [Inject]
+    private IPetSpeciesServiceClient _petClient { get; set; }
+    [Inject]
+    private ISnackbar snackbar { get; set; }
 
-	[CascadingParameter]
-	MudDialogInstance _dialogBox { get; set; }
-	private string _nameButton = "Thêm mới";
+    [CascadingParameter]
+    MudDialogInstance _dialogBox { get; set; }
+    private string _nameButton = "Thêm mới";
 
-	[Parameter]
-	public PetCreateUpdate pet { get; set; } = new PetCreateUpdate()
+    [Parameter]
+    public PetCreateUpdate pet { get; set; } = new PetCreateUpdate()
 		{
 			Gender = false,
 		};
 
-	[Parameter]
-	public Guid guestID { get; set; }
+    [Parameter]
+    public Guid guestID { get; set; }
 
 
-	MudChip selected;
-	MudChip selectedVaccinated;
-	private bool coerceValue { get; set; }
-	private MudTextField<string> multilineReference;
-	public PetSpeciesVM selectedSpecies = new PetSpeciesVM();
-	public PetSpeciesVM selectedSpecies2 = new PetSpeciesVM();
-	public List<PetSpeciesVM> lstPetSpecies = new List<PetSpeciesVM>();
-	private bool IsNew = true;
-	private string AddressCode = "";
+    MudChip selected;
+    MudChip selectedVaccinated;
+    private bool coerceValue { get; set; }
+    private MudTextField<string> multilineReference;
+    public PetSpeciesVM selectedSpecies = new PetSpeciesVM();
+    public PetSpeciesVM selectedSpecies2 = new PetSpeciesVM();
+    public List<PetSpeciesVM> lstPetSpecies = new List<PetSpeciesVM>();
+    private bool IsNew = true;
+    private string AddressCode = "";
 
-	protected override async Task OnInitializedAsync()
-	{
-		var dataSpecies = await _petClient.GetAll();
-		lstPetSpecies = dataSpecies.Data!.Where(p => !p.IsDelete.HasValue || !p.IsDelete.Value).ToList();
-		selectedSpecies = lstPetSpecies.First();
-		if (!string.IsNullOrEmpty(pet.Name))
-		{
-			_nameButton = "Cập nhật";
-			IsNew = false;
-			selectedSpecies = lstPetSpecies.FirstOrDefault(s => s.Id == pet.SpeciesId)!;
+    protected override async Task OnInitializedAsync()
+    {
+        var dataSpecies = await _petClient.GetAll();
+        lstPetSpecies = dataSpecies.Data!.Where(p => !p.IsDelete.HasValue || !p.IsDelete.Value).ToList();
+        selectedSpecies = lstPetSpecies.First();
+        if (!string.IsNullOrEmpty(pet.Name))
+        {
+            _nameButton = "Cập nhật";
+            IsNew = false;
+            selectedSpecies = lstPetSpecies.FirstOrDefault(s => s.Id == pet.SpeciesId)!;
 
-		}
-	}
-	private async Task<IEnumerable<PetSpeciesVM>> SearchSpecies(string value)
-	{
+        }
+    }
+    private async Task<IEnumerable<PetSpeciesVM>> SearchSpecies(string value)
+    {
 
-		if (string.IsNullOrEmpty(value))
-			return lstPetSpecies;
+        if (string.IsNullOrEmpty(value))
+            return lstPetSpecies;
 
-		return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-	}
-	private async Task<IEnumerable<PetSpeciesVM>> SearchAsync(string value)
-	{
-		// In real life use an asynchronous function for fetching data from an api.
-		await Task.Delay(5);
+        return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    private async Task<IEnumerable<PetSpeciesVM>> SearchAsync(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
 
-		// if text is null or empty, show complete list
-		if (string.IsNullOrEmpty(value))
-		{
-			return lstPetSpecies;
-		}
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return lstPetSpecies;
+        }
 
-		return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-	}
-	protected async Task Create()
-	{
-		var confirm = await Confirm("tạo mới");
-		if (!confirm)
-		{
-			return;
-		}
-		var result = await _client.CreatePet(pet);
-		if (result.IsSuccess)
-		{
-			Snackbar.Add(result.Data, Severity.Success);
-			_dialogBox.Close();
-		}
-		else
-		{
-			Snackbar.Add(result.Error, Severity.Error);
-		}
-	}
+        return lstPetSpecies.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    protected async Task Create()
+    {
+        var confirm = await Confirm("tạo mới");
+        if (!confirm)
+        {
+            return;
+        }
+        var result = await _client.CreatePet(pet);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add(result.Data, Severity.Success);
+            _dialogBox.Close();
+        }
+        else
+        {
+            Snackbar.Add(result.Error, Severity.Error);
+        }
+    }
 
-	private async Task<bool> Confirm(string text)
-	{
-		var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} thú cưng?",
-		yesText: "Xác nhận",
-		cancelText: "Hủy", noText: null,
-		options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-		StateHasChanged();
-		if (!confirm.HasValue) return false;
-		return confirm.Value;
-	}
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} thú cưng?",
+        yesText: "Xác nhận",
+        cancelText: "Hủy", noText: null,
+        options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+    }
 
-	public async Task Update()
-	{
+    public async Task Update()
+    {
 
-		var confirm = await Confirm("cập nhật");
-		if (!confirm)
-		{
-			return;
-		}
-		var result = await _client.UpdatePet(pet);
-		if (result.IsSuccess)
-		{
-			Snackbar.Add(result.Data, Severity.Success);
-			_dialogBox.Close();
-		}
-		else
-		{
-			Snackbar.Add(result.Error, Severity.Error);
-		}
-	}
+        var confirm = await Confirm("cập nhật");
+        if (!confirm)
+        {
+            return;
+        }
+        var result = await _client.UpdatePet(pet);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add(result.Data, Severity.Success);
+            _dialogBox.Close();
+        }
+        else
+        {
+            Snackbar.Add(result.Error, Severity.Error);
+        }
+    }
 
-	private async Task Submit()
-	{
-		pet.SpeciesId = selectedSpecies.Id;
-		pet.OwnerId = guestID;
-		if (selected.Value != null) pet.Neutered = (bool)selected.Value;
+    private async Task Submit()
+    {
+        pet.SpeciesId = selectedSpecies.Id;
+        pet.OwnerId = guestID;
+        if (selected.Value != null) pet.Neutered = (bool)selected.Value;
 
-		if (IsNew)
-		{
-			await Create();
-		}
-		else
-		{
-			await Update();
-		}
-		StateHasChanged();
-	}
+        if (IsNew)
+        {
+            await Create();
+        }
+        else
+        {
+            await Update();
+        }
+        StateHasChanged();
+    }
+    private async Task CheckDate(Microsoft.AspNetCore.Components.Web.FocusEventArgs e)
+    {
+        if (pet.Birthday == null)
+        { 
+            pet.Birthday = DateTime.Now;
+        StateHasChanged();
+            pet.Birthday = null;
+        }
+    }
 }
