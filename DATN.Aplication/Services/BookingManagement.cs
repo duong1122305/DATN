@@ -1040,7 +1040,7 @@ namespace DATN.Aplication.Services
                     productdes = checkQuan;
                 }
             }
-            if (productdes.Count > 0)
+            if (productdes != null && productdes.Count > 0)
             {
                 foreach (var item in productdes)
                 {
