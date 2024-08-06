@@ -111,7 +111,7 @@ else
         var respone = await _client.ListBookingDetailInDay(id);
         if (respone.IsSuccess)
         {
-            lstBooking = respone.Data;
+            lstBooking = respone.Data.OrderByDescending(x=>x.StartDate).ToList();
         }
         else
         {
@@ -129,7 +129,7 @@ else
             {
                 IdBokingOrDetail = idS,
 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
-                
+
             };
         var respone = await _client.CompleteBookingDetail(actionView);
         if (respone.IsSuccess)
@@ -142,7 +142,7 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             Message(respone.Error, Severity.Error);
         }
     }
-    
+
     private async Task StartServices(int id)
     {
         var confirm = await Confirm("bắt đầu");
@@ -227,6 +227,7 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
         {
             createUpdateDialog.Close();
             StateHasChanged();
+            await LoadData();
         }
 
     }

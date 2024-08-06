@@ -119,12 +119,12 @@
                 FullWidth = true,
                 DisableBackdropClick = true,
             };
-        _dialogBox.Close();
         var createUpdateDialog = await _dialogservice.ShowAsync<SelectTimeAndStaff3>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Cancelled)
         {
             createUpdateDialog.Close();
+            _dialogBox.Close();
             StateHasChanged();
         }
     }
