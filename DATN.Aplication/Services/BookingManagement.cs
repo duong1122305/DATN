@@ -25,9 +25,7 @@ namespace DATN.Aplication.Services
 {
     public class BookingManagement : IBookingManagement
     {
-        string partnerCode = "MOMO5RGX20191128";
-        string accessKey = "M8brj9K6E22vXoDB";
-        string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly NotificationHub _notificationHub;
@@ -1267,10 +1265,12 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int id, string totalPrice)
         {
             string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
-
+            string partnerCode = "MOMO5RGX20191128";
+            string accessKey = "M8brj9K6E22vXoDB";
+            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
             string orderInfo = "Chuyển khoản thanh toán làm dịch vụ MewShop";
             string redirectUrl = "https://localhost:7259/ListServicesBooking";
-            string ipnUrl = $"https://localhost:7039/Booking/Check-Status/{id}";
+            string ipnUrl = $"https://localhost:7039/Booking/Check-Status/{id}/";
             string requestType = "captureWallet";
 
             string amount = totalPrice;
@@ -1394,7 +1394,7 @@ namespace DATN.Aplication.Services
                             ActionByID = Guid.Parse(idUserAction.Data),
                             ActionTime = DateTime.Now,
                             ActionID = 12,
-                            Description = "Tạo mới hóa đơn tại quầy",
+                            Description = "Thêm dịch vụ con cho booking",
                             BookingID = createBookingDetailRequest.BookingId,
                         };
                         await _unitOfWork.HistoryActionRepository.AddAsync(history);
@@ -1546,6 +1546,142 @@ namespace DATN.Aplication.Services
                     Data = new List<GetBookingByGuestVM>(),
                     Error = ex.Message
                 };
+            }
+        }
+        public async Task<ResponseData<string>> CreateBookingForGuestNoAcount(BookingForGuestNoAccount booking)
+        {
+            var guest = new Guest
+            {
+                Id = Guid.NewGuid(),
+                IsComfirm = false,
+                Gender = true,
+                Email = booking.Email,
+                PhoneNumber = booking.PhoneNumber,
+                Name = booking.NameGuest,
+            };
+            var pet = new Pet
+            {
+                Name = booking.NamePet,
+                Gender = booking.GenderPet,
+                OwnerId = guest.Id,
+                SpeciesId = booking.SpeciesId,
+            };
+            await _unitOfWork.GuestRepository.AddAsync(guest);
+            await _unitOfWork.PetRepository.AddAsync(pet);
+            await _unitOfWork.SaveChangeAsync();
+            if (booking.LstBookingDetail.Count > 0)
+            {
+                try
+                {
+                    var query = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                select serviceDetail;
+                    for (global::System.Int32 i = 0; i < booking.LstBookingDetail.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            int time = (int)(query.FirstOrDefault(c => c.Id == booking.LstBookingDetail[0].ServiceDetailId).Duration) / 60;
+                            booking.LstBookingDetail[0].EndDateTime = booking.LstBookingDetail[0].StartDateTime.Add(new TimeSpan(time, (int)(query.FirstOrDefault(c => c.Id == booking.LstBookingDetail[0].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                        else
+                        {
+                            int time = (int)(query.FirstOrDefault(c => c.Id == booking.LstBookingDetail[0].ServiceDetailId).Duration) / 60;
+                            booking.LstBookingDetail[i].StartDateTime = booking.LstBookingDetail[i - 1].EndDateTime;
+                            booking.LstBookingDetail[i].EndDateTime = booking.LstBookingDetail[i].StartDateTime.Add(new TimeSpan(time, (int)(query.FirstOrDefault(c => c.Id == booking.LstBookingDetail[i].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                    }
+
+                    foreach (var item in booking.LstBookingDetail)
+                    {
+                        var lst = await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date);
+                        if (lst.IsSuccess)
+                        {
+                            item.StaffId = lst.Data.FirstOrDefault().IdStaff;
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = lst.Error };
+                        }
+                    }
+
+                    var bookingInsert = new Booking()
+                    {
+                        GuestId = guest.Id,
+                        BookingTime = DateTime.Now,
+                        VoucherId = booking.VoucherId,
+                        TotalPrice = 0,
+                        PaymentTypeId = 1,
+                        ReducedAmount = 0,
+                        Status = BookingStatus.PendingConfirmation,
+                        IsPayment = false,
+                        IsAddToSchedule = false,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(bookingInsert);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    List<BookingDetail> list = new List<BookingDetail>();
+                    var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                             select detail;
+                    for (global::System.Int32 i = 0; i < booking.LstBookingDetail.Count; i++)
+                    {
+                        for (global::System.Int32 j = 0; j < booking.LstBookingDetail.Count; j++)
+                        {
+                            if (i == j)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                var term1 = booking.LstBookingDetail[i];
+                                var term2 = booking.LstBookingDetail[j];
+                                if (term1.ServiceDetailId == term2.ServiceDetailId && term1.PetId == term2.PetId)
+                                {
+                                    return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có 1 dịch vụ sử dùng 2 lần cho 1 bé thú cưng!!!" };
+                                }
+                                else if (term1.ServiceDetailId == term2.ServiceDetailId && term1.StaffId == term2.StaffId)
+                                {
+                                    if (term1.StartDateTime.CompareTo(term2.StartDateTime) > 0 && term1.StartDateTime.CompareTo(term2.EndDateTime) < 0)
+                                    {
+                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                                    }
+                                    else if (term1.EndDateTime.CompareTo(term2.StartDateTime) > 0 && term1.EndDateTime.CompareTo(term2.EndDateTime) < 0)
+                                    {
+                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    foreach (var item in booking.LstBookingDetail)
+                    {
+                        var bookingDetail = new BookingDetail()
+                        {
+                            BookingId = bookingInsert.Id,
+                            PetId = item.PetId,
+                            Price = queryServiceDetail.FirstOrDefault(c => c.Id == item.ServiceDetailId).Price,
+                            StaffId = item.StaffId,
+                            EndDateTime = item.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
+                            StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
+                            Status = BookingDetailStatus.Unfulfilled,
+                            ServiceDetailId = item.ServiceDetailId,
+                            Quantity = 1
+                        };
+                        list.Add(bookingDetail);
+                    }
+                    await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
+                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
+                }
+                catch (Exception e)
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+                }
+            }
+            else
+            {
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
             }
         }
     }
