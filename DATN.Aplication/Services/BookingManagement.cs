@@ -293,67 +293,20 @@ namespace DATN.Aplication.Services
                             return new ResponseData<string> { IsSuccess = false, Error = lst.Error };
                         }
                     }
-
-                    var queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
-                                       where bookingTable.GuestId == createBookingRequest.GuestId
-                                       && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
-                                       && bookingTable.Status != BookingStatus.StaffCancelled && bookingTable.Status != BookingStatus.AdminCancelled && bookingTable.Status != BookingStatus.CustomerCancelled
-                                       select bookingTable;
-                    if (queryBooking.Count() == 0)
+                    var booking = new Booking()
                     {
-                        var booking = new Booking()
-                        {
-                            GuestId = createBookingRequest.GuestId,
-                            BookingTime = DateTime.Now,
-                            VoucherId = createBookingRequest.VoucherId,
-                            TotalPrice = 0,
-                            PaymentTypeId = 1,
-                            ReducedAmount = 0,
-                            Status = BookingStatus.PendingConfirmation,
-                            IsPayment = false,
-                            IsAddToSchedule = false,
-                        };
-                        await _unitOfWork.BookingRepository.AddAsync(booking);
-                        await _unitOfWork.SaveChangeAsync();
-                        queryBooking = from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
-                                       where bookingTable.GuestId == createBookingRequest.GuestId
-                                       && bookingTable.BookingTime.Date.CompareTo(DateTime.Now.Date) == 0
-                                       && bookingTable.Status != BookingStatus.StaffCancelled && bookingTable.Status != BookingStatus.AdminCancelled && bookingTable.Status != BookingStatus.CustomerCancelled
-                                       select bookingTable;
-                    }
-                    else
-                    {
-                        var queryBookingDetailHaven = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                                                       where bookingDetail.BookingId == queryBooking.FirstOrDefault().Id
-                                                       select bookingDetail).ToList();
-                        for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
-                        {
-                            for (global::System.Int32 j = 0; j < queryBookingDetailHaven.Count(); j++)
-                            {
-                                var term1 = createBookingRequest.ListIdServiceDetail[i];
-                                var term2 = queryBookingDetailHaven[j];
-                                if (term1.ServiceDetailId == term2.ServiceDetailId && term1.PetId == term2.PetId)
-                                {
-                                    return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có 1 dịch vụ sử dùng 2 lần cho 1 bé thú cưng!!!" };
-                                }
-                                else if (term1.ServiceDetailId != term2.ServiceDetailId && term1.StaffId == term2.StaffId)
-                                {
-                                    if (term1.StartDateTime.CompareTo(term2.StartDateTime.TimeOfDay) > 0 && term1.StartDateTime.CompareTo(term2.EndDateTime.TimeOfDay) < 0)
-                                    {
-                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
-                                    }
-                                    else if (term1.EndDateTime.CompareTo(term2.StartDateTime.TimeOfDay) > 0 && term1.EndDateTime.CompareTo(term2.EndDateTime.TimeOfDay) < 0)
-                                    {
-                                        return new ResponseData<string> { IsSuccess = false, Error = "Trong các dịch vụ đã chọn có dịch vụ chung 1 người làm và cùng 1 thời điểm!!!" };
-                                    }
-                                    else
-                                    {
-                                        continue;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                        GuestId = createBookingRequest.GuestId,
+                        BookingTime = DateTime.Now,
+                        VoucherId = createBookingRequest.VoucherId,
+                        TotalPrice = 0,
+                        PaymentTypeId = 1,
+                        ReducedAmount = 0,
+                        Status = BookingStatus.PendingConfirmation,
+                        IsPayment = false,
+                        IsAddToSchedule = false,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(booking);
+                    await _unitOfWork.SaveChangeAsync();
 
                     List<BookingDetail> list = new List<BookingDetail>();
                     var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
@@ -396,7 +349,7 @@ namespace DATN.Aplication.Services
                     {
                         var bookingDetail = new BookingDetail()
                         {
-                            BookingId = queryBooking.FirstOrDefault().Id,
+                            BookingId = booking.Id,
                             PetId = item.PetId,
                             Price = queryServiceDetail.FirstOrDefault(c => c.Id == item.ServiceDetailId).Price,
                             StaffId = item.StaffId,
