@@ -1300,7 +1300,6 @@ namespace DATN.Aplication.Services
                                  where booking.BookingId == createBookingDetailRequest.BookingId
                                  select booking).ToList();
 
-                    List<BookingDetail> list = new List<BookingDetail>();
                     var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                              select detail;
                     for (global::System.Int32 i = 0; i < query.Count; i++)
@@ -1338,7 +1337,7 @@ namespace DATN.Aplication.Services
                         ServiceDetailId = createBookingDetailRequest.ServiceDetailId,
                         Quantity = 1,
                     };
-                    await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
+                    await _unitOfWork.BookingDetailRepository.AddAsync(bookingDetail);
                     var idUserAction = await _user.GetUserByToken(createBookingDetailRequest.Token);
                     if (idUserAction.IsSuccess)
                     {
