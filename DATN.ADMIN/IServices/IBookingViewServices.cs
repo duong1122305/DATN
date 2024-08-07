@@ -27,7 +27,7 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> PaymentInStore(Payment payment);
         public Task<ResponseData<string>> QrCodeCheckIn(int idBooking);
         public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
-        public Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice, int? id);
+        public Task<ResponseData<ResponseMomo>> PaymentQr(Payment payment, int? id);
         public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
         public Task<ResponseData<string>> CheckInArrive(int idBooking);
         public Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest);

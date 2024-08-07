@@ -284,9 +284,21 @@
     }
     public async Task PayMentQr()
     {
-       try
+        try
         {
-            var response = await _client.PaymentQr(bill.TotalPayment.ToString(), idBooking);
+            var payment = new Payment()
+                {
+                    DateBooking = DateTime.Now,
+                    LstProducts = bill.ListProductDetail,
+                    Reduce = bill.ReducePrice,
+                    Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    TotalPrice = bill.TotalPrice,
+                    VoucherId = bill.IdVoucher,
+                    TypePaymenId = 2,
+                    IdBooking = 0,
+                    IdGuest = guid,
+                };
+            var response = await _client.PaymentQr(payment, idBooking);
             if (response.IsSuccess)
             {
                 if (response.Data.resultCode == 0)

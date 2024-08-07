@@ -220,7 +220,7 @@ namespace DATN.Aplication.Services
                         {
                             BookingId = booking.Id,
                             PetId = item.PetId,
-                            Price = item.Price,
+                            Price = item.Price.Value,
                             StaffId = item.StaffId,
                             EndDateTime = item.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
                             StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
@@ -1215,7 +1215,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
             }
         }
-        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, Payment payment)
         {
             string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
             string partnerCode = "MOMO5RGX20191128";
@@ -1226,7 +1226,7 @@ namespace DATN.Aplication.Services
             string ipnUrl = $"https://localhost:7039/api/Booking/Check-Status/{id}";
             string requestType = "captureWallet";
 
-            string amount = totalPrice.Replace(" ", "").TrimStart().TrimEnd();
+            string amount = (payment.TotalPrice - payment.Reduce).ToString().Replace(" ", "").TrimStart().TrimEnd();
             string orderId = Guid.NewGuid().ToString();
             string requestId = Guid.NewGuid().ToString();
 
@@ -1268,11 +1268,71 @@ namespace DATN.Aplication.Services
                 { "signature", signature }
 
             };
+            try
+            {
+                if (id == 0 || id == null)
+                {
+                    var booking = new Booking()
+                    {
+                        GuestId = payment.IdGuest == null ? Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0") : payment.IdGuest.Value,
+                        BookingTime = DateTime.Now,
+                        VoucherId = null,
+                        TotalPrice = 0,
+                        PaymentTypeId = 1,
+                        ReducedAmount = 0,
+                        Status = BookingStatus.Confirmed,
+                        IsPayment = false,
+                        IsAddToSchedule = true,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(booking);
+                    await _unitOfWork.SaveChangeAsync();
+                    var bill = await CheckBill(null, payment.LstProducts);
+                    if (bill.Data.IdVoucher != null)
+                    {
+                        var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                            where dis.Id == bill.Data.IdVoucher
+                                            select dis).FirstOrDefault();
+                        checkVoucher.AmountUsed++;
+                        await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
+                    }
+                    booking.TotalPrice = bill.Data.TotalPayment;
+                    booking.PaymentTypeId = payment.TypePaymenId;
+                    booking.ReducedAmount = bill.Data.ReducePrice;
+                    booking.IsPayment = true;
+                    booking.VoucherId = bill.Data.IdVoucher;
+                    var listProduct = (from buypro in payment.LstProducts
+                                       select new BuyProduct
+                                       {
+                                           IdBooking = booking.Id,
+                                           IdProductDetail = buypro.IdProductDetail,
+                                           Quantity = buypro.SelectQuantityProduct,
+                                           Price = buypro.Price,
+                                       }).ToList();
+                    var user = await _user.GetUserByToken(payment.Token);
+                    HistoryAction action = new HistoryAction()
+                    {
+                        ActionByID = Guid.Parse(user.Data),
+                        ActionID = 16,
+                        ActionTime = DateTime.Now,
+                        BookingID = booking.Id,
+                        Description = "Khách tạo mã momo thanh toán đây là trạng thái chờ thanh toán",
+                    };
+                    await _unitOfWork.BookingRepository.UpdateAsync(booking);
+                    await _unitOfWork.HistoryActionRepository.AddAsync(action);
+                    await _unitOfWork.SaveChangeAsync();
+                    await _productManagement.BuyProduct(listProduct);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
         }
         public async Task CheckStatusPayment(int id, MomoResultRequest momoResult)
         {
-            if (momoResult != null && momoResult.resultCode == 0)
+            if (id != null && id != 0)
             {
                 var booking = (from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                where bookingTable.Id == id
