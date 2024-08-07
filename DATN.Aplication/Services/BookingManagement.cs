@@ -1226,7 +1226,7 @@ namespace DATN.Aplication.Services
             string ipnUrl = $"https://localhost:7039/Booking/Check-Status/{id}";
             string requestType = "captureWallet";
 
-            string amount = totalPrice.Replace(" ","").TrimStart().TrimEnd();
+            string amount = totalPrice.Replace(" ", "").TrimStart().TrimEnd();
             string orderId = Guid.NewGuid().ToString();
             string requestId = Guid.NewGuid().ToString();
 
@@ -1502,24 +1502,35 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> CreateBookingForGuestNoAcount(BookingForGuestNoAccount booking)
         {
-            var guest = new Guest
+            var checkGuest = from guestTable in await _unitOfWork.GuestRepository.GetAllAsync()
+                             where guestTable.PhoneNumber == booking.PhoneNumber
+                             select guestTable;
+            Guest guest;
+            if (!checkGuest.Any())
             {
-                Id = Guid.NewGuid(),
-                IsComfirm = false,
-                Gender = true,
-                Email = booking.Email,
-                PhoneNumber = booking.PhoneNumber,
-                Name = booking.NameGuest,
-            };
-            var pet = new Pet
+                guest = new Guest
+                {
+                    Id = Guid.NewGuid(),
+                    IsComfirm = false,
+                    Gender = true,
+                    PhoneNumber = booking.PhoneNumber,
+                    Name = booking.NameGuest,
+                };
+                await _unitOfWork.GuestRepository.AddAsync(guest);
+            }
+            else
             {
-                Name = booking.NamePet,
-                Gender = booking.GenderPet,
-                OwnerId = guest.Id,
-                SpeciesId = booking.SpeciesId,
-            };
-            await _unitOfWork.GuestRepository.AddAsync(guest);
-            await _unitOfWork.PetRepository.AddAsync(pet);
+                guest = checkGuest.FirstOrDefault();
+            }
+            Pet pet = new Pet();
+            if (booking.LstBookingDetail[0].PetId == null)
+            {
+                pet.Name = booking.NamePet;
+                pet.Gender = booking.GenderPet;
+                pet.OwnerId = guest.Id;
+                pet.SpeciesId = booking.SpeciesId;
+                await _unitOfWork.PetRepository.AddAsync(pet);
+            }
             await _unitOfWork.SaveChangeAsync();
             if (booking.LstBookingDetail.Count > 0)
             {
@@ -1547,6 +1558,10 @@ namespace DATN.Aplication.Services
                         var lst = await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date);
                         if (lst.IsSuccess)
                         {
+                            if (item.PetId == null)
+                            {
+                                item.PetId = pet.Id;
+                            }
                             item.StaffId = lst.Data.FirstOrDefault().IdStaff;
                         }
                         else
