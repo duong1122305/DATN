@@ -140,7 +140,7 @@ namespace DATN.ADMIN.Services
 
         }
 
-        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice, int id)
+        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice, int? id)
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<ResponseMomo>>($"/api/Booking/Payment-Qr?totalPrice={totalPrice} &id={id}");
         }

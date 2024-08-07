@@ -1215,7 +1215,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Ko có id ko tạo dc" };
             }
         }
-        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int id, string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, string totalPrice)
         {
             string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
             string partnerCode = "MOMO5RGX20191128";
@@ -1563,6 +1563,7 @@ namespace DATN.Aplication.Services
                                 item.PetId = pet.Id;
                             }
                             item.StaffId = lst.Data.FirstOrDefault().IdStaff;
+                            item.Price = (double)query.FirstOrDefault(c => c.Id == item.ServiceDetailId).Price;
                         }
                         else
                         {

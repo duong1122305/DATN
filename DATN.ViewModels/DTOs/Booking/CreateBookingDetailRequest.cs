@@ -21,6 +21,6 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public BookingDetailStatus Status { get; set; }
 
-        public double Price { get; set; }
+        public double? Price { get; set; }
     }
 }

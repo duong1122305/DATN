@@ -141,7 +141,7 @@ namespace DATN.API.Controllers
             return await _bookingManagement.QrCodeCheckIn(idBooking);
         }
         [HttpGet("Payment-Qr")]
-        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int id, string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, string totalPrice)
         {
             return await _bookingManagement.PaymentQrMomo(id, totalPrice);
         }
