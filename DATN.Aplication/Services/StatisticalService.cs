@@ -243,7 +243,7 @@ namespace DATN.Aplication.Services
 					Data = new Statistical()
 					{
 						CustomerStatistical = cusStatistical,
-						ProductQuantityStatistical = dataSP.OrderByDescending(p => p.TotalAmount).Take(3).ToList(),
+						ProductQuantityStatistical = dataSP.OrderByDescending(p => p.TotalAmount).ThenByDescending(p=>p.TotalRevenue).Take(3).ToList(),
 						//ProductRevenueStatistical=dataSP.OrderByDescending(p=>p.TotalRevenue).Take(3).ToList(),
 						//ServiceRevenueStatistical=dataDV.OrderByDescending(p=>p.TotalRevenue).Take(3).ToList(),
 						ServiceQuantityStatistical = dataDV.OrderByDescending(p => p.TotalAmount).Take(3).ToList(),

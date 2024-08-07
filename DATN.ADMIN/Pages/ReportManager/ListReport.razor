@@ -1,0 +1,259 @@
+﻿@* @page "/ListGuest"
+@using System.Net.Http.Json
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.Guest
+@using System.Timers
+
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+@inject IAddressService _addressServive;
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách nhân viên</MudText>
+@if (lstGuest != null && lstGuest.Count > 0)
+{
+
+	<MudDrawerContainer Class="mud-height-full" Style=" width:100%">
+
+		<MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
+			<ToolBarContent>
+				<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
+
+				<MudSpacer />
+				<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
+			</ToolBarContent>
+			<HeaderContent>
+				<MudTh>STT</MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Name)">Tên</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.PhoneNumber)">Số điện thoại</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Gender)">Giới tính</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.Address)">Địa chỉ</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.CountPet)">Thú cưng</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<GuestViewModel, object>(x=>x.IsConfirm)">Xác minh</MudTableSortLabel></MudTh>
+				<MudTh Class="text-center">Trạng thái</MudTh>
+				<MudTh Class="justify-center">Hành động</MudTh>
+			</HeaderContent>
+			<RowTemplate>
+				@{
+					var stt = 1;
+				}
+				<MudTd DataLabel="STT">@(lstGuest.IndexOf(context) + 1)</MudTd>
+				<MudTd DataLabel="Tên">@context.Name</MudTd>
+				<MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+				@{
+					string gender = "Không xác định";
+					if (context.Gender.HasValue)
+					{
+						gender = context.Gender.Value ? "Nam" : "Nữ";
+					}
+				}
+				<MudTd DataLabel="Giới tính">@gender</MudTd>
+				<MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Address!) ?? "Không có địa chỉ")</MudTd>
+				<MudTd @onclick="@(async()=>await OpeListPetDialog(context.Id))" DataLabel="Thú cưng">
+					<div style="display: flex; align-items: center;">
+						<span>@context.CountPet</span>
+						<MudIcon Color="Color.Primary" Icon="@Icons.Material.Filled.AddBox" style="margin-left: 8px;" />
+					</div>
+				</MudTd>
+				@if (context.IsConfirm ?? false)
+				{
+					<MudTd DataLabel="" Style="text-align:center;">
+
+						<MudChip Style="width:120px!important;" Color="Color.Success">Đã xác minh</MudChip>
+
+					</MudTd>
+				}
+				else
+				{
+					<MudTd DataLabel="" Style="text-align:center;">
+
+						<MudChip Style="width:120px!important;" Color="Color.Error">Chưa xác minh</MudChip>
+
+					</MudTd>
+				}
+
+				<MudTd>
+					<MudSwitch T="bool" Value="@(context.IsDelete!.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, context.Id))" Color="Color.Primary"></MudSwitch>
+				</MudTd>
+				<MudTd>
+					<MudButtonGroup Variant="Variant.Filled">
+						<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Disabled=@isOpenDialog OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
+						<MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
+
+					</MudButtonGroup>
+				</MudTd>
+			</RowTemplate>
+			<PagerContent>
+				<MudTablePager />
+			</PagerContent>
+		</MudTable>
+	</MudDrawerContainer>
+
+
+}
+else
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+<style>
+	.my-custom-class {
+		backdrop-filter: blur(10px);
+	}
+</style>
+@code {
+
+	//button trạng thái
+	private bool isOpenDialog = false;
+	private string searchString = "";
+	private bool cusDetailOpen = false;
+	[CascadingParameter]
+	public bool Rtl { get; set; }
+	private GuestViewModel selectedGuest = new GuestViewModel();
+	private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
+	[Inject]
+	private IGuestManagerClient _guestService { get; set; }
+	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+
+	// load lai du lieu
+	protected async Task LoadData()
+	{
+		//var response = await _client.GetGuest();
+		var response = await _guestService.GetGuest();
+		lstGuest = response.Data!;
+
+		StateHasChanged();
+	}
+	// mở details
+	private void ChangDetailPopup()
+	{
+		cusDetailOpen = !cusDetailOpen;
+	}
+	bool isShowPass = false;
+	InputType PasswordInput = InputType.Password;
+	void ButtonShowclick()
+	{
+		@if (isShowPass)
+		{
+			isShowPass = false;
+			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+			PasswordInput = InputType.Password;
+		}
+		else
+		{
+			isShowPass = true;
+			PasswordInputIcon = Icons.Material.Filled.Visibility;
+			PasswordInput = InputType.Text;
+		}
+	}
+
+
+	private async Task OnchangeStatus(bool value, Guid id)
+	{
+		ChangeUIStatus(value, id);
+		var response = await _guestService.ChangStatus(!value, id);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data!, Severity.Success);
+			return;
+		}
+		Snackbar.Add(response.Error!, Severity.Error);
+		await LoadData();
+
+	}
+	public void ChangeUIStatus(bool value, Guid id)
+	{
+		var guestToUpdate = lstGuest.FirstOrDefault(g => g.Id == id);
+		if (guestToUpdate != null)
+		{
+			guestToUpdate.IsDelete = !value;
+			StateHasChanged();
+		}
+	}
+
+	private bool FilterFunc(GuestViewModel element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
+			return true;
+		if (element.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		if (element.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+	public void OpenGuestDetails(Guid id)
+	{
+		bool result = id == selectedGuest.Id;
+		selectedGuest = lstGuest!.Find(p => p.Id == id);
+		if (result || !cusDetailOpen)
+		{
+			ChangDetailPopup();
+
+		}
+		else
+		{
+		}
+	}
+	// them sửa khách
+	public async Task OpenDialog(Guid id)
+	{
+		isOpenDialog = true;
+		var parameters = new DialogParameters();
+		string nameDialog = "Thêm mới khách hàng";
+		if (id != Guid.Empty)
+		{
+			var guest = lstGuest.FirstOrDefault(c => c.Id == id);
+
+			parameters.Add("guest", guest);
+			nameDialog = "Cập nhật khách hàng";
+		}
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Small,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdateGuest>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+		isOpenDialog = false;
+	}// them sửa khách
+	public async Task OpeListPetDialog(Guid id)
+	{
+		var parameters = new DialogParameters();
+		parameters.Add("Id", id);
+		string nameDialog = "Danh sách thú cưng";
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true,
+
+			};
+		var createUpdateDialog = await _dialogservice.ShowAsync<ViewPetOfGuest>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		if (result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+	}
+
+} *@
