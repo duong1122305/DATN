@@ -173,7 +173,7 @@ namespace DATN.API.Controllers
             return await _bookingManagement.AddService(createBookingDetailRequest);
         }
 
-        [HttpPost("Check-Status/{id}/")]
+        [HttpPost("Check-Status/{id}")]
         public async Task<IActionResult> Check([FromBody] MomoResultRequest momoResultRequest, int id)
         {
             await _bookingManagement.CheckStatusPayment(id, momoResultRequest);
