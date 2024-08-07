@@ -1223,14 +1223,14 @@ namespace DATN.Aplication.Services
             string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
             string orderInfo = "Chuyển khoản thanh toán làm dịch vụ MewShop";
             string redirectUrl = "https://localhost:7259/ListServicesBooking";
-            string ipnUrl = $"https://localhost:7039/Booking/Check-Status/{id}/";
+            string ipnUrl = "https://localhost:7039/Booking/Check-Status";
             string requestType = "captureWallet";
 
-            string amount = totalPrice;
+            string amount = totalPrice.Replace(" ","").TrimStart().TrimEnd();
             string orderId = Guid.NewGuid().ToString();
             string requestId = Guid.NewGuid().ToString();
 
-            string extraData = "{username:Tên la gi}";
+            string extraData = "";
 
             //Before sign HMAC SHA256 signature
             string rawHash = "accessKey=" + accessKey +
@@ -1245,10 +1245,10 @@ namespace DATN.Aplication.Services
                 "&requestType=" + requestType
                 ;
 
-            MoMoSecurity moMoSecurity = new MoMoSecurity();
 
+            MoMoSecurity crypto = new MoMoSecurity();
             //sign signature SHA256
-            string signature = moMoSecurity.signSHA256(rawHash, serectkey);
+            string signature = crypto.signSHA256(rawHash, serectkey);
 
             //build body json request
             JObject message = new JObject
