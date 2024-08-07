@@ -9,6 +9,7 @@ namespace DATN.Aplication.Services.IServices
 {
     public interface IBookingManagement
     {
+        public Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest);
         public Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek();
         public Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(int id);
         public Task<ResponseData<string>> CreateBookingInStore(CreateBookingRequest createBookingRequest, string token);

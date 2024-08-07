@@ -12,7 +12,6 @@ namespace DATN.ViewModels.DTOs.Payment
         }
         public static async Task<ResponseData<ResponseMomo>> sendPaymentRequest(string endpoint, string postJsonString)
         {
-
             try
             {
                 HttpClient client = new HttpClient();
