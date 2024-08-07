@@ -1223,7 +1223,7 @@ namespace DATN.Aplication.Services
             string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
             string orderInfo = "Chuyển khoản thanh toán làm dịch vụ MewShop";
             string redirectUrl = "https://localhost:7259/ListServicesBooking";
-            string ipnUrl = $"https://localhost:7039/Booking/Check-Status/{id}";
+            string ipnUrl = $"https://localhost:7039/api/Booking/Check-Status/{id}";
             string requestType = "captureWallet";
 
             string amount = totalPrice.Replace(" ", "").TrimStart().TrimEnd();
