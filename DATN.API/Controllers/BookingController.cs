@@ -64,37 +64,37 @@ namespace DATN.API.Controllers
             return await _bookingManagement.GetBill(idguest, dateBooking);
         }
 
-        [HttpPut("Complete-Booking")]
+        [HttpPatch("Complete-Booking")]
         public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
             return await _bookingManagement.CompleteBooking(actionView);
         }
-        [HttpPut("start-booking")]
+        [HttpPatch("start-booking")]
         public async Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
             return await _bookingManagement.StartBooking(actionView);
         }
-        [HttpPut("canel-booking")]
+        [HttpPatch("canel-booking")]
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
             return await _bookingManagement.CancelBooking(actionView);
         }
-        [HttpPut("start-booking-details")]
+        [HttpPatch("start-booking-details")]
         public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
             return await _bookingManagement.StartBookingDetail(actionView);
         }
-        [HttpPut("cancel-booking-details")]
+        [HttpPatch("cancel-booking-details")]
         public async Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
             return await _bookingManagement.CancelBookingDetail(actionView);
         }
-        [HttpPut("complete-bookingDetails")]
+        [HttpPatch("complete-bookingDetails")]
         public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
             return await _bookingManagement.CompleteBookingDetail(actionView);
         }
-        [HttpPut("Confirm-booking")]
+        [HttpPatch("Confirm-booking")]
         public async Task<ResponseData<string>> ConfirmBooking(ActionView actionView)
         {
             return await _bookingManagement.ConfirmBooking(actionView);
