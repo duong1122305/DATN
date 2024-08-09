@@ -14,7 +14,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public string NamePet { get; set; }
         public bool GenderPet { get; set; }
         public int SpeciesId { get; set; }
-        public int? IdBoooking { get; set; }
         public int? VoucherId { get; set; }
         public List<CreateBookingDetailRequest> LstBookingDetail { get; set; }
     }

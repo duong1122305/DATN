@@ -1575,6 +1575,7 @@ namespace DATN.Aplication.Services
                     Gender = true,
                     PhoneNumber = booking.PhoneNumber,
                     Name = booking.NameGuest,
+                    Address = ""
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
             }
