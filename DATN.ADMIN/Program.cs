@@ -24,7 +24,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/"), Timeout = TimeSpan.FromMinutes(30) });
+builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://api.datlich.id.vn/"), Timeout = TimeSpan.FromMinutes(30) });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<IVoucherServices, VoucherServices>();
 builder.Services.AddScoped<HttpContextAccessor>();
@@ -107,7 +107,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
            builder =>
            {
-               builder.WithOrigins("https://localhost:44305", "http://localhost:5173") // Đổi thành domain của client
+               builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn/") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials(); // Cho phép gửi thông tin xác thực

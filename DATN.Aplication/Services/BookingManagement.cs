@@ -1217,57 +1217,6 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, Payment payment)
         {
-            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
-            string partnerCode = "MOMO5RGX20191128";
-            string accessKey = "M8brj9K6E22vXoDB";
-            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
-            string orderInfo = "Chuyển khoản thanh toán làm dịch vụ MewShop";
-            string redirectUrl = "https://localhost:7259/ListServicesBooking";
-            string ipnUrl = $"https://localhost:7039/api/Booking/Check-Status/{id}";
-            string requestType = "captureWallet";
-
-            string amount = (payment.TotalPrice - payment.Reduce).ToString().Replace(" ", "").TrimStart().TrimEnd();
-            string orderId = Guid.NewGuid().ToString();
-            string requestId = Guid.NewGuid().ToString();
-
-            string extraData = "";
-
-            //Before sign HMAC SHA256 signature
-            string rawHash = "accessKey=" + accessKey +
-                "&amount=" + amount +
-                "&extraData=" + extraData +
-                "&ipnUrl=" + ipnUrl +
-                "&orderId=" + orderId +
-                "&orderInfo=" + orderInfo +
-                "&partnerCode=" + partnerCode +
-                "&redirectUrl=" + redirectUrl +
-                "&requestId=" + requestId +
-                "&requestType=" + requestType
-                ;
-
-
-            MoMoSecurity crypto = new MoMoSecurity();
-            //sign signature SHA256
-            string signature = crypto.signSHA256(rawHash, serectkey);
-
-            //build body json request
-            JObject message = new JObject
-            {
-                { "partnerCode", partnerCode },
-                { "partnerName", "Test" },
-                { "storeId", "MomoTestStore" },
-                { "requestId", requestId },
-                { "amount", amount },
-                { "orderId", orderId },
-                { "orderInfo", orderInfo },
-                { "redirectUrl", redirectUrl },
-                { "ipnUrl", ipnUrl },
-                { "lang", "en" },
-                { "extraData", extraData },
-                { "requestType", requestType },
-                { "signature", signature }
-
-            };
             try
             {
                 if (id == 0 || id == null)
@@ -1321,13 +1270,64 @@ namespace DATN.Aplication.Services
                     await _unitOfWork.HistoryActionRepository.AddAsync(action);
                     await _unitOfWork.SaveChangeAsync();
                     await _productManagement.BuyProduct(listProduct);
+                    id = booking.Id;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-                throw;
+                return new ResponseData<ResponseMomo> { IsSuccess = false, Data = new ResponseMomo { resultCode = 2003, message = e.Message } };
             }
+            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+            string partnerCode = "MOMO5RGX20191128";
+            string accessKey = "M8brj9K6E22vXoDB";
+            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
+            string orderInfo = "Chuyển khoản thanh toán làm dịch vụ MewShop";
+            string redirectUrl = "https://localhost:7259/ListServicesBooking";
+            string ipnUrl = $"https://api.datlich.id.vn/api/Booking/Check-Status/{id}";
+            string requestType = "captureWallet";
+
+            string amount = (payment.TotalPrice - payment.Reduce).ToString().Replace(" ", "").TrimStart().TrimEnd();
+            string orderId = Guid.NewGuid().ToString();
+            string requestId = Guid.NewGuid().ToString();
+
+            string extraData = "";
+
+            //Before sign HMAC SHA256 signature
+            string rawHash = "accessKey=" + accessKey +
+                "&amount=" + amount +
+                "&extraData=" + extraData +
+                "&ipnUrl=" + ipnUrl +
+                "&orderId=" + orderId +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + partnerCode +
+                "&redirectUrl=" + redirectUrl +
+                "&requestId=" + requestId +
+                "&requestType=" + requestType
+                ;
+
+
+            MoMoSecurity crypto = new MoMoSecurity();
+            //sign signature SHA256
+            string signature = crypto.signSHA256(rawHash, serectkey);
+
+            //build body json request
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "partnerName", "Test" },
+                { "storeId", "MomoTestStore" },
+                { "requestId", requestId },
+                { "amount", amount },
+                { "orderId", orderId },
+                { "orderInfo", orderInfo },
+                { "redirectUrl", redirectUrl },
+                { "ipnUrl", ipnUrl },
+                { "lang", "en" },
+                { "extraData", extraData },
+                { "requestType", requestType },
+                { "signature", signature }
+
+            };
             return await PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
         }
         public async Task CheckStatusPayment(int id, MomoResultRequest momoResult)
