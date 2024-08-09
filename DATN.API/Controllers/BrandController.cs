@@ -22,7 +22,7 @@ namespace DATN.API.Controllers
             return await _brandManagementService.CreateBrand(brandView);
         }
 
-        [HttpPatch("Update-Brand")]
+        [HttpPut("Update-Brand")]
         public async Task<ResponseData<string>> UpdateBrand(BrandView brandView)
         {
             return await _brandManagementService.UpdateCategory(brandView);

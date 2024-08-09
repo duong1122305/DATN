@@ -50,7 +50,7 @@ namespace DATN.API.Controllers
         }
 
         //change password
-        [HttpPatch("changePassword")]
+        [HttpPut("changePassword")]
         public async Task<ResponseData<string>> ChangePassword(UserChangePasswordView changePasswordView)
         {
             var result = await _userrepo.ChangePassword(changePasswordView);
@@ -169,7 +169,7 @@ namespace DATN.API.Controllers
             return await _userrepo.AddRole(roleName);
         }
         //api cập nhật nhân viên
-        [HttpPatch("Update-inf")]
+        [HttpPut("Update-inf")]
         public Task<ResponseData<string>> UpdateInfUser(UserUpdateView userUpdateView, string id)
         {
             return _userrepo.UpdateInformationUser(userUpdateView, id);
@@ -183,7 +183,7 @@ namespace DATN.API.Controllers
         }
 
         //api cập nhật ca làm
-        [HttpPatch("Update-shift")]
+        [HttpPut("Update-shift")]
         public async Task<ResponseData<string>> UpdateShift(ShiftView shift, int id)
         {
             return await _shiftManagement.UpdateShift(shift, id);
@@ -213,7 +213,7 @@ namespace DATN.API.Controllers
             return await _vouchermanagement.CreateVoucher(voucherView);
         }
 
-        [HttpPatch("Update-Voucher")]
+        [HttpPut("Update-Voucher")]
         public async Task<ResponseData<string>> UpdateVoucher(VoucherView voucherView)
         {
             return await _vouchermanagement.UpdateVoucher(voucherView);

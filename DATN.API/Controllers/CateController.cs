@@ -24,7 +24,7 @@ namespace DATN.API.Controllers
         {
             return await _categoryManagement.CreateCategory(categoryView);
         }
-        [HttpPatch("Update-Category")]
+        [HttpPut("Update-Category")]
 
         public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
         {
@@ -50,7 +50,7 @@ namespace DATN.API.Controllers
         {
             return _categoryProductManagement.CreateCategory(categoryView);
         }
-        [HttpPatch("Update-Category-Product")]
+        [HttpPut("Update-Category-Product")]
 
         public Task<ResponseData<string>> UpdateCategoryProduct(CreateCategoryProductView categoryView)
         {

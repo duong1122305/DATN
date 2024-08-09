@@ -66,14 +66,14 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateCategory(CategoryView categoryView)
         {
-            var respone = await _httpClient.PatchAsJsonAsync("api/cate/Update-Category", categoryView);
+            var respone = await _httpClient.PutAsJsonAsync("api/cate/Update-Category", categoryView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }
 
         public async Task<ResponseData<string>> UpdateCategoryProduct(CreateCategoryProductView categoryView)
         {
-            var respone = await _httpClient.PatchAsJsonAsync("api/cate/Update-Category-Product", categoryView);
+            var respone = await _httpClient.PutAsJsonAsync("api/cate/Update-Category-Product", categoryView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }

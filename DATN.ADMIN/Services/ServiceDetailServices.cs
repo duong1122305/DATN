@@ -69,7 +69,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> Update(int id, UpdateServiceDetailVM serviceDetail)
         {
-            var response = await _client.PatchAsJsonAsync($"api/ServicesDetail/updateServiceDetail/{id}", serviceDetail);
+            var response = await _client.PutAsJsonAsync($"api/ServicesDetail/updateServiceDetail/{id}", serviceDetail);
             var result = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(result);
 
