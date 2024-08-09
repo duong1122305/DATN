@@ -155,7 +155,7 @@
     private async Task InitializeSignalR()
     {
         var connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7039/bookingHub")
+            .WithUrl("https://api.datlich.id.vn/bookingHub")
             .Build();
 
         connection.On<string>("ReceiveBookingNotification",async message =>
@@ -195,7 +195,7 @@
     // SignalR Connection
     (function () {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://localhost:7039/bookingHub")
+            .withUrl("https://https://api.datlich.id.vn/bookingHub")
             .build();
 
         connection.on("ReceiveBookingNotification", function (message) {
