@@ -24,7 +24,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://api.datlich.id.vn/"), Timeout = TimeSpan.FromMinutes(30) });
+builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetSection("BaseUrlAPI").Value), Timeout = TimeSpan.FromMinutes(30) });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<IVoucherServices, VoucherServices>();
 builder.Services.AddScoped<HttpContextAccessor>();
