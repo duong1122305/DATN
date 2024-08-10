@@ -1,6 +1,7 @@
-﻿<div class="div-content">
+﻿@inject IJSRuntime jsRuntime;
+<div class="div-content">
     <h3>MEW SHOP</h3>
-   <div>
+    <div>
         <p>Địa chỉ: Quận Ba Đình, Thành Phố Hà Nội</p>
         <p>Thời gian: 11.08.2024 05:06</p>
         <p>Nhân viên: Việt Nguyễn</p>
@@ -8,7 +9,7 @@
         <div>
             mã qr
         </div>
-   </div>
+    </div>
 
     <table class="table">
         <thead>
@@ -41,7 +42,7 @@
 
 }
 <style>
-    .div-content     {
+    .div-content {
         font-family: Arial, sans-serif;
         padding: 20px;
         border: 1px solid #ddd;
@@ -51,6 +52,7 @@
         margin: 0 auto;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     h3 {
         color: #333;
         text-align: center;
@@ -95,3 +97,11 @@
         }
 
 </style>
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(2000);
+        await jsRuntime.InvokeVoidAsync("window.print");
+        
+    }
+}

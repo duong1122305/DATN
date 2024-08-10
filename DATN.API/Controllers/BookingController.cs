@@ -109,12 +109,6 @@ namespace DATN.API.Controllers
             }
             return result;
         }
-
-        [HttpPost("Add-Product-For-Bill")]
-        public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
-        {
-            return await _productManagement.BuyProduct(buyProducts);
-        }
         [HttpGet("List-Product-View-Sale")]
         public async Task<ResponseData<List<ProductSelect>>> ListProductViewSale()
         {
