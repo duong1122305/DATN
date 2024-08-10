@@ -5,11 +5,10 @@
 
 <div style="text-align:center">
   @*   <img src="@linkqr" height="540px" width="440px"> *@
-    <img src="@linkqr" height="200" width="200">
-    @if (idGuest != null)
-    {
+    <img src="@linkqr" height="540px" width="440px">
+    <div>
         <MudButton OnClick="PayMent" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Đã thanh toán</MudButton>
-    }
+    </div>
 </div>
 
 @code {
@@ -20,9 +19,7 @@
     [Parameter]
     public int idBooking { get; set; }
     [Parameter]
-    public int TotalPrice { get; set; }
-    // [Parameter]
-    // public int paymentMethod { get; set; }
+    public double TotalPrice { get; set; }
     [Parameter]
     public DateTime dateBooking { get; set; }
     [Parameter]
