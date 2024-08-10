@@ -51,7 +51,7 @@ namespace DATN.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("updateServiceDetail/{id}")]
+        [HttpPatch("updateServiceDetail/{id}")]
         public async Task<IActionResult> UpdateServiceDetail(int id, UpdateServiceDetailVM serviceDetail)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

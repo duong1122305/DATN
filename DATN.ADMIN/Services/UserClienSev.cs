@@ -78,14 +78,14 @@ namespace DATN.ADMIN.Services
         public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView, string id)
         {
             var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
-            var respone = await _client.PutAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
+            var respone = await _client.PatchAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
         }
 
         public async Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView)
         {
-            var response = await _client.PutAsJsonAsync("api/UserLogin/changePassword", userChangePasswordView);
+            var response = await _client.PatchAsJsonAsync("api/UserLogin/changePassword", userChangePasswordView);
             return await response.Content.ReadFromJsonAsync<ResponseData<UserChangePasswordView>>();
         }
 

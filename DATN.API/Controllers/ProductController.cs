@@ -25,7 +25,7 @@ namespace DATN.API.Controllers
         {
             return await _productManagementServicel.CreateProduct(productView);
         }
-        [HttpPut("Update-Product")]
+        [HttpPatch("Update-Product")]
         public async Task<ResponseData<string>> UpdateProduct(CreateProductView productView)
         {
             return await _productManagementServicel.UpdateProduct(productView);
@@ -54,7 +54,7 @@ namespace DATN.API.Controllers
         {
             return await _productDetaiManagementServicel.CreateProductDetail(productView);
         }
-        [HttpPut("Update-Product-Details")]
+        [HttpPatch("Update-Product-Details")]
         public async Task<ResponseData<string>> UpdateProductDetails(CreateProductDetaiView productView)
         {
             return await _productDetaiManagementServicel.UpdateProductDetail(productView);
