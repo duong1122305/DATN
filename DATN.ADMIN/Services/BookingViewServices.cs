@@ -6,6 +6,7 @@ using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace DATN.ADMIN.Services
 {
@@ -26,6 +27,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
+            _httpClient.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/canel-booking", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;

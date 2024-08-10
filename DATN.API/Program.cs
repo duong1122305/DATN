@@ -68,7 +68,8 @@ builder.Services.AddCors(options =>
                builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn/") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+                      .AllowCredentials()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains(); // Cho phép gửi thông tin xác thực
            });
 });
 
