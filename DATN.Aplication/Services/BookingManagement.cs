@@ -1151,7 +1151,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write($"https://drive.google.com/drive/folders/1g9NhwRRKEpP5uvOBHIaV2jk-afxUpXcu"))
+                    using (var bitmap = barcodeWriter.Write($"https://sd33.datlich.id.vn/public/{idBooking}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);
@@ -1194,7 +1194,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write("https://localhost:7259/ListServicesBooking"))
+                    using (var bitmap = barcodeWriter.Write("https://mewshop.datlich.id.vn/report/"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);

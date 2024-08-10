@@ -65,10 +65,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
            builder =>
            {
-               builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn/") // Đổi thành domain của client
+               builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+                      .AllowCredentials()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains(); // Cho phép gửi thông tin xác thực
            });
 });
 
@@ -128,6 +129,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();

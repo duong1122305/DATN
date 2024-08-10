@@ -110,12 +110,12 @@ builder.Services.AddCors(options =>
                builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn/") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+                      .AllowCredentials()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains();
            });
 });
 
-var app = builder.Build();
-
+var app = builder.Build(); 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -124,7 +124,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseCors("AllowSpecificOrigin"); // Áp dụng CORS
 // ... (in the Configure method)
 app.UseResponseCaching();
 app.UseHttpsRedirection();
@@ -135,9 +135,7 @@ app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapBlazorHub();
-app.UseCors("AllowSpecificOrigin"); // Áp dụng CORS
 app.MapFallbackToPage("/_Host");
 
 app.Run();
