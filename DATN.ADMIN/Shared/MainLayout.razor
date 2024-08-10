@@ -192,25 +192,25 @@
 }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
 <script>
-    // SignalR Connection
-    (function () {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://api.datlich.id.vn/bookingHub")
-            .build();
+    // // SignalR Connection
+    // (function () {
+    //     const connection = new signalR.HubConnectionBuilder()
+    //         .withUrl("https://api.datlich.id.vn/bookingHub")
+    //         .build();
 
-        connection.on("ReceiveBookingNotification", function (message) {
-            // Call function to handle the notification
-            handleNewNotification(message);
-            console.log(message);
-            // alert(message);
-        });
+    //     connection.on("ReceiveBookingNotification", function (message) {
+    //         // Call function to handle the notification
+    //         handleNewNotification(message);
+    //         console.log(message);
+    //         // alert(message);
+    //     });
 
-        connection.start().then(() => {
-            console.log("Connected to Hub.");
-        }).catch(function (err) {
-            console.error("Connection failed: ", err.toString());
-        });
-    })();
+    //     connection.start().then(() => {
+    //         console.log("Connected to Hub.");
+    //     }).catch(function (err) {
+    //         console.error("Connection failed: ", err.toString());
+    //     });
+    // })();
 
     function handleNewNotification(message) {
         const notificationList = document.getElementById("notificationList");

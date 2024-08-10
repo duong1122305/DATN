@@ -4,10 +4,13 @@ using CloudinaryDotNet.Actions;
 using DATN.Aplication;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Options;
 
 namespace DATN.API.Services
 {
+    [EnableCors("AllowSpecificOrigin")]
+        
     public class UploadFileServices : IUploadFileServices
     {
         private readonly Cloudinary _cloundinary;
