@@ -41,23 +41,21 @@
 			<MudItem sm="12" md="7">
 				@if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
 				{
-					<MudPaper Elevation="2" Class="pa-4" Style="" Height="350px">
+					<MudPaper Elevation="2" Class="pa-4" Height="350px">
 
 						<SfChart Title="@customerData.Name" Width="@width">
-							<ChartPrimaryXAxis Title="" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-							<ChartPrimaryYAxis Interval="1"></ChartPrimaryYAxis>
-							<ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+							<ChartPrimaryXAxis Format="NO" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+							@* <ChartPrimaryYAxis Interval="1"></ChartPrimaryYAxis> *@
 							<ChartSeriesCollection>
 								<ChartSeries DataSource="@customerData.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
+									<ChartMarker>
+										<ChartDataLabel Visible="true" Format="N0" />
+									</ChartMarker>
 								</ChartSeries>
 							</ChartSeriesCollection>
 						</SfChart>
-
-
 					</MudPaper>
 				}
-
-
 			</MudItem>
 			<MudItem sm="12" md="5">
 				<MudPaper Elevation="2" Class="pa-4" Style="height: 350px;">
@@ -65,7 +63,6 @@
 					{
 						<SfAccumulationChart Title="@revenuePieDatas.Name">
 							<AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
-
 							<AccumulationChartSeriesCollection>
 								<AccumulationChartSeries DataSource="@revenuePieDatas.Data" XName="Label" YName="Value" Name="Browser">
 									<AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
