@@ -29,7 +29,10 @@
                 <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
                     @foreach (var item2 in context.Item.ListProductDetail)
                     {
-                        <MudSelectItem Value="item2">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price) - @item2.Quantity Sản phẩm</MudSelectItem>
+                        if (item2.Quantity > 0)
+                        {
+                            <MudSelectItem Value="item2">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price) - @item2.Quantity Sản phẩm</MudSelectItem>
+                        }
                     }
                 </MudSelect>
             </CellTemplate>

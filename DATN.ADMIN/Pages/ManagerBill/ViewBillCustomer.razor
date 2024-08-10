@@ -452,6 +452,24 @@
     }
     public async Task PrintBill()
     {
+        DialogParameters parameter = new DialogParameters();
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = false,
+                DisableBackdropClick = true,
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("", options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
     }
 
     private async void RemoveProduct(ProductDetailView product)
