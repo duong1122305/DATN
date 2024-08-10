@@ -8,6 +8,7 @@
 @inject IAddressService _addressServive;
 @inject IDialogService _dialogservice;
 @inject ISnackbar Snackbar
+@inject IJSRuntime jsRuntime;
 <style>
     .mud-dialog-width-lg {
         height: 680px;
@@ -216,6 +217,7 @@
 
     [Inject]
     NavigationManager navigationManager { get; set; }
+
     private async Task LoadData()
     {
         await OpenDialogReload();
@@ -451,6 +453,7 @@
     }
     public async Task PrintBill()
     {
+        jsRuntime.InvokeVoidAsync("PrintPageBill");
     }
 
     private async void RemoveProduct(ProductDetailView product)
@@ -505,8 +508,10 @@
             await LoadData();
         }
     }
-
-
 }
-
-
+<script>
+    function PrintPageBill()
+    {
+        window.print();
+    }
+</script>

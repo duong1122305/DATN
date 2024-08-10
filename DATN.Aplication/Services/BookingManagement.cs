@@ -1,4 +1,5 @@
 ﻿using Azure;
+using CloudinaryDotNet.Actions;
 using DATN.Aplication.Services.IServices;
 using DATN.Aplication.System;
 using DATN.Data.Entities;
@@ -969,9 +970,18 @@ namespace DATN.Aplication.Services
                         };
                         await _unitOfWork.BookingRepository.UpdateAsync(booking);
                         await _unitOfWork.HistoryActionRepository.AddAsync(action);
-                        await _unitOfWork.SaveChangeAsync();
-                        await _productManagement.BuyProduct(listProduct);
-                        return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
+                        var buyProduct = await _productManagement.BuyProduct(listProduct);
+                        if (buyProduct.IsSuccess)
+                        {
+                            await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(buyProduct.Data.Item2);
+                            await _unitOfWork.OrderDetailRepository.AddRangeAsync(buyProduct.Data.Item1);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = buyProduct.Error };
+                        }
                     }
                     else
                     {
