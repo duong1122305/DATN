@@ -21,13 +21,13 @@
         <div id="notificationPopover" class="notification-popover">
             <ul id="notificationList"></ul>
         </div> *@
-        <div style="position: relative; display: inline-block;">
+@*         <div style="position: relative; display: inline-block;">
             <MudIconButton Id="notificationBell" Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" OnClick="ToggleNotificationPopover" />
             @if (notificationCount > 0)
             {
                 <MudBadge Content="@notificationCount" Color="Color.Error" MaxValue="99" Style="position: relative; top: -10px; right: 10px;" />
             }
-        </div>
+        </div> *@
 
         <MudPopover AnchorId="notificationBell" Open="@showNotifications" CloseOnOutsideClick="true" OnClose="OnPopoverClose" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="notification-popover">
             <MudPaper>
@@ -78,8 +78,8 @@
     protected IHttpContextAccessor httpContextAccessor { get; set; }
     [Inject]
     protected IUserClientSev _ser { get; set; }
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; }
+    // [Inject]
+    // private IJSRuntime JSRuntime { get; set; }
     private bool isPopoverOpen = false;
     private void TogglePopover()
     {
@@ -129,7 +129,6 @@
         }
         if (string.IsNullOrEmpty(session))
         {
-            // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
             navigationManager.NavigateTo($"/dangnhap", true);
 
         }
@@ -137,7 +136,6 @@
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
-            // var listClaims = jwtSecurityToken.Claims.ToArray();
             name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value!;
             string idUser = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
             string fullName = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.UserData).FirstOrDefault()?.Value!;
@@ -160,18 +158,18 @@
 
         connection.On<string>("ReceiveBookingNotification",async message =>
         {
-            // Call JavaScript function to handle the notification
-            await JSRuntime.InvokeVoidAsync("handleNewNotification", message);
-            notifications.Add(new Notification { Message = message });
+            // // Call JavaScript function to handle the notification
+            // await JSRuntime.InvokeVoidAsync("handleNewNotification", message);
+            // notifications.Add(new Notification { Message = message });
             _snackBar.Add(message, Severity.Success);
         });
         await connection.StartAsync();
     }
-    private void ToggleNotificationPopover()
-    {
-        JSRuntime.InvokeVoidAsync("ToggleNotificationPopover");
-        showNotifications = !showNotifications;
-    }
+    // private void ToggleNotificationPopover()
+    // {
+    //     JSRuntime.InvokeVoidAsync("ToggleNotificationPopover");
+    //     showNotifications = !showNotifications;
+    // }
     // private void ShowNotification(string message)
     // {
     //     _snackBar.Add(message, Severity.Success);
@@ -191,50 +189,6 @@
     }
 }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-<script>
-    // // SignalR Connection
-    // (function () {
-    //     const connection = new signalR.HubConnectionBuilder()
-    //         .withUrl("https://api.datlich.id.vn/bookingHub")
-    //         .build();
 
-    //     connection.on("ReceiveBookingNotification", function (message) {
-    //         // Call function to handle the notification
-    //         handleNewNotification(message);
-    //         console.log(message);
-    //         // alert(message);
-    //     });
-
-    //     connection.start().then(() => {
-    //         console.log("Connected to Hub.");
-    //     }).catch(function (err) {
-    //         console.error("Connection failed: ", err.toString());
-    //     });
-    // })();
-
-    function handleNewNotification(message) {
-        const notificationList = document.getElementById("notificationList");
-        if (notificationList) {
-            const li = document.createElement("li");
-            li.textContent = message;
-            notificationList.appendChild(li);
-        }
-
-        // Show the notification popover
-        ToggleNotificationPopover(); // Ensure this is called to toggle visibility
-    }
-
-    function ToggleNotificationPopover() {
-        const popover = document.getElementById("notificationPopover");
-        const notificationBell = document.getElementById("notificationBell");
-
-        if (popover && notificationBell) {
-            const bellRect = notificationBell.getBoundingClientRect();
-            popover.style.left = `${bellRect.left}px`;
-            popover.style.top = `${bellRect.bottom}px`;
-            popover.style.display = (popover.style.display === "none" || popover.style.display === "") ? "block" : "none";
-        }
-    }
-</script>
 
 

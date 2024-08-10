@@ -72,7 +72,11 @@ builder.Services.AddCors(options =>
                       .SetIsOriginAllowedToAllowWildcardSubdomains(); // Cho phép gửi thông tin xác thực
            });
 });
-
+builder.Services.AddServerSideBlazor()
+        .AddCircuitOptions(options =>
+        {
+            options.DetailedErrors = true;
+        });
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
