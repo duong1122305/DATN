@@ -278,7 +278,6 @@
             parameter.Add("idBooking", idBooking.Value);
             parameter.Add("idGuest", guid.Value);
             parameter.Add("TotalPrice", bill.TotalPrice);
-            // parameter.Add("paymentMethod", selectedPaymentMethod);
             parameter.Add("dateBooking", date);
             parameter.Add("bookingService", bookingService);
             var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
