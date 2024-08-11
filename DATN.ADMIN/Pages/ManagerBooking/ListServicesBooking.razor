@@ -277,7 +277,7 @@
                 DisableBackdropClick = true
             };
         parameters.Add("linkqr", response.Data);
-        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CheckInOut>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -300,7 +300,7 @@
                 DisableBackdropClick = true
             };
         parameters.Add("linkqr", response.Data);
-        var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CheckInOut>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
