@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace DATN.API.Services
-{
+{        
     public class UploadFileServices : IUploadFileServices
     {
         private readonly Cloudinary _cloundinary;

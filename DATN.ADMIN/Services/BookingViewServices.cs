@@ -6,6 +6,7 @@ using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace DATN.ADMIN.Services
 {

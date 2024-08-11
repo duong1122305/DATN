@@ -1,4 +1,5 @@
 ﻿using Azure;
+using CloudinaryDotNet.Actions;
 using DATN.Aplication.Services.IServices;
 using DATN.Aplication.System;
 using DATN.Data.Entities;
@@ -870,53 +871,46 @@ namespace DATN.Aplication.Services
                 {
                     if (!queryBooking.IsPayment)
                     {
-                        if (payment.TypePaymenId == 1)
+                        if (queryBooking.VoucherId != null)
                         {
-                            if (queryBooking.VoucherId != null)
-                            {
-                                var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                    where dis.Id == queryBooking.VoucherId
-                                                    select dis).FirstOrDefault();
-                                checkVoucher.AmountUsed++;
-                                await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
+                            var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                                where dis.Id == queryBooking.VoucherId
+                                                select dis).FirstOrDefault();
+                            checkVoucher.AmountUsed++;
+                            await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
 
-                            }
-                            queryBooking.TotalPrice = bill.Data.TotalPayment;
-                            queryBooking.PaymentTypeId = payment.TypePaymenId;
-                            queryBooking.ReducedAmount = bill.Data.ReducePrice;
-                            queryBooking.IsPayment = true;
-                            queryBooking.VoucherId = bill.Data.IdVoucher;
-                            var listProduct = (from buypro in payment.LstProducts
-                                               select new BuyProduct
-                                               {
-                                                   IdBooking = payment.IdBooking,
-                                                   IdProductDetail = buypro.IdProductDetail,
-                                                   Quantity = buypro.SelectQuantityProduct,
-                                                   Price = buypro.Price,
-                                               }).ToList();
-                            var user = await _user.GetUserByToken(payment.Token);
-                            HistoryAction action = new HistoryAction()
-                            {
-                                ActionID = 16,
-                                ActionByID = Guid.Parse(user.Data),
-                                ActionTime = DateTime.Now,
-                                BookingID = queryBooking.Id,
-                                Description = "Đây là nhân viên thanh toán cho khách nhé :)))",
-                            };
-                            await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
-                            await _unitOfWork.HistoryActionRepository.AddAsync(action);
-                            await _unitOfWork.SaveChangeAsync();
-                            await _productManagement.BuyProduct(listProduct);
-                            return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
                         }
-                        else
+                        queryBooking.TotalPrice = bill.Data.TotalPayment;
+                        queryBooking.PaymentTypeId = payment.TypePaymenId;
+                        queryBooking.ReducedAmount = bill.Data.ReducePrice;
+                        queryBooking.IsPayment = true;
+                        queryBooking.VoucherId = bill.Data.IdVoucher;
+                        var listProduct = (from buypro in payment.LstProducts
+                                           select new BuyProduct
+                                           {
+                                               IdBooking = payment.IdBooking,
+                                               IdProductDetail = buypro.IdProductDetail,
+                                               Quantity = buypro.SelectQuantityProduct,
+                                               Price = buypro.Price,
+                                           }).ToList();
+                        var user = await _user.GetUserByToken(payment.Token);
+                        HistoryAction action = new HistoryAction()
                         {
-                            return new ResponseData<string> { IsSuccess = true, Data = "Chưa biết làm chuyển khoản" };
-                        }
+                            ActionID = 16,
+                            ActionByID = Guid.Parse(user.Data),
+                            ActionTime = DateTime.Now,
+                            BookingID = queryBooking.Id,
+                            Description = "Đây là nhân viên thanh toán cho khách nhé :)))",
+                        };
+                        await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
+                        await _unitOfWork.HistoryActionRepository.AddAsync(action);
+                        await _unitOfWork.SaveChangeAsync();
+                        await _productManagement.BuyProduct(listProduct);
+                        return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công!" };
                     }
                     else
                     {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Đơn này thanh toán rồi thanh toán đéo gì lắm" };
+                        return new ResponseData<string> { IsSuccess = false, Error = "Đơn này đã thanh toán rồi!" };
                     }
                 }
                 else
@@ -969,9 +963,18 @@ namespace DATN.Aplication.Services
                         };
                         await _unitOfWork.BookingRepository.UpdateAsync(booking);
                         await _unitOfWork.HistoryActionRepository.AddAsync(action);
-                        await _unitOfWork.SaveChangeAsync();
-                        await _productManagement.BuyProduct(listProduct);
-                        return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
+                        var buyProduct = await _productManagement.BuyProduct(listProduct);
+                        if (buyProduct.IsSuccess)
+                        {
+                            await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(buyProduct.Data.Item2);
+                            await _unitOfWork.OrderDetailRepository.AddRangeAsync(buyProduct.Data.Item1);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = buyProduct.Error };
+                        }
                     }
                     else
                     {
@@ -1151,7 +1154,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write($"https://drive.google.com/drive/folders/1g9NhwRRKEpP5uvOBHIaV2jk-afxUpXcu"))
+                    using (var bitmap = barcodeWriter.Write($"https://sd33.datlich.id.vn/public/{idBooking}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);
@@ -1194,7 +1197,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write("https://localhost:7259/ListServicesBooking"))
+                    using (var bitmap = barcodeWriter.Write("https://mewshop.datlich.id.vn/report/"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);

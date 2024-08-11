@@ -13,7 +13,7 @@ namespace DATN.Aplication.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
+        public async Task<ResponseData<(List<OrderDetail>, List<ProductDetail>)>> BuyProduct(List<BuyProduct> buyProducts)
         {
             try
             {
@@ -47,16 +47,14 @@ namespace DATN.Aplication.Services
                     }
                     else
                     {
-                        return new ResponseData<string> { IsSuccess = false ,Error="Có sản phẩm trong giỏ hàng đã hết hàng trong kho vui lòng chọn sản phẩm khác"};
+                        return new ResponseData<(List<OrderDetail>, List<ProductDetail>)> { IsSuccess = false, Error = "Có sản phẩm trong giỏ hàng đã hết hàng trong kho vui lòng chọn sản phẩm khác" };
                     }
                 }
-                await _unitOfWork.OrderDetailRepository.AddRangeAsync(orderDetails);
-                await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(lstUpdate);
-                return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                return new ResponseData<(List<OrderDetail>, List<ProductDetail>)> { IsSuccess = true, Data = (orderDetails, lstUpdate) };
             }
             catch (Exception e)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = e.Message };
+                return new ResponseData<(List<OrderDetail>, List<ProductDetail>)> { IsSuccess = false, Error = e.Message };
             }
         }
         public async Task<ResponseData<BillProduct>> GetBillProduct(int id)

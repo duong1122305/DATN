@@ -1,0 +1,120 @@
+﻿@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
+@inject IJSRuntime jsRuntime;
+@inject IAddressService _addressServive;
+
+<div class="div-content">
+    <h3>MEW SHOP</h3>
+    <div>
+        <p>Khách hàng: @BillInvoice.GuestName</p>
+        <p>Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+        <p>Nhân viên: Việt Nguyễn</p>
+        <p>Số điện thoại: @BillInvoice.PhoneNumber</p>
+        <p>Địa chỉ: @_addressServive.GetAddress(BillInvoice.Address)</p>
+
+        <div>
+            mã qr
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tên dịch vụ</th>
+                <th scope="col">Giá dịch vụ</th>
+                <th scope="col">Tên sản phẩm</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Giá sản phẩm</th>
+                <th scope="col">Tổng tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in BillInvoice.ListServiceBooked)
+            {
+               @foreach (var item2 in BillInvoice.ListProductDetail)
+                {
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>@item.ServiceDetailName</td>
+                        <td>@CurrencyHelper.FormatCurrency((float)item.Price)</td>
+                        <td>@item2.Name</td>
+                        <td>@item2.SelectQuantityProduct</td>
+                        <td>@CurrencyHelper.FormatCurrency((float)item2.Price)</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <p><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)BillInvoice.ReducePrice)</p>
+    <p><b>Thanh toán:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.TotalPayment)</p>
+    <p><b>Tiền khách trả:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.TotalPayment)</p>
+</div>
+@code {
+    [Parameter]
+    public Bill BillInvoice { get; set; } = new Bill();
+}
+<style>
+    .div-content {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+        color: #333;
+        text-align: center;
+    }
+
+    p {
+        margin: 0;
+        padding: 5px 0;
+        margin-left: 5px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f4f4f4;
+        }
+
+        .table td {
+            background-color: #fafafa;
+        }
+
+        .table thead {
+            background-color: #f9f9f9;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table tr:hover {
+            background-color: #eaeaea;
+        }
+
+</style>
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(2000);
+        await jsRuntime.InvokeVoidAsync("window.print");
+    }
+}

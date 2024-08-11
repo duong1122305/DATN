@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace DATN.API.Services
 {
+
     public interface IUploadFileServices
     {
         public Task<ResponseData<string>> UploadAvatarAsync(IFormFile file);
