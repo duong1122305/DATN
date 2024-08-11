@@ -99,6 +99,7 @@ builder.Services.AddScoped<IProductDetaiManagementService, ProductDetaiManagemen
 builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
 builder.Services.AddScoped<IAttendanteMangarService, AttendanteMangarService>();
 builder.Services.AddScoped<IStatisticalService, StatisticalService>();
+builder.Services.AddScoped<IUploadFileServices, UploadFileServices>();
 
 // Add auto mapper
 builder.Services.AddScoped<IBookingManagement, BookingManagement>();
