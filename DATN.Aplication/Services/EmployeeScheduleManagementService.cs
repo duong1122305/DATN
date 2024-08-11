@@ -3,6 +3,7 @@ using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
+using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -585,7 +586,8 @@ namespace DATN.Aplication.Services
                                                       on schdule.WorkShiftId equals workshift.Id
                                                       join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                                       on workshift.ShiftId equals shift.Id
-                                                      where bookingDetail.StaffId == item.IdStaff
+                                                      where bookingDetail.StaffId == item.IdStaff 
+                                                      && bookingDetail.Status != BookingDetailStatus.Cancelled
                                                       select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                                 if (queryCheckUser.Count() == 0)
                                 {

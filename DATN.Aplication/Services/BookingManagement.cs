@@ -1441,6 +1441,18 @@ namespace DATN.Aplication.Services
                             }
                         }
                     }
+                    foreach (var item in createBookingDetailRequest.ListServiceDetail)
+                    {
+                        var lst = await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date);
+                        if (lst.IsSuccess)
+                        {
+                            item.StaffId = lst.Data.FirstOrDefault().IdStaff;
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = lst.Error };
+                        }
+                    }
                     List<BookingDetail> lstAdd = new List<BookingDetail>();
                     foreach (var item in createBookingDetailRequest.ListServiceDetail)
                     {
