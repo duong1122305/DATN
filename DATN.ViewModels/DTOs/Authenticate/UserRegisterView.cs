@@ -6,7 +6,7 @@ namespace DATN.ViewModels.DTOs.Authenticate
     {
         [Required, RegularExpression(@"(^([a-zỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ'A-ZỲỌÁẦẢẤỜỄÀẠẰỆẾÝỘẬỐŨỨĨÕÚỮỊỖÌỀỂẨỚẶÒÙỒỢÃỤỦÍỸẮẪỰỈỎỪỶỞÓÉỬỴẲẸÈẼỔẴẺỠƠÔƯĂÊÂĐ]{1,})((\s)([a-zỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ'A-ZỲỌÁẦẢẤỜỄÀẠẰỆẾÝỘẬỐŨỨĨÕÚỮỊỖÌỀỂẨỚẶÒÙỒỢÃỤỦÍỸẮẪỰỈỎỪỶỞÓÉỬỴẲẸÈẼỔẴẺỠƠÔƯĂÊÂĐ]{1,}))*)$", ErrorMessage = "Tên chưa đúng định dạng")]
         public string FullName { get; set; }
-        public bool Gender { get; set; }
+        public bool Gender { get; set; }    
         public string? Password { get; set; }
         [Required(ErrorMessage = "Vui lòng không để trống trường này")]
         [RegularExpression(@"([\w]{5})+@[a-z]+\.([a-z]{2,3}|[a-z]{2,3}\.[a-z]{2,3})$", ErrorMessage = "Email chưa đúng định dạng")]

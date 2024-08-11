@@ -163,21 +163,35 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
-                    var booking = new Booking()
+                    var query = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                                select serviceDetail;
+                    for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
                     {
-                        GuestId = createBookingRequest.GuestId,
-                        BookingTime = DateTime.Now,
-                        VoucherId = null,
-                        TotalPrice = 0,
-                        PaymentTypeId = 1,
-                        ReducedAmount = 0,
-                        Status = BookingStatus.Confirmed,
-                        IsPayment = false,
-                        IsAddToSchedule = true,
-                    };
-                    await _unitOfWork.BookingRepository.AddAsync(booking);
-                    await _unitOfWork.SaveChangeAsync();
+                        if (i == 0)
+                        {
+                            int time = (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[0].ServiceDetailId).Duration) / 60;
+                            createBookingRequest.ListIdServiceDetail[0].EndDateTime = createBookingRequest.ListIdServiceDetail[0].StartDateTime.Add(new TimeSpan(time, (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[0].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                        else
+                        {
+                            int time = (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[0].ServiceDetailId).Duration) / 60;
+                            createBookingRequest.ListIdServiceDetail[i].StartDateTime = createBookingRequest.ListIdServiceDetail[i - 1].EndDateTime;
+                            createBookingRequest.ListIdServiceDetail[i].EndDateTime = createBookingRequest.ListIdServiceDetail[i].StartDateTime.Add(new TimeSpan(time, (int)(query.FirstOrDefault(c => c.Id == createBookingRequest.ListIdServiceDetail[i].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                    }
 
+                    foreach (var item in createBookingRequest.ListIdServiceDetail)
+                    {
+                        var lst = await _employeeScheduleManagementService.ListStaffFreeInTime(item.StartDateTime, item.EndDateTime, item.DateBooking.Date);
+                        if (lst.IsSuccess)
+                        {
+                            item.StaffId = lst.Data.FirstOrDefault().IdStaff;
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = lst.Error };
+                        }
+                    }
                     List<BookingDetail> list = new List<BookingDetail>();
                     var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                              select detail;
@@ -215,37 +229,39 @@ namespace DATN.Aplication.Services
                             }
                         }
                     }
+                    var booking = new Booking()
+                    {
+                        GuestId = createBookingRequest.GuestId,
+                        BookingTime = DateTime.Now,
+                        VoucherId = createBookingRequest.VoucherId,
+                        TotalPrice = 0,
+                        PaymentTypeId = 1,
+                        ReducedAmount = 0,
+                        Status = BookingStatus.PendingConfirmation,
+                        IsPayment = false,
+                        IsAddToSchedule = false,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(booking);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    
                     foreach (var item in createBookingRequest.ListIdServiceDetail)
                     {
                         var bookingDetail = new BookingDetail()
                         {
                             BookingId = booking.Id,
                             PetId = item.PetId,
-                            Price = item.Price.Value,
+                            Price = queryServiceDetail.FirstOrDefault(c => c.Id == item.ServiceDetailId).Price,
                             StaffId = item.StaffId,
                             EndDateTime = item.DateBooking.Date.AddHours(item.EndDateTime.Hours).AddMinutes(item.EndDateTime.Minutes),
                             StartDateTime = item.DateBooking.Date.AddHours(item.StartDateTime.Hours).AddMinutes(item.StartDateTime.Minutes),
                             Status = BookingDetailStatus.Unfulfilled,
                             ServiceDetailId = item.ServiceDetailId,
-                            Quantity = 1,
+                            Quantity = 1
                         };
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
-                    var idUserAction = await _user.GetUserByToken(token);
-                    if (idUserAction.IsSuccess)
-                    {
-                        var history = new HistoryAction()
-                        {
-                            ActionByID = Guid.Parse(idUserAction.Data),
-                            ActionTime = DateTime.Now,
-                            ActionID = 12,
-                            Description = "Tạo mới hóa đơn tại quầy",
-                            BookingID = booking.Id,
-                        };
-                        await _unitOfWork.HistoryActionRepository.AddAsync(history);
-                        await _unitOfWork.SaveChangeAsync();
-                    }
                     return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
                 }
                 catch (Exception e)
@@ -260,7 +276,6 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> GuestCreateBooking(CreateBookingRequest createBookingRequest)
         {
-
             if (createBookingRequest.ListIdServiceDetail.Count > 0)
             {
                 try
@@ -294,21 +309,6 @@ namespace DATN.Aplication.Services
                             return new ResponseData<string> { IsSuccess = false, Error = lst.Error };
                         }
                     }
-                    var booking = new Booking()
-                    {
-                        GuestId = createBookingRequest.GuestId,
-                        BookingTime = DateTime.Now,
-                        VoucherId = createBookingRequest.VoucherId,
-                        TotalPrice = 0,
-                        PaymentTypeId = 1,
-                        ReducedAmount = 0,
-                        Status = BookingStatus.PendingConfirmation,
-                        IsPayment = false,
-                        IsAddToSchedule = false,
-                    };
-                    await _unitOfWork.BookingRepository.AddAsync(booking);
-                    await _unitOfWork.SaveChangeAsync();
-
                     List<BookingDetail> list = new List<BookingDetail>();
                     var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                              select detail;
@@ -346,6 +346,22 @@ namespace DATN.Aplication.Services
                             }
                         }
                     }
+                    var booking = new Booking()
+                    {
+                        GuestId = createBookingRequest.GuestId,
+                        BookingTime = DateTime.Now,
+                        VoucherId = createBookingRequest.VoucherId,
+                        TotalPrice = 0,
+                        PaymentTypeId = 1,
+                        ReducedAmount = 0,
+                        Status = BookingStatus.PendingConfirmation,
+                        IsPayment = false,
+                        IsAddToSchedule = false,
+                    };
+                    await _unitOfWork.BookingRepository.AddAsync(booking);
+                    await _unitOfWork.SaveChangeAsync();
+
+
                     foreach (var item in createBookingRequest.ListIdServiceDetail)
                     {
                         var bookingDetail = new BookingDetail()

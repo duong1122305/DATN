@@ -38,9 +38,6 @@
     <p><b>Thanh toán:</b> 45.000 VNĐ</p>
     <p><b>Tiền khách trả:</b> 45.000 VNĐ</p>
 </div>
-@code {
-
-}
 <style>
     .div-content {
         font-family: Arial, sans-serif;
@@ -100,7 +97,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(2000);
+        await Task.Delay(500);
         await jsRuntime.InvokeVoidAsync("window.print");
         
     }
