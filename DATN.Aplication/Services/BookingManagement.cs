@@ -246,7 +246,7 @@ namespace DATN.Aplication.Services
                         await _unitOfWork.HistoryActionRepository.AddAsync(history);
                         await _unitOfWork.SaveChangeAsync();
                     }
-                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công!" };
                 }
                 catch (Exception e)
                 {
@@ -255,7 +255,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
             }
         }
         public async Task<ResponseData<string>> GuestCreateBooking(CreateBookingRequest createBookingRequest)
@@ -363,7 +363,7 @@ namespace DATN.Aplication.Services
                         list.Add(bookingDetail);
                     }
                     await _unitOfWork.BookingDetailRepository.AddRangeAsync(list);
-                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công" };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Đặt lịch thành công!" };
                 }
                 catch (Exception e)
                 {
@@ -372,7 +372,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
             }
         }
         public async Task<ResponseData<Bill>> GetBill(Guid IdGuest, DateTime dateBooking)
@@ -469,7 +469,7 @@ namespace DATN.Aplication.Services
             if (bill != null)
                 return new ResponseData<Bill> { IsSuccess = true, Data = bill };
             else
-                return new ResponseData<Bill> { IsSuccess = false, Error = "Không tìm thấy bill" };
+                return new ResponseData<Bill> { IsSuccess = false, Error = "Không tìm thấy hoá đơn!" };
         }
         public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
@@ -496,7 +496,7 @@ namespace DATN.Aplication.Services
                     await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
                     await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thành công!" };
                 }
                 else
                 {
@@ -524,7 +524,7 @@ namespace DATN.Aplication.Services
 
                     if (query.Status == BookingDetailStatus.Processing || query.Status == BookingDetailStatus.Completed)
                     {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Trang thái của dịch vụ hiện tại không cho phép hủy " };
+                        return new ResponseData<string> { IsSuccess = false, Error = "Trạng thái của dịch vụ hiện tại không cho phép hủy!" };
                     }
                     else
                     {
@@ -554,7 +554,7 @@ namespace DATN.Aplication.Services
                     }
 
                 }
-                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ hủy thì ra booking mà hủy hẳn :)))" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ, vui lòng huỷ ngoài màn danh sách!" };
             }
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
@@ -978,7 +978,7 @@ namespace DATN.Aplication.Services
                     }
                     else
                     {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Không thể thanh toán bill trống!!!" };
+                        return new ResponseData<string> { IsSuccess = false, Error = "Không thể thanh toán hoá đơn trống!!!" };
                     }
                 }
             }
@@ -1424,7 +1424,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
             }
         }
         public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
@@ -1713,7 +1713,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch :)))))" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
             }
         }
     }
