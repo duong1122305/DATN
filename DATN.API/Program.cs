@@ -65,7 +65,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
            builder =>
            {
-               builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn/") // Đổi thành domain của client
+               builder.WithOrigins("https://localhost:44305", "https://mewshop.datlich.id.vn/", "http://localhost:5173") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials(); // Cho phép gửi thông tin xác thực
@@ -94,6 +94,7 @@ builder.Services.AddScoped<IProductDetaiManagementService, ProductDetaiManagemen
 builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
 builder.Services.AddScoped<IAttendanteMangarService, AttendanteMangarService>();
 builder.Services.AddScoped<IStatisticalService, StatisticalService>();
+builder.Services.AddScoped<IUploadFileServices, UploadFileServices>();
 
 // Add auto mapper
 builder.Services.AddScoped<IBookingManagement, BookingManagement>();

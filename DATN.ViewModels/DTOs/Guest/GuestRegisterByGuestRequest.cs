@@ -1,4 +1,5 @@
 ﻿using DATN.Utilites.Validator;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 namespace DATN.ViewModels.DTOs.Guest
 {
@@ -18,7 +19,6 @@ namespace DATN.ViewModels.DTOs.Guest
         public string Email { get; set; }
         [Required(ErrorMessage = "Tên đăng nhập không được để trống")]
         public string UserName { get; set; }
-
-
+        public IFormFile? AvatarFile { get; set; }
     }
 }

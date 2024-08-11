@@ -4,6 +4,7 @@ using CloudinaryDotNet.Actions;
 using DATN.Aplication;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace DATN.API.Services
@@ -24,16 +25,10 @@ namespace DATN.API.Services
             _cloundinary = new Cloudinary(account);
             _unitOfWork = unitOfWork;
         }
-        public async Task<ResponseData<string>> UploadAvatarAsync(Guid idUser, IFormFile file)
+        public async Task<ResponseData<string>> UploadAvatarAsync(IFormFile file)
         {
             try
             {
-                var guest = await _unitOfWork.GuestRepository.GetAsync(idUser);
-                if (guest == null)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Data = null, Error = "Có lỗi trong quá trình xác thực tài khoản của bạn" };
-                }
-
                 var param = new ImageUploadParams()
                 {
                     File = new FileDescription(file.FileName, file.OpenReadStream())
@@ -41,13 +36,14 @@ namespace DATN.API.Services
 
                 var uploadFile = await _cloundinary.UploadAsync(param);
 
-                guest.AvatarUrl = uploadFile.SecureUrl.AbsoluteUri;
-
-                await _unitOfWork.GuestRepository.UpdateAsync(guest);
-                var result = await _unitOfWork.SaveChangeAsync();
-                if (result > 0)
+                if (uploadFile.StatusCode == System.Net.HttpStatusCode.OK) // Kiểm tra trạng thái upload
                 {
-                    return new ResponseData<string> { IsSuccess = true, Data = "Tải ảnh đại diện thành công", Error = null };
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Data = uploadFile.SecureUrl.AbsoluteUri, // Trả về URL của ảnh
+                        Error = null
+                    };
                 }
                 return new ResponseData<string> { IsSuccess = false, Data = null, Error = "Tải ảnh đại diện thất bại" };
             }
