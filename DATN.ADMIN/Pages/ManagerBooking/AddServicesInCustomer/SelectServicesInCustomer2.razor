@@ -31,9 +31,6 @@
     private IUserClientSev _clienById { get; set; }
 
 
-    private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
-    [Inject]
-    public IServiceDetailServices _serviceDetailService { get; set; }
     public List<PetVM> lstPet = new List<PetVM>();
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
@@ -92,6 +89,7 @@
         var parameters = new DialogParameters();
 
         parameters.Add("bookingDate", bookingDate);
+        parameters.Add("idBooking", idBooking);
         parameters.Add("timeStart", timeStart);
         //id pet
         parameters.Add("idPet", value2.Id);
@@ -105,7 +103,7 @@
                 FullWidth = true,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _diagService.ShowAsync<SelectServicesBooking3>("Chọn dịch vụ", parameters, options);
+        var createUpdateDialog = await _diagService.ShowAsync<SelectTimeAndStaff3>("Chọn dịch vụ", parameters, options);
         var result2 = await createUpdateDialog.Result;
         if (!result2.Canceled)
         {

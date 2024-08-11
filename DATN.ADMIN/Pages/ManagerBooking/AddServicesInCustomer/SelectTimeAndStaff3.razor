@@ -68,6 +68,8 @@
     [Parameter]
     public TimeSpan? timeStart { get; set; }
     [Parameter]
+    public int idBooking { get; set; }
+    [Parameter]
     public int idPet { get; set; }
 
     private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
@@ -77,15 +79,17 @@
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
     private bool IsAnyUserSelected => selectedServices.Any(selected => selected);
-    private List<CreateBookingDetailRequest> bookingDetailRequests = new List<CreateBookingDetailRequest>();
 
     private List<bool> selectedServices = new List<bool>();
 
-    [Inject] 
+    [Inject]
     private BookingService bookingService { get; set; }
 
     [Inject]
     private IBookingViewServices _iBooking { get; set; }
+
+    private List<AddBookingDetail> bookingDetailRequestsSer = new List<AddBookingDetail>();
+
 
     private string searchString = "";
 
@@ -143,38 +147,53 @@
         try
         {
 
-            if (await Confirm2() ==true)
+            if (await Confirm2() == true)
             {
-                // CreateServiceDetail bookingCreate = new CreateServiceDetail()
-                //     {
-                //         PetId = idPet,
-                //         ServiceDetailName = servicedetailname,
-                //         StaffName = name,
-                //         StaffId = guid,
-                //         ServiceDetailId = idDetailsServices,
-                //         Price = (double)priceServicesDetails,
-                //         StartDateTime = timeStart.Value,
-                //         EndDateTime = timeEnd.Value,
-                //         DateBooking = bookingDate.Value,
-                //         BookingId = idBooking,
-                //         Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
-                //     };
-                // var respone = await _iBooking.AddService(bookingCreate);
-                // if (respone.IsSuccess)
-                // {
-                //     Message(respone.Data, Severity.Success);
-                //     StateHasChanged();
-                //     _dialogBox.Close();
-                // }
-                // else
-                // {
-                //     Message(respone.Error, Severity.Error);
-                // }
+                var selectServiceIndex = selectedServices.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
+                var selectServiceIndex2 = selectServiceIndex.Select(index => lstServiceName[index]).ToList();
+
+                foreach (var item in selectServiceIndex2)
+                {
+                    var bookingDetailRequest = new AddBookingDetail
+                        {
+                            // Gán các giá trị từ dịch vụ đã chọn vào đối tượng CreateBookingDetailRequest
+                            PetId = idPet,
+                            ListServiceDetail = new List<BookingDetailView>
+                            {
+                                new BookingDetailView
+                                {
+                                     ServiceDetailName = item.Description,
+                    ServiceDetailId = item.ServiceDetailId,
+                    DateBooking = bookingDate.Value,
+                    EndDateTime = timeStart.Value,
+                    StartDateTime = timeStart.Value,
+                    Price = item.Price
+                                }
+                            },
+                            BookingId = idBooking,
+                            Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                        };
+                    var respone = await _iBooking.AddService(bookingDetailRequest);
+                    if (respone.IsSuccess)
+                    {
+                        Message(respone.Data, Severity.Success);
+                        StateHasChanged();
+                        _dialogBox.Close();
+                    }
+                    else
+                    {
+                        Message(respone.Error, Severity.Error);
+                    }
+                }
+            }
+            else
+            {
+                Message("Đã có lỗi!", Severity.Error);
             }
         }
         catch (Exception e)
         {
-            
+
             throw;
         }
     }
