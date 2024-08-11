@@ -1375,12 +1375,27 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+
                     var query = (from booking in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                                  where booking.BookingId == createBookingDetailRequest.BookingId
                                  select booking).ToList();
 
                     var queryServiceDetail = from detail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                              select detail;
+                    for (global::System.Int32 i = 0; i < createBookingDetailRequest.ListServiceDetail.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            int time = (int)(queryServiceDetail.FirstOrDefault(c => c.Id == createBookingDetailRequest.ListServiceDetail[0].ServiceDetailId).Duration) / 60;
+                            createBookingDetailRequest.ListServiceDetail[0].EndDateTime = createBookingDetailRequest.ListServiceDetail[0].StartDateTime.Add(new TimeSpan(time, (int)(queryServiceDetail.FirstOrDefault(c => c.Id == createBookingDetailRequest.ListServiceDetail[0].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                        else
+                        {
+                            int time = (int)(queryServiceDetail.FirstOrDefault(c => c.Id == createBookingDetailRequest.ListServiceDetail[0].ServiceDetailId).Duration) / 60;
+                            createBookingDetailRequest.ListServiceDetail[i].StartDateTime = createBookingDetailRequest.ListServiceDetail[i - 1].EndDateTime;
+                            createBookingDetailRequest.ListServiceDetail[i].EndDateTime = createBookingDetailRequest.ListServiceDetail[i].StartDateTime.Add(new TimeSpan(time, (int)(queryServiceDetail.FirstOrDefault(c => c.Id == createBookingDetailRequest.ListServiceDetail[i].ServiceDetailId).Duration - (time * 60)), 0));
+                        }
+                    }
                     for (global::System.Int32 i = 0; i < query.Count; i++)
                     {
                         var term = query[i];
