@@ -163,7 +163,7 @@ namespace DATN.API.Controllers
         }
 
         [HttpPost("Add-Service-For-Booking")]
-        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {
             return await _bookingManagement.AddService(createBookingDetailRequest);
         }

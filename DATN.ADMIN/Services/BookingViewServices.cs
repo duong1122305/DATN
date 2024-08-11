@@ -155,9 +155,9 @@ namespace DATN.ADMIN.Services
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/Booking/CheckIn-Booking?idBooking={idBooking}");
         }
-        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {
-            var response = await _httpClient.PostAsJsonAsync<CreateServiceDetail>("/api/Booking/Add-Service-For-Booking", createBookingDetailRequest);
+            var response = await _httpClient.PostAsJsonAsync<AddBookingDetail>("/api/Booking/Add-Service-For-Booking", createBookingDetailRequest);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
