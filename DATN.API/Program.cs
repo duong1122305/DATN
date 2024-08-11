@@ -65,7 +65,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
            builder =>
            {
-               builder.WithOrigins("https://localhost:44305/", "https://mewshop.datlich.id.vn", "https://datn-sd33.datlich.id.vn/") // Đổi thành domain của client
+               builder.WithOrigins("https://localhost:44305/", "https://localhost:7259/", "http://localhost:5173/", "https://mewshop.datlich.id.vn", "https://datn-sd33.datlich.id.vn/") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials()
