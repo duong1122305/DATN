@@ -5,7 +5,6 @@ namespace DATN.ViewModels.DTOs.Booking
     public class BookingService
     {
         public List<CreateBookingDetailRequest> lstBooking { get; set; } = new List<CreateBookingDetailRequest>();
-        public List<AddBookingDetail> lstBookingSer { get; set; } = new List<AddBookingDetail>();
         public List<ProductDetailView> ListProductDetail { get; set; } = new List<ProductDetailView>();
 
         public event Action OnChange;
@@ -15,11 +14,7 @@ namespace DATN.ViewModels.DTOs.Booking
             lstBooking.AddRange(booking);
             NotifyStateChanged();
         } 
-        public void AddBookingServices(List<AddBookingDetail> AddBookingDetail)
-        {
-            lstBookingSer.AddRange(AddBookingDetail);
-            NotifyStateChanged();
-        }
+
         public void AddProduct(ProductDetailView product)
         {
             if (product.Term != 0)

@@ -1,4 +1,5 @@
 ﻿@page "/CreateBookingCustomer"
+@using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.ADMIN.Pages.ManagerServices
@@ -257,6 +258,8 @@
         {
             if (await Confirm2() == true)
             {
+                var options2 = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+                var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options2);
                 CreateBookingRequest createBookingRequest = new CreateBookingRequest()
                     {
                         GuestId = value1.Id,
@@ -269,6 +272,7 @@
                     Message(repos.Data, Severity.Success);
                     StateHasChanged();
                     _dialogBox.Close();
+                    dialog.Close();
                 }
                 else
                 {

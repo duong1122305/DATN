@@ -1,4 +1,5 @@
-﻿@using DATN.ADMIN.IServices
+﻿@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.Utilites
 @using DATN.ViewModels.DTOs.Authenticate
@@ -88,9 +89,6 @@
     [Inject]
     private IBookingViewServices _iBooking { get; set; }
 
-    private List<AddBookingDetail> bookingDetailRequestsSer = new List<AddBookingDetail>();
-
-
     private string searchString = "";
 
     [Inject]
@@ -151,39 +149,43 @@
             {
                 var selectServiceIndex = selectedServices.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
                 var selectServiceIndex2 = selectServiceIndex.Select(index => lstServiceName[index]).ToList();
+                List<BookingDetailView> listAdd = new List<BookingDetailView>();
 
                 foreach (var item in selectServiceIndex2)
                 {
-                    var bookingDetailRequest = new AddBookingDetail
+                    var booking = new BookingDetailView
                         {
-                            // Gán các giá trị từ dịch vụ đã chọn vào đối tượng CreateBookingDetailRequest
-                            PetId = idPet,
-                            ListServiceDetail = new List<BookingDetailView>
-                            {
-                                new BookingDetailView
-                                {
-                                ServiceDetailName = item.Description,
-                                ServiceDetailId = item.ServiceDetailId,
-                                DateBooking = bookingDate.Value,
-                                EndDateTime = timeStart.Value,
-                                StartDateTime = timeStart.Value,
-                                Price = item.Price
-                                }
-                            },
-                            BookingId = idBooking,
-                            Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                            ServiceDetailName = item.Description,
+                            ServiceDetailId = item.ServiceDetailId,
+                            DateBooking = bookingDate.Value,
+                            EndDateTime = timeStart.Value,
+                            StartDateTime = timeStart.Value,
+                            Price = item.Price,
                         };
-                    var respone = await _iBooking.AddService(bookingDetailRequest);
-                    if (respone.IsSuccess)
+                    listAdd.Add(booking);
+                }
+                var bookingDetail = new AddBookingDetail
                     {
-                        Message(respone.Data, Severity.Success);
-                        StateHasChanged();
-                        _dialogBox.Close();
-                    }
-                    else
-                    {
-                        Message(respone.Error, Severity.Error);
-                    }
+                        // Gán các giá trị từ dịch vụ đã chọn vào đối tượng CreateBookingDetailRequest
+                        PetId = idPet,
+                        ListServiceDetail = listAdd,
+                        BookingId = idBooking,
+                        Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                    };
+                var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+                var dialog = await _diagService.ShowAsync<LoadingIndicator>("", options);
+                StateHasChanged();
+                var respone = await _iBooking.AddService(bookingDetail);
+                if (respone.IsSuccess)
+                {
+                    Message(respone.Data, Severity.Success);
+                    StateHasChanged();
+                    dialog.Close();
+                    _dialogBox.Close();
+                }
+                else
+                {
+                    Message(respone.Error, Severity.Error);
                 }
             }
             else
