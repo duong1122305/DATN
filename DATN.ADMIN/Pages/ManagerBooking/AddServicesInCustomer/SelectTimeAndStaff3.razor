@@ -1,172 +1,123 @@
 ﻿@using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
+@using DATN.Utilites
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Pet
+@using DATN.ViewModels.DTOs.ServiceDetail
 @using DATN.ViewModels.Enum
 @inject IDialogService _diagService;
 @inject ISnackbar Snackbar
-@inject BookingService bookingService;
+<MudDataGrid Items="@lstServiceName" QuickFilter="@_quickFilter" Filterable="true">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async()=>await CreateBooking())" Color="Color.Primary" Disabled="@(!IsAnyUserSelected)" Style="margin-bottom: 10px" title="Tiếp tục">Lấy dịch vụ đã chọn</MudButton>
 
-<div style="display:flex;width:500px;margin-left:10px">
-    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
-    <MudButton @onclick="@(async()=>await OpeListPetDialog())">Thêm thú cưng</MudButton>
-</div>
-<div style="display:flex;width:500px;margin-left:10px">
-    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
-    <MudDatePicker @bind-Date="bookingDate" Label="Ngày hẹn" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" />
-    <MudButton OnClick="@(async()=>await Create())">Tìm Kiếm</MudButton>
-</div>
-@if (lstFreeTime.Count > 0 && lstFreeTime != null)
-{
-    <MudDataGrid Items="@lstFreeTime" Groupable="false" QuickFilter="@_quickFilter" Hover="true" Filterable="true" Style="margin-top:5px">
-        <ToolBarContent>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
-        </ToolBarContent>
-        <Columns>
-            <TemplateColumn Title="STT" Sortable="false" Filterable="false">
-                <CellTemplate>
-                    <span>@(lstFreeTime.IndexOf(context.Item) + 1)</span>
-                </CellTemplate>
-            </TemplateColumn>
-
-            <PropertyColumn Property="x => x.FullName" Title="Tên nhân viên" Sortable="false" Filterable="false" />
-            <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
-            <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
-                <CellTemplate>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" OnClick="@(async () => await CreateBooking(context.Item.IdStaff,context.Item.FullName))" Color="Color.Success" title="Chọn">Chọn</MudButton>
-                </CellTemplate>
-            </TemplateColumn>
-        </Columns>
-        <PagerContent>
-            <MudDataGridPager T="NumberOfScheduleView" />
-        </PagerContent>
-    </MudDataGrid>
-}
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudCheckBox @bind-Checked="selectedServices[lstServiceName.IndexOf(context.Item)]" />
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @(lstServiceName.IndexOf(context.Item) + 1)
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.ServiceName" Title="Tên chi dịch vụ" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @(CurrencyHelper.FormatCurrency(context.Item.Price))
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Thời gian làm" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @context.Item.Duration <span>Phút</span>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x=>x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
+        <TemplateColumn Sortable="false" Filterable="false" Title="Trạng thái">
+            <CellTemplate>
+                @if (!context.Item.IsDeleted)
+                {
+                    <span>
+                        <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
+                    </span>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="GetServiceNameVM" />
+    </PagerContent>
+</MudDataGrid>
 @code {
     [Parameter]
-    public double duration { get; set; }
+    public Guid idCustomer { get; set; }
     [Parameter]
-    public Guid idCus { get; set; }
+    public DateTime? bookingDate { get; set; }
     [Parameter]
-    public int idDetailsServices { get; set; }
+    public TimeSpan? timeStart { get; set; }
     [Parameter]
-    public float priceServicesDetails { get; set; }
-    [Parameter]
-    public string servicedetailname { get; set; }
-    [Parameter]
-    public int idBooking{ get; set; }
+    public int idPet { get; set; }
+
+    private List<GetServiceNameVM> lstServiceName = new List<GetServiceNameVM>();
+    [Inject]
+    public IServiceDetailServices _serviceDetailService { get; set; }
+
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+    private bool IsAnyUserSelected => selectedServices.Any(selected => selected);
+    private List<CreateBookingDetailRequest> bookingDetailRequests = new List<CreateBookingDetailRequest>();
+
+    private List<bool> selectedServices = new List<bool>();
+
+    [Inject] 
+    private BookingService bookingService { get; set; }
+
     [Inject]
     private IBookingViewServices _iBooking { get; set; }
 
-    [Inject]
-    public IPetServiceClient petService { get; set; }
-    [Inject]
-    private IUserClientSev _clienById { get; set; }
-
-    public List<PetVM> lstPet = new List<PetVM>();
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
     private string searchString = "";
 
-    private PetVM value2;
-    [Inject]
-    private IBookingViewServices _BookingSer { get; set; }
     [Inject]
     HttpContextAccessor _httpContextAccessor { get; set; }
 
-    private List<NumberOfScheduleView> lstFreeTime = new List<NumberOfScheduleView>();
-    TimeSpan? timeStart;
-    TimeSpan? timeEnd;
-    DateTime? bookingDate;
+
     protected async override Task OnInitializedAsync()
     {
-        LoadData();
+        var result = await _serviceDetailService.GetServiceName();
+        if (result != null)
+        {
+            lstServiceName = result;
+        }
+        selectedServices = Enumerable.Repeat(false, lstServiceName.Count).ToList();
     }
 
-    private IEnumerable<NumberOfScheduleView> LoadData()
+    private Func<GetServiceNameVM, bool> _quickFilter => x =>
     {
-        if (lstFreeTime.Count > 0)
-        {
-            return lstFreeTime;
-        }
-        else
-        {
-            return lstFreeTime = new List<NumberOfScheduleView>();
-        }
-    }
-    private async Task<IEnumerable<PetVM>> Search2(string value)
-    {
-        var responsePet = await petService.GetAll();
-        if (responsePet.Data.Count > 0)
-        {
-            lstPet = responsePet.Data.Where(x => x.OwnerId == idCus).ToList();
-        }
-        else
-        {
-            lstPet = new List<PetVM>();
-        }
-        if (lstPet.Count() < 0)
-        {
-            return lstPet = new List<PetVM>();
-        }
-        else
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return lstPet;
-            }
-            return lstPet.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-        }
-    }
-    private Func<NumberOfScheduleView, bool> _quickFilter => x =>
-       {
-           if (string.IsNullOrWhiteSpace(searchString))
-               return true;
-
-           if (x.FullName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-               return true;
-
-           if (x.UserName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-               return true;
-           return false;
-       };
-
-
-    protected async Task Create()
-    {
-
-        if (value2 == null)
-        {
-            Message("Vui lòng chọn thú cưng trước khi tìm nhân viên.", Severity.Warning);
-            return;
-        }
-        if (timeStart == null || bookingDate == null)
-        {
-            Message("Vui lòng chọn ngày giờ.", Severity.Warning);
-            return;
-        }
-        //gọi api thêm
-        int time = (int)duration / 60;
-        timeEnd = timeStart.Value.Add(new TimeSpan(time, (int)(duration - (time * 60)), 0));
-        var result = await _iBooking.ListStaffFreeInTime(timeStart.Value.ToString(), timeEnd.Value.ToString(), bookingDate.Value);
-        if (result.IsSuccess)
-        {
-            Message("Tìm thành công", Severity.Success);
-            lstFreeTime = result.Data;
-            StateHasChanged();
-        }
-        else
-        {
-            Message(result.Error, Severity.Error);
-        }
-    }
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (x.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{x.Duration} {x.Price} {x.Description}".Contains(searchString.Trim()))
+            return true;
+        return false;
+    };
 
     public async Task OpeListPetDialog()
     {
         var parameters = new DialogParameters();
-        parameters.Add("Id", idCus);
+        parameters.Add("Id", idCustomer);
         string nameDialog = "Danh sách thú cưng";
         DialogOptions options = new DialogOptions()
             {
@@ -187,38 +138,38 @@
     }
 
 
-    private async Task CreateBooking(Guid? guid, string name)
+    private async Task CreateBooking()
     {
         try
         {
 
             if (await Confirm2() ==true)
             {
-                CreateServiceDetail bookingCreate = new CreateServiceDetail()
-                    {
-                        PetId = value2.Id,
-                        ServiceDetailName = servicedetailname,
-                        StaffName = name,
-                        StaffId = guid,
-                        ServiceDetailId = idDetailsServices,
-                        Price = (double)priceServicesDetails,
-                        StartDateTime = timeStart.Value,
-                        EndDateTime = timeEnd.Value,
-                        DateBooking = bookingDate.Value,
-                        BookingId = idBooking,
-                        Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
-                    };
-                var respone = await _BookingSer.AddService(bookingCreate);
-                if (respone.IsSuccess)
-                {
-                    Message(respone.Data, Severity.Success);
-                    StateHasChanged();
-                    _dialogBox.Close();
-                }
-                else
-                {
-                    Message(respone.Error, Severity.Error);
-                }
+                // CreateServiceDetail bookingCreate = new CreateServiceDetail()
+                //     {
+                //         PetId = idPet,
+                //         ServiceDetailName = servicedetailname,
+                //         StaffName = name,
+                //         StaffId = guid,
+                //         ServiceDetailId = idDetailsServices,
+                //         Price = (double)priceServicesDetails,
+                //         StartDateTime = timeStart.Value,
+                //         EndDateTime = timeEnd.Value,
+                //         DateBooking = bookingDate.Value,
+                //         BookingId = idBooking,
+                //         Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                //     };
+                // var respone = await _iBooking.AddService(bookingCreate);
+                // if (respone.IsSuccess)
+                // {
+                //     Message(respone.Data, Severity.Success);
+                //     StateHasChanged();
+                //     _dialogBox.Close();
+                // }
+                // else
+                // {
+                //     Message(respone.Error, Severity.Error);
+                // }
             }
         }
         catch (Exception e)

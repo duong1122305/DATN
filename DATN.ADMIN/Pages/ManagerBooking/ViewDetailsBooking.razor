@@ -208,15 +208,15 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
     }
     public async Task OpenDialogServices()
     {
-        string nameDialog = "Danh sách dịch vụ";
+        string nameDialog = "Chọn thời gian";
         var parameters = new DialogParameters();
-        parameters.Add("idCustomer", idGuest);
+        parameters.Add("idCus", idGuest);
         parameters.Add("idBooking", id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.ExtraLarge,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true,
