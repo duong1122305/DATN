@@ -9,9 +9,9 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public event Action OnChange;
 
-        public void AddBooking(CreateBookingDetailRequest booking)
+        public void AddBooking(List<CreateBookingDetailRequest> booking)
         {
-            lstBooking.Add(booking);
+            lstBooking.AddRange(booking);
             NotifyStateChanged();
         }
         public void AddProduct(ProductDetailView product)
