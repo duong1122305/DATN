@@ -58,6 +58,7 @@
         <RowTemplate>
             <MudTd DataLabel="Sign">@context.ServiceDetailName</MudTd>
             <MudTd DataLabel="Sign">@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+            <MudTd DataLabel="Sign"></MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveBooking(@context))" Color="Color.Error">Xoá</MudButton>
             </MudTd>
