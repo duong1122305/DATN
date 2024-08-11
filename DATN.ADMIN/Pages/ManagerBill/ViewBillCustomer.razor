@@ -205,6 +205,8 @@
     public int? idBooking { get; set; }
     [Parameter]
     public int? termId { get; set; }
+    [Parameter]
+    public Bill billInvoice { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
@@ -463,7 +465,8 @@
                 FullWidth = false,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("", options);
+            parameter.Add("BillInvoice", bill);
+        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("",parameter, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {

@@ -1,11 +1,18 @@
-﻿@inject IJSRuntime jsRuntime;
+﻿@using DATN.ADMIN.IServices
+@using DATN.Utilites
+@using DATN.ViewModels.DTOs.Booking
+@inject IJSRuntime jsRuntime;
+@inject IAddressService _addressServive;
+
 <div class="div-content">
     <h3>MEW SHOP</h3>
     <div>
-        <p>Địa chỉ: Quận Ba Đình, Thành Phố Hà Nội</p>
-        <p>Thời gian: 11.08.2024 05:06</p>
+        <p>Khách hàng: @BillInvoice.GuestName</p>
+        <p>Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
         <p>Nhân viên: Việt Nguyễn</p>
-        <p>Khách hàng: khách lẻ | khách chẵn</p>
+        <p>Số điện thoại: @BillInvoice.PhoneNumber</p>
+        <p>Địa chỉ: @_addressServive.GetAddress(BillInvoice.Address)</p>
+
         <div>
             mã qr
         </div>
@@ -18,26 +25,36 @@
                 <th scope="col">Tên dịch vụ</th>
                 <th scope="col">Giá dịch vụ</th>
                 <th scope="col">Tên sản phẩm</th>
+                <th scope="col">Số lượng</th>
                 <th scope="col">Giá sản phẩm</th>
                 <th scope="col">Tổng tiền</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Cắt tỉa lông</td>
-                <td>20.000 VNĐ</td>
-                <td>Bánh mì cho chó</td>
-                <td>30.000 VNĐ</td>
-                <td>50.000 VNĐ</td>
-            </tr>
+            @foreach (var item in BillInvoice.ListServiceBooked)
+            {
+               @foreach (var item2 in BillInvoice.ListProductDetail)
+                {
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>@item.ServiceDetailName</td>
+                        <td>@CurrencyHelper.FormatCurrency((float)item.Price)</td>
+                        <td>@item2.Name</td>
+                        <td>@item2.SelectQuantityProduct</td>
+                        <td>@CurrencyHelper.FormatCurrency((float)item2.Price)</td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
-    <p><b>Thành tiền:</b> 50.000 VNĐ</p>
-    <p><b>Giảm giá:</b> 5.000</p>
-    <p><b>Thanh toán:</b> 45.000 VNĐ</p>
-    <p><b>Tiền khách trả:</b> 45.000 VNĐ</p>
+    <p><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)BillInvoice.ReducePrice)</p>
+    <p><b>Thanh toán:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.TotalPayment)</p>
+    <p><b>Tiền khách trả:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.TotalPayment)</p>
 </div>
+@code {
+    [Parameter]
+    public Bill BillInvoice { get; set; } = new Bill();
+}
 <style>
     .div-content {
         font-family: Arial, sans-serif;
@@ -99,6 +116,5 @@
     {
         await Task.Delay(500);
         await jsRuntime.InvokeVoidAsync("window.print");
-        
     }
 }
