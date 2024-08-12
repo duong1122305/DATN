@@ -1,6 +1,7 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.Aplication.CustomProvider;
+using DATN.Aplication.Services;
 using DATN.Data.EF;
 using DATN.Data.Entities;
 using DATN.ViewModels.DTOs.Booking;
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
 builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
 builder.Services.AddScoped<IStatiscalClient, StatiscalClient>();
+builder.Services.AddScoped<IReportClient, ReportClient>();
 builder.Services.AddSingleton<BookingService>();
 builder.Services.AddMudServices(config =>
 {
