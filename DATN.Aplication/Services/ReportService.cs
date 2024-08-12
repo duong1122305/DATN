@@ -34,7 +34,7 @@ namespace DATN.Aplication.Services
 			try
 			{
 				var query = from rp in await _uow.ReportRepository.GetAllAsync()
-							join bd in await _uow.BookingDetailRepository.GetAllAsync() on rp.BookingDetailId equals bd.Id
+							join bd in await _uow.BookingDetailRepository.GetAllAsync() on rp.BookingId equals bd.Id
 							join b in await _uow.BookingRepository.GetAllAsync() on bd.BookingId equals b.Id
 							join g in await _uow.GuestRepository.GetAllAsync() on b.GuestId equals g.Id
 							join u in await _userManager.Users.ToListAsync() on bd.StaffId equals u.Id
@@ -46,6 +46,7 @@ namespace DATN.Aplication.Services
 								BillID = b.Id,
 								Comment = rp.Comment,
 								DateRate = rp.CreateAt.ToString("dd/MM/yyyy"),
+								Rate= rp.Rate,
 								NameCustomer = g.Name,
 								NameStaff = u.FullName,
 								ServiceName = g.Name,
@@ -90,7 +91,7 @@ namespace DATN.Aplication.Services
 			{
 				var newRP = new Report()
 				{
-					BookingDetailId = report.IdBooking,
+					BookingId = report.IdBooking,
 					Comment = report.Commment,
 					CreateAt = DateTime.Now,
 				};
@@ -109,7 +110,7 @@ namespace DATN.Aplication.Services
 			try
 			{
 				var query = from rp in await _uow.ReportRepository.GetAllAsync()
-							join bd in await _uow.BookingDetailRepository.GetAllAsync() on rp.BookingDetailId equals bd.Id
+							join bd in await _uow.BookingDetailRepository.GetAllAsync() on rp.BookingId equals bd.Id
 							join b in await _uow.BookingRepository.GetAllAsync() on bd.BookingId equals b.Id
 							join g in await _uow.GuestRepository.GetAllAsync() on b.GuestId equals g.Id
 							join u in await _userManager.Users.ToListAsync() on bd.StaffId equals u.Id
@@ -123,6 +124,7 @@ namespace DATN.Aplication.Services
 								Comment = rp.Comment,
 								DateRate = rp.CreateAt.ToString("dd/MM/yyyy"),
 								NameCustomer = g.Name,
+								Rate = rp.Rate,
 								NameStaff = u.FullName,
 								ServiceName = g.Name,
 								StaffID = u.Id,

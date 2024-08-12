@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,5 +17,6 @@ namespace DATN.ViewModels.DTOs.Report
         public string ServiceName {  get; set; }
         public Guid StaffID { get; set; }
         public int BillID { get; set; }
-    }
+		public int Rate { get; set; }
+	}
 }

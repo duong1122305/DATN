@@ -26,6 +26,7 @@
 				<MudTh>STT</MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameCustomer)">Tên khách hàng</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.DateRate)">Ngày đánh giá</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Rate)">Số sao</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Comment)">Nội dung đánh giá</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameStaff)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.BillID)">Mã hóa đơn</MudTableSortLabel></MudTh>
@@ -38,6 +39,9 @@
 				<MudTd >@(lstReport.IndexOf(context) + 1)</MudTd>
 				<MudTd >@context.NameCustomer</MudTd>
 				<MudTd >@context.DateRate</MudTd>
+				<MudTd >
+					<MudRating ReadOnly=true SelectedValue="@context.Rate"></MudRating>
+				</MudTd>
 				<MudTd >@context.Comment</MudTd>
 				<MudTd >@context.NameStaff</MudTd>
 				<MudTd>@context.BillID</MudTd>
