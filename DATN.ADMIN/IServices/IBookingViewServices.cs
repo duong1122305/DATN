@@ -30,6 +30,6 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice);
         public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
         public Task<ResponseData<string>> CheckInArrive(int idBooking);
-
+        public Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest);
     }
 }

@@ -1,9 +1,9 @@
-﻿@page "/selectBooking"
-@using DATN.ADMIN.IServices
+﻿@using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.ViewModels.DTOs.Authenticate
 @using DATN.ViewModels.DTOs.Booking
 @using DATN.ViewModels.DTOs.Pet
+@using DATN.ViewModels.Enum
 @inject IDialogService _diagService;
 @inject ISnackbar Snackbar
 @inject BookingService bookingService;
@@ -36,7 +36,7 @@
             <PropertyColumn Property="x => x.UserName" Title="Mã nhân viên" Sortable="false" Filterable="false" />
             <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                 <CellTemplate>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" OnClick="@(async()=>await CreateBooking(context.Item.IdStaff,context.Item.FullName))" Color="Color.Success" title="Chọn">Chọn</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Done" OnClick="@(async () => await CreateBooking(context.Item.IdStaff,context.Item.FullName))" Color="Color.Success" title="Chọn">Chọn</MudButton>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -56,6 +56,8 @@
     public float priceServicesDetails { get; set; }
     [Parameter]
     public string servicedetailname { get; set; }
+    [Parameter]
+    public int idBooking{ get; set; }
     [Inject]
     private IBookingViewServices _iBooking { get; set; }
 
@@ -69,6 +71,7 @@
     private string searchString = "";
 
     private PetVM value2;
+    [Inject]
     private IBookingViewServices _BookingSer { get; set; }
     [Inject]
     HttpContextAccessor _httpContextAccessor { get; set; }
@@ -147,7 +150,7 @@
         //gọi api thêm
         int time = (int)duration / 60;
         timeEnd = timeStart.Value.Add(new TimeSpan(time, (int)(duration - (time * 60)), 0));
-        var result = await _iBooking.ListStaffFreeInTime(timeStart.Value.ToString(), timeEnd.Value.ToString(),bookingDate.Value);
+        var result = await _iBooking.ListStaffFreeInTime(timeStart.Value.ToString(), timeEnd.Value.ToString(), bookingDate.Value);
         if (result.IsSuccess)
         {
             Message("Tìm thành công", Severity.Success);
@@ -184,57 +187,47 @@
     }
 
 
-    protected async Task CreateBooking(Guid? id, string name)
-    {
-        CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
-            {
-                PetId = value2.Id,
-                ServiceDetailName = servicedetailname,
-                StaffName = name,
-                StaffId = id,
-                ServiceDetailId = idDetailsServices,
-                Price = (double)priceServicesDetails,
-                StartDateTime = timeStart.Value,
-                EndDateTime = timeEnd.Value,
-                DateBooking = bookingDate.Value,
-            };
-        bookingService.AddBooking(bookingCreate);
-        // Đóng dialog sau khi thêm xong
-        _dialogBox.Close(DialogResult.Ok(true));
-        StateHasChanged();
-    }
-
-    public async Task CreateBookingInDb()
+    private async Task CreateBooking(Guid? guid, string name)
     {
         try
         {
-            if (await Confirm2() == true)
+
+            if (await Confirm2() ==true)
             {
-                CreateBookingRequest createBookingRequest = new CreateBookingRequest()
+                CreateServiceDetail bookingCreate = new CreateServiceDetail()
                     {
-                        GuestId = idCus,
-                        ListIdServiceDetail = bookingService.lstBooking,
-                        PaymentTypeId = 1,
+                        PetId = value2.Id,
+                        ServiceDetailName = servicedetailname,
+                        StaffName = name,
+                        StaffId = guid,
+                        ServiceDetailId = idDetailsServices,
+                        Price = (double)priceServicesDetails,
+                        StartDateTime = timeStart.Value,
+                        EndDateTime = timeEnd.Value,
+                        DateBooking = bookingDate.Value,
+                        BookingId = idBooking,
+                        Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
                     };
-                var repos = await _BookingSer.CreateBookingStore(createBookingRequest, _httpContextAccessor.HttpContext.Session.GetString("Key"));
-                if (repos.IsSuccess)
+                var respone = await _BookingSer.AddService(bookingCreate);
+                if (respone.IsSuccess)
                 {
-                    Message(repos.Data, Severity.Success);
+                    Message(respone.Data, Severity.Success);
                     StateHasChanged();
                     _dialogBox.Close();
                 }
                 else
                 {
-                    Message(repos.Error, Severity.Error);
+                    Message(respone.Data, Severity.Error);
                 }
             }
         }
-        catch (Exception)
+        catch (Exception e)
         {
-
+            
             throw;
         }
     }
+
     private async Task<bool?> Confirm2()
     {
         var confirm = await _diagService.ShowMessageBox("Thông báo",

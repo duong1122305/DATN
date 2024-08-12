@@ -11,6 +11,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DATN.Aplication.Services
 {
@@ -88,7 +89,7 @@ namespace DATN.Aplication.Services
 					var timeNow = DateTime.Now.Hour > maxTime ? maxTime : DateTime.Now.Hour;
 					for (int i = 7; i <= timeNow; i++)
 					{
-						var bookingInHour = lstBooking.Where(p => p.BookingTime.Hour == i);
+						var bookingInHour = lstBooking.Where(p => p.HistoryActions.Any(x => x.ActionID == 16 && x.ActionTime.Hour == i));
 						var chartData = new ChartData();
 						var dataRevenue = new ChartData();
 						chartData.Label = (i + "h");
@@ -116,7 +117,7 @@ namespace DATN.Aplication.Services
 					for (var date = startDate; date <= today.Date; date = date.Value.AddDays(1))
 					{
 
-						var bookingsInDay = lstBooking.Where(p => p.BookingTime.Date == date);
+						var bookingsInDay = lstBooking.Where(p => p.HistoryActions.Any(x => x.ActionID == 16 && x.ActionTime.Date == date));
 						var chartData = new ChartData();
 						var dataRevenue = new ChartData();
 						chartData.Label = date.Value.ToString("dd/MM");
@@ -141,7 +142,7 @@ namespace DATN.Aplication.Services
 					revStatistical.Name = "Doanh thu trong tháng " + DateTime.Now.Month;
 					for (var date = startDate; date <= today.Date; date = date.Value.AddDays(1))
 					{
-						var bookingsInDay = lstBooking.Where(p => p.BookingTime.Date == date);
+						var bookingsInDay = lstBooking.Where(p => p.HistoryActions.Any(x=>x.ActionID==16&& x.ActionTime.Date==date));
 						var dataRevenue = new ChartData();
 						var chartData = new ChartData();
 						chartData.Label = date.Value.ToString("dd");
@@ -166,9 +167,10 @@ namespace DATN.Aplication.Services
 					revStatistical.Name = $"Doanh thu  từ {startDate.Value.ToString("dd/MM/yyyy")} đến {endDate.Value.ToString("dd/MM/yyyy")} ";
 					for (var date = startDate; date <= endDate; date = date.Value.AddDays(1))
 					{
-						var bookingsInDay = lstBooking.Where(p => p.BookingTime.Date == date);
+						var bookingsInDay = lstBooking.Where(p => p.HistoryActions.Any(x => x.ActionID == 16 && x.ActionTime.Date == date));
 						var dataRevenue = new ChartData();
 						var chartData = new ChartData();
+
 						chartData.Label = date.Value.ToString("dd");
 						dataRevenue.Label = date.Value.ToString("dd");
 						if (bookingsInDay != null && bookingsInDay.Any())
@@ -243,7 +245,7 @@ namespace DATN.Aplication.Services
 					Data = new Statistical()
 					{
 						CustomerStatistical = cusStatistical,
-						ProductQuantityStatistical = dataSP.OrderByDescending(p => p.TotalAmount).Take(3).ToList(),
+						ProductQuantityStatistical = dataSP.OrderByDescending(p => p.TotalAmount).ThenByDescending(p=>p.TotalRevenue).Take(3).ToList(),
 						//ProductRevenueStatistical=dataSP.OrderByDescending(p=>p.TotalRevenue).Take(3).ToList(),
 						//ServiceRevenueStatistical=dataDV.OrderByDescending(p=>p.TotalRevenue).Take(3).ToList(),
 						ServiceQuantityStatistical = dataDV.OrderByDescending(p => p.TotalAmount).Take(3).ToList(),

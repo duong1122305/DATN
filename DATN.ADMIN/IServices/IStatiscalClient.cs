@@ -5,7 +5,7 @@ namespace DATN.ADMIN.IServices
 {
 	public interface IStatiscalClient
 	{
-		Task<ResponseData<Statistical>> StatisticalIndex( DateTime? startDate, DateTime? endDate,int type = 1);
+		Task<ResponseData<Statistical>> StatisticalIndex( string? startDate, string? endDate,int type = 1);
 
 	}
 }

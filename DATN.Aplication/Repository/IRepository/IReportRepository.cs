@@ -5,5 +5,7 @@ namespace DATN.Aplication.Repository.IRepository
 {
     public interface IReportRepository : IGenericRepository<Report>
     {
-    }
+		 Task<bool> Remove(Report rp);
+
+	}
 }

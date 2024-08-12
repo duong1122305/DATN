@@ -64,6 +64,7 @@ namespace DATN.ADMIN.Pages
 					{
 						startDate = _picker.DateRange.Start;
 						endDate = _picker.DateRange.End;
+						var days = _picker.DateRange.Start.Value.Day;
 					}
 				}
             }
@@ -71,10 +72,10 @@ namespace DATN.ADMIN.Pages
             {
                 isDisplayDate = false;
             }
-            StateHasChanged();
+       //     StateHasChanged();
             if (value == null) return;
 			type = value.Value;
-			var response = await statiscalClient.StatisticalIndex( startDate.Value,endDate.Value, type);
+			var response = await statiscalClient.StatisticalIndex( startDate.Value.ToString("MM/dd/yyy"),endDate.Value.ToString("MM/dd/yyy"), type);
 			if(type==5)type = 4;
             if (response.IsSuccess)
 			{

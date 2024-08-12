@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace DATN.ViewModels.DTOs.Pet
 {
@@ -14,7 +15,7 @@ namespace DATN.ViewModels.DTOs.Pet
         public string Name { get; set; } // Tên thú cưng
 
         public bool Gender { get; set; } // Giới tính
-
+       
         public DateTime? Birthday { get; set; } // Ngày sinh
         [Range(0.2, 50, ErrorMessage = "Không con pet nào cân nặng như vậy cả")]
         [Required(ErrorMessage = "Phải nhập trường này ")]
