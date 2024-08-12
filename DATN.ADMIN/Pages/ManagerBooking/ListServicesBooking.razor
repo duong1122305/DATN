@@ -1,5 +1,6 @@
 ﻿@page "/ListServicesBooking"
 @using System.Net.Http.Json
+@using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerBill
 @using DATN.Data.Enum
@@ -14,7 +15,9 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
-<PageTitle>Danh sách đặt dịch vụ</PageTitle>
+
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
@@ -113,7 +116,7 @@
         <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value,context.Item.IdGuest.Value))"></MudIconButton>
+                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value,context.Item.IdGuest.Value,context.Item.IsPayment))"></MudIconButton>
                     @if (context.Item.Status == BookingStatus.PendingConfirmation)
                     {
                         <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -177,7 +180,9 @@
     bool _customizeGroupTemplate;
     static bool _customizeGroupBy;
     static bool _customizeGroupByCus;
+
     private string searchString = "";
+    private bool isLoading;
 
     MudDataGrid<BookingView> dataGrid;
     [Inject] private BookingService bookingService { get; set; }
@@ -344,8 +349,11 @@
         dataGrid?.ExpandAllGroups();
     }
 
-    private async Task OpenDialog(int id,Guid idGuest)
+
+    private async Task OpenDialog(int id,Guid idGuest, bool payment)
     {
+        isLoading = true;
+        await Task.Delay(500);
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
         DialogOptions options = new DialogOptions()
@@ -359,11 +367,13 @@
             };
         parameters.Add("id", id);
         parameters.Add("idGuest", idGuest);
+        parameters.Add("payment", payment);
         // check có danh sách ko
         var respone2 = await _client.ListBookingDetailInDay(id);
         if (respone2.IsSuccess)
         {
             var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
+            isLoading = false;
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {

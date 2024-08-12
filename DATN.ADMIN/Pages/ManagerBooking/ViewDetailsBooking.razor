@@ -16,8 +16,15 @@
     <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
                  Hideable="true" Groupable="true" GroupExpanded="false">
         <ToolBarContent>
-            <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+            @if (!payment)
+            {
+                <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+            }
+            else
+            {
+                <MudButton Disabled OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
 
+            }
             <MudSpacer />
         </ToolBarContent>
         <Columns>
@@ -87,6 +94,8 @@ else
     public int id { get; set; }
     [Parameter]
     public DateTime dateBooking { get; set; }
+    [Parameter]
+    public bool payment { get; set; }
 
     [Parameter]
     public Guid idGuest { get; set; }
@@ -111,7 +120,7 @@ else
         var respone = await _client.ListBookingDetailInDay(id);
         if (respone.IsSuccess)
         {
-            lstBooking = respone.Data.OrderByDescending(x=>x.StartDate).ToList();
+            lstBooking = respone.Data.OrderByDescending(x => x.StartDate).ToList();
         }
         else
         {
@@ -128,7 +137,7 @@ else
         ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = idS,
-Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
 
             };
         var respone = await _client.CompleteBookingDetail(actionView);
@@ -137,7 +146,8 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             Message(respone.Data, Severity.Success);
             await LoadData();
             StateHasChanged();
-        }else
+        }
+        else
         {
             Message(respone.Error, Severity.Error);
         }
@@ -208,15 +218,15 @@ Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
     }
     public async Task OpenDialogServices()
     {
-        string nameDialog = "Danh sách dịch vụ";
+        string nameDialog = "Chọn thời gian";
         var parameters = new DialogParameters();
-        parameters.Add("idCustomer", idGuest);
+        parameters.Add("idCus", idGuest);
         parameters.Add("idBooking", id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.ExtraLarge,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true,

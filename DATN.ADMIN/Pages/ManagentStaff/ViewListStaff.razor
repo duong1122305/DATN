@@ -9,6 +9,7 @@
 @inject IAddressService _addressServive;
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
 <PageTitle>Danh sách nhân viên</PageTitle>
 <MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách nhân viên</MudText>
@@ -146,6 +147,7 @@ else
     }
 </style>
 @code {
+    private bool isLoading;
 
     //button trạng thái
     private bool _disableElevation = false;
@@ -273,6 +275,8 @@ else
     //thêm sửa !
     private async Task OpenDialog(string username)
     {
+        isLoading = true;
+        await Task.Delay(500);
         if (isEditing)
         {
             return; // Exit if already editing
@@ -308,6 +312,7 @@ else
         var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         isEditing = false;
+        isLoading = false;
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -453,7 +458,7 @@ else
             }
             else
             {
-                Message("Thêm hông thành công", Severity.Error);
+                Message("Thêm không thành công", Severity.Error);
             }
         }
         else

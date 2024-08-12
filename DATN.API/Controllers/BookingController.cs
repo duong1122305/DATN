@@ -10,6 +10,7 @@ using DATN.ViewModels.DTOs.Product;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace DATN.API.Controllers
 {
@@ -162,7 +163,7 @@ namespace DATN.API.Controllers
         }
 
         [HttpPost("Add-Service-For-Booking")]
-        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {
             return await _bookingManagement.AddService(createBookingDetailRequest);
         }

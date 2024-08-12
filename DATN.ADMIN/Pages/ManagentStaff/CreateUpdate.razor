@@ -5,6 +5,8 @@
 @using DATN.Data.Entities
 @using DATN.ViewModels.Common
 @using DATN.ViewModels.DTOs.Authenticate
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+
 <EditForm Model="@user">
     <DataAnnotationsValidator />
     <MudItem xs="12" sm="12">
@@ -49,6 +51,7 @@
 </EditForm>
 
 @code {
+
     [Parameter]
     public string userName { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
@@ -63,6 +66,8 @@
     public List<RoleView> lstRole = new List<RoleView>();
 
     public RoleView role;
+    private bool isLoading;
+
     protected async override Task OnInitializedAsync()
     {
         if (userName != null)
@@ -93,6 +98,8 @@
         {
             return;
         }
+        isLoading = true;
+        await Task.Delay(500);
         //gọi api thêm
         var result = await _client.Register(user);
 
@@ -106,6 +113,7 @@
                 };
             var position = await _client.AddRoleForUser(addRole);
             Message(result.Data, Severity.Success);
+            isLoading = false;
             _dialogBox.Close();
         }
         else
@@ -127,6 +135,8 @@
     //cập nhật
     public async Task Update()
     {
+        isLoading = true;
+        await Task.Delay(500);
         var confirm = await Confirm("cập nhật");
         if (!confirm)
         {
@@ -145,6 +155,7 @@
         {
             Message(result.Data, Severity.Success);
             _dialogBox.Close();
+            isLoading = false;
             StateHasChanged();
         }
         else
