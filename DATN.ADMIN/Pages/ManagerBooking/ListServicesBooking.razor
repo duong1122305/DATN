@@ -15,7 +15,9 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
-<PageTitle>Danh sách đặt dịch vụ</PageTitle>
+
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
@@ -180,7 +182,8 @@
     static bool _customizeGroupByCus;
 
     private string searchString = "";
-    private bool _visible;
+    private bool isLoading;
+
     MudDataGrid<BookingView> dataGrid;
     [Inject] private BookingService bookingService { get; set; }
     [Inject]
@@ -348,11 +351,18 @@
     private async Task Dialo()
     {
 
-    }
+        if (_visible == true)
+        {
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+            var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
+        }
 
-    private async Task OpenDialog(int id, Guid idGuest, bool payment)
+
+    private async Task OpenDialog(int id,Guid idGuest, bool payment)
+    private async Task OpenDialog(int id,Guid idGuest, bool payment)
     {
-
+        isLoading = true;
+        await Task.Delay(500);
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
         DialogOptions options = new DialogOptions()
@@ -363,18 +373,15 @@
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
-            };
-        parameters.Add("id", id);
         parameters.Add("idGuest", idGuest);
         parameters.Add("payment", payment);
         // check có danh sách ko
-        // var options2 = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
         // var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options2);
         var respone2 = await _client.ListBookingDetailInDay(id);
         if (respone2.IsSuccess)
         {
             // dialog.Close();
-            var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
+            _visible = false;
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {
