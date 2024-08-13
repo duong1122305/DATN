@@ -1112,7 +1112,7 @@ namespace DATN.Aplication.Services
                 var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
                 var discount = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.DiscountPercent;
                 var reduce = voucherWillUse != 0 ? (double)discount * totalprice / 100 >= maxMoney ? maxMoney : (double)discount * totalprice / 100 : 0;
-                if (queryBooking.Count > 0 || idBooking.Value != null && idBooking.Value != 0)
+                if (queryBooking.Count > 0 || idBooking != null && idBooking != 0)
                 {
                     return new ResponseData<Bill>
                     {
@@ -1251,7 +1251,7 @@ namespace DATN.Aplication.Services
                 {
                     var booking = new Booking()
                     {
-                        GuestId = payment.IdGuest == null ? Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0") : payment.IdGuest.Value,
+                        GuestId = Guid.Parse("cf9fa787-b64c-462a-a3ba-08dc8d178fc0"),
                         BookingTime = DateTime.Now,
                         VoucherId = null,
                         TotalPrice = 0,
@@ -1263,7 +1263,7 @@ namespace DATN.Aplication.Services
                     };
                     await _unitOfWork.BookingRepository.AddAsync(booking);
                     await _unitOfWork.SaveChangeAsync();
-                    var bill = await CheckBill(null, payment.LstProducts);
+                    var bill = await CheckBill(booking.Id, payment.LstProducts);
                     if (bill.Data.IdVoucher != null)
                     {
                         var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
@@ -1374,12 +1374,8 @@ namespace DATN.Aplication.Services
                 var booking = (from bookingTable in await _unitOfWork.BookingRepository.GetAllAsync()
                                where bookingTable.Id == id
                                select bookingTable).FirstOrDefault();
-                var bill = await CheckBill(id, null);
                 booking.Status = BookingStatus.Completed;
                 booking.IsPayment = true;
-                booking.TotalPrice = bill.Data.TotalPrice;
-                booking.ReducedAmount = bill.Data.ReducePrice;
-                booking.VoucherId = bill.Data.IdVoucher;
                 booking.PaymentTypeId = 2;
                 booking.IsAddToSchedule = true;
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);

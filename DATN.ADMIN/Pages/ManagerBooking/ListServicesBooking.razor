@@ -351,15 +351,14 @@
     private async Task Dialo()
     {
 
-        if (_visible == true)
+        if (isLoading)
         {
             var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
             var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
         }
 
-
-    private async Task OpenDialog(int id,Guid idGuest, bool payment)
-    private async Task OpenDialog(int id,Guid idGuest, bool payment)
+    }
+    private async Task OpenDialog(int id, Guid idGuest, bool payment)
     {
         isLoading = true;
         await Task.Delay(500);
@@ -373,15 +372,16 @@
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
+            };
+        parameters.Add("id", id);
         parameters.Add("idGuest", idGuest);
         parameters.Add("payment", payment);
         // check có danh sách ko
-        // var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options2);
         var respone2 = await _client.ListBookingDetailInDay(id);
         if (respone2.IsSuccess)
         {
-            // dialog.Close();
-            _visible = false;
+            isLoading = false;
+            var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {
