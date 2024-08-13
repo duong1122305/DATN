@@ -143,7 +143,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<ResponseMomo>> PaymentQr(Payment payment, int? id)
         {
-            var response = await _httpClient.PostAsJsonAsync<Payment>($"/api/Booking/Payment-Qr?total?id={id}", payment);
+            var response = await _httpClient.PostAsJsonAsync<Payment>($"/api/Booking/Payment-Qr?id={id}", payment);
             var result = JsonConvert.DeserializeObject<ResponseData<ResponseMomo>>(await response.Content.ReadAsStringAsync());
             return result;
         }

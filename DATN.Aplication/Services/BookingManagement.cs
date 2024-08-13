@@ -887,7 +887,7 @@ namespace DATN.Aplication.Services
                 {
                     if (!queryBooking.IsPayment)
                     {
-                        if (queryBooking.VoucherId != null)
+                        if (bill.Data.IdVoucher != null)
                         {
                             var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
                                                 where dis.Id == queryBooking.VoucherId
@@ -920,9 +920,18 @@ namespace DATN.Aplication.Services
                         };
                         await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
                         await _unitOfWork.HistoryActionRepository.AddAsync(action);
-                        await _unitOfWork.SaveChangeAsync();
-                        await _productManagement.BuyProduct(listProduct);
-                        return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công!" };
+                        var buyProduct = await _productManagement.BuyProduct(listProduct);
+                        if (buyProduct.IsSuccess)
+                        {
+                            await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(buyProduct.Data.Item2);
+                            await _unitOfWork.OrderDetailRepository.AddRangeAsync(buyProduct.Data.Item1);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string>() { IsSuccess = true, Data = "Thanh toán thành công" };
+                        }
+                        else
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = buyProduct.Error };
+                        }
                     }
                     else
                     {
@@ -1287,9 +1296,18 @@ namespace DATN.Aplication.Services
                     };
                     await _unitOfWork.BookingRepository.UpdateAsync(booking);
                     await _unitOfWork.HistoryActionRepository.AddAsync(action);
-                    await _unitOfWork.SaveChangeAsync();
-                    await _productManagement.BuyProduct(listProduct);
-                    id = booking.Id;
+                    var buyProduct = await _productManagement.BuyProduct(listProduct);
+                    if (buyProduct.IsSuccess)
+                    {
+                        await _unitOfWork.ProductDetailRepository.UpdateRangeAsync(buyProduct.Data.Item2);
+                        await _unitOfWork.OrderDetailRepository.AddRangeAsync(buyProduct.Data.Item1);
+                        await _unitOfWork.SaveChangeAsync();
+                        id = booking.Id;
+                    }
+                    else
+                    {
+                        return new ResponseData<ResponseMomo> { IsSuccess = false, Error = buyProduct.Error };
+                    }
                 }
             }
             catch (Exception e)
@@ -1674,7 +1692,9 @@ namespace DATN.Aplication.Services
                     Gender = true,
                     PhoneNumber = booking.PhoneNumber,
                     Name = booking.NameGuest,
-                    Address = ""
+                    Address = "",
+                    RegisteredAt = DateTime.Now,
+                    Email = booking.Email,
                 };
                 await _unitOfWork.GuestRepository.AddAsync(guest);
             }

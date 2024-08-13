@@ -277,8 +277,8 @@
                 };
             DialogParameters parameter = new DialogParameters();
             parameter.Add("linkqr", result.data.qrDataURL);
-            parameter.Add("idBooking", idBooking.Value);
-            parameter.Add("idGuest", guid.Value);
+            parameter.Add("idBooking", idBooking != null ? idBooking.Value : null);
+            parameter.Add("idGuest", guid != null ? guid.Value : null);
             parameter.Add("TotalPrice", bill.TotalPrice);
             parameter.Add("dateBooking", date);
             parameter.Add("bookingService", bookingService);
@@ -465,8 +465,8 @@
                 FullWidth = false,
                 DisableBackdropClick = true,
             };
-            parameter.Add("BillInvoice", bill);
-        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("",parameter, options);
+        parameter.Add("BillInvoice", bill);
+        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("", parameter, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
