@@ -17,39 +17,6 @@
     <MudAppBar Elevation="5">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
-       @*  <MudIconButton Id="notificationBell" Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" OnClick="ToggleNotificationPopover" />
-        <div id="notificationPopover" class="notification-popover">
-            <ul id="notificationList"></ul>
-        </div> *@
-        <div style="position: relative; display: inline-block;">
-            <MudIconButton Id="notificationBell" Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" OnClick="ToggleNotificationPopover" />
-            @if (notificationCount > 0)
-            {
-                <MudBadge Content="@notificationCount" Color="Color.Error" MaxValue="99" Style="position: relative; top: -10px; right: 10px;" />
-            }
-        </div>
-
-        <MudPopover AnchorId="notificationBell" Open="@showNotifications" CloseOnOutsideClick="true" OnClose="OnPopoverClose" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="notification-popover">
-            <MudPaper>
-                <MudList>
-                    @if (notifications.Count == 0)
-                    {
-                        <MudListItem>
-                            <MudText>No new notifications</MudText>
-                        </MudListItem>
-                    }
-                    else
-                    {
-                        @foreach (var notification in notifications)
-                        {
-                            <MudListItem>
-                                <MudText>@notification.Message</MudText>
-                            </MudListItem>
-                        }
-                    }
-                </MudList>
-            </MudPaper>
-        </MudPopover>
         <MudAvatar>
             <MudImage Src="@urlImg"></MudImage>
         </MudAvatar>
@@ -78,19 +45,14 @@
     protected IHttpContextAccessor httpContextAccessor { get; set; }
     [Inject]
     protected IUserClientSev _ser { get; set; }
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; }
     private bool isPopoverOpen = false;
-    private void TogglePopover()
-    {
-        isPopoverOpen = !isPopoverOpen;
-    }
+  
     bool _drawerOpen = true;
     private string name = "";
     private string mess = "";
     private string urlImg = Contant.ImgUser;
 
-    private bool showNotifications = false;
+   
     private int notificationCount => notifications.Count;
     private List<Notification> notifications = new List<Notification>();
 
@@ -98,10 +60,7 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-    private void OnPopoverClose()
-    {
-        showNotifications = false;
-    }
+   
     private async Task logOut()
     {
         var confirm = await Confirm();
@@ -160,22 +119,11 @@
 
         connection.On<string>("ReceiveBookingNotification",async message =>
         {
-            // Call JavaScript function to handle the notification
-            await JSRuntime.InvokeVoidAsync("handleNewNotification", message);
-            notifications.Add(new Notification { Message = message });
             _snackBar.Add(message, Severity.Success);
         });
         await connection.StartAsync();
     }
-    private void ToggleNotificationPopover()
-    {
-        JSRuntime.InvokeVoidAsync("ToggleNotificationPopover");
-        showNotifications = !showNotifications;
-    }
-    // private void ShowNotification(string message)
-    // {
-    //     _snackBar.Add(message, Severity.Success);
-    // }
+   
     private async Task<bool?> Confirm()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
@@ -191,115 +139,4 @@
     }
 }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-<script>
-    // SignalR Connection
-    (function () {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://localhost:7039/bookingHub")
-            .build();
-
-        connection.on("ReceiveBookingNotification", function (message) {
-            // Call function to handle the notification
-            handleNewNotification(message);
-            console.log(message);
-            // alert(message);
-        });
-
-        connection.start().then(() => {
-            console.log("Connected to Hub.");
-        }).catch(function (err) {
-            console.error("Connection failed: ", err.toString());
-        });
-    })();
-
-    function handleNewNotification(message) {
-        const notificationList = document.getElementById("notificationList");
-        if (notificationList) {
-            const li = document.createElement("li");
-            li.textContent = message;
-            notificationList.appendChild(li);
-        }
-
-        // Show the notification popover
-        ToggleNotificationPopover(); // Ensure this is called to toggle visibility
-    }
-
-    function ToggleNotificationPopover() {
-        const popover = document.getElementById("notificationPopover");
-        const notificationBell = document.getElementById("notificationBell");
-
-        if (popover && notificationBell) {
-            const bellRect = notificationBell.getBoundingClientRect();
-            popover.style.left = `${bellRect.left}px`;
-            popover.style.top = `${bellRect.bottom}px`;
-            popover.style.display = (popover.style.display === "none" || popover.style.display === "") ? "block" : "none";
-        }
-    }
-</script>
-@* <style>
-    .notification-popover {
-        position: absolute;
-        top: 100%; /* Hiển thị ngay dưới nút thông báo */
-        right: 0; /* Canh phải ngay dưới nút thông báo */
-        background-color: white;
-        border: 1px solid #ccc;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 10px;
-        width: 200px; /* Điều chỉnh độ rộng nếu cần */
-        z-index: 1000; /* Đảm bảo popover nằm trên các phần tử khác */
-        display: none; /* Ẩn popover khi không có thông báo */
-    }
-
-    #notificationList {
-        list-style-type: none; /* Loại bỏ dấu chấm đầu mục */
-        padding: 0; /* Loại bỏ khoảng cách bên trong */
-        margin: 0; /* Loại bỏ khoảng cách bên ngoài */
-    }
-
-        #notificationList li {
-            padding: 5px 0; /* Khoảng cách giữa các mục */
-            color: black; /* Màu chữ */
-        }
-
-</style> *@
-@* <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-<script>
-    (function () {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://localhost:7039/bookingHub", {
-                withCredentials: true
-            })
-            .build();
-
-        connection.on("ReceiveBookingNotification", function (message) {
-            alert("Thông báo: " + message);
-        });
-
-        connection.start().then(() => {
-            console.log("Connected to Hub.");
-        }).catch(function (err) {
-            console.error("Connection failed: ", err.toString());
-        });
-    })();
-    function handleNewNotification(message) {
-        // Add the new message to the notification list
-        const notificationList = document.getElementById("notificationList");
-        const li = document.createElement("li");
-        li.textContent = message;
-        notificationList.appendChild(li);
-
-        // Show the notification popover if it's not already visible
-        const popover = document.getElementById("notificationPopover");
-        if (popover.style.display === "none") {
-            popover.style.display = "block";
-        }
-    }
-
-    function ToggleNotificationPopover() {
-        const popover = document.getElementById("notificationPopover");
-        popover.style.display = (popover.style.display === "none" || popover.style.display === "") ? "block" : "none";
-    }
-</script> *@
-
-
 
