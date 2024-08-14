@@ -168,9 +168,6 @@ else
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
-
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
          }
          else if (selectedStatus == CateStatus.Active && x.IsDeleted != true)
          {
@@ -178,9 +175,6 @@ else
                  return true;
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
-
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
          }
          else
@@ -190,9 +184,6 @@ else
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
-
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
          }
          return false;
      };
@@ -201,7 +192,7 @@ else
     private async Task<bool?> Confirm()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận xoá danh mục này?",
+                    "Xác nhận cập nhật trạng thái danh mục này?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();

@@ -141,10 +141,10 @@ namespace DATN.Aplication.Services
                     product.Status = false;
                     await _unitOfWork.ProductRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Cập nhật trạng thái thành công" };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy sản phẩm cần xóa" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy sản phẩm cần cập nhật" };
 
             }
             catch (Exception)
@@ -164,10 +164,10 @@ namespace DATN.Aplication.Services
                     product.Status = true;
                     await _unitOfWork.ProductRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Active thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Cập nhật trạng thái thành công" };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy sản phẩm cần xóa" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy sản phẩm cần cập nhật" };
 
             }
             catch (Exception)

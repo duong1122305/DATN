@@ -231,7 +231,7 @@ else
     private async Task<bool?> Confirm()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận xóa nhân viên?",
+                    "Xác nhận cập nhật trạng thái nhân viên?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();
@@ -246,7 +246,7 @@ else
             var response2 = await _client.GetByIdRemove(userName);
             if (response2.IsSuccess)
             {
-                Message($"Đã xoá nhân viên {userName}", Severity.Success);
+                Message($"Đã cập nhật trạng thái nhân viên {userName}", Severity.Success);
                 await LoadData();
             }
             else

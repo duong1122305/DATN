@@ -201,7 +201,7 @@ else
     private async Task<bool?> Confirm()
     {
         var confirm = await _diagService.ShowMessageBox("Thông báo",
-                    "Xác nhận xoá danh mục này?",
+                    "Xác nhận cập nhật trạng thái danh mục này?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();

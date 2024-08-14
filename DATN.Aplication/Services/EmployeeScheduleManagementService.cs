@@ -193,7 +193,7 @@ namespace DATN.Aplication.Services
                     }
                     else
                     {
-                        return new ResponseData<string> { IsSuccess = false, Error = $"Quá muộn màng rồi con người chứ không phải quỷ mà thêm ca của ngày trong quá khứ!!!" };
+                        return new ResponseData<string> { IsSuccess = false, Error = $"Không thêm được ca trong quá khứ!" };
                     }
                 }
 
@@ -548,7 +548,7 @@ namespace DATN.Aplication.Services
                 var endShift = queryshift.OrderByDescending(c => c.To).FirstOrDefault().To;
                 if (from1.CompareTo(startShift) < 0 || from1.CompareTo(endShift) > 0 || to.CompareTo(endShift) > 0)
                 {
-                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không ai làm mà phục vụ đâu" };
+                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Hiện tại không có nhân viên phục vụ!" };
                 }
                 else
                 {
@@ -621,7 +621,7 @@ namespace DATN.Aplication.Services
                             if (listStaff.Count > 0)
                                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                             else
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện tại nhân viên làm đã hết giờ" };
                         }
                     }
                     else if (dateTime.Date.CompareTo(dateNow.Date) > 0)
@@ -631,7 +631,7 @@ namespace DATN.Aplication.Services
                                           select shift).FirstOrDefault();
                         if (queryShift == null)
                         {
-                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
+                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca có nhân viên" };
                         }
 
                         var response = await GetListStaffInDay(queryShift.Id, dateTime);
@@ -682,15 +682,15 @@ namespace DATN.Aplication.Services
                         if (listStaff.Count > 0)
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                         else
-                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
+                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện tại nhân viên làm đã hết giờ" };
 
                     }
                     else
                     {
-                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Con người sống trong hiện tại và tương lai chọn ngày quá khứ ăn db à :))))" };
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Vui lòng không chọn lịch trong quá khứ!" };
                     }
                 }
-                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Dev cũng chịu không biết ở đây sao lỗi được luôn" };
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Lỗi không xác định!" };
             }
             catch (Exception e)
             {
