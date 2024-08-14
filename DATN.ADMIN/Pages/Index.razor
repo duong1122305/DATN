@@ -6,16 +6,43 @@
 <PageTitle>Trang chủ</PageTitle>
 <AuthorizeView Roles="Admin">
 	<Authorized>
-
+		<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Thống kê doanh thu cửa hàng</MudText>
 		<MudGrid>
 			<MudItem sm="12">
-				<MudToggleGroup T="int?" SelectionMode="MudBlazor.SelectionMode.SingleSelection" Value="type" ValueChanged="(e)=>LoadData(e)" Color="Color.Tertiary" Style="height: 100px" CheckMark>
-					<MudToggleItem Value="@((int?)1)" Text="Ngày" />
-					<MudToggleItem Value="@((int?)2)" Text="Tuần" />
-					<MudToggleItem Value="@((int?)3)" Text="Tháng" />
-				</MudToggleGroup>
-				<br />
-				<MudText Typo="Typo.h4" HtmlTag="h2">Thống kê doanh thu cửa hàng</MudText>
+				
+
+				<div style="display:flex">
+					<div style="width:400px">
+						<MudSelect Value=@type T="int?" Label="Thống kê theo" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+								   ValueChanged="(e)=>LoadData(e)" AnchorOrigin="Origin.BottomCenter">
+							<MudSelectItem Value="@((int?)1)">Ngày</MudSelectItem>
+							<MudSelectItem Value="@((int?)2)">Tuần</MudSelectItem>
+							<MudSelectItem Value="@((int?)3)">Tháng</MudSelectItem>
+							<MudSelectItem Value="@((int?)4)">Tùy chọn</MudSelectItem>
+						</MudSelect>
+					</div>
+					@if (isDisplayDate)
+					{
+						<div style="margin-left:15px;display:flex">
+							<div>
+								<MudStack>
+									<MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
+														TitleDateFormat="dd, MM, yyyy" AutoClose="true" PickerVariant="PickerVariant.Dialog">
+										<PickerActions Context="data">
+											<MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
+											<MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
+											<MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
+										</PickerActions>
+									</MudDateRangePicker>
+								</MudStack>
+							</div>
+							<div style="margin-top:20px">
+								<MudButton OnClick="()=>LoadData(5)">Tìm kiếm</MudButton>
+							</div>
+						</div>
+					}
+					
+				</div>
 			</MudItem>
 			<MudItem md="12">
 				@if (revenueDatas != null && revenueDatas.Data != null && revenueDatas.Data.Count() > 0)
@@ -67,10 +94,10 @@
 									<AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
 								</AccumulationChartSeries>
 							</AccumulationChartSeriesCollection>
-							<AccumulationChartTooltipSettings 	 Format="${point.x} : <b>${point.y}đ</b>" Header="Doanh thu" Enable="true">
-								
+							<AccumulationChartTooltipSettings Format="${point.x} : <b>${point.y}đ</b>" Header="Doanh thu" Enable="true">
+
 							</AccumulationChartTooltipSettings>
-							
+
 						</SfAccumulationChart>
 					}
 				</MudPaper>
@@ -133,7 +160,7 @@
 			<MudItem sm="12" md="12">
 
 				<MudPaper Elevation="2" Class="pa-4">
-
+					<h1>Các sản phẩm cần nhập hàng</h1>
 					@if (lstProductOutStock != null && lstProductOutStock.Count > 0)
 					{
 						<MudDataGrid Items="@lstProductOutStock" Groupable="false" Hover="true" Filterable="true">
@@ -141,7 +168,7 @@
 							<ToolBarContent>
 								<div style="width:200px">
 									<MudSelect T="int" Value=-1 Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="ChangStatus">
-										<MudSelectItem  Value="-1">Tất cả</MudSelectItem>
+										<MudSelectItem Value="-1">Tất cả</MudSelectItem>
 										<MudSelectItem Value="0">Hết hàng</MudSelectItem>
 										<MudSelectItem Value="1">Sắp hết</MudSelectItem>
 									</MudSelect>

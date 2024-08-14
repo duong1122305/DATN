@@ -1,0 +1,142 @@
+﻿@page "/lstReport"
+@using System.Net.Http.Json
+@using DATN.ADMIN.Components
+@using DATN.ADMIN.IServices
+@using DATN.ADMIN.Services
+@using DATN.Data.Entities
+@using DATN.ViewModels.Common
+@using DATN.ViewModels.DTOs.Authenticate
+@using DATN.ViewModels.DTOs.Guest
+@using System.Timers
+@using DATN.ViewModels.DTOs.Report
+
+@inject ISnackbar Snackbar
+<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách đánh giá</MudText>
+@if (lstReport != null && lstReport.Count > 0)
+{
+
+	<MudDrawerContainer Class="mud-height-full" Style=" width:100%">
+
+		<MudTable Items="@lstReport" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<ReportVM,bool>(FilterFunc)">
+			<ToolBarContent>
+				<MudSpacer />
+				<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
+			</ToolBarContent>
+			<HeaderContent>
+				<MudTh>STT</MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameCustomer)">Tên khách hàng</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.DateRate)">Ngày đánh giá</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Rate)">Số sao</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Comment)">Nội dung đánh giá</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameStaff)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
+				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.BillID)">Mã hóa đơn</MudTableSortLabel></MudTh>
+				<MudTh>Thao tác</MudTh>
+			</HeaderContent>
+			<RowTemplate>
+				@{
+					var stt = 1;
+				}
+				<MudTd >@(lstReport.IndexOf(context) + 1)</MudTd>
+				<MudTd >@context.NameCustomer</MudTd>
+				<MudTd >@context.DateRate</MudTd>
+				<MudTd >
+					<MudRating ReadOnly=true SelectedValue="@context.Rate"></MudRating>
+				</MudTd>
+				<MudTd >@context.Comment</MudTd>
+				<MudTd >@context.NameStaff</MudTd>
+				<MudTd>@context.BillID</MudTd>
+				
+				<MudTd>
+					<MudButtonGroup Variant="Variant.Filled">
+						<MudIconButton OnClick="()=>DeleteReport(context.ID)" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Title="Xóa đánh giá"></MudIconButton>
+
+					</MudButtonGroup>
+				</MudTd>
+			</RowTemplate>
+			<PagerContent>
+				<MudTablePager />
+			</PagerContent>
+		</MudTable>
+	</MudDrawerContainer>
+
+
+}
+else
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+<style>
+	.my-custom-class {
+		backdrop-filter: blur(10px);
+	}
+</style>
+@code {
+	string searchString = "";
+
+	private ReportVM selectedReport = new ReportVM();
+	private List<ReportVM> lstReport = new List<ReportVM>();
+	[Inject]
+	private IReportClient _ser { get; set; }
+	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+	[Inject]
+	private IDialogService _dialogService{ get; set; }
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+
+	// load lai du lieu
+	protected async Task LoadData()
+	{
+		var response = await _ser.GetAllReports();
+		if (response.IsSuccess)
+		{
+			lstReport = response.Data;
+			StateHasChanged();
+		}
+		else
+		{
+			
+		}
+
+	}
+
+
+
+	private async Task DeleteReport(int id)
+	{
+		var confirm = await _dialogService.ShowMessageBox("Thông báo", $"Xác nhận xóa report?",
+		yesText: "Xác nhận",
+		cancelText: "Hủy", noText: null,
+		options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+		StateHasChanged();
+
+		if (!confirm.HasValue || !confirm.Value) return;
+
+
+		var response = await _ser.DeleteReport(id);
+		if (response.IsSuccess)
+		{
+			Snackbar.Add(response.Data!, Severity.Success);
+			
+		}
+		else
+		Snackbar.Add(response.Error!, Severity.Error);
+		await LoadData();
+		StateHasChanged();
+
+	}
+
+	private bool FilterFunc(ReportVM element)// lọc data
+	{
+		if (string.IsNullOrWhiteSpace(searchString.Trim()))
+			return true;
+		if (element.NameCustomer.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		if (element.NameStaff.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+	
+
+}

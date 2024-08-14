@@ -13,7 +13,7 @@ namespace DATN.Data.Config
             //
             builder.HasOne(c => c.BookingDetail)
                 .WithMany(c => c.Reports)
-                .HasForeignKey(c => c.BookingDetailId);
+                .HasForeignKey(c => c.BookingId);
 
             builder.Property(x => x.Comment)
                 .IsRequired();

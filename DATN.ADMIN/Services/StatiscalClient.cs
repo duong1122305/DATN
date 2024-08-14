@@ -13,9 +13,15 @@ namespace DATN.ADMIN.Services
 		{
 			_httpClient = client;
 		}
-		public async Task<ResponseData<Statistical>> StatisticalIndex(int type = 1)
+		public async Task<ResponseData<Statistical>> StatisticalIndex(string? startDate, string? endDate, int type = 1)
 		{
+			if (startDate != null&& endDate!=null)
+            {
+				return await _httpClient.GetFromJsonAsync<ResponseData<Statistical>>($"api/Statistical?type={type}&startDate={startDate!}&endDate={endDate!}");
+			}
 			return await _httpClient.GetFromJsonAsync<ResponseData<Statistical>>($"api/Statistical?type={type}");
 		}
+
+		
 	}
 }

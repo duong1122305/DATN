@@ -59,7 +59,51 @@ namespace DATN.Aplication.Services
             }
         }
 
-        public async Task<ResponseData<List<GuestViewModel>>> GetGuest()
+		public async Task<ResponseData<List<GuestViewModel>>> GetAllGuest()
+		{
+			try
+			{
+				var result = await _unitOfWork.GuestRepository.GetAllAsync();
+				var response = result.Where(p=>p.IsComfirm.Value&& !(p.IsDeleted.HasValue&&p.IsDeleted.Value)).Select(p => new GuestViewModel()
+				{
+					Address = p.Address,
+					Email = p.Email,
+					Gender = p.Gender,
+					Id = p.Id,
+					Name = p.Name,
+					IsDelete = p.IsDeleted,
+					PhoneNumber = p.PhoneNumber,
+					UserName = p.UserName,
+					IsConfirm = p.IsComfirm
+				}).ToList();
+				
+				if (response != null && response.Count>0)
+				{
+
+					return new ResponseData<List<GuestViewModel>>
+					{
+						IsSuccess = true,
+						Data = response,
+					};
+				}
+				return new ResponseData<List<GuestViewModel>>
+				{
+					IsSuccess = true,
+					Data = new List<GuestViewModel>()
+				};
+			}
+
+			catch (Exception ex)
+			{
+
+				return new ResponseData<List<GuestViewModel>>
+				{
+					IsSuccess = false,
+					Error = ex.Message
+				};
+			}
+		}
+		public async Task<ResponseData<List<GuestViewModel>>> GetGuest()
         {
             try
             {
@@ -73,7 +117,6 @@ namespace DATN.Aplication.Services
                     Id = p.Id,
                     Name = p.Name,
                     IsDelete = p.IsDeleted,
-                    Password = p.PasswordHash != null ? _passwordExtensitons.Decrypt(p.PasswordHash) : "",
                     PhoneNumber = p.PhoneNumber,
                     UserName = p.UserName,
                     IsConfirm = p.IsComfirm
