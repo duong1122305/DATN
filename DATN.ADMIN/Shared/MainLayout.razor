@@ -45,19 +45,14 @@
     protected IHttpContextAccessor httpContextAccessor { get; set; }
     [Inject]
     protected IUserClientSev _ser { get; set; }
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; }
     private bool isPopoverOpen = false;
-    private void TogglePopover()
-    {
-        isPopoverOpen = !isPopoverOpen;
-    }
+  
     bool _drawerOpen = true;
     private string name = "";
     private string mess = "";
     private string urlImg = Contant.ImgUser;
 
-    private bool showNotifications = false;
+   
     private int notificationCount => notifications.Count;
     private List<Notification> notifications = new List<Notification>();
 
@@ -65,10 +60,7 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-    private void OnPopoverClose()
-    {
-        showNotifications = false;
-    }
+   
     private async Task logOut()
     {
         var confirm = await Confirm();
