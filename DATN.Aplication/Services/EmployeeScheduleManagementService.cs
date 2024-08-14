@@ -571,7 +571,7 @@ namespace DATN.Aplication.Services
                                               select shift).FirstOrDefault();
                             if (queryShift == null)
                             {
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không có nhân viên nào trong ca" };
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không trong giờ làm việc" };
                             }
 
                             var response = await GetListStaffInDay(queryShift.Id, dateTime);
@@ -586,8 +586,7 @@ namespace DATN.Aplication.Services
                                                       on schdule.WorkShiftId equals workshift.Id
                                                       join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                                       on workshift.ShiftId equals shift.Id
-                                                      where bookingDetail.StaffId == item.IdStaff 
-                                                      && bookingDetail.Status != BookingDetailStatus.Cancelled
+                                                      where bookingDetail.StaffId == item.IdStaff
                                                       select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                                 if (queryCheckUser.Count() == 0)
                                 {
@@ -649,6 +648,7 @@ namespace DATN.Aplication.Services
                                                   join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                                   on workshift.ShiftId equals shift.Id
                                                   where bookingDetail.StaffId == item.IdStaff
+                                                  && bookingDetail.Status != BookingDetailStatus.Cancelled
                                                   select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                             if (queryCheckUser.Count() == 0)
                             {
