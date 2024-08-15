@@ -9,6 +9,8 @@
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
+<PageTitle>Điểm danh ngày</PageTitle>
+
 <MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:10px;">Điểm danh ngày: @DateTime.Now.ToString("dd/ MM/ yyyy")</MudText>
 @if (lstAtendance != null && lstAtendance.Count > 0)
 {

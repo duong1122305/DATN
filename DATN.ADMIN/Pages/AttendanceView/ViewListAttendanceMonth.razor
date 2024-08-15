@@ -2,6 +2,8 @@
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.DTOs.Attendace
 @inject IDialogService _dialogservice;
+<PageTitle>Danh sách chấm công</PageTitle>
+
 <MudDrawerContainer Class="mud-height-full" Style=" width:100%">
 	<MudText Typo="Typo.h6">Thông tin chấm công tháng @month</MudText>
 	<MudTable Items="@lstAM" Hover="true" Style="width:100% auto; margin-top: 30px"  SortLabel="Sort By" Filter="new Func<AttendanceMonth,bool>(FilterFunc)">

@@ -15,10 +15,11 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
+<PageTitle>Danh sách đặt lịch</PageTitle>
 
 <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
+<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt lịch dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
@@ -330,7 +331,10 @@
     private async Task Change(Status selected)
     {
         selectedStatus = selected;
+        isLoading = true;   
         await LoadData();
+        await Task.Delay(500);
+        isLoading = false;
     }
     //group ngày
     private Func<BookingView, string> _groupBy = x =>
@@ -348,16 +352,16 @@
     {
         dataGrid?.ExpandAllGroups();
     }
-    private async Task Dialo()
-    {
+    // private async Task Dialo()
+    // {
 
-        if (isLoading)
-        {
-            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-            var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
-        }
+    //     if (isLoading)
+    //     {
+    //         var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+    //         var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
+    //     }
 
-    }
+    // }
     private async Task OpenDialog(int id, Guid idGuest, bool payment)
     {
         isLoading = true;
@@ -391,6 +395,8 @@
         }
         else
         {
+            isLoading = false;
+            StateHasChanged();
             Message("Không có dữ liệu", Severity.Warning);
         }
     }
@@ -423,6 +429,9 @@
 
     private async Task OpenDialogBillInStore(Guid? id, DateTime date)
     {
+        isLoading = true;
+        await Task.Delay(500);
+
         string nameDialog = "";
         DialogOptions options = new DialogOptions()
             {
@@ -438,6 +447,7 @@
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
+        isLoading = false;
             await LoadData();
         }
     }
@@ -549,6 +559,8 @@
 
     private async Task OpenDialogCreateBooking()
     {
+        isLoading = true;
+        await Task.Delay(500);
         string nameDialog = "Đặt lịch tại quầy";
         DialogOptions options = new DialogOptions()
             {
@@ -565,6 +577,7 @@
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
+        isLoading = false;
             await LoadData();
         }
     }
@@ -574,6 +587,7 @@
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
+
     private async Task<bool> Confirm(string text)
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",

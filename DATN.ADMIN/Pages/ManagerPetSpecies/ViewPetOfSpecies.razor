@@ -4,6 +4,8 @@
 @inject ISnackbar Snackbar
 
 @inject IAddressService _addressServive;
+<PageTitle>Danh sách loài</PageTitle>
+
 <MudTable Items="@lstPet" Hover="true" SortLabel="Sort By" Filter="new Func<PetVM,bool>(FilterFunc)">
 	<ToolBarContent>
 		<MudText Typo="Typo.h6">Danh sách loài</MudText>
