@@ -54,8 +54,15 @@ namespace DATN.ADMIN.Services
                 {
                     return new ResponseData<string[]>(false, "File chỉ nhận dưới 5mb");
                 }
-                string[] imageFormats = { "jpg", "png", "gif", "bmp", "tif", "webp", "jpeg" };
-                if (!imageFormats.Contains(file.Name.Split('.').Last()))
+				string[] imageFormats = {
+	"jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "webp", "ico", "heif", "heic",
+	"svg", "psd", "ai", "eps", "pdf", "raw", "cr2", "nef", "orf", "sr2", "arw", "dng",
+	"raf", "rw2", "pef", "3fr", "mef", "srw", "x3f", "cpt", "jxr", "hdp", "wdp", "pgm",
+	"ppm", "pbm", "pnm", "dds", "xcf", "kdc", "ciff", "mrw", "nrw", "ptx", "srf", "ras",
+	"sun", "jbig", "jng", "mng"
+};
+
+				if (!imageFormats.Contains(file.Name.Split('.').Last()))
                 {
                     return new ResponseData<string[]>(false, "Hãy chọn file ảnh");
                 }
@@ -77,7 +84,7 @@ namespace DATN.ADMIN.Services
             }
             catch (Exception ex)
             {
-                return new ResponseData<string[]>(false, "Có lỗi gì đó");
+                return new ResponseData<string[]>(false, "Có lỗi gì đó:"+ex);
             }
         }
         public async Task<ResponseData<string>> RemoveImg(string publicId)
