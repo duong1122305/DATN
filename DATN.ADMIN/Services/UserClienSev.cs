@@ -135,5 +135,10 @@ namespace DATN.ADMIN.Services
             var result = _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/update-url?url={url}&imgId={imgId}&id={id}").GetAwaiter().GetResult();
             return result;
         }
+
+        public async Task<ResponseData<string>> GetRoleUser(string id)
+        {
+            return await _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/Get-role-user?id={id}");
+        }
     }
 }
