@@ -88,7 +88,6 @@
         }
         if (string.IsNullOrEmpty(session))
         {
-            // navigationManager.NavigateTo("/dangnhap?rnd=" + Guid.NewGuid().ToString(), true);
             navigationManager.NavigateTo($"/dangnhap", true);
 
         }
@@ -96,7 +95,6 @@
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
-            // var listClaims = jwtSecurityToken.Claims.ToArray();
             name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value!;
             string idUser = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
             string fullName = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.UserData).FirstOrDefault()?.Value!;
@@ -114,7 +112,7 @@
     private async Task InitializeSignalR()
     {
         var connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7039/bookingHub")
+            .WithUrl("https://api.datlich.id.vn/bookingHub")
             .Build();
 
         connection.On<string>("ReceiveBookingNotification",async message =>

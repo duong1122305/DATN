@@ -29,7 +29,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri("https://localhost:7039/"), Timeout = TimeSpan.FromMinutes(30) });
+builder.Services.AddScoped(_http => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetSection("BaseUrlAPI").Value), Timeout = TimeSpan.FromMinutes(30) });
 builder.Services.AddScoped<IUserClientSev, UserClienSev>();
 builder.Services.AddScoped<IVoucherServices, VoucherServices>();
 builder.Services.AddScoped<HttpContextAccessor>();
@@ -113,15 +113,19 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
            builder =>
            {
-               builder.WithOrigins("https://localhost:44305", "http://localhost:5173") // Đổi thành domain của client
+               builder.WithOrigins("https://localhost:44305/", "https://localhost:7259/", "http://localhost:5173/", "https://mewshop.datlich.id.vn/", "https://datn-sd33.datlich.id.vn/") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+                      .AllowCredentials()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains();
            });
 });
-
-var app = builder.Build();
-
+builder.Services.AddServerSideBlazor()
+        .AddCircuitOptions(options =>
+        {
+            options.DetailedErrors = true;
+        });
+var app = builder.Build(); 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -130,7 +134,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseCors("AllowSpecificOrigin"); // Áp dụng CORS
 // ... (in the Configure method)
 app.UseResponseCaching();
 app.UseHttpsRedirection();
@@ -141,9 +145,7 @@ app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapBlazorHub();
-app.UseCors("AllowSpecificOrigin"); // Áp dụng CORS
 app.MapFallbackToPage("/_Host");
 
 app.Run();

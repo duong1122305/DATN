@@ -264,5 +264,18 @@ namespace DATN.Aplication.Services
 				
 			}
 		}
+		//public async Task<ResponseData<Statistical>> StatisticalBill(DateTime? startDate, DateTime? endDate, int type = 1)
+		//{
+
+		//	try
+		//	{
+
+		//	}
+		//	catch (Exception ex)
+		//	{
+
+		//		throw;
+		//	}
+		//}
 	}
 }

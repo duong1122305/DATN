@@ -1,14 +1,90 @@
-﻿<div style="text-align:center">
+﻿@using DATN.ADMIN.IServices
+@using DATN.ViewModels.DTOs.Booking
+@inject ISnackbar Snackbar
+@inject IDialogService _dialogservice;
+
+<div style="text-align:center">
   @*   <img src="@linkqr" height="540px" width="440px"> *@
-    <img src="@linkqr" height="200" width="200">
+    <img src="@linkqr" height="540px" width="440px">
+    <div>
+        <MudButton OnClick="PayMent" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Đã thanh toán</MudButton>
+    </div>
 </div>
 
 @code {
     [Parameter]
     public string linkqr { get; set; }
+    [Parameter]
+    public Guid idGuest { get; set; }
+    [Parameter]
+    public int idBooking { get; set; }
+    [Parameter]
+    public double TotalPrice { get; set; }
+    [Parameter]
+    public DateTime dateBooking { get; set; }
+    [Parameter]
+    public double ReducePrice { get; set; }
+    [Parameter]
+    public int IdVoucher { get; set; }
+    [Parameter]
+    public BookingService bookingService { get; set; }
+    [Inject]
+    private IBookingViewServices _client { get; set; }
+    [Inject]
+    private IHttpContextAccessor httpContextAccessor { get; set; }
+
+    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
     protected override Task OnInitializedAsync()
     {
         var test = linkqr;
         return base.OnInitializedAsync();
+    }
+    public async Task PayMent()
+    {
+        var confirm = await Confirm("thanh toán");
+        if (!confirm)
+        {
+            return;
+        }
+        Payment payment = new Payment()
+            {
+                IdBooking = idBooking,
+                IdGuest = idGuest,
+                TotalPrice = TotalPrice,
+                TypePaymenId = 2,
+                Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                LstProducts = bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList(),
+                DateBooking = dateBooking,
+                Reduce = ReducePrice,
+                VoucherId = IdVoucher
+            };
+        var respone = await _client.PaymentInStore(payment);
+        if (respone.IsSuccess)
+        {
+            Message(respone.Data, Severity.Success);
+            _dialogBox.Close();
+        }
+        else
+        {
+            Message(respone.Error, Severity.Error);
+        }
+
+    }
+    private async Task<bool> Confirm(string text)
+    {
+        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+                    yesText: "Xác nhận",
+                    cancelText: "Hủy", noText: null,
+                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+        StateHasChanged();
+        if (!confirm.HasValue) return false;
+        return confirm.Value;
+    }
+    private void Message(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add(message, severity);
     }
 }

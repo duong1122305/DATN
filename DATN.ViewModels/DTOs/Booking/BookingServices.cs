@@ -9,11 +9,12 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public event Action OnChange;
 
-        public void AddBooking(CreateBookingDetailRequest booking)
+        public void AddBooking(List<CreateBookingDetailRequest> booking)
         {
-            lstBooking.Add(booking);
+            lstBooking.AddRange(booking);
             NotifyStateChanged();
-        }
+        } 
+
         public void AddProduct(ProductDetailView product)
         {
             if (product.Term != 0)
@@ -58,10 +59,9 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public void RemoveBooking(CreateBookingDetailRequest booking)
         {
-            var bookingToRemove = lstBooking.FirstOrDefault(b => b.BookingId == booking.BookingId); // Tìm đối tượng booking cần xoá
-            if (bookingToRemove != null)
+            if (booking != null)
             {
-                lstBooking.Remove(bookingToRemove); // Xoá đối tượng booking từ danh sách
+                lstBooking.Remove(booking); // Xoá đối tượng booking từ danh sách
                 //NotifyStateChanged(); // Thông báo sự thay đổi để giao diện có thể cập nhật
             }
         }

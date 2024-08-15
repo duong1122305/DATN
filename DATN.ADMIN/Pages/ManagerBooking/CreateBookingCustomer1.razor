@@ -1,4 +1,5 @@
 ﻿@page "/CreateBookingCustomer"
+@using DATN.ADMIN.Components
 @using DATN.ADMIN.IServices
 @using DATN.ADMIN.Pages.ManagerGuest
 @using DATN.ADMIN.Pages.ManagerServices
@@ -28,7 +29,7 @@
             }
             <div style="display: flex; align-items: center;padding-left:200px">
                 <MudButton OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
-                <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+                <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Chọn ngày làm dịch vụ</MudButton>
                 @if (bookingService.lstBooking.Count > 0 && value1 != null)
                 {
                     <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm lịch hẹn</MudButton>
@@ -43,21 +44,22 @@
     </MudItem>
     <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
         <HeaderContent>
-            @* <MudTh>Tên dịch vụ</MudTh> *@
-            <MudTh>Nhân viên</MudTh>
-            <MudTh>Dịch vụ chi tiết</MudTh>
+            <MudTh>Tên dịch vụ chi tiết</MudTh>
             <MudTh>Giá</MudTh>
-            <MudTh>Giờ bắt đầu</MudTh>
-            <MudTh>Giờ kết thúc</MudTh>
+            @if (bookingService.lstBooking.Count > 0)
+            {
+                <MudTh>@bookingService.lstBooking[0].StartDateTime</MudTh>
+            }
+            else
+            {
+                <MudTh>Chưa có giờ bắt đầu</MudTh>
+            }
             <MudTh>Hành động</MudTh>
         </HeaderContent>
         <RowTemplate>
-            @* <MudTd DataLabel="Sign">@(async()=> await _serviceDetailService.GetById(context.ServiceDetailId))</MudTd> *@
-            <MudTd DataLabel="Sign">@context.StaffName</MudTd>
             <MudTd DataLabel="Sign">@context.ServiceDetailName</MudTd>
             <MudTd DataLabel="Sign">@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
-            <MudTd DataLabel="Name">@context.StartDateTime</MudTd>
-            <MudTd DataLabel="Molar mass">@context.EndDateTime</MudTd>
+            <MudTd DataLabel="Sign"></MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveBooking(@context))" Color="Color.Error">Xoá</MudButton>
             </MudTd>
@@ -67,7 +69,8 @@
 </MudForm>
 
 @code {
-    [Inject] private BookingService bookingService { get; set; }
+    [Inject]
+    private BookingService bookingService { get; set; }
     [Inject]
     private IGuestManagerClient _guestService { get; set; }
     private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
@@ -80,7 +83,7 @@
     //gắn cờ
     private bool isEditing = false;
 
-    // disable nếu chọn khách và đã có dịch vụ 
+    // disable nếu chọn khách và đã có dịch vụ
     private bool CanSelectGuest => value1 == null && bookingService.lstBooking.Count == 0;
     [Inject]
     public IPetServiceClient petService { get; set; }
@@ -222,24 +225,24 @@
     {
         if (value1 == null)
         {
-            Message("Vui lòng chọn khách hàng trước khi xem dịch vụ.", Severity.Warning);
+            Message("Vui lòng chọn khách hàng trước chọn thời gian.", Severity.Warning);
             return;
         }
         var id = value1.Id;
         var name = value1.Name;
-        string nameDialog = "Danh sách dịch vụ";
+        string nameDialog = "Chọn thời gian làm dịch vụ";
         var parameters = new DialogParameters();
-        parameters.Add("idCustomer", id);
+        parameters.Add("idCus", id);
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.ExtraLarge,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesBooking2>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<SelectBookingTimeAndStaff2>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Cancelled)
         {
@@ -255,6 +258,8 @@
         {
             if (await Confirm2() == true)
             {
+                var options2 = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+                var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options2);
                 CreateBookingRequest createBookingRequest = new CreateBookingRequest()
                     {
                         GuestId = value1.Id,
@@ -267,6 +272,7 @@
                     Message(repos.Data, Severity.Success);
                     StateHasChanged();
                     _dialogBox.Close();
+                    dialog.Close();
                 }
                 else
                 {

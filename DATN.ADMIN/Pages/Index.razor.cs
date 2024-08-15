@@ -28,8 +28,6 @@ namespace DATN.ADMIN.Pages
 		LstDataChart revenuePieDatas = new LstDataChart();
 		List<ProductOutStock> lstProductOutStock = new List<ProductOutStock>();
 		List<ProductOutStock> lstProductDataRaw = new List<ProductOutStock>();
-		//List<Top3Statistical> top3ProductReven;
-		//List<Top3Statistical> top3ServiceReven;
 		List<Top3Statistical> top3ProductQuantity;
 		List<Top3Statistical> top3ServiceQuantity;
 		public double[] dataPie = { 0, 0 };
@@ -83,15 +81,13 @@ namespace DATN.ADMIN.Pages
 				customerData = response.Data.CustomerStatistical;
 				revenueDatas = response.Data.RevenueStatistical;
 				lstProductDataRaw = response.Data.LstProductOutStock;
-				//	top3ProductReven = response.Data.ProductRevenueStatistical;
-				// top3ServiceReven = response.Data.ServiceRevenueStatistical;
 				top3ProductQuantity = response.Data.ProductQuantityStatistical;
 				top3ServiceQuantity = response.Data.ServiceQuantityStatistical;
 				width = "99%";
 			}
 			else
 			{
-				Snackbar.Add("Chưa có data nhé b!");
+				Snackbar.Add("Chưa có dữ liệu!");
 			}
 			StateHasChanged();
 			width = "100%";

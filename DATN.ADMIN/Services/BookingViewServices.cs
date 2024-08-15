@@ -6,6 +6,7 @@ using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Product;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace DATN.ADMIN.Services
 {
@@ -26,14 +27,14 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/canel-booking", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/canel-booking", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
 
         public async Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/cancel-booking-details", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/cancel-booking-details", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
@@ -58,21 +59,21 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/Complete-Booking", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/Complete-Booking", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
 
         public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/complete-bookingDetails", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/complete-bookingDetails", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
 
         public async Task<ResponseData<string>> ConfirmBooking(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/Confirm-booking", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/Confirm-booking", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
@@ -110,14 +111,14 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/start-booking", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/start-booking", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
 
         public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
-            var response = await _httpClient.PutAsJsonAsync<ActionView>($"/api/Booking/start-booking-details", actionView);
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"/api/Booking/start-booking-details", actionView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
 
@@ -140,9 +141,11 @@ namespace DATN.ADMIN.Services
 
         }
 
-        public async Task<ResponseData<ResponseMomo>> PaymentQr(string totalPrice)
+        public async Task<ResponseData<ResponseMomo>> PaymentQr(Payment payment, int? id)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<ResponseMomo>>($"/api/Booking/Payment-Qr?totalPrice={totalPrice}");
+            var response = await _httpClient.PostAsJsonAsync<Payment>($"/api/Booking/Payment-Qr?id={id}", payment);
+            var result = JsonConvert.DeserializeObject<ResponseData<ResponseMomo>>(await response.Content.ReadAsStringAsync());
+            return result;
         }
         public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
         {
@@ -152,9 +155,9 @@ namespace DATN.ADMIN.Services
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/Booking/CheckIn-Booking?idBooking={idBooking}");
         }
-        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {
-            var response = await _httpClient.PostAsJsonAsync<CreateServiceDetail>("/api/Booking/Add-Service-For-Booking", createBookingDetailRequest);
+            var response = await _httpClient.PostAsJsonAsync<AddBookingDetail>("/api/Booking/Add-Service-For-Booking", createBookingDetailRequest);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }

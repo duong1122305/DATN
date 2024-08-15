@@ -15,6 +15,7 @@ namespace DATN.ViewModels.DTOs.Payment
             try
             {
                 HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMilliseconds(15000);
                 StringContent content = new StringContent(postJsonString, Encoding.UTF8, "application/json");
                 var request = await client.PostAsync(endpoint, content);
                 var response = JsonConvert.DeserializeObject<ResponseMomo>(await request.Content.ReadAsStringAsync());
@@ -26,5 +27,6 @@ namespace DATN.ViewModels.DTOs.Payment
                 return new ResponseData<ResponseMomo> { IsSuccess = false, Error = e.Message };
             }
         }
+
     }
 }

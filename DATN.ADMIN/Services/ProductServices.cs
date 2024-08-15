@@ -68,14 +68,14 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateProduct(CreateProductView productView)
         {
-            var respone = await _httpClient.PutAsJsonAsync("api/Product/Update-Product", productView);
+            var respone = await _httpClient.PatchAsJsonAsync("api/Product/Update-Product", productView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }
 
         public async Task<ResponseData<string>> UpdateProductDetails(CreateProductDetaiView productView)
         {
-            var respone = await _httpClient.PutAsJsonAsync("api/Product/Update-Product-Details", productView);
+            var respone = await _httpClient.PatchAsJsonAsync("api/Product/Update-Product-Details", productView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }
