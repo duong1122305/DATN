@@ -14,12 +14,12 @@
 
                 @if (id == 0 || id == null)
                 {
-                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" />
+                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" MaxLength="255" />
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@category.Description" For="@(() => category.Description)" />
                 }
                 else
                 {
-                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" />
+                    <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" MaxLength="255" />
                     <MudTextField T="string" Label="Mô tả" @bind-Value="@category.Description" For="@(() => category.Description)" />
                 }
                 <hr class="hr" />

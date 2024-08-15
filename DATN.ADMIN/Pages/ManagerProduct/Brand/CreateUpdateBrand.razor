@@ -15,7 +15,7 @@
 
                 @if (id == 0 || id == null)
                 {
-                    <MudTextField T="string" Label="Tên thương hiệu" @bind-Value="@brand.Name" For="@(() => brand.Name)" />
+                    <MudTextField T="string" Label="Tên thương hiệu" @bind-Value="@brand.Name" For="@(() => brand.Name)" MaxLength="255"/>
                     <MudTextField T="string" Label="Mô Tả" @bind-Value="@brand.Description" For="@(() => brand.Description)" />
                 }
                 else

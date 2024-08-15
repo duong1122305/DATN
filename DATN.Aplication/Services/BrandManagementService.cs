@@ -68,7 +68,7 @@ namespace DATN.Aplication.Services
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
                     }
                     else
-                        return new ResponseData<string> { IsSuccess = false, Error = "Tên loại sản phẩm trùng với loại sản phẩm đã có" };
+                        return new ResponseData<string> { IsSuccess = false, Error = "Tên thương hiệu đã tồn tại trên hệ thống!" };
                 }
 
             }
@@ -91,7 +91,7 @@ namespace DATN.Aplication.Services
                     brand.Status = false;
                     await _unitOfWork.BrandRepository.UpdateAsync(brand);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Xóa thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Cập nhật trạng thái thành công" };
                 }
                 else
                     return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
@@ -99,7 +99,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Xóa không thành công " };
+                return new ResponseData<string> { IsSuccess = false, Error = "Cập nhật trạng thái không thành công " };
             }
         }
         public async Task<ResponseData<string>> Active(int id)
@@ -115,7 +115,7 @@ namespace DATN.Aplication.Services
                     brand.Status = true;
                     await _unitOfWork.BrandRepository.UpdateAsync(brand);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Kích hoạt thành công " };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Cập nhật trạng thái thành công" };
                 }
                 else
                     return new ResponseData<string> { IsSuccess = false, Error = "Không có danh mục này" };
@@ -123,7 +123,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception)
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Kích hoạt không thành công " };
+                return new ResponseData<string> { IsSuccess = false, Error = "Cập nhật trạng thái không thành công!" };
             }
         }
         public async Task<ResponseData<List<BrandView>>> ListBrand()
