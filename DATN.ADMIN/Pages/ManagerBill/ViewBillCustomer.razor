@@ -8,6 +8,7 @@
 @inject IAddressService _addressServive;
 @inject IDialogService _dialogservice;
 @inject ISnackbar Snackbar
+@inject IJSRuntime jsRuntime;
 <style>
     .mud-dialog-width-lg {
         height: 680px;
@@ -24,7 +25,7 @@
                         <MudText Typo="Typo.h3" Class="invoice-label" Style="color: hotpink;text-align:center;">THÔNG TIN HOÁ ĐƠN</MudText>
                     </div>
                     <div class="text-right">
-                        <MudButton Class="invoice-label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Style="margin:15px">In</MudButton>
+                        <MudButton Class="invoice-label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" OnClick="PrintBill" Style="margin:15px">In</MudButton>
                     </div>
                 </div>
                 <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
@@ -52,14 +53,15 @@
                         </RowTemplate>
                     </MudTable>
                 }
-                
+
                 <br />
                 @if (bill.IsPayment)
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px" Disabled>Thêm sản phẩm</MudButton>
-                }else
+                }
+                else
                 {
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px" >Thêm sản phẩm</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
                 }
                 @if (idBooking != null && idBooking != 0)
                 {
@@ -173,7 +175,7 @@
                             else if (selectedPaymentMethod == 1)
                             {
                                 <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
-                                
+
                             }
                             else
                             {
@@ -203,6 +205,8 @@
     public int? idBooking { get; set; }
     [Parameter]
     public int? termId { get; set; }
+    [Parameter]
+    public Bill billInvoice { get; set; }
     [Inject]
     private IBookingViewServices _client { get; set; }
     private Bill bill = new Bill();
@@ -215,6 +219,7 @@
 
     [Inject]
     NavigationManager navigationManager { get; set; }
+
     private async Task LoadData()
     {
         await OpenDialogReload();
@@ -272,6 +277,11 @@
                 };
             DialogParameters parameter = new DialogParameters();
             parameter.Add("linkqr", result.data.qrDataURL);
+            parameter.Add("idBooking", idBooking != null ? idBooking.Value : null);
+            parameter.Add("idGuest", guid != null ? guid.Value : null);
+            parameter.Add("TotalPrice", bill.TotalPrice);
+            parameter.Add("dateBooking", date);
+            parameter.Add("bookingService", bookingService);
             var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
             var result1 = await createUpdateDialog.Result;
             if (!result1.Canceled)
@@ -279,25 +289,45 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            _dialogBox.Close();
         }
     }
     public async Task PayMentQr()
     {
-        var response = await _client.PaymentQr(bill.TotalPayment.ToString());
-        if (response.IsSuccess)
+        try
         {
-            if (response.Data.resultCode == 0)
+            var payment = new Payment()
+                {
+                    DateBooking = DateTime.Now,
+                    LstProducts = bill.ListProductDetail,
+                    Reduce = bill.ReducePrice,
+                    Token = httpContextAccessor.HttpContext.Session.GetString("Key"),
+                    TotalPrice = bill.TotalPrice,
+                    VoucherId = bill.IdVoucher,
+                    TypePaymenId = 2,
+                    IdBooking = 0,
+                    IdGuest = guid,
+                };
+            var response = await _client.PaymentQr(payment, idBooking);
+            if (response.IsSuccess)
             {
-                navigationManager.NavigateTo(response.Data.payUrl);
+                if (response.Data.resultCode == 0)
+                {
+                    navigationManager.NavigateTo(response.Data.payUrl);
+                }
+                else
+                {
+                    Message(response.Data.message, Severity.Warning);
+                }
             }
             else
             {
-                Message(response.Data.message, Severity.Warning);
+                Message(response.Error, Severity.Warning);
             }
         }
-        else
+        catch (Exception e)
         {
-            Message(response.Error, Severity.Warning);
+            Message(e.Message, Severity.Warning);
         }
     }
 
@@ -423,6 +453,28 @@
         }
 
     }
+    public async Task PrintBill()
+    {
+        DialogParameters parameter = new DialogParameters();
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = false,
+                DisableBackdropClick = true,
+            };
+        parameter.Add("BillInvoice", bill);
+        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("", parameter, options);
+        var result = await createUpdateDialog.Result;
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+            StateHasChanged();
+        }
+    }
 
     private async void RemoveProduct(ProductDetailView product)
     {
@@ -476,8 +528,4 @@
             await LoadData();
         }
     }
-
-
 }
-
-

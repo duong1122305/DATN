@@ -39,7 +39,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateBrand(BrandView brandView)
         {
-            var respone = await _httpClient.PutAsJsonAsync("api/Brand/Update-Brand", brandView);
+            var respone = await _httpClient.PatchAsJsonAsync("api/Brand/Update-Brand", brandView);
             var data = JsonConvert.DeserializeObject<ResponseData<string>>(await respone.Content.ReadAsStringAsync());
             return data;
         }

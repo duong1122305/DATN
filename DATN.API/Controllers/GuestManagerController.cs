@@ -68,7 +68,7 @@ namespace DATN.API.Controllers
         }
 
         [HttpPost("register-by-guest")]///////////////// đây là đăng ký mới
-        public async Task<ResponseData<string>> RegisterByCustomer(GuestRegisterByGuestRequest request)
+        public async Task<ResponseData<string>> RegisterByCustomer([FromForm]GuestRegisterByGuestRequest request)
         {
             return await _guestManagerService.RegisterByCustomer(request);
         }

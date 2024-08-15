@@ -3,6 +3,7 @@ using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
+using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -193,7 +194,7 @@ namespace DATN.Aplication.Services
                     }
                     else
                     {
-                        return new ResponseData<string> { IsSuccess = false, Error = $"Quá muộn màng rồi con người chứ không phải quỷ mà thêm ca của ngày trong quá khứ!!!" };
+                        return new ResponseData<string> { IsSuccess = false, Error = $"Không được phép thêm ca của ngày trong quá khứ!" };
                     }
                 }
 
@@ -548,7 +549,7 @@ namespace DATN.Aplication.Services
                 var endShift = queryshift.OrderByDescending(c => c.To).FirstOrDefault().To;
                 if (from1.CompareTo(startShift) < 0 || from1.CompareTo(endShift) > 0 || to.CompareTo(endShift) > 0)
                 {
-                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Giờ này không ai làm mà phục vụ đâu" };
+                    return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Chưa có nhân viên làm việc tại thời gian này!" };
                 }
                 else
                 {
@@ -570,7 +571,7 @@ namespace DATN.Aplication.Services
                                               select shift).FirstOrDefault();
                             if (queryShift == null)
                             {
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không trong giờ làm việc" };
                             }
 
                             var response = await GetListStaffInDay(queryShift.Id, dateTime);
@@ -621,7 +622,7 @@ namespace DATN.Aplication.Services
                             if (listStaff.Count > 0)
                                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                             else
-                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
+                                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện tại không còn nhân viên làm việc!" };
                         }
                     }
                     else if (dateTime.Date.CompareTo(dateNow.Date) > 0)
@@ -647,6 +648,7 @@ namespace DATN.Aplication.Services
                                                   join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                                   on workshift.ShiftId equals shift.Id
                                                   where bookingDetail.StaffId == item.IdStaff
+                                                  && bookingDetail.Status != BookingDetailStatus.Cancelled
                                                   select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                             if (queryCheckUser.Count() == 0)
                             {
@@ -682,12 +684,12 @@ namespace DATN.Aplication.Services
                         if (listStaff.Count > 0)
                             return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = true, Data = listStaff };
                         else
-                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện giờ nhân viên hết chọn giờ khác không thì phắn" };
+                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Ca hiện tại không còn nhân viên làm việc!" };
 
                     }
                     else
                     {
-                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Con người sống trong hiện tại và tương lai chọn ngày quá khứ ăn db à :))))" };
+                        return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Vui lòng không chọn ngày quá khứ!" };
                     }
                 }
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Dev cũng chịu không biết ở đây sao lỗi được luôn" };

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
+using DATN.API.Services;
 using DATN.Aplication.Extentions;
 using DATN.Data.Entities;
 using DATN.Utilites;
@@ -14,12 +16,14 @@ namespace DATN.Aplication.Services
         private readonly IUnitOfWork _unitOfWork;
         private PasswordExtensitons _passwordExtensitons;
         private MailExtention _mailExtension;
-        public GuestManagerService(IMapper mapper, IUnitOfWork unitOfWork, MailExtention mailExtension)
+        private readonly IUploadFileServices _cloundinary;
+        public GuestManagerService(IMapper mapper, IUnitOfWork unitOfWork, MailExtention mailExtension, IUploadFileServices cloudinary)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _passwordExtensitons = new PasswordExtensitons();
             _mailExtension = mailExtension;
+            _cloundinary = cloudinary;
         }
 
         public async Task<ResponseData<GuestViewModel>> FindGuestByID(Guid id)
@@ -265,6 +269,23 @@ namespace DATN.Aplication.Services
                         PasswordHash = !hasEmail ? null : _passwordExtensitons.HashPassword(request.Password),
                         IsComfirm = !hasEmail,
                     };
+
+                    if (request.AvatarFile != null)
+                    {
+                        var uploadFile = await _cloundinary.UploadAvatarAsync(request.AvatarFile);
+                        if (uploadFile.IsSuccess)
+                        {
+                            guest.AvatarUrl = uploadFile.Data;
+                        }
+                        else
+                        {
+                            return new ResponseData<string>
+                            {
+                                IsSuccess = false,
+                                Error = "Upload ảnh thất bại"
+                            };
+                        }
+                    }
                     await _unitOfWork.GuestRepository.AddAsync(guest);
                 }
                 else

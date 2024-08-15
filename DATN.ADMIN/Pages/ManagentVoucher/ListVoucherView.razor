@@ -146,12 +146,48 @@
     [Inject]
     private IVoucherServices _client { get; set; }
 
+    [Inject]
+    NavigationManager navigationManager { get; set; }
 
     private MudDateRangePicker _picker;
     private DateRange _dateRange;
     private bool _autoClose;
+    private Timer _timer;
 
+    private void SetReloadTimer()
+    {
+        DateTime now = DateTime.Now;
+        var checkTime = lstVoucher
+                              .Where(c => c.EndDate.Date.CompareTo(now) == 0
+                              && c.EndDate.CompareTo(now) >= 0
+                              && c.Status == VoucherStatus.GoingOn)
+                              .OrderBy(c => c.EndDate);
 
+        if (checkTime.Count() > 0)
+        {
+            DateTime time = checkTime.FirstOrDefault().EndDate; // 8:00 PM hôm nay
+
+            DateTime targetTime = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute, 0);
+
+            var timeUntilReload = targetTime - now;
+
+            _timer = new Timer(OnTimerElapsed, null, timeUntilReload, Timeout.InfiniteTimeSpan);
+        }
+    }
+
+    private void OnTimerElapsed(object state)
+    {
+        InvokeAsync(() =>
+        {
+            // Reload trang bằng cách điều hướng lại đến chính trang này
+            navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
+        });
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
 
     private enum Status
     {
@@ -199,6 +235,7 @@
         {
             lstVoucher = voucher.Data.Where(x => x.Status == VoucherStatus.NotOccur).ToList();
         }
+        SetReloadTimer();
     }
     // lọc ngày
     private async Task SearchByDate()
@@ -229,21 +266,22 @@
     }
 
 
-    private Func<VoucherView, bool> _quickFilter => x =>
-     {
-         if (string.IsNullOrWhiteSpace(searchString))
-             return true;
+    private Func<VoucherView, bool>
+    _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
 
-         if (x.VoucherCode.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-             return true;
+        if (x.VoucherCode.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
 
-         if (x.VoucherName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-             return true;
+        if (x.VoucherName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+            return true;
 
-         if ($"{x.StartDate} {x.EndDate} {x.MinMoneyApplicable} {x.MaxMoneyDiscount} {x.DiscountPercent}".Contains(searchString.Trim()))
-             return true;
-         return false;
-     };
+        if ($"{x.StartDate} {x.EndDate} {x.MinMoneyApplicable} {x.MaxMoneyDiscount} {x.DiscountPercent}".Contains(searchString.Trim()))
+            return true;
+        return false;
+    };
     //overlay màn
     private bool isVisible;
 
@@ -273,7 +311,8 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateVoucherUp>(nameDialog, parameters, options);
+        var createUpdateDialog = await _dialogservice.ShowAsync<CreateVoucherUp>
+            (nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
         if (!result.Canceled)
         {
@@ -309,14 +348,13 @@
         Snackbar.Add(message, severity);
     }
 
-    private async Task<bool?> Confirm()
+    private async Task<bool?>
+        Confirm()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận kết thúc voucher sớm?",
-                    yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+        yesText: "Xác nhận",
+        cancelText: "Hủy", noText: null,
+        options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
         return confirm;
     }
-
-
 }

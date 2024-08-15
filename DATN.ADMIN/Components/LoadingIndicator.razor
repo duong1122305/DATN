@@ -1,7 +1,7 @@
 ﻿<link rel="stylesheet" type="text/css" href="./css/Component.css">
 
-@if (IsDisplay)
-{
+@* @if (IsDisplay)
+{ *@
     <MudDialog Class="blur dialog-background"  ContentClass="dialog-background-surface">
         <DialogContent>
             <div class="m-auto">
@@ -41,10 +41,10 @@
     </MudDialog>
 
     
-}
+@* } *@
 
 @code
 {
-    [Parameter]
-    public bool IsDisplay { get; set; } = true;
+    // [Parameter]
+    // public bool IsDisplay { get; set; } = true;
 }

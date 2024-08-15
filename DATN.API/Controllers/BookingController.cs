@@ -10,6 +10,7 @@ using DATN.ViewModels.DTOs.Product;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace DATN.API.Controllers
 {
@@ -64,37 +65,37 @@ namespace DATN.API.Controllers
             return await _bookingManagement.GetBill(idguest, dateBooking);
         }
 
-        [HttpPut("Complete-Booking")]
+        [HttpPatch("Complete-Booking")]
         public async Task<ResponseData<string>> CompleteBooking(ActionView actionView)
         {
             return await _bookingManagement.CompleteBooking(actionView);
         }
-        [HttpPut("start-booking")]
+        [HttpPatch("start-booking")]
         public async Task<ResponseData<string>> StartBooking(ActionView actionView)
         {
             return await _bookingManagement.StartBooking(actionView);
         }
-        [HttpPut("canel-booking")]
+        [HttpPatch("canel-booking")]
         public async Task<ResponseData<string>> CancelBooking(ActionView actionView)
         {
             return await _bookingManagement.CancelBooking(actionView);
         }
-        [HttpPut("start-booking-details")]
+        [HttpPatch("start-booking-details")]
         public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
             return await _bookingManagement.StartBookingDetail(actionView);
         }
-        [HttpPut("cancel-booking-details")]
+        [HttpPatch("cancel-booking-details")]
         public async Task<ResponseData<string>> CancelBookingDetail(ActionView actionView)
         {
             return await _bookingManagement.CancelBookingDetail(actionView);
         }
-        [HttpPut("complete-bookingDetails")]
+        [HttpPatch("complete-bookingDetails")]
         public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
             return await _bookingManagement.CompleteBookingDetail(actionView);
         }
-        [HttpPut("Confirm-booking")]
+        [HttpPatch("Confirm-booking")]
         public async Task<ResponseData<string>> ConfirmBooking(ActionView actionView)
         {
             return await _bookingManagement.ConfirmBooking(actionView);
@@ -108,12 +109,6 @@ namespace DATN.API.Controllers
                 await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Booking đã được tạo thành công bởi ID: {createBookingRequest.GuestName}!");
             }
             return result;
-        }
-
-        [HttpPost("Add-Product-For-Bill")]
-        public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
-        {
-            return await _productManagement.BuyProduct(buyProducts);
         }
         [HttpGet("List-Product-View-Sale")]
         public async Task<ResponseData<List<ProductSelect>>> ListProductViewSale()
@@ -140,10 +135,10 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.QrCodeCheckIn(idBooking);
         }
-        [HttpGet("Payment-Qr")]
-        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice)
+        [HttpPost("Payment-Qr")]
+        public async Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, Payment payment)
         {
-            return await _bookingManagement.PaymentQrMomo(totalPrice);
+            return await _bookingManagement.PaymentQrMomo(id, payment);
         }
         [HttpGet("Payment-Qr-VnPay")]
         public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
@@ -168,9 +163,21 @@ namespace DATN.API.Controllers
         }
 
         [HttpPost("Add-Service-For-Booking")]
-        public async Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest)
+        public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {
             return await _bookingManagement.AddService(createBookingDetailRequest);
+        }
+
+        [HttpPost("Check-Status/{id}")]
+        public async Task<IActionResult> Check([FromBody] MomoResultRequest momoResultRequest, int id)
+        {
+            await _bookingManagement.CheckStatusPayment(id, momoResultRequest);
+            return StatusCode(204);
+        }
+        [HttpPost("Create-Booking-For-User-NoAccount")]
+        public async Task<ResponseData<string>> CreateBookingForUserNoAccount(BookingForGuestNoAccount booking)
+        {
+            return await _bookingManagement.CreateBookingForGuestNoAcount(booking);
         }
     }
 }

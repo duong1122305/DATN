@@ -9,7 +9,7 @@ namespace DATN.Aplication.Services.IServices
 {
     public interface IBookingManagement
     {
-        public Task<ResponseData<string>> AddService(CreateServiceDetail createBookingDetailRequest);
+        public Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest);
         public Task<ResponseData<List<BookingView>>> GetListBookingInOneWeek();
         public Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(int id);
         public Task<ResponseData<string>> CreateBookingInStore(CreateBookingRequest createBookingRequest, string token);
@@ -26,9 +26,11 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<Bill>> CheckBill(int? idBooking, List<ProductDetailView> productdes);
         public Task<ResponseData<string>> QrCodeCheckIn(int idBooking);
         public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
-        public Task<ResponseData<ResponseMomo>> PaymentQrMomo(string totalPrice);
+        public Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, Payment payment);
         public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
         public Task<ResponseData<string>> CheckInArrive(int idBooking);
         public Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest);
+        public Task CheckStatusPayment(int id, MomoResultRequest momoResult);
+        public Task<ResponseData<string>> CreateBookingForGuestNoAcount(BookingForGuestNoAccount booking);
     }
 }

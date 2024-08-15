@@ -65,13 +65,18 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
            builder =>
            {
-               builder.WithOrigins("https://localhost:44305", "http://localhost:5173") // Đổi thành domain của client
+               builder.WithOrigins("https://localhost:44305", "https://localhost:7259", "http://localhost:5173", "https://mewshop.datlich.id.vn", "https://datn-sd33.datlich.id.vn") // Đổi thành domain của client
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .AllowCredentials(); // Cho phép gửi thông tin xác thực
+                      .AllowCredentials()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains(); // Cho phép gửi thông tin xác thực
            });
 });
-
+builder.Services.AddServerSideBlazor()
+        .AddCircuitOptions(options =>
+        {
+            options.DetailedErrors = true;
+        });
 builder.Services.AddScoped<MailExtention>();
 builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
@@ -94,6 +99,9 @@ builder.Services.AddScoped<IProductDetaiManagementService, ProductDetaiManagemen
 builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
 builder.Services.AddScoped<IAttendanteMangarService, AttendanteMangarService>();
 builder.Services.AddScoped<IStatisticalService, StatisticalService>();
+builder.Services.AddScoped<IUploadFileServices, UploadFileServices>();
+
+// Add auto mapper
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IBookingManagement, BookingManagement>();
 builder.Services.AddScoped<IProductManagement, ProductManagement>();
@@ -129,6 +137,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();

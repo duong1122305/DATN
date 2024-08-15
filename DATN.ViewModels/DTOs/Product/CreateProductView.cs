@@ -9,8 +9,8 @@ namespace DATN.ViewModels.DTOs.Product
         public int? Id { get; set; }
 		[Required(ErrorMessage = "Phải chọn danh mục")]
 		public int IdCategoryProduct { get; set; }
-		[Required(ErrorMessage = "Phải có tên sản phẩm")]
-		public string Name { get; set; }
+        [Required(ErrorMessage = "Vui lòng không để trống trường này"), RegularExpression(@"(^([a-zỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ'A-ZỲỌÁẦẢẤỜỄÀẠẰỆẾÝỘẬỐŨỨĨÕÚỮỊỖÌỀỂẨỚẶÒÙỒỢÃỤỦÍỸẮẪỰỈỎỪỶỞÓÉỬỴẲẸÈẼỔẴẺỠƠÔƯĂÊÂĐ]{1,})((\s)([a-zỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ'A-ZỲỌÁẦẢẤỜỄÀẠẰỆẾÝỘẬỐŨỨĨÕÚỮỊỖÌỀỂẨỚẶÒÙỒỢÃỤỦÍỸẮẪỰỈỎỪỶỞÓÉỬỴẲẸÈẼỔẴẺỠƠÔƯĂÊÂĐ]{1,}))*)$", ErrorMessage = "Tên chưa đúng định dạng")]
+        public string Name { get; set; }
 		[Required(ErrorMessage = "Phải có mô tả")]
 		public string? Description { get; set; }
         public bool Status { get; set; }

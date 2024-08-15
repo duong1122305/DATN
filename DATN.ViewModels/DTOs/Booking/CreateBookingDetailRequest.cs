@@ -4,8 +4,6 @@ namespace DATN.ViewModels.DTOs.Booking
 {
     public class CreateBookingDetailRequest
     {
-        public int BookingId { get; set; }
-
         public Guid? StaffId { get; set; }
         public string? StaffName { get; set; }
         public string? ServiceDetailName { get; set; }
@@ -23,6 +21,6 @@ namespace DATN.ViewModels.DTOs.Booking
 
         public BookingDetailStatus Status { get; set; }
 
-        public double Price { get; set; }
+        public double? Price { get; set; }
     }
 }
