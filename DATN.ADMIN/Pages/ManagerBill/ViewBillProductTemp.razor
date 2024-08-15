@@ -4,10 +4,14 @@
 @using DATN.ViewModels.DTOs.Booking
 @inject IDialogService _dialogservice;
 @using DATN.ViewModels.DTOs.Product
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+
 <PageTitle>Danh sách hoá đơn tạm thời</PageTitle>
 <MudText Typo="Typo.h4" Style="text-align:center">Danh sách hoá đơn tạm thời</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
+
 </div>
 
 <MudDataGrid Items="@bookingService.ListProductDetail" Hover="true" Filterable="true" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
@@ -36,7 +40,7 @@
 @code {
     private List<ProductDetailView> lstBookingServices = new List<ProductDetailView>();
     [Inject] private BookingService bookingService { get; set; }
-
+    private bool isLoading = false;
 
     static bool _customizeGroupBy;
     MudDataGrid<ProductDetailView> dataGrid;
@@ -94,5 +98,27 @@
         var listRemove = bookingService.ListProductDetail.Where(c => c.Term == id).ToList();
         bookingService.RemoveBillTerm(listRemove);
         await Task.Delay(1);
+    }
+    private async Task OpenDialogBillInStore(Guid? id, DateTime date)
+    {
+        string nameDialog = "";
+        DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
+        var result = await createUpdateDialog.Result;
+        isLoading = false;
+        StateHasChanged();
+        if (!result.Canceled)
+        {
+            createUpdateDialog.Close();
+            await LoadData();
+        }
     }
 }
