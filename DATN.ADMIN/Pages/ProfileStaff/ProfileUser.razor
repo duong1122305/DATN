@@ -9,6 +9,7 @@
 @inject IDialogService _dialogservice;
 @inject ISnackbar Snackbar;
 @inject IJSRuntime JSRuntime;
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
 <div>
 	<PageTitle>Hồ Sơ Người Dùng</PageTitle>
@@ -67,6 +68,8 @@
 	[Inject]
 	public IHttpContextAccessor _contextAccessor { get; set; }
 
+	private bool isLoading;
+
 	private UserInfView user { get; set; } = new UserInfView();
 	private bool success = false;
 	private string id = "";
@@ -74,6 +77,8 @@
 	private string url = Contant.ImgUser;
 	protected async override Task OnInitializedAsync()
 	{
+		isLoading = true;
+		await Task.Delay(500);
 		var token = _contextAccessor.HttpContext.Session.GetString("Key");
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
@@ -88,6 +93,7 @@
 			{
 				url = user.ImgUrl!;
 			}
+			isLoading = false;
 			StateHasChanged();
 		}
 		else
@@ -98,6 +104,8 @@
 
 	private async Task Update()
 	{
+		isLoading = true;
+		await Task.Delay(500);
 		var userCU = new UserUpdateView()
 			{
 				FullName = user.FullName,
@@ -108,6 +116,7 @@
 		if (result.IsSuccess)
 		{
 			Snackbar.Add(result.Data, Severity.Success);
+			isLoading = false;
 			StateHasChanged();
 		}
 		else
@@ -117,6 +126,8 @@
 	}
 	private async Task OpenDialog(string username)
 	{
+		isLoading = true;
+		await Task.Delay(500);
 		var parameters = new DialogParameters();
 		string nameDialog = "Thay đổi mật khẩu";
 		DialogOptions options = new DialogOptions
@@ -132,7 +143,11 @@
 		if (!result.Canceled)
 		{
 			createUpdateDialog.Close();
+			isLoading = false;
+			StateHasChanged();
 		}
+		isLoading = false;
+		StateHasChanged();
 	}
 
 	private void HandleAddressChanged(string address)

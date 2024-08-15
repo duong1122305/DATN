@@ -12,6 +12,7 @@
 @using DATN.ViewModels.DTOs.ServiceDetail
 @inject IDialogService _dialogservice;
 @inject ISnackbar Snackbar
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 <MudForm Style="text-align:center;margin-bottom:20px">
     <MudItem xs="12" sm="6" md="4">
         <div style="display: flex; justify-content: flex-end; width: 1240px; margin-left: auto;margin-left:10px">
@@ -82,7 +83,7 @@
     private IUserClientSev _userClientSev { get; set; }
     //gắn cờ
     private bool isEditing = false;
-
+    private bool isLoading;
     // disable nếu chọn khách và đã có dịch vụ
     private bool CanSelectGuest => value1 == null && bookingService.lstBooking.Count == 0;
     [Inject]
@@ -256,10 +257,11 @@
     {
         try
         {
+            isLoading = true;
+            StateHasChanged();
             if (await Confirm2() == true)
             {
-                var options2 = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-                var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options2);
+                
                 CreateBookingRequest createBookingRequest = new CreateBookingRequest()
                     {
                         GuestId = value1.Id,
@@ -270,9 +272,9 @@
                 if (repos.IsSuccess)
                 {
                     Message(repos.Data, Severity.Success);
+                    isLoading = false;
                     StateHasChanged();
                     _dialogBox.Close();
-                    dialog.Close();
                 }
                 else
                 {

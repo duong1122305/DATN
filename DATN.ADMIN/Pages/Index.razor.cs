@@ -21,6 +21,7 @@ namespace DATN.ADMIN.Pages
 		protected IStatiscalClient statiscalClient { get; set; }
 		[Inject]
 		protected ISnackbar Snackbar { get; set; }
+		public bool isLoading;
 
 		int type = 1;
 		LstDataChart customerData = new LstDataChart();
@@ -39,23 +40,28 @@ namespace DATN.ADMIN.Pages
 		private bool isDisplayDate = false;
 		protected override async Task OnInitializedAsync()
 		{
-			type = 3;
+			isLoading = true;
+            StateHasChanged();
+            type = 3;
 			await LoadData(type);
 			StateHasChanged();
 			lstProductOutStock = lstProductDataRaw;
-        }
+			isLoading = false;
+			StateHasChanged();
+		}
         async Task LoadData(int? value = 1)
 		{
-			DateTime? startDate= DateTime.Now;
+            DateTime? startDate= DateTime.Now;
 			DateTime? endDate= DateTime.Now; 
 			if (value==4|| value==5)
 			{
+
 				isDisplayDate = true;
 				
                 if (value==4)
                 {
 					type = 4;
-					return;
+                    return;
                 }
 				else{
 					if (_picker != null && _picker.DateRange != null && _picker.DateRange.Start != null && _picker.DateRange.End != null)
@@ -63,7 +69,7 @@ namespace DATN.ADMIN.Pages
 						startDate = _picker.DateRange.Start;
 						endDate = _picker.DateRange.End;
 						var days = _picker.DateRange.Start.Value.Day;
-					}
+                    }
 				}
             }
             else
@@ -84,12 +90,11 @@ namespace DATN.ADMIN.Pages
 				top3ProductQuantity = response.Data.ProductQuantityStatistical;
 				top3ServiceQuantity = response.Data.ServiceQuantityStatistical;
 				width = "99%";
-			}
+            }
 			else
 			{
-				Snackbar.Add("Chưa có dữ liệu!");
+                Snackbar.Add("Chưa có dữ liệu!");
 			}
-			StateHasChanged();
 			width = "100%";
            
         }

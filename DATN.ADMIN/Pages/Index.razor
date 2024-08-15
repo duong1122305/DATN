@@ -4,13 +4,12 @@
 @inject IDialogService DialogService
 <link rel="stylesheet" href="/css/Statical.css">
 <PageTitle>Trang chủ</PageTitle>
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 <AuthorizeView Roles="Admin">
 	<Authorized>
 		<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Thống kê doanh thu cửa hàng</MudText>
 		<MudGrid>
 			<MudItem sm="12">
-				
-
 				<div style="display:flex">
 					<div style="width:400px">
 						<MudSelect Value=@type T="int?" Label="Thống kê theo" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"

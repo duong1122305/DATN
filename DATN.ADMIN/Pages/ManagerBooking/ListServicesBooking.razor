@@ -329,7 +329,7 @@
         selectedStatus = selected;
         isLoading = true;   
         await LoadData();
-        await Task.Delay(500);
+        StateHasChanged();
         isLoading = false;
     }
     //group ngày
@@ -351,7 +351,7 @@
     private async Task OpenDialog(int id, Guid idGuest, bool payment)
     {
         isLoading = true;
-        await Task.Delay(500);
+        StateHasChanged();
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
         DialogOptions options = new DialogOptions()
@@ -370,9 +370,10 @@
         var respone2 = await _client.ListBookingDetailInDay(id);
         if (respone2.IsSuccess)
         {
-            isLoading = false;
             var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
+              isLoading = false;
+                StateHasChanged();
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
@@ -390,7 +391,7 @@
     private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
     {
         isLoading = true;
-        await Task.Delay(500);
+                StateHasChanged();
         var parameters = new DialogParameters();
         string nameDialog = "";
 
@@ -550,7 +551,7 @@
     private async Task OpenDialogCreateBooking()
     {
         isLoading = true;
-        await Task.Delay(500);
+        StateHasChanged();
         string nameDialog = "Đặt lịch tại quầy";
         DialogOptions options = new DialogOptions()
             {
@@ -564,8 +565,8 @@
         var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer1>(nameDialog, options);
         var result = await createUpdateDialog.Result;
         ClearBookingRequests();
-        isLoading = false;
-        StateHasChanged();
+            isLoading = false;
+            StateHasChanged();
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
