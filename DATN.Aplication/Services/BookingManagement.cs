@@ -6,6 +6,7 @@ using DATN.Data.Entities;
 using DATN.Data.Enum;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ActionBooking;
+using DATN.ViewModels.DTOs.Authenticate;
 using DATN.ViewModels.DTOs.Booking;
 using DATN.ViewModels.DTOs.Payment;
 using DATN.ViewModels.DTOs.Payment.DATN.ViewModels.DTOs.Payment;
@@ -1079,34 +1080,98 @@ namespace DATN.Aplication.Services
             {
                 var queryCheckVoucherCanApply = (await _voucherManagementService.GetAllVoucherCanApply(totalprice)).Data;
                 int voucherWillUse = 0;
-                if (queryCheckVoucherCanApply.Count > 1)
+                if (idBooking != null && idBooking != 0)
                 {
-                    voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
-                    foreach (var item in queryCheckVoucherCanApply)
+                    var booking = (await _unitOfWork.BookingRepository.GetAllAsync()).Where(c => c.Id == idBooking).FirstOrDefault();
+                    if (booking.IsPayment)
                     {
-                        var reducedAmount1 = totalprice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalprice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
-                        foreach (var item2 in queryCheckVoucherCanApply)
+                        if (booking.VoucherId != null && booking.VoucherId != 0)
                         {
-                            if (item.Id == item.Id)
+                            voucherWillUse = booking.VoucherId.Value;
+                            queryCheckVoucherCanApply = (from voucher in await _unitOfWork.DiscountRepository.GetAllAsync()
+                                                         where voucher.Id == voucherWillUse
+                                                         select new VoucherView
+                                                         {
+                                                             Id = voucherWillUse,
+                                                             AmountUsed = voucher.AmountUsed,
+                                                             Description = voucher.Description,
+                                                             DiscountPercent = voucher.DiscountPercent,
+                                                             EndDate = voucher.EndDate,
+                                                             MaxMoneyDiscount = voucher.MaxMoneyDiscount,
+                                                             MinMoneyApplicable = voucher.MinMoneyApplicable,
+                                                             Quantity = voucher.Quantity,
+                                                             StartDate = voucher.StartDate,
+                                                             Status = voucher.Status,
+                                                             VoucherCode = voucher.VoucherCode,
+                                                             VoucherName = voucher.VoucherName,
+                                                         }).ToList();
+                        }
+                    }
+                    else
+                    {
+                        if (queryCheckVoucherCanApply.Count > 1)
+                        {
+                            voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
+                            foreach (var item in queryCheckVoucherCanApply)
                             {
-                                continue;
-                            }
-                            else
-                            {
-                                var reducedAmount2 = totalprice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalprice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
-                                if (reducedAmount1 < reducedAmount2)
+                                var reducedAmount1 = totalprice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalprice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
+                                foreach (var item2 in queryCheckVoucherCanApply)
                                 {
-                                    voucherWillUse = item2.Id.Value;
+                                    if (item.Id == item.Id)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        var reducedAmount2 = totalprice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalprice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
+                                        if (reducedAmount1 < reducedAmount2)
+                                        {
+                                            voucherWillUse = item2.Id.Value;
+                                        }
+                                    }
                                 }
+                            }
+                        }
+                        else
+                        {
+                            if (queryCheckVoucherCanApply.Count() == 1)
+                            {
+                                voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
                             }
                         }
                     }
                 }
                 else
                 {
-                    if (queryCheckVoucherCanApply.Count() == 1)
+                    if (queryCheckVoucherCanApply.Count > 1)
                     {
                         voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
+                        foreach (var item in queryCheckVoucherCanApply)
+                        {
+                            var reducedAmount1 = totalprice * (double)item.DiscountPercent <= item.MaxMoneyDiscount ? totalprice * (double)item.DiscountPercent : item.MaxMoneyDiscount;
+                            foreach (var item2 in queryCheckVoucherCanApply)
+                            {
+                                if (item.Id == item.Id)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    var reducedAmount2 = totalprice * (double)item2.DiscountPercent <= item2.MaxMoneyDiscount ? totalprice * (double)item2.DiscountPercent : item2.MaxMoneyDiscount;
+                                    if (reducedAmount1 < reducedAmount2)
+                                    {
+                                        voucherWillUse = item2.Id.Value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (queryCheckVoucherCanApply.Count() == 1)
+                        {
+                            voucherWillUse = queryCheckVoucherCanApply.FirstOrDefault().Id.Value;
+                        }
                     }
                 }
                 var maxMoney = queryCheckVoucherCanApply.FirstOrDefault(c => c.Id == voucherWillUse)?.MaxMoneyDiscount;
