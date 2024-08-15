@@ -76,9 +76,13 @@
                     {
                         <span>Nhân viên dịch vụ</span>
                     }
-                    else
+                    else if (context.Item.Position == "Receptionist")
                     {
                         <span>Lễ tân</span>
+                    }
+                    else
+                    {
+                        <span>Chưa có có chức gì cả</span>
                     }
                 </CellTemplate>
             </TemplateColumn>
@@ -337,7 +341,7 @@ else
         var listIdUser = new List<string>();
         if (await Confirm2() == true)
         {
-            
+
             if (selectedUser1s.Count > 0 && selectedUser1s != null)
             {
                 foreach (var user2 in selectedUser1s)
@@ -397,12 +401,13 @@ else
                 DisableBackdropClick = true
             };
         parameters.Add("lstUser", selectedUser1s);
-        if (selectedShiftId == null || selectedShiftId ==0)
+        if (selectedShiftId == null || selectedShiftId == 0)
         {
             Message("Vui lòng chọn ca làm", Severity.Warning);
-        }else
+        }
+        else
         {
-        parameters.Add("idShift", selectedShiftId);
+            parameters.Add("idShift", selectedShiftId);
             var createUpdateDialog = await _dialogservice.ShowAsync<AddStaffSuddenly>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
             isEditing = false;
@@ -413,8 +418,8 @@ else
                 StateHasChanged();
             }
         }
-       
-        
+
+
 
     }
     //thêm nhân viên vào ca làm tháng hiện tại

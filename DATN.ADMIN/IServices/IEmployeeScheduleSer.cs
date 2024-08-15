@@ -10,7 +10,7 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<List<ScheduleView>>> GetAll();
         Task<ScheduleView> UpdateUser(ScheduleView scheduleView);
         Task<ResponseData<List<NumberOfScheduleView>>> ListStaffOfDay(int id, DateTime workDate);
-        Task<ResponseData<List<UserInfView>>> lstUsrInffor(int idUser, DateTime workDate);
+        Task<ResponseData<List<UserInfView>>> lstUsrInffor(int idUser, DateTime workDate, string role);
 
         Task<ResponseData<string>> changgeShift(ChangeShiftView changeShiftView);
         //thêm 1 tháng sau

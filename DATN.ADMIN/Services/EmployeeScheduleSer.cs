@@ -60,9 +60,9 @@ namespace DATN.ADMIN.Services
         }
 
         //list thông tin nhân viên trống ca làm
-        public async Task<ResponseData<List<UserInfView>>> lstUsrInffor(int idUser, DateTime workDate)
+        public async Task<ResponseData<List<UserInfView>>> lstUsrInffor(int idUser, DateTime workDate, string role)
         {
-            var respone = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>($"api/UserLogin/Get-List-Staff-Not-Working-in-Day?shiftId={idUser}&workdate={workDate.Year}-{workDate.Month}-{workDate.Day}");
+            var respone = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>($"api/UserLogin/Get-List-Staff-Not-Working-in-Day?shiftId={idUser}&workdate={workDate.Year}-{workDate.Month}-{workDate.Day}&&role={role}");
             return respone;
         }
 

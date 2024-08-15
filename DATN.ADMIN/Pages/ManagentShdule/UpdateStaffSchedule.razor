@@ -42,11 +42,11 @@ else
     [Parameter]
     public string idNhanVien { get; set; }//id của nhân viên về nấu cơm
     [Parameter]
-    public string fulName{ get; set; }
+    public string fulName { get; set; }
     [Inject]
     IEmployeeScheduleSer _client { get; set; }
     [Inject]
-    IUserClientSev _clienId{ get; set; }
+    IUserClientSev _clienId { get; set; }
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
 
@@ -54,8 +54,16 @@ else
 
     private async Task loadData()
     {
-        var res = await _client.lstUsrInffor(idShift, workDate);
-        lst = res.Data;
+        var role = await _clienId.GetRoleUser(idNhanVien);
+        if (role.IsSuccess)
+        {
+            var res = await _client.lstUsrInffor(idShift, workDate, role.Data);
+            lst = res.Data;
+        }
+        else
+        {
+            Message("Ko có nhân viên nào có cùng chức vụ nhân viên đang chọn", Severity.Warning);
+        }
         StateHasChanged();
     }
 
@@ -87,9 +95,9 @@ else
         return confirm;
     }
 
-    public async Task Update(string userName,string fulname2)
+    public async Task Update(string userName, string fulname2)
     {
-        if (await Confirm(fulname2)==true)
+        if (await Confirm(fulname2) == true)
         {
             var idUser = await _clienId.GetById(userName);
             ChangeShiftView changeShiftView = new ChangeShiftView();
