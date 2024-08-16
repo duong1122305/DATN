@@ -179,5 +179,10 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.CreateBookingForGuestNoAcount(booking);
         }
+        [HttpPatch("Cancel-BookingDetail-ByGuest")]
+        public async Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView)
+        {
+            return await _bookingManagement.CancelBookingDetailByGuest(actionView);
+        }
     }
 }

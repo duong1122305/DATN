@@ -576,6 +576,58 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
         }
+        public async Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView)
+        {
+            var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                         where bookingDetail.Id == actionView.IdBokingOrDetail
+                         select bookingDetail).FirstOrDefault();
+            if (query != null)
+            {
+                int count = 0;
+                foreach (var item in (await _unitOfWork.BookingDetailRepository.GetAllAsync()).Where(c => c.BookingId == query.BookingId && c.Status != BookingDetailStatus.Cancelled))
+                {
+                    count++;
+                }
+                if (count > 1)
+                {
+
+                    if (query.Status == BookingDetailStatus.Processing || query.Status == BookingDetailStatus.Completed)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Trạng thái của dịch vụ hiện tại không cho phép hủy!" };
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var queryBoking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                               where booking.Id == query.BookingId
+                                               select booking).FirstOrDefault();
+                            query.Status = BookingDetailStatus.Cancelled;
+                            HistoryAction historyAction = new HistoryAction()
+                            {
+                                BookingID = queryBoking.Id,
+                                ActionTime = DateTime.Now,
+                                Description = actionView.Reason + $"(Trạng thái khách hủy dịch vụ con {actionView.IdBokingOrDetail})",
+                                ActionID = 14,
+                                ByGuest = true
+                            };
+                            await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
+                            await _unitOfWork.HistoryActionRepository.UpdateAsync(historyAction);
+                            await _unitOfWork.SaveChangeAsync();
+                            return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                        }
+                        catch (Exception)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
+                        }
+                    }
+
+                }
+                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ, vui lòng huỷ ngoài màn danh sách!" };
+            }
+            else
+                return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
+        }
         public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
@@ -687,7 +739,7 @@ namespace DATN.Aplication.Services
                             ActionTime = DateTime.Now,
                             Description = actionView.Reason,
                             ActionID = 14,
-                            ActionByID = Guid.Parse(idUserAction.Data)
+                            ActionByID = Guid.Parse(idUserAction.Data),
                         };
                         await _unitOfWork.BookingRepository.UpdateAsync(query);
                         await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(queryBooking);
@@ -1447,7 +1499,6 @@ namespace DATN.Aplication.Services
                 await _unitOfWork.BookingRepository.SaveChangesAsync();
             }
         }
-
         public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {
             if (createBookingDetailRequest.ListServiceDetail.Count > 0)
