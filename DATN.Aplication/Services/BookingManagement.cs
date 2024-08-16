@@ -891,7 +891,7 @@ namespace DATN.Aplication.Services
                         if (bill.Data.IdVoucher != null)
                         {
                             var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                where dis.Id == queryBooking.VoucherId
+                                                where dis.Id == bill.Data.IdVoucher
                                                 select dis).FirstOrDefault();
                             checkVoucher.AmountUsed++;
                             await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
@@ -960,7 +960,7 @@ namespace DATN.Aplication.Services
                         if (bill.Data.IdVoucher != null)
                         {
                             var checkVoucher = (from dis in await _unitOfWork.DiscountRepository.GetAllAsync()
-                                                where dis.Id == queryBooking.VoucherId
+                                                where dis.Id == bill.Data.IdVoucher
                                                 select dis).FirstOrDefault();
                             checkVoucher.AmountUsed++;
                             await _unitOfWork.DiscountRepository.UpdateAsync(checkVoucher);
