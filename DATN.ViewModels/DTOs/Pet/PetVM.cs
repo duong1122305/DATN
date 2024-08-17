@@ -11,15 +11,8 @@
         public bool Gender { get; set; } // Giới tính
         public int? PetTypeId { get; set; }
         public DateTime? Birthday { get; set; } // Ngày sinh
-
         public float? Weight { get; set; } // Cân nặng
-
         public bool? Neutered { get; set; } // Đã triệt sản chưa
-
-        public string? OriginalColor { get; set; } // Màu lông ban đầu
-
-        public bool? Vaccinated { get; set; } // Đã tiêm phòng chưa
-
         public string? Note { get; set; } // Ghi chú
         public string? Address { get; set; }
         public bool IsDelete { get; set; }

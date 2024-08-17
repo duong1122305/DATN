@@ -15,8 +15,8 @@ namespace DATN.ADMIN.Services
         {
 
             _client = client;
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
             _httpContextAccessor = httpContextAccessor;
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
         //thêm ca làm cho tháng hiện tại
         public async Task<ResponseData<string>> AddSchuduleToMonth()
