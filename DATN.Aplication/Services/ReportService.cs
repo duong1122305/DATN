@@ -39,6 +39,7 @@ namespace DATN.Aplication.Services
 							join g in await _uow.GuestRepository.GetAllAsync() on b.GuestId equals g.Id
 							join u in await _userManager.Users.ToListAsync() on bd.StaffId equals u.Id
 							join sd in await _uow.ServiceDetailRepository.GetAllAsync() on bd.ServiceDetailId equals sd.Id
+							join s in await _uow.ServiceRepository.GetAllAsync() on sd.ServiceId equals s.Id
 							orderby rp.CreateAt descending
 							select new ReportVM
 							{
@@ -49,7 +50,7 @@ namespace DATN.Aplication.Services
 								Rate= rp.Rate,
 								NameCustomer = g.Name,
 								NameStaff = u.FullName,
-								ServiceName = g.Name,
+								ServiceName = s.Name,
 								StaffID = u.Id,
 							};
 				return new ResponseData<List<ReportVM>>(query.ToList());

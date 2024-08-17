@@ -57,9 +57,10 @@
                 <MudNavLink Href="/ListCategory" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh mục sản phẩm</MudNavLink>
                 <MudNavLink Href="/ListBrand" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách thương hiệu</MudNavLink>
             </MudNavGroup>
-            <MudNavLink Href="/lstReport" Icon="@Icons.Material.Filled.Assignment">
-                Đánh giá
-            </MudNavLink>
+             <MudNavGroup Title="Báo cáo thống kê" Icon="@Icons.Material.Filled.ListAlt">
+            <MudNavLink Href="/lstReport" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assignment">Danh sách đánh giá</MudNavLink>
+           <MudNavLink Href="/lstBillStatiscal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách hóa đơn</MudNavLink>
+   </MudNavGroup>
         </Authorized>
     </AuthorizeView>
 

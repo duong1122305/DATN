@@ -22,6 +22,7 @@ namespace DATN.ADMIN.Pages
         [Inject]
         protected ISnackbar Snackbar { get; set; }
         public bool isLoading;
+        public int filterType = -1;
         [Inject]
         NavigationManager navigationManager { get; set; }
         int type = 1;
@@ -103,6 +104,7 @@ namespace DATN.ADMIN.Pages
         async void ChangStatus(int value)
         {
 
+            filterType = value;
             if (value == -1)
             {
                 lstProductOutStock = lstProductDataRaw;
@@ -115,12 +117,9 @@ namespace DATN.ADMIN.Pages
             {
                 lstProductOutStock = lstProductDataRaw.Where(p => !p.Status).ToList();
             }
+
             StateHasChanged();
         }
         // lọc ngày
-        private async Task SearchByDate()
-        {
-
-        }
     }
 }
