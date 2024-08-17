@@ -10,14 +10,8 @@ namespace DATN.ViewModels.DTOs.Booking
 {
     public class GetBookingByGuestVM
     {
-        public string PetName { get; set; }
-        public List<string> ServiceName { get; set; }
-        public List<int> ServiceId { get; set; }
+        public int IdBooking { get; set; }
         public string BookingTime { get; set; }
-        public string StartDate { get; set; }
-        public string EndDate { get; set; }
-        public string StartTime { get; set; }
-        public double TotalPrice { get; set; }
-        public BookingDetailStatus Status { get; set; }
+        public List<BookingDetailForGuest> LstBookingDetail { get; set; }
     }
 }
