@@ -398,7 +398,7 @@ namespace DATN.Aplication.System
             {
                 return new ResponseData<string> { IsSuccess = true, Data = "Thêm chức vụ mới thành công" };
             }
-            return new ResponseData<string> { IsSuccess = false, Error = "Lỗi đéo biêts" };
+            return new ResponseData<string> { IsSuccess = false, Error = "Lỗi không mong muốn" };
         }
 
         public async Task<ResponseData<string>> ActiveAccount(string id)

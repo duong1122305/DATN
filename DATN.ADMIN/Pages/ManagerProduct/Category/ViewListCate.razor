@@ -11,7 +11,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 
-<PageTitle>Danh sách loại sản phẩm</PageTitle>
+<PageTitle>Danh mục sản phẩm</PageTitle>
 <MudText Typo="Typo.h6">Danh mục sản phẩm</MudText>
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
@@ -168,9 +168,6 @@ else
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
-
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
          }
          else if (selectedStatus == CateStatus.Active && x.IsDeleted != true)
          {
@@ -178,9 +175,6 @@ else
                  return true;
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
-
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
          }
          else
@@ -190,9 +184,6 @@ else
 
              if (x.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                  return true;
-
-             if (x.Description.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                 return true;
          }
          return false;
      };
@@ -201,7 +192,7 @@ else
     private async Task<bool?> Confirm()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-                    "Xác nhận xoá danh mục này?",
+                    "Xác nhận cập nhật trạng thái danh mục này?",
            yesText: "Xác nhận",
                     cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
         StateHasChanged();

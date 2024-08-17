@@ -698,7 +698,7 @@ namespace DATN.Aplication.Services
                                           select shift).FirstOrDefault();
                         if (queryShift == null)
                         {
-                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca nào cả không ai phục vụ" };
+                            return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Khoảng thời gian chọn không nằm trong ca có nhân viên" };
                         }
 
                         var response = await GetListStaffInDay(queryShift.Id, dateTime);
@@ -758,7 +758,7 @@ namespace DATN.Aplication.Services
                         return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Vui lòng không chọn ngày quá khứ!" };
                     }
                 }
-                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Dev cũng chịu không biết ở đây sao lỗi được luôn" };
+                return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = "Lỗi không xác định!" };
             }
             catch (Exception e)
             {

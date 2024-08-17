@@ -1,6 +1,7 @@
 ﻿using DATN.ADMIN.IServices;
 using DATN.ADMIN.Services;
 using DATN.Aplication.CustomProvider;
+using DATN.Aplication.Services;
 using DATN.Data.EF;
 using DATN.Data.Entities;
 using DATN.ViewModels.DTOs.Booking;
@@ -12,11 +13,15 @@ using Microsoft.IdentityModel.Tokens;
 using MudBlazor;
 using MudBlazor.Services;
 using Syncfusion.Blazor;
+using System.Globalization;
 using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlccnRRRmNYV0Z+X0U=");
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("vi-VN");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("vi-VN");
 builder.Services.Configure<CloundinarySettings>(builder.Configuration.GetSection("CloundinarySettings"));
+
 builder.Services.AddSyncfusionBlazor();
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -88,6 +93,7 @@ builder.Services.AddScoped<IAttendanceServiceClient, AttendanceServiceClient>();
 builder.Services.AddScoped<IUpLoadFileService, UploadFileService>();
 builder.Services.AddScoped<IBookingViewServices, BookingViewServices>();
 builder.Services.AddScoped<IStatiscalClient, StatiscalClient>();
+builder.Services.AddScoped<IReportClient, ReportClient>();
 builder.Services.AddSingleton<BookingService>();
 builder.Services.AddMudServices(config =>
 {

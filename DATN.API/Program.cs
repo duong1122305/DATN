@@ -102,10 +102,13 @@ builder.Services.AddScoped<IStatisticalService, StatisticalService>();
 builder.Services.AddScoped<IUploadFileServices, UploadFileServices>();
 
 // Add auto mapper
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IBookingManagement, BookingManagement>();
 builder.Services.AddScoped<IProductManagement, ProductManagement>();
 builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddScoped<Utils>();
+
+// Add auto mapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 

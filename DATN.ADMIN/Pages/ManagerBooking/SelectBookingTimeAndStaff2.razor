@@ -84,9 +84,14 @@
             Message("Vui lòng chọn ngày giờ.", Severity.Warning);
             return;
         }
-        //gọi api thêm
-        // int time = (int)duration / 60;
-        // timeEnd = timeStart.Value.Add(new TimeSpan(time, (int)(duration - (time * 60)), 0));
+        var now = DateTime.Now;
+        var selectedDateTime = bookingDate.Value.Date.Add(timeStart.Value);
+
+        if (selectedDateTime < now)
+        {
+            Message("Ngày và giờ đã chọn không hợp lệ. Vui lòng chọn lại ngày và giờ", Severity.Warning);
+            return;
+        }
 
         var parameters = new DialogParameters();
 
@@ -137,26 +142,6 @@
         }
     }
 
-
-    // protected async Task CreateBooking(Guid? id, string name)
-    // {
-    //     CreateBookingDetailRequest bookingCreate = new CreateBookingDetailRequest()
-    //         {
-    //             PetId = value2.Id,
-    //             ServiceDetailName = servicedetailname,
-    //             StaffName = name,
-    //             StaffId = id,
-    //             ServiceDetailId = idDetailsServices,
-    //             Price = (double)priceServicesDetails,
-    //             StartDateTime = timeStart.Value,
-    //             EndDateTime = timeEnd.Value,
-    //             DateBooking = bookingDate.Value,
-    //         };
-    //     bookingService.AddBooking(bookingCreate);
-    //     // Đóng dialog sau khi thêm xong
-    //     _dialogBox.Close(DialogResult.Ok(true));
-    //     StateHasChanged();
-    // }
 
     public async Task CreateBookingInDb()
     {

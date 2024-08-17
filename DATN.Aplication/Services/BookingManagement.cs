@@ -272,7 +272,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Vui lòng chọn dịch vụ!" };
             }
         }
         public async Task<ResponseData<string>> GuestCreateBooking(CreateBookingRequest createBookingRequest)
@@ -389,7 +389,7 @@ namespace DATN.Aplication.Services
             }
             else
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Vui lòng chọn dịch vụ!" };
             }
         }
         public async Task<ResponseData<Bill>> GetBill(Guid IdGuest, DateTime dateBooking)
@@ -486,7 +486,7 @@ namespace DATN.Aplication.Services
             if (bill != null)
                 return new ResponseData<Bill> { IsSuccess = true, Data = bill };
             else
-                return new ResponseData<Bill> { IsSuccess = false, Error = "Không tìm thấy hoá đơn!" };
+                return new ResponseData<Bill> { IsSuccess = false, Error = "Không tìm thấy hoá đơn" };
         }
         public async Task<ResponseData<string>> CompleteBookingDetail(ActionView actionView)
         {
@@ -571,7 +571,7 @@ namespace DATN.Aplication.Services
                     }
 
                 }
-                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ, vui lòng huỷ ngoài màn danh sách!" };
+                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ vui lòng ra màn đặt lịch để huỷ" };
             }
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };

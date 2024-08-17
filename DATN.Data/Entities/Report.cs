@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DATN.Data.Entities
 {
@@ -8,9 +9,12 @@ namespace DATN.Data.Entities
     {
         public int Id { get; set; } // Khóa chính
 
-        public int BookingDetailId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
+        public int BookingId { get; set; } // Khóa ngoại đến ID chi tiết dịch vụ
 
         public string Comment { get; set; } // Bình luận
+
+        [Range(1, 5, ErrorMessage = "Số sao chỉ từ 1 - 5")]
+        public int Rate { get; set; }
 
         public DateTime CreateAt { get; set; } // Thời gian tạo
 

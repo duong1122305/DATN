@@ -17,9 +17,9 @@ namespace DATN.API.Controllers
 			_statistical = statistical;
 		}
         [HttpGet]
-		public async Task<ResponseData<Statistical>> StatisticalIndex(int type = 1)
+		public async Task<ResponseData<Statistical>> StatisticalIndex(DateTime? startDate, DateTime? endDate, int type = 1)
 		{
-			return await _statistical.StatisticalIndex(type);
+			return await _statistical.StatisticalIndex(startDate,endDate, type);
 		}
 	}
 }

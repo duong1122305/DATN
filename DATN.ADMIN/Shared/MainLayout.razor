@@ -17,39 +17,6 @@
     <MudAppBar Elevation="5">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
-       @*  <MudIconButton Id="notificationBell" Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" OnClick="ToggleNotificationPopover" />
-        <div id="notificationPopover" class="notification-popover">
-            <ul id="notificationList"></ul>
-        </div> *@
-@*         <div style="position: relative; display: inline-block;">
-            <MudIconButton Id="notificationBell" Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" OnClick="ToggleNotificationPopover" />
-            @if (notificationCount > 0)
-            {
-                <MudBadge Content="@notificationCount" Color="Color.Error" MaxValue="99" Style="position: relative; top: -10px; right: 10px;" />
-            }
-        </div> *@
-
-        <MudPopover AnchorId="notificationBell" Open="@showNotifications" CloseOnOutsideClick="true" OnClose="OnPopoverClose" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="notification-popover">
-            <MudPaper>
-                <MudList>
-                    @if (notifications.Count == 0)
-                    {
-                        <MudListItem>
-                            <MudText>No new notifications</MudText>
-                        </MudListItem>
-                    }
-                    else
-                    {
-                        @foreach (var notification in notifications)
-                        {
-                            <MudListItem>
-                                <MudText>@notification.Message</MudText>
-                            </MudListItem>
-                        }
-                    }
-                </MudList>
-            </MudPaper>
-        </MudPopover>
         <MudAvatar>
             <MudImage Src="@urlImg"></MudImage>
         </MudAvatar>
@@ -78,19 +45,14 @@
     protected IHttpContextAccessor httpContextAccessor { get; set; }
     [Inject]
     protected IUserClientSev _ser { get; set; }
-    // [Inject]
-    // private IJSRuntime JSRuntime { get; set; }
     private bool isPopoverOpen = false;
-    private void TogglePopover()
-    {
-        isPopoverOpen = !isPopoverOpen;
-    }
+  
     bool _drawerOpen = true;
     private string name = "";
     private string mess = "";
     private string urlImg = Contant.ImgUser;
 
-    private bool showNotifications = false;
+   
     private int notificationCount => notifications.Count;
     private List<Notification> notifications = new List<Notification>();
 
@@ -98,10 +60,7 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-    private void OnPopoverClose()
-    {
-        showNotifications = false;
-    }
+   
     private async Task logOut()
     {
         var confirm = await Confirm();
@@ -158,22 +117,11 @@
 
         connection.On<string>("ReceiveBookingNotification",async message =>
         {
-            // // Call JavaScript function to handle the notification
-            // await JSRuntime.InvokeVoidAsync("handleNewNotification", message);
-            // notifications.Add(new Notification { Message = message });
             _snackBar.Add(message, Severity.Success);
         });
         await connection.StartAsync();
     }
-    // private void ToggleNotificationPopover()
-    // {
-    //     JSRuntime.InvokeVoidAsync("ToggleNotificationPopover");
-    //     showNotifications = !showNotifications;
-    // }
-    // private void ShowNotification(string message)
-    // {
-    //     _snackBar.Add(message, Severity.Success);
-    // }
+   
     private async Task<bool?> Confirm()
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo",
@@ -189,6 +137,4 @@
     }
 }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-
-
 

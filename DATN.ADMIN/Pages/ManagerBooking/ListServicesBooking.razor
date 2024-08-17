@@ -15,10 +15,11 @@
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice;
 @inject IAddressService _addressServive;
+<PageTitle>Danh sách đặt lịch</PageTitle>
 
 <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
+<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt lịch dịch vụ</MudText>
 <div style="display: flex; justify-content: flex-end;">
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
@@ -248,10 +249,6 @@
         }
         StateHasChanged();
     }
-    public async Task LstBooking()
-    {
-
-    }
     private enum Status
     {
         All,
@@ -330,7 +327,10 @@
     private async Task Change(Status selected)
     {
         selectedStatus = selected;
+        isLoading = true;   
         await LoadData();
+        StateHasChanged();
+        isLoading = false;
     }
     //group ngày
     private Func<BookingView, string> _groupBy = x =>
@@ -348,20 +348,10 @@
     {
         dataGrid?.ExpandAllGroups();
     }
-    private async Task Dialo()
-    {
-
-        if (isLoading)
-        {
-            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-            var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
-        }
-
-    }
     private async Task OpenDialog(int id, Guid idGuest, bool payment)
     {
         isLoading = true;
-        await Task.Delay(500);
+        StateHasChanged();
         var parameters = new DialogParameters();
         string nameDialog = "Chi tiết khách đặt lịch";
         DialogOptions options = new DialogOptions()
@@ -380,9 +370,10 @@
         var respone2 = await _client.ListBookingDetailInDay(id);
         if (respone2.IsSuccess)
         {
-            isLoading = false;
             var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
+              isLoading = false;
+                StateHasChanged();
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
@@ -391,12 +382,16 @@
         }
         else
         {
+            isLoading = false;
+            StateHasChanged();
             Message("Không có dữ liệu", Severity.Warning);
         }
     }
     //bill
     private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
     {
+        isLoading = true;
+                StateHasChanged();
         var parameters = new DialogParameters();
         string nameDialog = "";
 
@@ -414,6 +409,8 @@
         parameters.Add("idBooking", idBooking);
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
+        isLoading = false;
+        StateHasChanged();
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -423,6 +420,8 @@
 
     private async Task OpenDialogBillInStore(Guid? id, DateTime date)
     {
+       
+
         string nameDialog = "";
         DialogOptions options = new DialogOptions()
             {
@@ -435,6 +434,8 @@
             };
         var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
         var result = await createUpdateDialog.Result;
+        isLoading = false;
+        StateHasChanged();
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -549,6 +550,8 @@
 
     private async Task OpenDialogCreateBooking()
     {
+        isLoading = true;
+        StateHasChanged();
         string nameDialog = "Đặt lịch tại quầy";
         DialogOptions options = new DialogOptions()
             {
@@ -562,6 +565,8 @@
         var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer1>(nameDialog, options);
         var result = await createUpdateDialog.Result;
         ClearBookingRequests();
+            isLoading = false;
+            StateHasChanged();
         if (!result.Canceled)
         {
             createUpdateDialog.Close();
@@ -574,6 +579,7 @@
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
         Snackbar.Add(message, severity);
     }
+
     private async Task<bool> Confirm(string text)
     {
         var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
