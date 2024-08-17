@@ -3,15 +3,20 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.CategoryProduct;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace DATN.ADMIN.Services
 {
     public class CategoryServices : ICategoryServices
     {
         private readonly HttpClient _httpClient;
-        public CategoryServices(HttpClient client)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CategoryServices(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = client;
+            _httpContextAccessor = httpContextAccessor;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
         }
         public async Task<ResponseData<string>> ActiveCategory(int id)
         {

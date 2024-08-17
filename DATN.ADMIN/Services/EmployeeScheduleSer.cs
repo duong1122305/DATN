@@ -2,17 +2,21 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace DATN.ADMIN.Services
 {
     public class EmployeeScheduleSer : IEmployeeScheduleSer
     {
         HttpClient _client;
-        public EmployeeScheduleSer(HttpClient client)
+        IHttpContextAccessor _httpContextAccessor;
+        public EmployeeScheduleSer(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
 
             _client = client;
-
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+            _httpContextAccessor = httpContextAccessor;
         }
         //thêm ca làm cho tháng hiện tại
         public async Task<ResponseData<string>> AddSchuduleToMonth()

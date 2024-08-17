@@ -2,16 +2,20 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Pet;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace DATN.ADMIN.Services
 {
     public class PetServiceClient : IPetServiceClient
     {
         private readonly HttpClient _client;
-        public PetServiceClient(HttpClient client)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public PetServiceClient(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _client = client;
-
+            _httpContextAccessor = httpContextAccessor;
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
 
         public async Task<ResponseData<string>> CreatePet(PetCreateUpdate petVM)

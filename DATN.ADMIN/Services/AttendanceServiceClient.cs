@@ -5,6 +5,7 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Attendace;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 
 namespace DATN.ADMIN.Services
@@ -18,20 +19,16 @@ namespace DATN.ADMIN.Services
         {
             _client = client;
             _httpContextAccessor = httpContextAccessor;
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
 
         public async Task<ResponseData<string>> CheckIn(int scheduleId, int attendanceID, bool isCheckin, Guid id)
         {
-
-
             return _client.GetFromJsonAsync<ResponseData<string>>($@"/api/Attendace/check-in-hand?scheduleId={scheduleId}&attendanceID={attendanceID}&isCheckin={isCheckin}&userId={id}").GetAwaiter().GetResult()!;
-
-
         }
 
         public async Task<ResponseData<string>> CheckOut(int scheduleId, int attendanceID, bool isCheckout, Guid id)
         {
-
             return _client.GetFromJsonAsync<ResponseData<string>>($@"/api/Attendace/check-out-hand?scheduleId={scheduleId}&attendanceID={attendanceID}&isCheckout={isCheckout}&userId={id}").GetAwaiter().GetResult()!;
         }
 

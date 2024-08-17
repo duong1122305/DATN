@@ -2,6 +2,7 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace DATN.ADMIN.Services
 {
@@ -13,12 +14,13 @@ namespace DATN.ADMIN.Services
         {
             _client = client;
             _httpContextAccessor = httpContextAccessor;
-            //_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
 
         }
 
         public async Task<ResponseData<string>> activeUser(string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var respone = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
             var repon = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Active-user?id={respone.Data}");
             return repon;
@@ -26,6 +28,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> AddShuduleStaffMany(List<string> lstStaff, int idShift)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/them-ca-one-staff?shift={idShift}", lstStaff);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
@@ -33,22 +37,31 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<List<UserInfView>>> GetAll()
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var repon = await _client.GetFromJsonAsync<ResponseData<List<UserInfView>>>("api/UserLogin/List-User");
             return repon;
         }
 
         public async Task<ResponseData<List<ScheduleView>>> GetAllCaNhanVien()
         {
+
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             return await _client.GetFromJsonAsync<ResponseData<List<ScheduleView>>>("api/UserLogin/get-all-ca-lam");
         }
 
         public async Task<ResponseData<string>> GetById(string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             return await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
         }
 
         public async Task<ResponseData<string>> GetByIdRemove(string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var respone = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
             var result = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/remove?id={respone.Data}");
             return result;
@@ -56,6 +69,7 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> Login(UserLoginView user)
         {
+
             var response = await _client.PostAsJsonAsync("api/UserLogin/User-Login", user);
             var result = await response.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
@@ -63,6 +77,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<UserInfView>> GetInfoUser(string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var response = await _client.GetFromJsonAsync<ResponseData<UserInfView>>($"api/UserLogin/Get-user-inf-by-token/{id}");
             return response;
         }
@@ -70,6 +86,8 @@ namespace DATN.ADMIN.Services
         //public async Task<UserInfView> statusUser(DeleteRequest<Guid> deleteRequest)
         public async Task<ResponseData<string>> Register(UserRegisterView userRegisterView)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var respone = await _client.PostAsJsonAsync("api/UserLogin/User-Register", userRegisterView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
             return result;
@@ -77,6 +95,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateUser(UserUpdateView userInfView, string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var respone2 = await _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Get-id-user?username={id}");
             var respone = await _client.PatchAsJsonAsync($"api/UserLogin/Update-inf?id={respone2.Data}", userInfView);
             var result = await respone.Content.ReadFromJsonAsync<ResponseData<string>>();
@@ -85,6 +105,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<UserChangePasswordView>> ChangePassword(UserChangePasswordView userChangePasswordView)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var response = await _client.PatchAsJsonAsync("api/UserLogin/changePassword", userChangePasswordView);
             return await response.Content.ReadFromJsonAsync<ResponseData<UserChangePasswordView>>();
         }
@@ -96,11 +118,14 @@ namespace DATN.ADMIN.Services
         }
         public async Task<ResponseData<string>> CheckCodeOtp(string username, string code)
         {
+
             var result = _client.GetFromJsonAsync<ResponseData<string>>($"api/UserLogin/Check-Otp?username={username}&code={code}").GetAwaiter().GetResult();
             return result;
         }
         public async Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var response = _client.PostAsJsonAsync("api/UserLogin/Reset-Pass", userResetPassView).GetAwaiter().GetResult();
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             if (result == null)
@@ -113,11 +138,15 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<List<RoleView>>> ListPosition()
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             return await _client.GetFromJsonAsync<ResponseData<List<RoleView>>>("api/UserLogin/List-Position");
         }
 
         public async Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var lst = await _client.PostAsJsonAsync<AddRoleForUserView>("api/UserLogin/Add-role-user", addRoleForUserView);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
@@ -125,6 +154,8 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var lst = await _client.PostAsJsonAsync<List<string>>($"api/UserLogin/create-schedule-oneday-suddenly?shift={shift}&dateTime={dateTime.Year}-{dateTime.Month}-{dateTime.Day}", listUser);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await lst.Content.ReadAsStringAsync());
             return result;
@@ -132,12 +163,16 @@ namespace DATN.ADMIN.Services
 
         public async Task<ResponseData<string>> UpdateImg(string url, string imgId, string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             var result = _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/update-url?url={url}&imgId={imgId}&id={id}").GetAwaiter().GetResult();
             return result;
         }
 
         public async Task<ResponseData<string>> GetRoleUser(string id)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
+
             return await _client.GetFromJsonAsync<ResponseData<string>>($"/api/UserLogin/Get-role-user?id={id}");
         }
     }

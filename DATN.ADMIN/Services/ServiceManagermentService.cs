@@ -3,16 +3,21 @@ using DATN.Data.Entities;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.ServiceManager;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace DATN.ADMIN.Services
 {
     public class ServiceManagermentService : IServiceManagermentService
     {
         private readonly HttpClient _client;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ServiceManagermentService(HttpClient client)
+        public ServiceManagermentService(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _client = client;
+            _httpContextAccessor = httpContextAccessor;
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
         public async Task<ResponseData<string>> Create(CreateServiceVM service)
         {

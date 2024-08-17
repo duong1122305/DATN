@@ -2,16 +2,20 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Guest;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace DATN.ADMIN.Services
 {
     public class GuestManagerClient : IGuestManagerClient
     {
         private readonly HttpClient _client;
-        public GuestManagerClient(HttpClient client)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public GuestManagerClient(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _client = client;
-
+            _httpContextAccessor = httpContextAccessor;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
         public async Task<ResponseData<List<GuestViewModel>>> GetGuest()
         {

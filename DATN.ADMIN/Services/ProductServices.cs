@@ -3,15 +3,20 @@ using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace DATN.ADMIN.Services
 {
     public class ProductServices : IProductServices
     {
         private readonly HttpClient _httpClient;
-        public ProductServices(HttpClient client)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ProductServices(HttpClient client, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = client;
+            _httpContextAccessor = httpContextAccessor;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
         public async Task<ResponseData<string>> ActiveProduct(int id)
         {

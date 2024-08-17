@@ -13,13 +13,17 @@ namespace DATN.ADMIN.Services
     public class BookingViewServices : IBookingViewServices
     {
         private readonly HttpClient _httpClient;
-        public BookingViewServices(HttpClient httpClient)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public BookingViewServices(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
         }
 
         public async Task<ResponseData<string>> BuyProduct(List<BuyProduct> buyProducts)
         {
+
             var response = await _httpClient.PostAsJsonAsync<List<BuyProduct>>($"/api/Booking/Add-Product-For-Bill", buyProducts);
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
