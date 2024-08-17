@@ -1,176 +1,183 @@
-﻿@page "/lstBillStatiscal"
-@using System.Net.Http.Json
-@using DATN.ADMIN.Components
-@using DATN.ADMIN.IServices
-@using DATN.ADMIN.Services
-@using DATN.Data.Entities
-@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.Authenticate
-@using DATN.ViewModels.DTOs.Booking
-@using DATN.ViewModels.DTOs.Guest
-@using System.Timers
-@using DATN.ViewModels.DTOs.Report
-<PageTitle>Danh sách hoá đơn</PageTitle>
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @page "/lstBillStatiscal"
+        @using System.Net.Http.Json
+        @using DATN.ADMIN.Components
+        @using DATN.ADMIN.IServices
+        @using DATN.ADMIN.Services
+        @using DATN.Data.Entities
+        @using DATN.ViewModels.Common
+        @using DATN.ViewModels.DTOs.Authenticate
+        @using DATN.ViewModels.DTOs.Booking
+        @using DATN.ViewModels.DTOs.Guest
+        @using System.Timers
+        @using DATN.ViewModels.DTOs.Report
+        <PageTitle>Danh sách hoá đơn</PageTitle>
 
-@inject ISnackbar Snackbar
-<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách hóa đơn</MudText>
+        @inject ISnackbar Snackbar
+        <MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách hóa đơn</MudText>
 
-<div style="display:flex">
-	<div style="width:400px">
-		<MudSelect Value=@type T="int" Label="Thống kê theo" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
-				   ValueChanged="(e)=>ChangeType(e)" AnchorOrigin="Origin.BottomCenter">
-			<MudSelectItem Value="@((int)1)">Ngày</MudSelectItem>
-			<MudSelectItem Value="@((int)2)">Tuần</MudSelectItem>
-			<MudSelectItem Value="@((int)3)">Tháng</MudSelectItem>
-			<MudSelectItem Value="@((int)4)">Tùy chọn</MudSelectItem>
-		</MudSelect>
-	</div>
-	@if (isDisplayDate)
-	{
-		<div style="margin-left:15px;display:flex">
-			<div>
-				<MudStack>
-					<MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
-										TitleDateFormat="dd, MM, yyyy" AutoClose="true" PickerVariant="PickerVariant.Dialog">
-						<PickerActions Context="data">
-							<MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
-							<MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
-							<MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
-						</PickerActions>
-					</MudDateRangePicker>
-				</MudStack>
-			</div>
-			<div style="margin-top:20px">
-				<MudButton OnClick="()=>LoadData(5)">Tìm kiếm</MudButton>
-			</div>
-		</div>
-	}
+        <div style="display:flex">
+            <div style="width:400px">
+                <MudSelect Value=@type T="int" Label="Thống kê theo" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+                           ValueChanged="(e)=>ChangeType(e)" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@((int)1)">Ngày</MudSelectItem>
+                    <MudSelectItem Value="@((int)2)">Tuần</MudSelectItem>
+                    <MudSelectItem Value="@((int)3)">Tháng</MudSelectItem>
+                    <MudSelectItem Value="@((int)4)">Tùy chọn</MudSelectItem>
+                </MudSelect>
+            </div>
+            @if (isDisplayDate)
+            {
+                <div style="margin-left:15px;display:flex">
+                    <div>
+                        <MudStack>
+                            <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
+                                                TitleDateFormat="dd, MM, yyyy" AutoClose="true" PickerVariant="PickerVariant.Dialog">
+                                <PickerActions Context="data">
+                                    <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
+                                    <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
+                                    <MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
+                                </PickerActions>
+                            </MudDateRangePicker>
+                        </MudStack>
+                    </div>
+                    <div style="margin-top:20px">
+                        <MudButton OnClick="()=>LoadData(5)">Tìm kiếm</MudButton>
+                    </div>
+                </div>
+            }
 
-</div>
-@if (lstBill != null)
-{
+        </div>
+        @if (lstBill != null)
+        {
 
-	<MudDrawerContainer Class="mud-height-full" Style=" width:100%">
+            <MudDrawerContainer Class="mud-height-full" Style=" width:100%">
 
-		<MudTable Items="@lstBill" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<StatiscalBill,bool>(FilterFunc)">
-			<ToolBarContent>
-				<MudSpacer />
-				<MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
-			</ToolBarContent>
-			<HeaderContent>
-				<MudTh>STT</MudTh>
-				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.TimeComplete)">Thời gian</MudTableSortLabel></MudTh>
-				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.CusName)">Tên khách hàng</MudTableSortLabel></MudTh>
-				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng giá trị</MudTableSortLabel></MudTh>
-				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Status)">Trạng thái đơn hàng</MudTableSortLabel></MudTh>
-				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.StaffName)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
-				
-				<MudTh>Chi tiết</MudTh>
-			</HeaderContent>
-			<RowTemplate>
-				@{
-					var stt = 1;
-				}
-				<MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
-				<MudTd>@context.TimeComplete</MudTd>
-				<MudTd>@context.CusName</MudTd>
-				<MudTd>@context.Amount</MudTd>
-				<MudTd>@context.Status</MudTd>
-				<MudTd>@context.StaffName</MudTd>
+                <MudTable Items="@lstBill" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<StatiscalBill,bool>(FilterFunc)">
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>STT</MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.TimeComplete)">Thời gian</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.CusName)">Tên khách hàng</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng giá trị</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Status)">Trạng thái đơn hàng</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.StaffName)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
 
-				<MudTd>
-					<MudButtonGroup Variant="Variant.Filled">
-						<MudIconButton OnClick="()=>ViewDetail(context.ID)" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Title="Xóa đánh giá"></MudIconButton>
+                        <MudTh>Chi tiết</MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="data">
+                        @{
+                            var stt = 1;
+                        }
+                        <MudTd>@(lstBill.IndexOf(data) + 1)</MudTd>
+                        <MudTd>@data.TimeComplete</MudTd>
+                        <MudTd>@data.CusName</MudTd>
+                        <MudTd>@data.Amount</MudTd>
+                        <MudTd>@data.Status</MudTd>
+                        <MudTd>@data.StaffName</MudTd>
 
-					</MudButtonGroup>
-				</MudTd>
-			</RowTemplate>
-			<PagerContent>
-				<MudTablePager />
-			</PagerContent>
-		</MudTable>
-	</MudDrawerContainer>
+                        <MudTd>
+                            <MudButtonGroup Variant="Variant.Filled">
+                                <MudIconButton OnClick="()=>ViewDetail(data.ID)" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Title="Xóa đánh giá"></MudIconButton>
 
-
-}
-else
-{
-	<LoadingIndicator></LoadingIndicator>
-}
-<style>
-	.my-custom-class {
-		backdrop-filter: blur(10px);
-	}
-</style>
-@code {
-	int type = 1;
-	private MudDateRangePicker _picker;
-	private DateRange _dateRange;
-	private bool isDisplayDate = false;
-	string searchString = "";
-	private List<StatiscalBill> lstBill = new List<StatiscalBill>();
-	[Inject]
-	private IReportClient _ser { get; set; }
-	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-	[Inject]
-	private IDialogService _dialogService { get; set; }
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadData();
-	}
-
-	// load lai du lieu
-	protected async Task LoadData(int type=3 )
-	{
-		var response = await _ser.GetAllReports();
-		if (response.IsSuccess)
-		{
-			//lstReport = response.Data;
-			StateHasChanged();
-		}
-		else
-		{
-
-		}
-
-	}
-
-	private async Task ChangeType(int value=3)
-	{
-		
-	}
-
-	private async Task ViewDetail(int id)
-	{
-		
-		StateHasChanged();
-
-	
+                            </MudButtonGroup>
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            </MudDrawerContainer>
 
 
-		var response = await _ser.DeleteReport(id);
-		if (response.IsSuccess)
-		{
-			Snackbar.Add(response.Data!, Severity.Success);
+        }
+        else
+        {
+            <LoadingIndicator></LoadingIndicator>
+        }
+        <style>
+            .my-custom-class {
+                backdrop-filter: blur(10px);
+            }
+        </style>
+        @code {
+        int type = 1;
+        private MudDateRangePicker _picker;
+        private DateRange _dateRange;
+        private bool isDisplayDate = false;
+        string searchString = "";
+        private List<StatiscalBill> lstBill = new List<StatiscalBill>();
+        [Inject]
+        private IReportClient _ser { get; set; }
+        string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+        [Inject]
+        private IDialogService _dialogService { get; set; }
+        protected override async Task OnInitializedAsync()
+        {
+            await LoadData();
+        }
 
-		}
-		else
-			Snackbar.Add(response.Error!, Severity.Error);
-		await LoadData();
-		StateHasChanged();
+        // load lai du lieu
+        protected async Task LoadData(int type = 3)
+        {
+            var response = await _ser.GetAllReports();
+            if (response.IsSuccess)
+            {
+                //lstReport = response.Data;
+                StateHasChanged();
+            }
+            else
+            {
 
-	}
+            }
 
-	private bool FilterFunc(StatiscalBill element)// lọc data
-	{
-		if (string.IsNullOrWhiteSpace(searchString.Trim()))
-			return true;
-		if (element.CusName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-			return true;
-		if (element.StaffName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-			return true;
-		return false;
-	}
+        }
+
+        private async Task ChangeType(int value = 3)
+        {
+
+        }
+
+        private async Task ViewDetail(int id)
+        {
+
+            StateHasChanged();
 
 
-}
+
+
+            var response = await _ser.DeleteReport(id);
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.Data!, Severity.Success);
+
+            }
+            else
+                Snackbar.Add(response.Error!, Severity.Error);
+            await LoadData();
+            StateHasChanged();
+
+        }
+
+        private bool FilterFunc(StatiscalBill element)// lọc data
+        {
+            if (string.IsNullOrWhiteSpace(searchString.Trim()))
+                return true;
+            if (element.CusName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (element.StaffName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }
+
+
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

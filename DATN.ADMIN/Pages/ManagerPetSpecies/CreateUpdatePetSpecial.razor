@@ -1,130 +1,134 @@
-﻿@inject ISnackbar Snackbar
-@inject IDialogService _diagService;
-@inject HttpClient httpClient
-@using DATN.ADMIN.IServices
-@using DATN.Data.Entities
-@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.Authenticate
-@using DATN.ViewModels.DTOs.Guest
-@using System.ComponentModel.DataAnnotations
-@using DATN.ViewModels.DTOs.PetSpecies
-<EditForm Model="@petSpecies" OnValidSubmit="@(async()=>await Submit())">
-	<DataAnnotationsValidator />
-	<MudItem xs="12" sm="12">
-		<MudCard>
-			<MudCardContent>
-				<MudTextField @bind-Value="@petSpecies.Name" Label="Tên loài" For="@(() => petSpecies.Name)" />
-				<MudSelect Class="mud-mb-2" @bind-Value=@petSpecies.PetTypeId Label="Loại thú cưng" For="@(() => petSpecies.PetTypeId)">
-					<MudSelectItem  Value="1">Chó</MudSelectItem>
-					<MudSelectItem Value="2">Mèo</MudSelectItem>
-				</MudSelect>
-				<hr class="hr" />
-				<div class="mt-5 me-5" style="text-align: end;">
-					<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
-				</div>
-			</MudCardContent>
-		</MudCard>
-	</MudItem>
-</EditForm>
-@code {
-	[Inject]
-	private IPetSpeciesServiceClient _client { get; set; }
-	[Inject]
-	private ISnackbar snackbar { get; set; }
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @inject ISnackbar Snackbar
+        @inject IDialogService _diagService;
+        @inject HttpClient httpClient
+        @using DATN.ADMIN.IServices
+        @using DATN.Data.Entities
+        @using DATN.ViewModels.Common
+        @using DATN.ViewModels.DTOs.Authenticate
+        @using DATN.ViewModels.DTOs.Guest
+        @using System.ComponentModel.DataAnnotations
+        @using DATN.ViewModels.DTOs.PetSpecies
+        <EditForm Context="data" Model="@petSpecies" OnValidSubmit="@(async()=>await Submit())">
+            <DataAnnotationsValidator />
+            <MudItem xs="12" sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField @bind-Value="@petSpecies.Name" Label="Tên loài" For="@(() => petSpecies.Name)" />
+                        <MudSelect Class="mud-mb-2" @bind-Value=@petSpecies.PetTypeId Label="Loại thú cưng" For="@(() => petSpecies.PetTypeId)">
+                            <MudSelectItem Value="1">Chó</MudSelectItem>
+                            <MudSelectItem Value="2">Mèo</MudSelectItem>
+                        </MudSelect>
+                        <hr class="hr" />
+                        <div class="mt-5 me-5" style="text-align: end;">
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </EditForm>
+        @code {
+        [Inject]
+        private IPetSpeciesServiceClient _client { get; set; }
+        [Inject]
+        private ISnackbar snackbar { get; set; }
 
-	[CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-	private string _nameButton = "Thêm mới";
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+        private string _nameButton = "Thêm mới";
 
-	[Parameter]
-	public PetSpeciesVM petSpeciesVM { get; set; } = new PetSpeciesVM();
-	public PetSpeciesCreateUpdate petSpecies { get; set; } = new PetSpeciesCreateUpdate();
-	private bool registerUser = false;
-	private bool IsNew = true;
+        [Parameter]
+        public PetSpeciesVM petSpeciesVM { get; set; } = new PetSpeciesVM();
+        public PetSpeciesCreateUpdate petSpecies { get; set; } = new PetSpeciesCreateUpdate();
+        private bool registerUser = false;
+        private bool IsNew = true;
 
-	protected override void OnInitialized()
-	{
-		petSpecies.PetTypeId = 1;
-		if (!string.IsNullOrEmpty(petSpeciesVM.Name))
-		{
-			petSpecies = new PetSpeciesCreateUpdate()
-				{
-					Name = petSpeciesVM.Name,
-					Id = petSpeciesVM.Id,
-					IsDelete=petSpeciesVM.IsDelete,
-					PetTypeId= petSpeciesVM.PetTypeId,
-				};
-			_nameButton = "Cập nhật";
-			IsNew = false;
-		}
-	}
+        protected override void OnInitialized()
+        {
+            petSpecies.PetTypeId = 1;
+            if (!string.IsNullOrEmpty(petSpeciesVM.Name))
+            {
+                petSpecies = new PetSpeciesCreateUpdate()
+                {
+                    Name = petSpeciesVM.Name,
+                    Id = petSpeciesVM.Id,
+                    IsDelete = petSpeciesVM.IsDelete,
+                    PetTypeId = petSpeciesVM.PetTypeId,
+                };
+                _nameButton = "Cập nhật";
+                IsNew = false;
+            }
+        }
 
-	//thêm
-	protected async Task Create()
-	{
+        //thêm
+        protected async Task Create()
+        {
 
-		var confirm = await Confirm("tạo mới");
-		if (!confirm)
-		{
-			return;
-		}
-		var response = await _client.Create(petSpecies);
-		if (response.IsSuccess)
-		{
-			snackbar.Add(response.Data, Severity.Success);
-			_dialogBox.Close();
-		}
-		else
-		{
-			snackbar.Add(response.Error, Severity.Warning);
-		}
-
-
-
-	}
-	//thông báo xác nhận
-	private async Task<bool> Confirm(string text)
-	{
-		var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} loài?",
-					yesText: "Xác nhận",
-					cancelText: "Hủy", noText: null,
-					options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
-		StateHasChanged();
-		if (!confirm.HasValue) return false;
-		return confirm.Value;
-	}
-	//cập nhật
-	public async Task Update()
-	{
-		var confirm = await Confirm("cập nhật");
-		if (!confirm)
-		{
-			return;
-		}
-		var response = await _client.Update(petSpecies);
-		if (response.IsSuccess)
-		{
-			snackbar.Add(response.Data, Severity.Success);
-			_dialogBox.Close();
-		}
-		else
-		{
-			snackbar.Add(response.Error, Severity.Warning);
-		}
-	}
-	private async Task Submit()
-	{
-
-		if (IsNew)
-		{
-			await Create();
-		}
-		else
-		{
-			await Update();
-		}
-		StateHasChanged();
-	}
+            var confirm = await Confirm("tạo mới");
+            if (!confirm)
+            {
+                return;
+            }
+            var response = await _client.Create(petSpecies);
+            if (response.IsSuccess)
+            {
+                snackbar.Add(response.Data, Severity.Success);
+                _dialogBox.Close();
+            }
+            else
+            {
+                snackbar.Add(response.Error, Severity.Warning);
+            }
 
 
 
-} 
+        }
+        //thông báo xác nhận
+        private async Task<bool> Confirm(string text)
+        {
+            var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} loài?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+            StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
+        }
+        //cập nhật
+        public async Task Update()
+        {
+            var confirm = await Confirm("cập nhật");
+            if (!confirm)
+            {
+                return;
+            }
+            var response = await _client.Update(petSpecies);
+            if (response.IsSuccess)
+            {
+                snackbar.Add(response.Data, Severity.Success);
+                _dialogBox.Close();
+            }
+            else
+            {
+                snackbar.Add(response.Error, Severity.Warning);
+            }
+        }
+        private async Task Submit()
+        {
+
+            if (IsNew)
+            {
+                await Create();
+            }
+            else
+            {
+                await Update();
+            }
+            StateHasChanged();
+        }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

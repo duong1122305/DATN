@@ -1,130 +1,132 @@
-﻿@page "/ViewShift"
-@using System.Net.Http.Json
-@using DATN.Data.Entities
-@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.Authenticate
-@inject HttpClient httpClient
-@inject ISnackbar Snackbar
-@inject IDialogService _dialogservice;
-<PageTitle>Danh sách ca làm</PageTitle>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Disabled>Thêm</MudButton>
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @page "/ViewShift"
+        @using System.Net.Http.Json
+        @using DATN.Data.Entities
+        @using DATN.ViewModels.Common
+        @using DATN.ViewModels.DTOs.Authenticate
+        @inject HttpClient httpClient
+        @inject ISnackbar Snackbar
+        @inject IDialogService _dialogservice;
+        <PageTitle>Danh sách ca làm</PageTitle>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))" Disabled>Thêm</MudButton>
 
-@if (lstShift.Count > 0 && lstShift != null)
-{
-    <MudTable Items="@lstShift" Hover="@hover" Filter="new Func<Shift,bool>(FilterFunc1)">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Danh sách ca làm</MudText>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh Style="text-align:center;">STT</MudTh>
-            <MudTh Style="text-align:center;">Ca làm</MudTh>
-            <MudTh Style="text-align:center;">Từ</MudTh>
-            <MudTh Style="text-align:center;">Đến</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="STT" Style="text-align:center;">
-                @(lstShift.IndexOf(context) + 1)
-            </MudTd>
-            <MudTd DataLabel="Name" Style="text-align:center;">@context.Name</MudTd>
-            <MudTd DataLabel="From" Style="text-align:center;">@context.From</MudTd>
-            <MudTd DataLabel="To" Style="text-align:center;">@context.To</MudTd>
-            <MudTd Style="text-align:center;">
-                <MudButton StartIcon="@Icons.Material.Filled.Edit" IconSize="MudBlazor.Size.Large" IconColor="Color.Warning" OnClick="@(async()=> await OpenDialog(context.Id))" Disabled></MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconSize="MudBlazor.Size.Large" IconColor="Color.Info" OnClick="@(async()=> await OpenDialog(context.Id))" Disabled></MudButton>
-            </MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager TransformOrigin="Origin.TopCenter" />
-        </PagerContent>
-    </MudTable>
-}
-else
-{
-        <div style="justify-content:center; justify-items:center">
-        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-        
-    </div>
-}
-
-
-@code {
-    //button trạng thái
-    private bool _disableElevation = false;
-    //hiệu ứng hover
-    private bool hover = true;
-    private string searchString1 = "";
-
-    //đây là lấy danh sách ?
-    private List<Shift> lstShift = new List<Shift>();
-
-    protected async Task LoadData()
-    {
-        try
+        @if (lstShift.Count > 0 && lstShift != null)
         {
-            var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
-            if (!shift.IsSuccess)
-            {
-                lstShift = null;
-            }
-            else
-            {
-                lstShift = shift.Data;
-            }
+            <MudTable Items="@lstShift" Hover="@hover" Filter="new Func<Shift,bool>(FilterFunc1)">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Danh sách ca làm</MudText>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh Style="text-align:center;">STT</MudTh>
+                    <MudTh Style="text-align:center;">Ca làm</MudTh>
+                    <MudTh Style="text-align:center;">Từ</MudTh>
+                    <MudTh Style="text-align:center;">Đến</MudTh>
+                    <MudTh Style="text-align:center;">Hành động</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="data">
+                    <MudTd DataLabel="STT" Style="text-align:center;">
+                        @(lstShift.IndexOf(data) + 1)
+                    </MudTd>
+                    <MudTd DataLabel="Name" Style="text-align:center;">@data.Name</MudTd>
+                    <MudTd DataLabel="From" Style="text-align:center;">@data.From</MudTd>
+                    <MudTd DataLabel="To" Style="text-align:center;">@data.To</MudTd>
+                    <MudTd Style="text-align:center;">
+                        <MudButton StartIcon="@Icons.Material.Filled.Edit" IconSize="MudBlazor.Size.Large" IconColor="Color.Warning" OnClick="@(async()=> await OpenDialog(data.Id))" Disabled></MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" IconSize="MudBlazor.Size.Large" IconColor="Color.Info" OnClick="@(async()=> await OpenDialog(data.Id))" Disabled></MudButton>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager TransformOrigin="Origin.TopCenter" />
+                </PagerContent>
+            </MudTable>
         }
-        catch (Exception)
-        { 
-            throw;
-        }
-    }
+        else
+        {
+            <div style="justify-content:center; justify-items:center">
+                <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 
-    protected override async Task OnInitializedAsync()
-    {
+            </div>
+        }
+
+
+        @code {
+        //button trạng thái
+        private bool _disableElevation = false;
+        //hiệu ứng hover
+        private bool hover = true;
+        private string searchString1 = "";
+
+        //đây là lấy danh sách ?
+        private List<Shift> lstShift = new List<Shift>();
+
+        protected async Task LoadData()
+        {
+            try
+            {
+                var shift = await httpClient.GetFromJsonAsync<ResponseData<List<Shift>>>("api/UserLogin/Get-List-Shift");
+                if (!shift.IsSuccess)
+                {
+                    lstShift = null;
+                }
+                else
+                {
+                    lstShift = shift.Data;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
             await LoadData();
-    }
+        }
 
-    private bool FilterFunc1(Shift element) => FilterFunc(element, searchString1);
+        private bool FilterFunc1(Shift element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(Shift element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.From} {element.To}".Contains(searchString))
-            return true;
-        return false;
-    }
-
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
-
-
-    private async Task OpenDialog(int? id)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Thêm mới ca làm";
-        if (id != null)
+        private bool FilterFunc(Shift element, string searchString)
         {
-            var view = lstShift.FirstOrDefault(c => c.Id == id);
-            var updateView = new ShiftView()
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+            if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if ($"{element.From} {element.To}".Contains(searchString))
+                return true;
+            return false;
+        }
+
+        private void Message(string message, Severity severity)
+        {
+            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+            Snackbar.Add(message, severity);
+        }
+
+
+        private async Task OpenDialog(int? id)
+        {
+            var parameters = new DialogParameters();
+            string nameDialog = "Thêm mới ca làm";
+            if (id != null)
+            {
+                var view = lstShift.FirstOrDefault(c => c.Id == id);
+                var updateView = new ShiftView()
                 {
                     Name = view.Name,
                     From = view.From.Hours,
                     To = view.To.Hours,
                 };
+                parameters.Add("id", id);
+                parameters.Add("shiftView", updateView);
+                nameDialog = "Cập nhật ca làm";
+            }
             parameters.Add("id", id);
-            parameters.Add("shiftView", updateView);
-            nameDialog = "Cập nhật ca làm";
-        }
-        parameters.Add("id", id);
-        DialogOptions options = new DialogOptions()
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -133,23 +135,28 @@ else
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        try
-        {
-            var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog,parameters,options);
-            var result = await createUpdateDialog.Result;
-            if (!result.Canceled)
+            try
             {
-                createUpdateDialog.Close();
-                await LoadData();
-                await OnInitializedAsync();
+                var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpShift>(nameDialog, parameters, options);
+                var result = await createUpdateDialog.Result;
+                if (!result.Canceled)
+                {
+                    createUpdateDialog.Close();
+                    await LoadData();
+                    await OnInitializedAsync();
+                }
             }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
-        catch (Exception)
-        {
-            
-            throw;
+
         }
-    
-    }
-  
-}
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,132 +1,136 @@
-﻿@using DATN.ADMIN.IServices
-@using DATN.ViewModels.DTOs.Authenticate
-@inject IDialogService _diagService;
-@inject ISnackbar Snackbar
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @using DATN.ADMIN.IServices
+        @using DATN.ViewModels.DTOs.Authenticate
+        @inject IDialogService _diagService;
+        @inject ISnackbar Snackbar
 
-@if (lst.Count > 0 && lst != null)
-{
-    <MudTable Items="@lst" Dense="true" Filter="new Func<UserInfView,bool>(FilterFunc)" onchange="_tableRef">
-        <ToolBarContent>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh Style="text-align:center;">Họ và tên</MudTh>
-            <MudTh Style="text-align:center;">Mã nhân viên</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Name" Style="text-align:center;">@context.FullName</MudTd>
-            <MudTd DataLabel="Shift" Style="text-align:center;">@context.UserName</MudTd>
-            <MudTd Style="text-align:center;">
-                <MudButtonGroup Variant="Variant.Filled">
-                    @* <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.SwapHorizontalCircle" Title="Đổi ca" OnClick="@(async()=>await Update(context.UserName))"></MudIconButton> *@
-                    <MudButton IconColor="Color.Primary" StartIcon="@Icons.Material.Filled.SwapHorizontalCircle" title="Đổi ca" OnClick="@(async()=>await Update(context.UserName,context.FullName))">Đổi ca</MudButton>
-                </MudButtonGroup>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-}
-else
-{
-    <div style="justify-content:center; justify-items:center">
-        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-    </div>
-}
-@code {
-    private string searchString = "";
-    [Parameter]
-    public int idShift { get; set; }
-    [Parameter]
-    public DateTime workDate { get; set; }
-    [Parameter]
-    public string idNhanVien { get; set; }//id của nhân viên về nấu cơm
-    [Parameter]
-    public string fulName { get; set; }
-    [Inject]
-    IEmployeeScheduleSer _client { get; set; }
-    [Inject]
-    IUserClientSev _clienId { get; set; }
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-
-
-    private List<UserInfView> lst { get; set; } = new List<UserInfView>();
-
-    private async Task loadData()
-    {
-        var role = await _clienId.GetRoleUser(idNhanVien);
-        if (role.IsSuccess)
+        @if (lst.Count > 0 && lst != null)
         {
-            var res = await _client.lstUsrInffor(idShift, workDate, role.Data);
-            lst = res.Data;
+            <MudTable Items="@lst" Dense="true" Filter="new Func<UserInfView,bool>(FilterFunc)" onchange="_tableRef">
+                <ToolBarContent>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh Style="text-align:center;">Họ và tên</MudTh>
+                    <MudTh Style="text-align:center;">Mã nhân viên</MudTh>
+                    <MudTh Style="text-align:center;">Hành động</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="data">
+                    <MudTd DataLabel="Name" Style="text-align:center;">@data.FullName</MudTd>
+                    <MudTd DataLabel="Shift" Style="text-align:center;">@data.UserName</MudTd>
+                    <MudTd Style="text-align:center;">
+                        <MudButtonGroup Variant="Variant.Filled">
+                            <MudButton IconColor="Color.Primary" StartIcon="@Icons.Material.Filled.SwapHorizontalCircle" title="Đổi ca" OnClick="@(async()=>await Update(data.UserName,data.FullName))">Đổi ca</MudButton>
+                        </MudButtonGroup>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
         }
         else
         {
-            Message("Ko có nhân viên nào có cùng chức vụ nhân viên đang chọn", Severity.Warning);
+            <div style="justify-content:center; justify-items:center">
+                <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+            </div>
         }
-        StateHasChanged();
-    }
+        @code {
+        private string searchString = "";
+        [Parameter]
+        public int idShift { get; set; }
+        [Parameter]
+        public DateTime workDate { get; set; }
+        [Parameter]
+        public string idNhanVien { get; set; }//id của nhân viên về nấu cơm
+        [Parameter]
+        public string fulName { get; set; }
+        [Inject]
+        IEmployeeScheduleSer _client { get; set; }
+        [Inject]
+        IUserClientSev _clienId { get; set; }
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    protected async override Task OnInitializedAsync()
-    {
-        await loadData();
-    }
 
+        private List<UserInfView> lst { get; set; } = new List<UserInfView>();
 
-
-    // // tìm kiếm
-    private bool FilterFunc(UserInfView element)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
-    private async Task<bool?> Confirm(string fulname2)
-    {
-        var confirm = await _diagService.ShowMessageBox("Thông báo",
-    $"Xác nhận đổi ca làm của {fulName} vào ngày {workDate.ToString("dd/MM/yyyy")} cho nhân viên {fulname2}?",
-           yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Medium, FullWidth = true });
-        StateHasChanged();
-        return confirm;
-    }
-
-    public async Task Update(string userName, string fulname2)
-    {
-        if (await Confirm(fulname2) == true)
+        private async Task loadData()
         {
-            var idUser = await _clienId.GetById(userName);
-            ChangeShiftView changeShiftView = new ChangeShiftView();
-            changeShiftView.ShiftId = idShift;
-            changeShiftView.Date = workDate;
-            changeShiftView.UserIdFirst = idNhanVien;
-            changeShiftView.UserIdSecond = idUser.Data;
-            var result = await _client.changgeShift(changeShiftView);
-            if (result.IsSuccess)
+            var role = await _clienId.GetRoleUser(idNhanVien);
+            if (role.IsSuccess)
             {
-                Message(result.Data, Severity.Success);
-                _dialogBox.Close(DialogResult.Ok(true));
-                await loadData();
+                var res = await _client.lstUsrInffor(idShift, workDate, role.Data);
+                lst = res.Data;
             }
             else
             {
-                Message(result.Error, Severity.Error);
+                Message("Ko có nhân viên nào có cùng chức vụ nhân viên đang chọn", Severity.Warning);
             }
-
+            StateHasChanged();
         }
-    }
 
-    //thông báo
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
+        protected async override Task OnInitializedAsync()
+        {
+            await loadData();
+        }
 
 
-}
+
+        // // tìm kiếm
+        private bool FilterFunc(UserInfView element)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+            if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (element.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }
+        private async Task<bool?> Confirm(string fulname2)
+        {
+            var confirm = await _diagService.ShowMessageBox("Thông báo",
+            $"Xác nhận đổi ca làm của {fulName} vào ngày {workDate.ToString("dd/MM/yyyy")} cho nhân viên {fulname2}?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Medium, FullWidth = true });
+            StateHasChanged();
+            return confirm;
+        }
+
+        public async Task Update(string userName, string fulname2)
+        {
+            if (await Confirm(fulname2) == true)
+            {
+                var idUser = await _clienId.GetById(userName);
+                ChangeShiftView changeShiftView = new ChangeShiftView();
+                changeShiftView.ShiftId = idShift;
+                changeShiftView.Date = workDate;
+                changeShiftView.UserIdFirst = idNhanVien;
+                changeShiftView.UserIdSecond = idUser.Data;
+                var result = await _client.changgeShift(changeShiftView);
+                if (result.IsSuccess)
+                {
+                    Message(result.Data, Severity.Success);
+                    _dialogBox.Close(DialogResult.Ok(true));
+                    await loadData();
+                }
+                else
+                {
+                    Message(result.Error, Severity.Error);
+                }
+
+            }
+        }
+
+        //thông báo
+        private void Message(string message, Severity severity)
+        {
+            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+            Snackbar.Add(message, severity);
+        }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

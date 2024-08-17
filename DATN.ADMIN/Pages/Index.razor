@@ -1,219 +1,220 @@
-﻿@page "/trangchu"
-@using DATN.Utilites
-@using DATN.ViewModels.DTOs.Statistical
-@inject IDialogService DialogService
-<link rel="stylesheet" href="/css/Statical.css">
-<PageTitle>Trang chủ</PageTitle>
-<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+﻿
 <AuthorizeView Roles="Admin">
-	<Authorized>
-		<MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Thống kê doanh thu cửa hàng</MudText>
-		<MudGrid>
-			<MudItem sm="12">
-				<div style="display:flex">
-					<div style="width:400px">
-						<MudSelect Value=@type T="int?" Label="Thống kê theo" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
-								   ValueChanged="(e)=>LoadData(e)" AnchorOrigin="Origin.BottomCenter">
-							<MudSelectItem Value="@((int?)1)">Ngày</MudSelectItem>
-							<MudSelectItem Value="@((int?)2)">Tuần</MudSelectItem>
-							<MudSelectItem Value="@((int?)3)">Tháng</MudSelectItem>
-							<MudSelectItem Value="@((int?)4)">Tùy chọn</MudSelectItem>
-						</MudSelect>
-					</div>
-					@if (isDisplayDate)
-					{
-						<div style="margin-left:15px;display:flex">
-							<div>
-								<MudStack>
-									<MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
-														TitleDateFormat="dd, MM, yyyy" AutoClose="true" PickerVariant="PickerVariant.Dialog">
-										<PickerActions Context="data">
-											<MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
-											<MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
-											<MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
-										</PickerActions>
-									</MudDateRangePicker>
-								</MudStack>
-							</div>
-							<div style="margin-top:20px">
-								<MudButton OnClick="()=>LoadData(5)">Tìm kiếm</MudButton>
-							</div>
-						</div>
-					}
-					
-				</div>
-			</MudItem>
-			<MudItem md="12">
-				@if (revenueDatas != null && revenueDatas.Data != null && revenueDatas.Data.Count() > 0)
-				{
-					<MudPaper Elevation="2" Class="pa-4" Style="" Height="400px">
-						<SfChart Title="@revenueDatas.Name" Width="@width">
-							<ChartPrimaryXAxis Format="N0" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-							<ChartPrimaryYAxis Visible=true LabelFormat="N0"></ChartPrimaryYAxis>
-							@* <ChartTooltipSettings Enable="true"></ChartTooltipSettings> *@
-							<ChartSeriesCollection>
-								<ChartSeries DataSource="@revenueDatas.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
-									<ChartMarker>
-										<ChartDataLabel Visible="true" Format="N0" />
-									</ChartMarker>
-								</ChartSeries>
-							</ChartSeriesCollection>
-						</SfChart>
-					</MudPaper>
-				}
+    <Authorized>
+        @page "/trangchu"
+        @using DATN.Utilites
+        @using DATN.ViewModels.DTOs.Statistical
+        @inject IDialogService DialogService
+        <link rel="stylesheet" href="/css/Statical.css">
+        <PageTitle>Trang chủ</PageTitle>
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+        <MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Thống kê doanh thu cửa hàng</MudText>
+        <MudGrid>
+            <MudItem sm="12">
+                <div style="display:flex">
+                    <div style="width:400px">
+                        <MudSelect Value=@type T="int?" Label="Thống kê theo" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+                                   ValueChanged="(e)=>LoadData(e)" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelectItem Value="@((int?)1)">Ngày</MudSelectItem>
+                            <MudSelectItem Value="@((int?)2)">Tuần</MudSelectItem>
+                            <MudSelectItem Value="@((int?)3)">Tháng</MudSelectItem>
+                            <MudSelectItem Value="@((int?)4)">Tùy chọn</MudSelectItem>
+                        </MudSelect>
+                    </div>
+                    @if (isDisplayDate)
+                    {
+                        <div style="margin-left:15px;display:flex">
+                            <div>
+                                <MudStack>
+                                    <MudDateRangePicker @ref="_picker" Label="Chọn khoảng ngày cần tìm" @bind-DateRange="_dateRange"
+                                                        TitleDateFormat="dd, MM, yyyy" AutoClose="true" PickerVariant="PickerVariant.Dialog">
+                                        <PickerActions Context="data">
+                                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Xoá</MudButton>
+                                            <MudButton OnClick="@(() => _picker.Close(false))">Đóng</MudButton>
+                                            <MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
+                                        </PickerActions>
+                                    </MudDateRangePicker>
+                                </MudStack>
+                            </div>
+                            <div style="margin-top:20px">
+                                <MudButton OnClick="()=>LoadData(5)">Tìm kiếm</MudButton>
+                            </div>
+                        </div>
+                    }
 
-			</MudItem>
-			<MudItem sm="12" md="7">
-				@if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
-				{
-					<MudPaper Elevation="2" Class="pa-4" Height="350px">
+                </div>
+            </MudItem>
+            <MudItem md="12">
+                @if (revenueDatas != null && revenueDatas.Data != null && revenueDatas.Data.Count() > 0)
+                {
+                    <MudPaper Elevation="2" Class="pa-4" Style="" Height="400px">
+                        <SfChart Title="@revenueDatas.Name" Width="@width">
+                            <ChartPrimaryXAxis Format="N0" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Visible=true LabelFormat="N0"></ChartPrimaryYAxis>
+                            @* <ChartTooltipSettings Enable="true"></ChartTooltipSettings> *@
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@revenueDatas.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
+                                    <ChartMarker>
+                                        <ChartDataLabel Visible="true" Format="N0" />
+                                    </ChartMarker>
+                                </ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    </MudPaper>
+                }
 
-						<SfChart Title="@customerData.Name" Width="@width">
-							<ChartPrimaryXAxis Title="" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-							<ChartPrimaryYAxis Visible=true Interval="1"></ChartPrimaryYAxis>
-							<ChartTooltipSettings Enable="true" ></ChartTooltipSettings>
-							<ChartSeriesCollection>
-								<ChartSeries DataSource="@customerData.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
-									<ChartMarker>
-										<ChartDataLabel Visible="true" Format="N0" />
-									</ChartMarker>
-								</ChartSeries>
-							</ChartSeriesCollection>
-						</SfChart>
-					</MudPaper>
-				}
-			</MudItem>
-			<MudItem sm="12" md="5">
-				<MudPaper Elevation="2" Class="pa-4" Style="height: 350px;">
-					@if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
-					{
-						<SfAccumulationChart Title="@revenuePieDatas.Name">
-							<AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
-							<AccumulationChartSeriesCollection>
-								<AccumulationChartSeries DataSource="@revenuePieDatas.Data" XName="Label" YName="Value" Name="Browser">
-									<AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
-								</AccumulationChartSeries>
-							</AccumulationChartSeriesCollection>
-							<AccumulationChartTooltipSettings Format="${point.x} : <b>${point.y}đ</b>" Header="Doanh thu" Enable="true">
+            </MudItem>
+            <MudItem sm="12" md="7">
+                @if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
+                {
+                    <MudPaper Elevation="2" Class="pa-4" Height="350px">
 
-							</AccumulationChartTooltipSettings>
+                        <SfChart Title="@customerData.Name" Width="@width">
+                            <ChartPrimaryXAxis Title="" ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Visible=true Interval="1"></ChartPrimaryYAxis>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@customerData.Data" XName="Label" YName="Value" Type="ChartSeriesType.Column">
+                                    <ChartMarker>
+                                        <ChartDataLabel Visible="true" Format="N0" />
+                                    </ChartMarker>
+                                </ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    </MudPaper>
+                }
+            </MudItem>
+            <MudItem sm="12" md="5">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 350px;">
+                    @if (customerData != null && customerData.Data != null && customerData.Data.Count() > 0)
+                    {
+                        <SfAccumulationChart Title="@revenuePieDatas.Name">
+                            <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
+                            <AccumulationChartSeriesCollection>
+                                <AccumulationChartSeries DataSource="@revenuePieDatas.Data" XName="Label" YName="Value" Name="Browser">
+                                    <AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                                </AccumulationChartSeries>
+                            </AccumulationChartSeriesCollection>
+                            <AccumulationChartTooltipSettings Format="${point.x} : <b>${point.y}đ</b>" Header="Doanh thu" Enable="true">
 
-						</SfAccumulationChart>
-					}
-				</MudPaper>
-			</MudItem>
-			<MudItem sm="12" md="6">
+                            </AccumulationChartTooltipSettings>
 
-				<MudPaper Elevation="2" Class="pa-4" Style="height: fit-content;">
-					@if (top3ProductQuantity != null && top3ProductQuantity.Count > 0)
-					{
-						<div class="custom-container">
-							<h1>Top 3 sản phẩm bán chạy</h1>
-							@foreach (var item in top3ProductQuantity)
-							{
-								if (top3ProductQuantity.IndexOf(item) == 3)
-								{
-									break;
-								}
-								<div class="custom-product">
-									<img src="@item.ImgUrl" alt="Sản phẩm">
-									<div class="custom-product-info">
-										<h3 class="text-info">@item.Name</h3>
-										<p class="custom-price">Số lượng bán ra: @item.TotalAmount.ToString("N0")</p>
-										<p><b> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</b></p>
-									</div>
-								</div>
-							}
-						</div>
-					}
+                        </SfAccumulationChart>
+                    }
+                </MudPaper>
+            </MudItem>
+            <MudItem sm="12" md="6">
 
-				</MudPaper>
+                <MudPaper Elevation="2" Class="pa-4" Style="height: fit-content;">
+                    @if (top3ProductQuantity != null && top3ProductQuantity.Count > 0)
+                    {
+                        <div class="custom-container">
+                            <h1>Top 3 sản phẩm bán chạy</h1>
+                            @foreach (var item in top3ProductQuantity)
+                            {
+                                if (top3ProductQuantity.IndexOf(item) == 3)
+                                {
+                                    break;
+                                }
+                                <div class="custom-product">
+                                    <img src="@item.ImgUrl" alt="Sản phẩm">
+                                    <div class="custom-product-info">
+                                        <h3 class="text-info">@item.Name</h3>
+                                        <p class="custom-price">Số lượng bán ra: @item.TotalAmount.ToString("N0")</p>
+                                        <p><b> Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND</b></p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
 
-			</MudItem>
-			<MudItem sm="12" md="6">
-				<MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
-					@if (top3ServiceQuantity != null && top3ServiceQuantity.Count > 0)
-					{
-						<div class="custom-container">
-							<h1>Top 3 dịch vụ làm nhiều nhất</h1>
-							@foreach (var item in top3ServiceQuantity)
-							{
-								if (top3ServiceQuantity.IndexOf(item) == 3)
-								{
-									break;
-								}
-								<div class="custom-product">
-									<img src="/img/service.jpg" alt="Dịch vụ">
-									<div class="custom-product-info">
-										<h3 class="text-info">@item.Name</h3>
-										<p class="custom-price">Số lần được sử dụng: @item.TotalAmount.ToString("N0")</p>
-										<p><b>Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND </b> </p>
-									</div>
-								</div>
-							}
-						</div>
-					}
+                </MudPaper>
 
-				</MudPaper>
-			</MudItem>
+            </MudItem>
+            <MudItem sm="12" md="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+                    @if (top3ServiceQuantity != null && top3ServiceQuantity.Count > 0)
+                    {
+                        <div class="custom-container">
+                            <h1>Top 3 dịch vụ làm nhiều nhất</h1>
+                            @foreach (var item in top3ServiceQuantity)
+                            {
+                                if (top3ServiceQuantity.IndexOf(item) == 3)
+                                {
+                                    break;
+                                }
+                                <div class="custom-product">
+                                    <img src="/img/service.jpg" alt="Dịch vụ">
+                                    <div class="custom-product-info">
+                                        <h3 class="text-info">@item.Name</h3>
+                                        <p class="custom-price">Số lần được sử dụng: @item.TotalAmount.ToString("N0")</p>
+                                        <p><b>Tổng doanh thu: @item.TotalRevenue.ToString("N0") VND </b> </p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
 
-			<MudItem sm="12" md="12">
+                </MudPaper>
+            </MudItem>
 
-				<MudPaper Elevation="2" Class="pa-4">
-					<h1>Các sản phẩm cần nhập hàng</h1>
-					@if (lstProductOutStock != null && lstProductOutStock.Count > 0)
-					{
-						<MudDataGrid Items="@lstProductOutStock" Groupable="false" Hover="true" Filterable="true">
+            <MudItem sm="12" md="12">
 
-							<ToolBarContent>
-								<div style="width:200px">
-									<MudSelect T="int" Value=-1 Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="ChangStatus">
-										<MudSelectItem Value="-1">Tất cả</MudSelectItem>
-										<MudSelectItem Value="0">Hết hàng</MudSelectItem>
-										<MudSelectItem Value="1">Sắp hết</MudSelectItem>
-									</MudSelect>
-								</div>
-								<MudSpacer />
+                <MudPaper Elevation="2" Class="pa-4">
+                    <h1>Các sản phẩm cần nhập hàng</h1>
+                    @if (lstProductOutStock != null && lstProductOutStock.Count > 0)
+                    {
+                        <MudDataGrid Items="@lstProductOutStock" Groupable="false" Hover="true" Filterable="true">
 
-							</ToolBarContent>
-							<Columns>
-								<TemplateColumn Title="STT" Sortable="false" Filterable="false">
-									<CellTemplate Context="data">
-										<span>@(lstProductOutStock.IndexOf(data.Item) + 1)</span>
-									</CellTemplate>
-								</TemplateColumn>
-								<PropertyColumn Property="x => x.FullName" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
-								<PropertyColumn Property="x => x.Category" Title="Tên danh mục" Sortable="false" Filterable="false" />
-								<PropertyColumn Property="x => x.Brand" Title="Thương hiệu" Sortable="false" Filterable="false" />
-								<PropertyColumn Property="x => x.Quantity" Title="Số lượng tồn kho" Sortable="false" Filterable="false" />
-								<TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
-									<CellTemplate Context="data">
-										@if (!data.Item.Status)
-										{
-											<MudChip Color="Color.Error" title="Ngưng hoạt động">Hết hàng</MudChip>
-										}
-										else
-										{
-											<MudChip Color="Color.Warning" title="Hoạt động">Sắp hết</MudChip>
+                            <ToolBarContent>
+                                <div style="width:200px">
+                                    <MudSelect T="int" Value=-1 Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="ChangStatus">
+                                        <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                                        <MudSelectItem Value="0">Hết hàng</MudSelectItem>
+                                        <MudSelectItem Value="1">Sắp hết</MudSelectItem>
+                                    </MudSelect>
+                                </div>
+                                <MudSpacer />
 
-										}
-									</CellTemplate>
-								</TemplateColumn>
+                            </ToolBarContent>
+                            <Columns>
+                                <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+                                    <CellTemplate Context="data">
+                                        <span>@(lstProductOutStock.IndexOf(data.Item) + 1)</span>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                                <PropertyColumn Property="x => x.FullName" Title="Tên sản phẩm" Sortable="false" Filterable="false" />
+                                <PropertyColumn Property="x => x.Category" Title="Tên danh mục" Sortable="false" Filterable="false" />
+                                <PropertyColumn Property="x => x.Brand" Title="Thương hiệu" Sortable="false" Filterable="false" />
+                                <PropertyColumn Property="x => x.Quantity" Title="Số lượng tồn kho" Sortable="false" Filterable="false" />
+                                <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+                                    <CellTemplate Context="data">
+                                        @if (!data.Item.Status)
+                                        {
+                                            <MudChip Color="Color.Error" title="Ngưng hoạt động">Hết hàng</MudChip>
+                                        }
+                                        else
+                                        {
+                                            <MudChip Color="Color.Warning" title="Hoạt động">Sắp hết</MudChip>
 
-							</Columns>
-							<PagerContent>
-								<MudDataGridPager T="ProductOutStock" />
-							</PagerContent>
-						</MudDataGrid>
-					}
+                                        }
+                                    </CellTemplate>
+                                </TemplateColumn>
+
+                            </Columns>
+                            <PagerContent>
+                                <MudDataGridPager T="ProductOutStock" />
+                            </PagerContent>
+                        </MudDataGrid>
+                    }
 
 
-				</MudPaper>
+                </MudPaper>
 
-			</MudItem>
-		</MudGrid>
-	</Authorized>
-	<NotAuthorized>
-		<h1>Bạn không có quyền truy cập trang này !!!!</h1>
-	</NotAuthorized>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+    <NotAuthorized>
+    <p>Bạn không có quyền truy cập trang này!!!</p>
+    </NotAuthorized>
 </AuthorizeView>

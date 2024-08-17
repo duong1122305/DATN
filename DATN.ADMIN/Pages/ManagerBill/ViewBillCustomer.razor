@@ -1,4 +1,6 @@
-﻿@page "/viewbill"
+﻿<AuthorizeView>
+    <Authorized>
+        @page "/viewbill"
 @using DATN.ADMIN.IServices
 @using DATN.Utilites
 @using DATN.ViewModels.DTOs.Booking
@@ -45,11 +47,11 @@
                             <MudTh>Nhân viên làm dịch vụ</MudTh>
                             <MudTh>Đơn giá</MudTh>
                         </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.ServiceDetailName</MudTd>
-                            <MudTd>@context.PetName</MudTd>
-                            <MudTd>@context.NameStaff</MudTd>
-                            <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <RowTemplate Context="data">
+                            <MudTd>@data.ServiceDetailName</MudTd>
+                            <MudTd>@data.PetName</MudTd>
+                            <MudTd>@data.NameStaff</MudTd>
+                            <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
                         </RowTemplate>
                     </MudTable>
                 }
@@ -97,19 +99,19 @@
                                 <MudTh>Đơn giá</MudTh>
                                 <MudTh>Hành động</MudTh>
                             </HeaderContent>
-                            <RowTemplate>
-                                <MudTd>@context.Name</MudTd>
+                                    <RowTemplate Context="data">
+                                <MudTd>@data.Name</MudTd>
                                 <MudTd>
                                     <div class="quantity-input">
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
-                                        <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(data) )">-</button>
+                                        <input type="number" @bind="data.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@data.Quantity" disabled style="width:60px" />
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(data) )">+</button>
 
                                     </div>
                                 </MudTd>
-                                <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                                <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
                                 <MudTd>
-                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@data))" Color="Color.Error">Xoá</MudButton>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
@@ -124,19 +126,19 @@
                             <MudTh>Đơn giá</MudTh>
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.Name</MudTd>
+                                <RowTemplate Context="data">
+                            <MudTd>@data.Name</MudTd>
                             <MudTd>
                                 <div class="quantity-input">
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(context) )">-</button>
-                                    <input type="number" @bind="context.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@context.Quantity" disabled style="width:60px" />
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(context) )">+</button>
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(data) )">-</button>
+                                    <input type="number" @bind="data.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@data.Quantity" disabled style="width:60px" />
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(data) )">+</button>
 
                                 </div>
                             </MudTd>
-                            <MudTd>@CurrencyHelper.FormatCurrency((float)context.Price)</MudTd>
+                            <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
                             <MudTd>
-                                <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@context))" Color="Color.Error">Xoá</MudButton>
+                                <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@data))" Color="Color.Error">Xoá</MudButton>
                             </MudTd>
                         </RowTemplate>
                     </MudTable>
@@ -529,3 +531,9 @@
         }
     }
 }
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,8 +1,12 @@
 ﻿using DATN.ADMIN.IServices;
+using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DATN.ADMIN.Pages.Account
 {
@@ -45,7 +49,17 @@ namespace DATN.ADMIN.Pages.Account
                         {
 
                             _contextAccessor.HttpContext.Session.SetString("Key", checkLogin.Data);
-                            _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                            var jwt = new JwtSecurityTokenHandler();
+                            var tok = jwt.ReadJwtToken(checkLogin.Data);
+                            var claim = tok.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault()?.Value;
+                            if (claim == "Admin")
+                            {
+                                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                            }
+                            else
+                            {
+                                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/ListServicesBooking"));
+                            }
 
                         }
                         else if (!checkLogin.IsSuccess)
