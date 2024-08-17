@@ -23,7 +23,6 @@ namespace DATN.Data.Entities
         public DateTime? UpdateAt { get; set; } // Thời gian cập nhật
 
         public virtual Service Service { get; set; } // Dịch vụ
-        public virtual ICollection<ComboDetail> ComboDetails { get; set; } // Dịch vụ
         public virtual ICollection<BookingDetail> BookingDetails { get; set; } // Dịch vụ
     }
 }

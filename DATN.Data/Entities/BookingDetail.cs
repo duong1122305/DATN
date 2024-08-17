@@ -30,7 +30,6 @@ namespace DATN.Data.Entities
 
         public virtual Booking Booking { get; set; } // Đặt lịch
         public virtual Pet Pet { get; set; }
-        public virtual ComboService ComboService { get; set; } // Đặt lịch
         public virtual User Staff { get; set; } // Đặt lịch
         public virtual ICollection<Report> Reports { get; set; }
 

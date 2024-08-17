@@ -21,9 +21,6 @@ namespace DATN.Data.Config
                 .WithMany(c => c.BookingDetails)
                 .HasForeignKey(c => c.ServiceDetailId);
             //
-            builder.HasOne(c => c.ComboService)
-                .WithMany(c => c.BookingDetails)
-                .HasForeignKey(c => c.ComboId);
 
             builder.HasOne(c => c.Pet)
                 .WithMany(c => c.BookingDetails)

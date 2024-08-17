@@ -16,8 +16,6 @@ namespace DATN.Data.EF
             base.OnModelCreating(builder);
             builder.ApplyConfiguration(new BookingConfig());
             builder.ApplyConfiguration(new BookingDetailConfig());
-            builder.ApplyConfiguration(new ComboDetailConfig());
-            builder.ApplyConfiguration(new ComboServiceConfig());
             builder.ApplyConfiguration(new DiscountConfig());
             builder.ApplyConfiguration(new EmployeeAttendanceConfig());
             builder.ApplyConfiguration(new EmployeeScheduleConfig());
@@ -44,8 +42,6 @@ namespace DATN.Data.EF
         public DbSet<BookingView> BookingViews { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> bookingDetails { get; set; }
-        public DbSet<ComboDetail> comboDetails { get; set; }
-        public DbSet<ComboService> comboServices { get; set; }
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendances { get; set; }
         public DbSet<EmployeeSchedule> EmployeeSchedules { get; set; }

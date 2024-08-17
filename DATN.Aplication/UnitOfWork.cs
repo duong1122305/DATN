@@ -10,8 +10,6 @@ namespace DATN.Aplication
         private IServiceRepository _serviceRepository;
         private IBookingRepository _bookingRepository;
         private IBookingDetailRepository _bookingDetailRepository;
-        private IComboDetailRepository _comboDetailRepository;
-        private IComboServiceRepository _comboServiceRepository;
         private IDiscountRepository _discountRepository;
         private IEmployeeScheduleRepository _employeeScheduleRepository;
         private IEmployAttendanceRepository _employeeAttendanceRepository;
@@ -72,30 +70,6 @@ namespace DATN.Aplication
                     _bookingDetailRepository = new BookingDetailRepository(_context);
                 }
                 return _bookingDetailRepository;
-            }
-        }
-
-        public IComboDetailRepository ComboDetailRepository
-        {
-            get
-            {
-                if (_comboDetailRepository == null)
-                {
-                    _comboDetailRepository = new ComboDetailRepository(_context);
-                }
-                return _comboDetailRepository;
-            }
-        }
-
-        public IComboServiceRepository ComboServiceRepository
-        {
-            get
-            {
-                if (_comboServiceRepository == null)
-                {
-                    _comboServiceRepository = new ComboServiceRepository(_context);
-                }
-                return _comboServiceRepository;
             }
         }
 

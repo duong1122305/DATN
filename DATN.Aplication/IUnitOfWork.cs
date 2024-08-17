@@ -9,8 +9,6 @@ namespace DATN.Aplication
         IHistoryActionRepository HistoryActionRepository { get; }
         IBookingRepository BookingRepository { get; }
         IBookingDetailRepository BookingDetailRepository { get; }
-        IComboDetailRepository ComboDetailRepository { get; }
-        IComboServiceRepository ComboServiceRepository { get; }
         IDiscountRepository DiscountRepository { get; }
         IEmployeeScheduleRepository EmployeeScheduleRepository { get; }
         IEmployAttendanceRepository EmployeeAttendanceRepository { get; }
