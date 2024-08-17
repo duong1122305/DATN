@@ -93,7 +93,7 @@ namespace DATN.Aplication.Services
                         join brand in await _unitOfWork.BrandRepository.GetAllAsync()
                         on product.IdBrand equals brand.Id
                         join cate in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
-                        on product.IdCategoryProduct equals cate.Id
+                        on product.IdCategoryDeatail equals cate.Id
                         join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
                         on product.Id equals img.ProductID
                         where product.Status == true

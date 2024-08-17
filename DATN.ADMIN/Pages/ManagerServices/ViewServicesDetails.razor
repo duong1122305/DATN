@@ -12,7 +12,7 @@
                 <MudCardContent>
                     <MudTextField T="string" Label="Giá" ReadOnly Value="@CurrencyHelper.FormatCurrency(serviceDetail.Price)" />
                     <MudTextField T="string" Label="Thời gian làm" ReadOnly Value="@(serviceDetail.Duration + " phút")" />
-                    <MudTextField T="string" AutoGrow Label="Mô tả" ReadOnly Value="@serviceDetail.Description" />
+                    <MudTextField T="string" AutoGrow Label="Mô tả" ReadOnly Value="@serviceDetail.NameDetail" />
                     <MudTextField T="string" AutoGrow Label="Thời gian tạo" ReadOnly Value="@createdAt" />
                     <MudTextField T="string" AutoGrow Label="Thời gian cập nhật" ReadOnly Value="@updatedAt" />
                 </MudCardContent>

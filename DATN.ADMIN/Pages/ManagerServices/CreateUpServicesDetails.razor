@@ -104,7 +104,7 @@
 
                 updateServiceDetailVM.Price = data.Price;
                 updateServiceDetailVM.Duration = data.Duration;
-                updateServiceDetailVM.Description = data.Description;
+                updateServiceDetailVM.Description = data.NameDetail;
                 await OnPriceChanged(updateServiceDetailVM.Price);
             }
             else

@@ -23,12 +23,6 @@ namespace DATN.Data.Config
 
             builder.Property(x => x.CreateAt)
                 .IsRequired();
-
-            builder.Property(c => c.MinWeight)
-                .IsRequired();
-
-            builder.Property(c => c.MaxWeight)
-                .IsRequired();
         }
     }
 }

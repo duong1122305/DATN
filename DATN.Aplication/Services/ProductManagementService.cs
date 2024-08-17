@@ -27,7 +27,7 @@ namespace DATN.Aplication.Services
                         IdBrand = productView.IdBrand,
                         Name = productView.Name,
                         Description = productView.Description,
-                        IdCategoryProduct = productView.IdCategoryProduct,
+                        IdCategoryDeatail = productView.IdCategoryProduct,
                         Status = true,
                     };
                     await _unitOfWork.ProductRepository.AddAsync(product);
@@ -84,7 +84,7 @@ namespace DATN.Aplication.Services
                         product.Name = productView.Name;
                         product.Description = productView.Description;
                         product.IdBrand = productView.IdBrand;
-                        product.IdCategoryProduct = productView.IdCategoryProduct;
+                        product.IdCategoryDeatail = productView.IdCategoryProduct;
                         await _unitOfWork.ProductRepository.UpdateAsync(product);
 
                         var imgPro = await _unitOfWork.ImageProductRepository.FindAsync(p => p.ProductID == product.Id);
@@ -117,7 +117,7 @@ namespace DATN.Aplication.Services
                     product.Name = productView.Name;
                     product.Description = productView.Description;
                     product.IdBrand = productView.IdBrand;
-                    product.IdCategoryProduct = productView.IdCategoryProduct;
+                    product.IdCategoryDeatail = productView.IdCategoryProduct;
                     await _unitOfWork.ProductRepository.UpdateAsync(product);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
@@ -205,7 +205,7 @@ namespace DATN.Aplication.Services
                         join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
                         on product.Id equals img.ProductID
                         join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
-                        on product.IdCategoryProduct equals cd.Id
+                        on product.IdCategoryDeatail equals cd.Id
                         join c in await _unitOfWork.CategoryRepository.GetAllAsync()
                         on cd.IdCategory equals c.Id
                         select new ProductView()

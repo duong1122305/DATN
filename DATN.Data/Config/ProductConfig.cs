@@ -17,7 +17,7 @@ namespace DATN.Data.Config
 
             builder.HasOne(c => c.CategoryDetails)
                 .WithMany(c => c.Products)
-                .HasForeignKey(c => c.IdCategoryProduct)
+                .HasForeignKey(c => c.IdCategoryDeatail)
                 .IsRequired();
         }
     }

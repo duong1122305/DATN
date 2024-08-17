@@ -24,9 +24,7 @@ namespace DATN.Aplication.Services
                     ServiceId = serviceDetail.ServiceId,
                     Price = serviceDetail.Price,
                     Duration = serviceDetail.Duration,
-                    Description = serviceDetail.Description,
-                    MinWeight = serviceDetail.MinWeight,
-                    MaxWeight = serviceDetail.MaxWeight,
+                    NameDetail = serviceDetail.Description,
                     CreateAt = DateTime.Now
                 };
 
@@ -133,9 +131,7 @@ namespace DATN.Aplication.Services
                 var findServiceDetailById = await _unitOfWork.ServiceDetailRepository.GetAsync(id);
                 findServiceDetailById.Price = serviceDetail.Price;
                 findServiceDetailById.Duration = serviceDetail.Duration;
-                findServiceDetailById.Description = serviceDetail.Description;
-                findServiceDetailById.MinWeight = serviceDetail.MinWeight;
-                findServiceDetailById.MaxWeight = serviceDetail.MaxWeight;
+                findServiceDetailById.NameDetail = serviceDetail.Description;
                 findServiceDetailById.UpdateAt = DateTime.Now;
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
@@ -181,7 +177,7 @@ namespace DATN.Aplication.Services
                              ServiceName = sv.Name,
                              Price = sd.Price,
                              Duration = sd.Duration,
-                             Description = sd.Description,
+                             Description = sd.NameDetail,
                              CreatedAt = sd.CreateAt,
                              IsDeleted = sd.IsDeleted
                          }).AsQueryable();
@@ -200,7 +196,7 @@ namespace DATN.Aplication.Services
                         group new GetServiceDetail
                         {
                             Id = sd.Id,
-                            Description = sd.Description,
+                            Description = sd.NameDetail,
                             Price = sd.Price,
                             Duration = sd.Duration,
                             IsActive = sd.IsDeleted // Assuming you meant !sd.IsDeleted for IsActive

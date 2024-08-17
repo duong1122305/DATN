@@ -3,7 +3,7 @@
     public class Product
     {
         public int Id { get; set; }
-        public int IdCategoryProduct { get; set; }// IDCategoryDetails
+        public int IdCategoryDeatail { get; set; }// IDCategoryDetails
         public string Name { get; set; }
         public string? Description { get; set; }
         public bool Status { get; set; }

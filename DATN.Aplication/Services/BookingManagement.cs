@@ -135,13 +135,13 @@ namespace DATN.Aplication.Services
                         on bookingdetail.PetId equals pet.Id
                         where booking.Id == id
                         group new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
-                        by new { user.FullName, servicedetail.Price, pet.Name, servicedetail.Description, bookingdetail.Status, bookingdetail.StartDateTime, bookingdetail.EndDateTime, booking.BookingTime, bookingdetail.Id }
+                        by new { user.FullName, servicedetail.Price, pet.Name, servicedetail.NameDetail, bookingdetail.Status, bookingdetail.StartDateTime, bookingdetail.EndDateTime, booking.BookingTime, bookingdetail.Id }
                         into view
                         select new ListBokingDetailInDay
                         {
                             IdBookingDetail = view.Key.Id,
                             NameStaffService = view.Key.FullName,
-                            ServiceDetaiName = view.Key.Description,
+                            ServiceDetaiName = view.Key.NameDetail,
                             PetName = view.Key.Name,
                             BookingTime = view.Key.BookingTime,
                             Price = view.Key.Price,
@@ -413,7 +413,7 @@ namespace DATN.Aplication.Services
                                    PetName = pet.Name,
                                    Price = serviceDetail.Price,
                                    NameStaff = user.FullName,
-                                   ServiceDetailName = serviceDetail.Description
+                                   ServiceDetailName = serviceDetail.NameDetail
                                };
             var infoGuest = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
                              where guest.Id == IdGuest
@@ -1091,7 +1091,7 @@ namespace DATN.Aplication.Services
                                     PetName = pet.Name,
                                     Price = serviceDetail.Price,
                                     NameStaff = user.FullName,
-                                    ServiceDetailName = serviceDetail.Description
+                                    ServiceDetailName = serviceDetail.NameDetail
                                 }).ToList();
                 foreach (var item in queryBooking)
                 {
@@ -1733,7 +1733,7 @@ namespace DATN.Aplication.Services
                                 StartDate = new DateOnly(bd.StartDateTime.Year, bd.StartDateTime.Month, bd.StartDateTime.Day).ToString("dd/MM/yyyy"),
                                 PetName = p.Name,
                                 ServiceId = sd.Id,
-                                ServiceName = sd.Description,
+                                ServiceName = sd.NameDetail,
                                 StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
                                 Status = bd.Status,
                                 TotalPrice = bd.Price,

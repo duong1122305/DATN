@@ -22,14 +22,10 @@ namespace DATN.Data.Entities
 
         public bool? Neutered { get; set; } // Đã triệt sản chưa
 
-        public string? OriginalColor { get; set; } // Màu lông ban đầu
-
-        public bool? Vaccinated { get; set; } // Đã tiêm phòng chưa
         public bool? IsDelete { get; set; } // Đã tiêm phòng chưa
 
         public string? Note { get; set; } // Ghi chú
 
-        public virtual ICollection<ImagePet>? ImagePets { get; set; }
         public virtual Guest? Guest { get; set; } // Chủ nhân
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }
 

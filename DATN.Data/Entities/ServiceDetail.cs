@@ -13,9 +13,7 @@ namespace DATN.Data.Entities
 
         public double Duration { get; set; } // Khoảng thời gian
 
-        public string Description { get; set; } // Mô tả
-        public float MinWeight { get; set; }
-        public float MaxWeight { get; set; }
+        public string NameDetail { get; set; } // Mô tả
         public bool IsDeleted { get; set; } = false;
 
         public DateTime CreateAt { get; set; } // Thời gian tạo
