@@ -1,68 +1,70 @@
-﻿@inject ISnackbar Snackbar
-@inject IDialogService _diagService;
-@inject HttpClient httpClient
-@using DATN.ADMIN.Components
-@using DATN.ADMIN.IServices
-@using DATN.Data.Entities
-@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.Authenticate
-    <MudItem xs="12" sm="12">
-        <MudCard>
-            <MudCardContent>
-                <MudDatePicker @bind-Date="time" Label="Chọn ngày thêm nhân viên vào ca" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" />
-                <hr class="hr" />
-                <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async()=>await OnValidSubmit())">@_nameButton</MudButton>
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @inject ISnackbar Snackbar
+        @inject IDialogService _diagService;
+        @inject HttpClient httpClient
+        @using DATN.ADMIN.Components
+        @using DATN.ADMIN.IServices
+        @using DATN.Data.Entities
+        @using DATN.ViewModels.Common
+        @using DATN.ViewModels.DTOs.Authenticate
+        <MudItem xs="12" sm="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudDatePicker @bind-Date="time" Label="Chọn ngày thêm nhân viên vào ca" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" />
+                    <hr class="hr" />
+                    <div class="mt-5" style="text-align: end;">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async()=>await OnValidSubmit())">@_nameButton</MudButton>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-@code {
-    //khai báo list userinfview để nhận các đối tượng bên viewliststaff
-    [Parameter]
-    public List<UserInfView> lstUser { get; set; } = new List<UserInfView>();
+        @code {
+        //khai báo list userinfview để nhận các đối tượng bên viewliststaff
+        [Parameter]
+        public List<UserInfView> lstUser { get; set; } = new List<UserInfView>();
 
-    //khai báo int để nhận id ca làm
-    [Parameter]
-    public int idShift { get; set; }
+        //khai báo int để nhận id ca làm
+        [Parameter]
+        public int idShift { get; set; }
 
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-    private string _nameButton = "Thêm mới";
-    [Inject]
-    private IUserClientSev _client { get; set; }
-    //nó đây
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+        private string _nameButton = "Thêm mới";
+        [Inject]
+        private IUserClientSev _client { get; set; }
+        //nó đây
 
-    private DateTime? time;
-    protected async override Task OnInitializedAsync()
-    {
-    }
-
-
-    //thêm
-    protected async Task Create()
-    {
-        var confirm = await Confirm("thêm nhân viên vào ca khẩn cấp");
-        if (!confirm)
+        private DateTime? time;
+        protected async override Task OnInitializedAsync()
         {
-            return;
         }
-        // Xử lý logic để thêm selectedUsers vào một ca làm
-        var listIdUser = new List<string>();
-            // nứng à
-        if (lstUser.Count > 0 && lstUser != null)
+
+
+        //thêm
+        protected async Task Create()
+        {
+            var confirm = await Confirm("thêm nhân viên vào ca khẩn cấp");
+            if (!confirm)
             {
-            foreach (var user2 in lstUser)
+                return;
+            }
+            // Xử lý logic để thêm selectedUsers vào một ca làm
+            var listIdUser = new List<string>();
+            // nứng à
+            if (lstUser.Count > 0 && lstUser != null)
+            {
+                foreach (var user2 in lstUser)
                 {
                     var idUser = await _client.GetById(user2.UserName);
                     listIdUser.Add(idUser.Data);
                 }
-            if (idShift > 0)
+                if (idShift > 0)
                 {
-                var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-                var dialog = await _diagService.ShowAsync<LoadingIndicator>("", options);
-                    var repo = await _client.InsertOneDayScheduleForStaffSuddenly(listIdUser,idShift,time.Value);
-                dialog.Close();
+                    var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+                    var dialog = await _diagService.ShowAsync<LoadingIndicator>("", options);
+                    var repo = await _client.InsertOneDayScheduleForStaffSuddenly(listIdUser, idShift, time.Value);
+                    dialog.Close();
                     if (repo.IsSuccess)
                     {
                         Message(repo.Data, Severity.Success);
@@ -83,34 +85,39 @@
             {
                 Message("Thêm hông thành công", Severity.Error);
             }
-    }
-    //thông báo xác nhận
-    private async Task<bool> Confirm(string text)
-    {
-        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
-                    yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
-        StateHasChanged();
-        if (!confirm.HasValue) return false;
-        return confirm.Value;
-    }
-    //cập nhật
-   
-    private async Task OnValidSubmit()
-    {
-        if (idShift != null && lstUser.Count > 0 )
-        {
-            await Create();
-            StateHasChanged();
         }
-    }
+        //thông báo xác nhận
+        private async Task<bool> Confirm(string text)
+        {
+            var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} nhân viên?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+            StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
+        }
+        //cập nhật
 
-    //thông báo
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
-} 
+        private async Task OnValidSubmit()
+        {
+            if (idShift != null && lstUser.Count > 0)
+            {
+                await Create();
+                StateHasChanged();
+            }
+        }
+
+        //thông báo
+        private void Message(string message, Severity severity)
+        {
+            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+            Snackbar.Add(message, severity);
+        }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,4 +1,6 @@
-﻿@using DATN.ADMIN.IServices
+﻿<AuthorizeView Roles="Admin,Receptionist">
+    <Authorized>
+        @using DATN.ADMIN.IServices
 @using DATN.ViewModels.DTOs.Pet
 @inject ISnackbar Snackbar
 @inject IDialogService _dialogservice
@@ -38,16 +40,16 @@
 			<MudTh>Thao tác</MudTh>
 
 		</HeaderContent>
-		<RowTemplate>
+				<RowTemplate Context="data">
 
-			<MudTd DataLabel="STT">@(lstPet.IndexOf(context) + 1)</MudTd>
-			<MudTd DataLabel="Tên">@context.Name</MudTd>
-			<MudTd>@(context.Species)</MudTd>
-			<MudTd>@(context.Gender ? "Đực" : "Cái")</MudTd>
-			<MudTd>@(context.Weight ?? 0.0f)</MudTd>
-			<MudTd>@(!context.Neutered.HasValue ? "Chưa có thông tin" : context.Neutered!.Value ? "Đã triệt sản" : "Chưa triệt sản")</MudTd>
-			<MudTd>@(context.Note ?? "Chưa có ghi chú")</MudTd>
-			<MudTd>	<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(context.Id))" Title="Sửa thông tin cá nhân"></MudIconButton></MudTd>
+			<MudTd DataLabel="STT">@(lstPet.IndexOf(data) + 1)</MudTd>
+			<MudTd DataLabel="Tên">@data.Name</MudTd>
+			<MudTd>@(data.Species)</MudTd>
+			<MudTd>@(data.Gender ? "Đực" : "Cái")</MudTd>
+			<MudTd>@(data.Weight ?? 0.0f)</MudTd>
+			<MudTd>@(!data.Neutered.HasValue ? "Chưa có thông tin" : data.Neutered!.Value ? "Đã triệt sản" : "Chưa triệt sản")</MudTd>
+			<MudTd>@(data.Note ?? "Chưa có ghi chú")</MudTd>
+			<MudTd>	<MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" OnClick="@(async()=>await OpenDialog(data.Id))" Title="Sửa thông tin cá nhân"></MudIconButton></MudTd>
 
 		</RowTemplate>
 		<PagerContent>
@@ -134,3 +136,9 @@
 		
 	}
 }
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

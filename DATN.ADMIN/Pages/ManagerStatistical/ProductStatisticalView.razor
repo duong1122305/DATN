@@ -1,26 +1,34 @@
-﻿@page "/statisticalProduct"
-@using DATN.ADMIN.Components
-@inject IDialogService DialogService
-@inject NavigationManager Navigation
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @page "/statisticalProduct"
+        @using DATN.ADMIN.Components
+        @inject IDialogService DialogService
+        @inject NavigationManager Navigation
 
-<MudButton OnClick="ChangeDate">Test</MudButton>
+        <MudButton OnClick="ChangeDate">Test</MudButton>
 
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-    }
+        @code {
+        protected override async Task OnInitializedAsync()
+        {
+        }
 
-    public async Task ChangeDate()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
+        public async Task ChangeDate()
+        {
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
 
-        var dialog=  await DialogService.ShowAsync<LoadingIndicator>("", options);
+            var dialog = await DialogService.ShowAsync<LoadingIndicator>("", options);
 
-        // Wait for 3 seconds
-        await Task.Delay(3000);
+            // Wait for 3 seconds
+            await Task.Delay(3000);
 
-        // Close the dialog
-        dialog.Close();
+            // Close the dialog
+            dialog.Close();
 
-    }
-}
+        }
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

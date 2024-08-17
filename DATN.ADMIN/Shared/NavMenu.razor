@@ -3,44 +3,65 @@
         <Authorized>
             <MudNavLink Href="/trangchu" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Bảng điều khiển</MudNavLink>
         </Authorized>
-        
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin,ServiceStaff,Receptionist">
+        <Authorized>
+            <MudNavGroup Title="Quản lý dịch vụ" Icon="@Icons.Material.Filled.HomeRepairService">
+                <MudNavLink Href="/ListServicesBooking" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách đặt lịch</MudNavLink>
+                <MudNavLink Href="/ViewBillProductTemp" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Hoá đơn tạm</MudNavLink>
+                <MudNavLink Href="/ListServices" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Danh sách dịch vụ</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
     </AuthorizeView>
 
-    <MudNavGroup Title="Quản lý dịch vụ" Icon="@Icons.Material.Filled.HomeRepairService">
-        <MudNavLink Href="/ListServicesBooking" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách đặt lịch</MudNavLink>
-        <MudNavLink Href="/ViewBillProductTemp" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Hoá đơn tạm</MudNavLink>
-        <MudNavLink Href="/ListServices" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Danh sách dịch vụ</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Quản lý nhân viên" Icon="@Icons.Material.Filled.SupervisedUserCircle">
-        <MudNavLink Href="/ListStaff" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Danh sách nhân viên</MudNavLink>
-        <MudNavLink Href="/ViewShift" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm</MudNavLink>
-        <MudNavLink Href="/ViewListShudule" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm của nhân viên</MudNavLink>
-    </MudNavGroup> 
+    <AuthorizeView Roles="Admin,ServiceStaff,Receptionist">
+        <Authorized>
+            <MudNavGroup Title="Quản lý nhân viên" Icon="@Icons.Material.Filled.SupervisedUserCircle">
+                <MudNavLink Href="/ListStaff" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Danh sách nhân viên</MudNavLink>
+                <MudNavLink Href="/ViewShift" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm</MudNavLink>
+                <MudNavLink Href="/ViewListShudule" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Danh sách ca làm của nhân viên</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
     <MudNavGroup Title="Điểm danh" Icon="@Icons.Material.Filled.Schedule">
-       <AuthorizeView Roles="Admin">
-            <MudNavLink Href="/attendancePersonal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FreeCancellation">Điểm danh cá nhân </MudNavLink>
-            <MudNavLink Href="/attenPerMonthView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper">Xem điểm danh cá nhân </MudNavLink>
-       </AuthorizeView>
-        <MudNavLink Href="/AttendanceView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Điểm danh tay </MudNavLink>
-        <MudNavLink Href="/viewAAM" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Danh sách điểm danh tháng </MudNavLink>
+
+        <AuthorizeView Roles="ServiceStaff,Receptionist">
+            <Authorized>
+                <MudNavLink Href="/attendancePersonal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FreeCancellation">Điểm danh cá nhân </MudNavLink>
+                <MudNavLink Href="/attenPerMonthView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper">Xem điểm danh cá nhân </MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin,Receptionist">
+            <Authorized>
+                <MudNavLink Href="/AttendanceView" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Điểm danh tay </MudNavLink>
+                <MudNavLink Href="/viewAAM" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Danh sách điểm danh tháng </MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+
     </MudNavGroup>
-    <MudNavGroup Title="Quản lý khách hàng" Icon="@Icons.Material.Filled.SupervisedUserCircle">
-        <MudNavLink Href="/ListGuest" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách khách hàng</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Quản lý thú cưng" Icon="@Icons.Material.Filled.Pets">
-        <MudNavLink Href="/ListPetSpecies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SnippetFolder">Quản lý loài</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Quản lý giảm giá" Icon="@Icons.Material.Filled.KeyboardDoubleArrowDown">
-        <MudNavLink Href="/ListVoucher" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách mã giảm giá</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Quản lý sản phẩm" Icon="@Icons.Material.Filled.ListAlt">
-        <MudNavLink Href="/ListProduct" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách sản phẩm</MudNavLink>
-        <MudNavLink Href="/ListCategory" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh mục sản phẩm</MudNavLink>
-        <MudNavLink Href="/ListBrand" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách thương hiệu</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Báo cáo thống kê" Icon="@Icons.Material.Filled.ListAlt">
-        <MudNavLink Href="/lstReport" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assignment">Danh sách đánh giá</MudNavLink>
-        <MudNavLink Href="/lstBillStatiscal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách hóa đơn</MudNavLink>
-      </MudNavGroup>
-    
+
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <MudNavGroup Title="Quản lý khách hàng" Icon="@Icons.Material.Filled.SupervisedUserCircle">
+                <MudNavLink Href="/ListGuest" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách khách hàng</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Quản lý thú cưng" Icon="@Icons.Material.Filled.Pets">
+                <MudNavLink Href="/ListPetSpecies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SnippetFolder">Quản lý loài</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Quản lý giảm giá" Icon="@Icons.Material.Filled.KeyboardDoubleArrowDown">
+                <MudNavLink Href="/ListVoucher" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách mã giảm giá</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Quản lý sản phẩm" Icon="@Icons.Material.Filled.ListAlt">
+                <MudNavLink Href="/ListProduct" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách sản phẩm</MudNavLink>
+                <MudNavLink Href="/ListCategory" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh mục sản phẩm</MudNavLink>
+                <MudNavLink Href="/ListBrand" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách thương hiệu</MudNavLink>
+            </MudNavGroup>
+             <MudNavGroup Title="Báo cáo thống kê" Icon="@Icons.Material.Filled.ListAlt">
+            <MudNavLink Href="/lstReport" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assignment">Danh sách đánh giá</MudNavLink>
+           <MudNavLink Href="/lstBillStatiscal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FormatListBulleted">Danh sách hóa đơn</MudNavLink>
+   </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
+
 </MudNavMenu>

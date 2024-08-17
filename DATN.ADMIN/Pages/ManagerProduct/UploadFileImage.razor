@@ -1,25 +1,32 @@
-﻿@page "/UploadFile"
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @page "/UploadFile"
 
-<input id="fileInput" type="file" hidden />
-<MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
-       <ButtonTemplate>
-        <MudButton HtmlTag="label"
-                   Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   StartIcon="@Icons.Material.Filled.CloudUpload"
-                   for="fileInput">
-            Thêm ảnh cho sản phẩm
-        </MudButton>
-       </ButtonTemplate>
-</MudFileUpload>
+        <input id="fileInput" type="file" hidden />
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+            <ButtonTemplate Context="data">
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                           for="fileInput">
+                    Thêm ảnh cho sản phẩm
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
 
 
-@code
-{
-    IList<IBrowserFile> files = new List<IBrowserFile>();
-    private void UploadFiles(IBrowserFile file)
-    {
-        files.Add(file);
-        //TODO upload the files to the server
-    }
-}
+        @code
+        {
+        IList<IBrowserFile> files = new List<IBrowserFile>();
+        private void UploadFiles(IBrowserFile file)
+        {
+            files.Add(file);
+            //TODO upload the files to the server
+        }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

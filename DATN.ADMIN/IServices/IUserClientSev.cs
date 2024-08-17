@@ -27,5 +27,6 @@ namespace DATN.ADMIN.IServices
         Task<ResponseData<string>> AddRoleForUser(AddRoleForUserView addRoleForUserView);
         Task<ResponseData<string>> InsertOneDayScheduleForStaffSuddenly(List<string> listUser, int shift, DateTime dateTime);
         Task<ResponseData<string>> UpdateImg(string url, string imgId, string id);
+        public Task<ResponseData<string>> GetRoleUser(string id);
     }
 }

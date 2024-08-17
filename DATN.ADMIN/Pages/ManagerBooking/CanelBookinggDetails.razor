@@ -1,30 +1,32 @@
-﻿@using DATN.ADMIN.IServices
-@using DATN.ViewModels.DTOs.ActionBooking
-@inject ISnackbar Snackbar
+﻿<AuthorizeView >
+    <Authorized>
+        @using DATN.ADMIN.IServices
+        @using DATN.ViewModels.DTOs.ActionBooking
+        @inject ISnackbar Snackbar
 
-<MudDialog>
-    <DialogContent>
-        <MudTextField @bind-Value="actionView.Reason" For="@(() => actionView.Reason)" Label="Lý do huỷ" MaxLength="255" Required />
-    </DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
-        <MudButton Color="Color.Error" OnClick="@(async()=>await ConfirmCancel())">Xác nhận</MudButton>
-    </DialogActions>
-</MudDialog>
-@code {
-    [Parameter]
-    public int id { get; set; }
+        <MudDialog>
+            <DialogContent>
+                <MudTextField @bind-Value="actionView.Reason" For="@(() => actionView.Reason)" Label="Lý do huỷ" MaxLength="255" Required />
+            </DialogContent>
+            <DialogActions>
+                <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
+                <MudButton Color="Color.Error" OnClick="@(async()=>await ConfirmCancel())">Xác nhận</MudButton>
+            </DialogActions>
+        </MudDialog>
+        @code {
+        [Parameter]
+        public int id { get; set; }
 
-    [Inject]
-    private IHttpContextAccessor _httpContextAccessor { get; set; }
-    public ActionView actionView = new ActionView();
+        [Inject]
+        private IHttpContextAccessor _httpContextAccessor { get; set; }
+        public ActionView actionView = new ActionView();
 
-    [Inject]
-    IBookingViewServices _client { get; set; }
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+        [Inject]
+        IBookingViewServices _client { get; set; }
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    public async Task ConfirmCancel()
-    {
+        public async Task ConfirmCancel()
+        {
             actionView.IdBokingOrDetail = id;
             actionView.Token = _httpContextAccessor.HttpContext.Session.GetString("Key");
             var respone = await _client.CancelBookingDetail(actionView);
@@ -39,18 +41,24 @@
             }
 
 
-    }
-    public async Task Canel()
-    {
-        _dialogBox.Close(DialogResult.Ok(true));
-    }
+        }
+        public async Task Canel()
+        {
+            _dialogBox.Close(DialogResult.Ok(true));
+        }
 
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
+        private void Message(string message, Severity severity)
+        {
+            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+            Snackbar.Add(message, severity);
+        }
 
-}
+        }
 
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

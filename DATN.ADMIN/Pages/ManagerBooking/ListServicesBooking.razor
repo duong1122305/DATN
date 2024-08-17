@@ -1,278 +1,277 @@
-﻿@page "/ListServicesBooking"
-@using System.Net.Http.Json
-@using DATN.ADMIN.Components
-@using DATN.ADMIN.IServices
-@using DATN.ADMIN.Pages.ManagerBill
-@using DATN.Data.Enum
-@using DATN.Utilites
-@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.ActionBooking
-@using DATN.ViewModels.DTOs.Authenticate
-@using DATN.ViewModels.DTOs.Booking
-@using DATN.ViewModels.Enum
-@using Microsoft.AspNetCore.SignalR.Client
-@inject HttpClient httpClient
-@inject ISnackbar Snackbar
-@inject IDialogService _dialogservice;
-@inject IAddressService _addressServive;
+﻿<AuthorizeView>
+    <Authorized>
+        @page "/ListServicesBooking"
+        @using System.Net.Http.Json
+        @using DATN.ADMIN.Components
+        @using DATN.ADMIN.IServices
+        @using DATN.ADMIN.Pages.ManagerBill
+        @using DATN.Data.Enum
+        @using DATN.Utilites
+        @using DATN.ViewModels.Common
+        @using DATN.ViewModels.DTOs.ActionBooking
+        @using DATN.ViewModels.DTOs.Authenticate
+        @using DATN.ViewModels.DTOs.Booking
+        @using DATN.ViewModels.Enum
+        @using Microsoft.AspNetCore.SignalR.Client
+        @inject HttpClient httpClient
+        @inject ISnackbar Snackbar
+        @inject IDialogService _dialogservice;
+        @inject IAddressService _addressServive;
+        <PageTitle>Danh sách đặt lịch</PageTitle>
 
-<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-<MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt dịch vụ</MudText>
-<div style="display: flex; justify-content: flex-end;">
-    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
-    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
-</div>
-
-<MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" QuickFilter="@_quickFilter" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
-    <ToolBarContent>
-        <div style="width:200px">
-            <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
-                       ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
-                <MudSelectItem Value="Status.PendingConfirmation">Chờ xác nhận</MudSelectItem>
-                <MudSelectItem Value="Status.Confirmed">Đã xác nhận</MudSelectItem>
-                <MudSelectItem Value="Status.Arrived">Đã đến nơi</MudSelectItem>
-                <MudSelectItem Value="Status.InProgress">Đang thực hiện</MudSelectItem>
-                <MudSelectItem Value="Status.Completed">Đã hoàn thành</MudSelectItem>
-                <MudSelectItem Value="Status.NoShow">Khách không đến</MudSelectItem>
-                <MudSelectItem Value="Status.CustomerCancelled">Khách huỷ</MudSelectItem>
-                <MudSelectItem Value="Status.StaffCancelled">Nhân viên huỷ</MudSelectItem>
-                <MudSelectItem Value="Status.AdminCancelled">Admin huỷ</MudSelectItem>
-            </MudSelect>
+        <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt lịch dịch vụ</MudText>
+        <div style="display: flex; justify-content: flex-end;">
+            <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+            <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
         </div>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
-        <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 
-    </ToolBarContent>
-    <Columns>
-        <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
-            <GroupTemplate>
-                <span style="font-weight:bold">@context.Grouping.Key</span>
-            </GroupTemplate>
-        </TemplateColumn>
-        <PropertyColumn Property="x=>x.NameGuest" Title="Tên khách hàng" Sortable="false" Filterable="false" />
-        <PropertyColumn Property="x=>x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
-        <TemplateColumn Title="Địa chỉ" Sortable="false" Filterable="false">
-            <CellTemplate>
-                <span DataLabel="Địa chỉ">@(_addressServive.GetAddress(context.Item.Address!) ?? "Không có địa chỉ")</span>
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title="Thời gian đặt" Sortable="false" Filterable="false">
-            <CellTemplate>
-                <span>
-                    @context.Item.BookingTime.ToString("dd/MM/yyyy HH:mm")
-                </span>
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
-            <CellTemplate>
-                @if (context.Item.Status == BookingStatus.PendingConfirmation)
-                {
-                    <MudChip Color="Color.Warning">Chờ xác nhận</MudChip>
-                }
-                @if (context.Item.Status == BookingStatus.Confirmed)
-                {
-                    <MudChip Color="Color.Success">Đã xác nhận</MudChip>
+        <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" QuickFilter="@_quickFilter" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
+            <ToolBarContent>
+                <div style="width:200px">
+                    <MudSelect T="Status" Label="Trạng thái" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;"
+                               ValueChanged="Change" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="Status.All">Tất cả</MudSelectItem>
+                        <MudSelectItem Value="Status.PendingConfirmation">Chờ xác nhận</MudSelectItem>
+                        <MudSelectItem Value="Status.Confirmed">Đã xác nhận</MudSelectItem>
+                        <MudSelectItem Value="Status.Arrived">Đã đến nơi</MudSelectItem>
+                        <MudSelectItem Value="Status.InProgress">Đang thực hiện</MudSelectItem>
+                        <MudSelectItem Value="Status.Completed">Đã hoàn thành</MudSelectItem>
+                        <MudSelectItem Value="Status.NoShow">Khách không đến</MudSelectItem>
+                        <MudSelectItem Value="Status.CustomerCancelled">Khách huỷ</MudSelectItem>
+                        <MudSelectItem Value="Status.StaffCancelled">Nhân viên huỷ</MudSelectItem>
+                        <MudSelectItem Value="Status.AdminCancelled">Admin huỷ</MudSelectItem>
+                    </MudSelect>
+                </div>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+                <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 
-                }@if (context.Item.Status == BookingStatus.Arrived)
-                {
-                    <MudChip Color="Color.Success">Khách đã đến</MudChip>
-
-                }@if (context.Item.Status == BookingStatus.InProgress)
-                {
-                    <MudChip Color="Color.Primary">Đang thực hiện</MudChip>
-
-                }@if (context.Item.Status == BookingStatus.Completed)
-                {
-                    @if (context.Item.IsPayment)
-                    {
-                        <MudChip Color="Color.Success">Đã thanh toán</MudChip>
-                    }
-                    else
-                    {
-                        <MudChip Color="Color.Success">Hoàn thành</MudChip>
-                    }
-                }
-                @if (context.Item.Status == BookingStatus.NoShow)
-                {
-                    <MudChip Color="Color.Surface">Khách không đến</MudChip>
-
-                }@if (context.Item.Status == BookingStatus.CustomerCancelled)
-                {
-                    <MudChip Color="Color.Error">Khách huỷ</MudChip>
-                }@if (context.Item.Status == BookingStatus.StaffCancelled)
-                {
-                    <MudChip Color="Color.Error">Nhân viên huỷ</MudChip>
-
-                }@if (context.Item.Status == BookingStatus.AdminCancelled)
-                {
-                    <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip>
-
-                }
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
-            <CellTemplate>
-                <MudButtonGroup Variant="Variant.Filled">
-                    <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(context.Item.IdBooking.Value,context.Item.IdGuest.Value,context.Item.IsPayment))"></MudIconButton>
-                    @if (context.Item.Status == BookingStatus.PendingConfirmation)
-                    {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(context.Item.IdBooking.Value))">Xác nhận</MudIconButton>
-                        <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(context.Item.IdBooking.Value))">Huỷ</MudIconButton>
-                    }
-                    @if (context.Item.Status == BookingStatus.Confirmed)
-                    {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Khách đến" OnClick="@(async()=>await CheckInArrive(context.Item.IdBooking.Value))">Khách đến</MudIconButton>
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(context.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
-
-                    }
-                    @if (context.Item.Status == BookingStatus.Arrived)
-                    {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(context.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
-
-                    }@if (context.Item.Status == BookingStatus.InProgress)
-                    {
-                        <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteBooking(context.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
-
-                    }@if (context.Item.Status == BookingStatus.Completed)
-                    {
-                        if (!context.Item.IsPayment)
+            </ToolBarContent>
+            <Columns>
+                <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
+                    <GroupTemplate Context="data">
+                        <span style="font-weight:bold">@data.Grouping.Key</span>
+                    </GroupTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x=>x.NameGuest" Title="Tên khách hàng" Sortable="false" Filterable="false" />
+                <PropertyColumn Property="x=>x.PhoneNumber" Title="SĐT" Sortable="false" Filterable="false" />
+                <TemplateColumn Title="Địa chỉ" Sortable="false" Filterable="false">
+                    <CellTemplate Context="data">
+                        <span DataLabel="Địa chỉ">@(_addressServive.GetAddress(data.Item.Address!) ?? "Không có địa chỉ")</span>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Thời gian đặt" Sortable="false" Filterable="false">
+                    <CellTemplate Context="data">
+                        <span>
+                            @data.Item.BookingTime.ToString("dd/MM/yyyy HH:mm")
+                        </span>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Trạng thái" Sortable="false" Filterable="false">
+                    <CellTemplate Context="data">
+                        @if (data.Item.Status == BookingStatus.PendingConfirmation)
                         {
-                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Thanh toán</MudIconButton>
+                            <MudChip Color="Color.Warning">Chờ xác nhận</MudChip>
                         }
-                        else
+                        @if (data.Item.Status == BookingStatus.Confirmed)
                         {
-                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem hóa đơn đã mua" OnClick="@(async()=>await OpenDialogBill(context.Item.IdGuest.Value,context.Item.BookingTime,context.Item.IdBooking))">Xem hóa đơn</MudIconButton>
-                            <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" OnClick="@(async()=>await CheckOut(context.Item.IdBooking.Value))" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
+                            <MudChip Color="Color.Success">Đã xác nhận</MudChip>
+
+                        }@if (data.Item.Status == BookingStatus.Arrived)
+                        {
+                            <MudChip Color="Color.Success">Khách đã đến</MudChip>
+
+                        }@if (data.Item.Status == BookingStatus.InProgress)
+                        {
+                            <MudChip Color="Color.Primary">Đang thực hiện</MudChip>
+
+                        }@if (data.Item.Status == BookingStatus.Completed)
+                        {
+                            @if (data.Item.IsPayment)
+                            {
+                                <MudChip Color="Color.Success">Đã thanh toán</MudChip>
+                            }
+                            else
+                            {
+                                <MudChip Color="Color.Success">Hoàn thành</MudChip>
+                            }
                         }
-                    }
-                    @if (context.Item.Status == BookingStatus.NoShow)
-                    {
-                        @* <MudChip Color="Color.Surface">Khách không đến</MudChip> *@
+                        @if (data.Item.Status == BookingStatus.NoShow)
+                        {
+                            <MudChip Color="Color.Surface">Khách không đến</MudChip>
 
-                    }@if (context.Item.Status == BookingStatus.CustomerCancelled)
-                    {
-                        @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
-                    }@if (context.Item.Status == BookingStatus.StaffCancelled)
-                    {
-                        @* <MudChip Color="Color.Error">Nhân viên huỷ</MudChip> *@
+                        }@if (data.Item.Status == BookingStatus.CustomerCancelled)
+                        {
+                            <MudChip Color="Color.Error">Khách huỷ</MudChip>
+                        }@if (data.Item.Status == BookingStatus.StaffCancelled)
+                        {
+                            <MudChip Color="Color.Error">Nhân viên huỷ</MudChip>
 
-                    }@if (context.Item.Status == BookingStatus.AdminCancelled)
-                    {
-                        @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
+                        }@if (data.Item.Status == BookingStatus.AdminCancelled)
+                        {
+                            <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip>
 
-                    }
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
+                    <CellTemplate Context="data">
+                        <MudButtonGroup Variant="Variant.Filled">
+                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment))"></MudIconButton>
+                            @if (data.Item.Status == BookingStatus.PendingConfirmation)
+                            {
+                                <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(data.Item.IdBooking.Value))">Xác nhận</MudIconButton>
+                                <MudIconButton Variant="Variant.Text" Color="Color.Error" Title="Huỷ" OnClick="@(async()=>await CanncelSerices(data.Item.IdBooking.Value))">Huỷ</MudIconButton>
+                            }
+                            @if (data.Item.Status == BookingStatus.Confirmed)
+                            {
+                                <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Khách đến" OnClick="@(async()=>await CheckInArrive(data.Item.IdBooking.Value))">Khách đến</MudIconButton>
+                                <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode" OnClick="@(async()=>await CheckIn(data.Item.IdBooking.Value))" Title="Quét qr checkin">Quét QR</MudIconButton>
 
-                </MudButtonGroup>
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-    <PagerContent>
-        <MudDataGridPager T="BookingView" />
-    </PagerContent>
-</MudDataGrid>
+                            }
+                            @if (data.Item.Status == BookingStatus.Arrived)
+                            {
+                                <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Bắt đầu dịch vụ" OnClick="@(async()=>await StartBooking(data.Item.IdBooking.Value))">Bắt đầu</MudIconButton>
 
-@code {
+                            }@if (data.Item.Status == BookingStatus.InProgress)
+                            {
+                                <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Hoàn thành tất cả dịch vụ" OnClick="@(async()=>await CompleteBooking(data.Item.IdBooking.Value))">Hoàn thành</MudIconButton>
 
-    private List<BookingView> lstBookingServices = new List<BookingView>();
-    bool _customizeGroupTemplate;
-    static bool _customizeGroupBy;
-    static bool _customizeGroupByCus;
+                            }@if (data.Item.Status == BookingStatus.Completed)
+                            {
+                                if (!data.Item.IsPayment)
+                                {
+                                    <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Thanh toán" OnClick="@(async()=>await OpenDialogBill(data.Item.IdGuest.Value,data.Item.BookingTime,data.Item.IdBooking))">Thanh toán</MudIconButton>
+                                }
+                                else
+                                {
+                                    <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem hóa đơn đã mua" OnClick="@(async()=>await OpenDialogBill(data.Item.IdGuest.Value,data.Item.BookingTime,data.Item.IdBooking))">Xem hóa đơn</MudIconButton>
+                                    <MudIconButton Variant="Variant.Text" Color="Color.Success" Icon="@Icons.Material.Filled.QrCode2" OnClick="@(async()=>await CheckOut(data.Item.IdBooking.Value))" Title="Quét qr checkout">Quét QR CheckOut</MudIconButton>
+                                }
+                            }
+                            @if (data.Item.Status == BookingStatus.NoShow)
+                            {
+                                @* <MudChip Color="Color.Surface">Khách không đến</MudChip> *@
 
-    private string searchString = "";
-    private bool isLoading;
+                            }@if (data.Item.Status == BookingStatus.CustomerCancelled)
+                            {
+                                @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
+                            }@if (data.Item.Status == BookingStatus.StaffCancelled)
+                            {
+                                @* <MudChip Color="Color.Error">Nhân viên huỷ</MudChip> *@
 
-    MudDataGrid<BookingView> dataGrid;
-    [Inject] private BookingService bookingService { get; set; }
-    [Inject]
-    private IHttpContextAccessor _httpContextAccessor { get; set; }
+                            }@if (data.Item.Status == BookingStatus.AdminCancelled)
+                            {
+                                @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
 
-    [Inject]
-    private IBookingViewServices _client { get; set; }
+                            }
 
-    private HubConnection hubConnection;
-    private NavigationManager navigation { get; set; }
-    [Parameter]
-    public List<ListBokingDetailInDay> lstBooking { get; set; } = new List<ListBokingDetailInDay>();
+                        </MudButtonGroup>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="BookingView" />
+            </PagerContent>
+        </MudDataGrid>
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
-    }
+        @code {
 
-    private async Task LoadData()
-    {
-        var respone = await _client.GetAll();
-        lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
-        if (selectedStatus == Status.All)
+        private List<BookingView> lstBookingServices = new List<BookingView>();
+        bool _customizeGroupTemplate;
+        static bool _customizeGroupBy;
+        static bool _customizeGroupByCus;
+
+        private string searchString = "";
+        private bool isLoading;
+
+        MudDataGrid<BookingView> dataGrid;
+        [Inject] private BookingService bookingService { get; set; }
+        [Inject]
+        private IHttpContextAccessor _httpContextAccessor { get; set; }
+
+        [Inject]
+        private IBookingViewServices _client { get; set; }
+
+        private HubConnection hubConnection;
+        private NavigationManager navigation { get; set; }
+        [Parameter]
+        public List<ListBokingDetailInDay> lstBooking { get; set; } = new List<ListBokingDetailInDay>();
+
+        protected override async Task OnInitializedAsync()
         {
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            var respone = await _client.GetAll();
             lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
+            if (selectedStatus == Status.All)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
+            }
+            else if (selectedStatus == Status.PendingConfirmation)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+            }
+            else if (selectedStatus == Status.Confirmed)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Confirmed).ToList();
+            }
+            else if (selectedStatus == Status.Arrived)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Arrived).ToList();
+            }
+            else if (selectedStatus == Status.InProgress)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.InProgress).ToList();
+            }
+            else if (selectedStatus == Status.Completed)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Completed).ToList();
+            }
+            else if (selectedStatus == Status.NoShow)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.NoShow).ToList();
+            }
+            else if (selectedStatus == Status.CustomerCancelled)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
+            }
+            else if (selectedStatus == Status.StaffCancelled)
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
+            }
+            else
+            {
+                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
+            }
+            StateHasChanged();
         }
-        else if (selectedStatus == Status.PendingConfirmation)
+        private enum Status
         {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+            All,
+            PendingConfirmation, // Chờ xác nhận
+            Confirmed,           // Đã xác nhận
+            Arrived,             // Đã đến nơi
+            InProgress,          // Đang thực hiện
+            Completed,           // Đã hoàn thành
+            NoShow,              // Khách không đến
+            CustomerCancelled,   // Khách huỷ
+            StaffCancelled,      // Nhân viên huỷ
+            AdminCancelled    // Admin huỷ
         }
-        else if (selectedStatus == Status.Confirmed)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Confirmed).ToList();
-        }
-        else if (selectedStatus == Status.Arrived)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Arrived).ToList();
-        }
-        else if (selectedStatus == Status.InProgress)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.InProgress).ToList();
-        }
-        else if (selectedStatus == Status.Completed)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Completed).ToList();
-        }
-        else if (selectedStatus == Status.NoShow)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.NoShow).ToList();
-        }
-        else if (selectedStatus == Status.CustomerCancelled)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
-        }
-        else if (selectedStatus == Status.StaffCancelled)
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
-        }
-        else
-        {
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
-        }
-        StateHasChanged();
-    }
-    public async Task LstBooking()
-    {
 
-    }
-    private enum Status
-    {
-        All,
-        PendingConfirmation, // Chờ xác nhận
-        Confirmed,           // Đã xác nhận
-        Arrived,             // Đã đến nơi
-        InProgress,          // Đang thực hiện
-        Completed,           // Đã hoàn thành
-        NoShow,              // Khách không đến
-        CustomerCancelled,   // Khách huỷ
-        StaffCancelled,      // Nhân viên huỷ
-        AdminCancelled    // Admin huỷ
-    }
+        private async Task CheckIn(int idBooking)
+        {
+            var response = await _client.QrCodeCheckIn(idBooking);
+            var parameters = new DialogParameters();
+            string nameDialog = "Khách check In";
 
-    private async Task CheckIn(int idBooking)
-    {
-        var response = await _client.QrCodeCheckIn(idBooking);
-        var parameters = new DialogParameters();
-        string nameDialog = "Khách check In";
-
-        DialogOptions options = new DialogOptions()
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -281,107 +280,8 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("linkqr", response.Data);
-        var createUpdateDialog = await _dialogservice.ShowAsync<CheckInOut>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-        }
-    }
-    private async Task CheckOut(int idBooking)
-    {
-        var response = await _client.QrCodeCheckIn(idBooking);
-        var parameters = new DialogParameters();
-        string nameDialog = "Khách check Out";
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
-                CloseButton = true,
-                FullWidth = true,
-                DisableBackdropClick = true
-            };
-        parameters.Add("linkqr", response.Data);
-        var createUpdateDialog = await _dialogservice.ShowAsync<CheckInOut>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-        }
-    }
-    private Func<BookingView, bool> _quickFilter => x =>
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (x.NameGuest.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{x.Address} {x.BookingTime}".Contains(searchString.Trim()))
-            return true;
-
-        return false;
-    };
-    private Status selectedStatus = Status.All;
-    private async Task Change(Status selected)
-    {
-        selectedStatus = selected;
-        await LoadData();
-    }
-    //group ngày
-    private Func<BookingView, string> _groupBy = x =>
-    {
-        if (_customizeGroupBy)
-        {
-            return x.NameGuest;
-        }
-        else
-        {
-            return x.BookingTime.ToString("dd/MM/yyyy");
-        }
-    };
-    void ExpandAllGroups()
-    {
-        dataGrid?.ExpandAllGroups();
-    }
-    private async Task Dialo()
-    {
-
-        if (isLoading)
-        {
-            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-            var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
-        }
-
-    }
-    private async Task OpenDialog(int id, Guid idGuest, bool payment)
-    {
-        isLoading = true;
-        await Task.Delay(500);
-        var parameters = new DialogParameters();
-        string nameDialog = "Chi tiết khách đặt lịch";
-        DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
-                CloseButton = true,
-                FullWidth = true,
-                DisableBackdropClick = true
-            };
-        parameters.Add("id", id);
-        parameters.Add("idGuest", idGuest);
-        parameters.Add("payment", payment);
-        // check có danh sách ko
-        var respone2 = await _client.ListBookingDetailInDay(id);
-        if (respone2.IsSuccess)
-        {
-            isLoading = false;
-            var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
+            parameters.Add("linkqr", response.Data);
+            var createUpdateDialog = await _dialogservice.ShowAsync<CheckInOut>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
             if (!result.Canceled)
             {
@@ -389,18 +289,12 @@
                 await LoadData();
             }
         }
-        else
+        private async Task CheckOut(int idBooking)
         {
-            Message("Không có dữ liệu", Severity.Warning);
-        }
-    }
-    //bill
-    private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "";
-
-        DialogOptions options = new DialogOptions()
+            var response = await _client.QrCodeCheckIn(idBooking);
+            var parameters = new DialogParameters();
+            string nameDialog = "Khách check Out";
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -409,22 +303,60 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("guid", id);
-        parameters.Add("date", date);
-        parameters.Add("idBooking", idBooking);
-        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
+            parameters.Add("linkqr", response.Data);
+            var createUpdateDialog = await _dialogservice.ShowAsync<CheckInOut>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
         }
-    }
+        private Func<BookingView, bool> _quickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+            if (x.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (x.NameGuest.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+                return true;
+            if ($"{x.Address} {x.BookingTime}".Contains(searchString.Trim()))
+                return true;
 
-    private async Task OpenDialogBillInStore(Guid? id, DateTime date)
-    {
-        string nameDialog = "";
-        DialogOptions options = new DialogOptions()
+            return false;
+        };
+        private Status selectedStatus = Status.All;
+        private async Task Change(Status selected)
+        {
+            selectedStatus = selected;
+            isLoading = true;
+            await LoadData();
+            StateHasChanged();
+            isLoading = false;
+        }
+        //group ngày
+        private Func<BookingView, string> _groupBy = x =>
+        {
+            if (_customizeGroupBy)
+            {
+                return x.NameGuest;
+            }
+            else
+            {
+                return x.BookingTime.ToString("dd/MM/yyyy");
+            }
+        };
+        void ExpandAllGroups()
+        {
+            dataGrid?.ExpandAllGroups();
+        }
+        private async Task OpenDialog(int id, Guid idGuest, bool payment)
+        {
+            isLoading = true;
+            StateHasChanged();
+            var parameters = new DialogParameters();
+            string nameDialog = "Chi tiết khách đặt lịch";
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -433,97 +365,168 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
+            parameters.Add("id", id);
+            parameters.Add("idGuest", idGuest);
+            parameters.Add("payment", payment);
+            // check có danh sách ko
+            var respone2 = await _client.ListBookingDetailInDay(id);
+            if (respone2.IsSuccess)
+            {
+                var createUpdateDialog = await _dialogservice.ShowAsync<ViewDetailsBooking>(nameDialog, parameters, options);
+                var result = await createUpdateDialog.Result;
+                isLoading = false;
+                StateHasChanged();
+                if (!result.Canceled)
+                {
+                    createUpdateDialog.Close();
+                    await LoadData();
+                }
+            }
+            else
+            {
+                isLoading = false;
+                StateHasChanged();
+                Message("Không có dữ liệu", Severity.Warning);
+            }
         }
-    }
-    private async Task StartBooking(int id)
-    {
-        var confirm = await Confirm("bắt đầu");
-        if (!confirm)
+        //bill
+        private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
         {
-            return;
+            isLoading = true;
+            StateHasChanged();
+            var parameters = new DialogParameters();
+            string nameDialog = "";
+
+            DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+            parameters.Add("guid", id);
+            parameters.Add("date", date);
+            parameters.Add("idBooking", idBooking);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            isLoading = false;
+            StateHasChanged();
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
         }
-        ActionView actionView = new ActionView()
+
+        private async Task OpenDialogBillInStore(Guid? id, DateTime date)
+        {
+
+
+            string nameDialog = "";
+            DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+            var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
+            var result = await createUpdateDialog.Result;
+            isLoading = false;
+            StateHasChanged();
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
+        }
+        private async Task StartBooking(int id)
+        {
+            var confirm = await Confirm("bắt đầu");
+            if (!confirm)
+            {
+                return;
+            }
+            ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
             };
-        var respone = await _client.StartBooking(actionView);
-        if (respone.IsSuccess)
-        {
-            Message(respone.Data, Severity.Success);
-            await LoadData();
+            var respone = await _client.StartBooking(actionView);
+            if (respone.IsSuccess)
+            {
+                Message(respone.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
         }
-        else
+        private async Task CompleteBooking(int id)
         {
-            Message(respone.Error, Severity.Error);
-        }
-    }
-    private async Task CompleteBooking(int id)
-    {
-        var confirm = await Confirm("hoàn thành");
-        if (!confirm)
-        {
-            return;
-        }
-        ActionView actionView = new ActionView()
+            var confirm = await Confirm("hoàn thành");
+            if (!confirm)
+            {
+                return;
+            }
+            ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             };
-        var respone = await _client.CompleteBooking(actionView);
-        if (respone.IsSuccess)
-        {
-            Message(respone.Data, Severity.Success);
-            await LoadData();
+            var respone = await _client.CompleteBooking(actionView);
+            if (respone.IsSuccess)
+            {
+                Message(respone.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
         }
-        else
+        private async Task ConfimBooking(int id)
         {
-            Message(respone.Error, Severity.Error);
-        }
-    }
-    private async Task ConfimBooking(int id)
-    {
-        ActionView actionView = new ActionView()
+            ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
                 Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
             };
-        var respone = await _client.ConfirmBooking(actionView);
-        if (respone.IsSuccess)
-        {
-            Message(respone.Data, Severity.Success);
-            await LoadData();
+            var respone = await _client.ConfirmBooking(actionView);
+            if (respone.IsSuccess)
+            {
+                Message(respone.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
         }
-        else
-        {
-            Message(respone.Error, Severity.Error);
-        }
-    }
 
-    private async Task CheckInArrive(int id)
-    {
-        var respone = await _client.CheckInArrive(id);
-        if (respone.IsSuccess)
+        private async Task CheckInArrive(int id)
         {
-            Message(respone.Data, Severity.Success);
-            await LoadData();
+            var respone = await _client.CheckInArrive(id);
+            if (respone.IsSuccess)
+            {
+                Message(respone.Data, Severity.Success);
+                await LoadData();
+            }
+            else
+            {
+                Message(respone.Error, Severity.Error);
+            }
         }
-        else
-        {
-            Message(respone.Error, Severity.Error);
-        }
-    }
 
-    private async Task CanncelSerices(int? id)
-    {
-        var parameters = new DialogParameters();
-        string nameDialog = "Huỷ dịch vụ";
-        DialogOptions options = new DialogOptions()
+        private async Task CanncelSerices(int? id)
+        {
+            var parameters = new DialogParameters();
+            string nameDialog = "Huỷ dịch vụ";
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -532,25 +535,27 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("id", id);
-        var createUpdateDialog = await _dialogservice.ShowAsync<CanelBooking>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
+            parameters.Add("id", id);
+            var createUpdateDialog = await _dialogservice.ShowAsync<CanelBooking>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
         }
-    }
 
-    private void ClearBookingRequests()
-    {
-        bookingService.lstBooking.Clear();
-    }
+        private void ClearBookingRequests()
+        {
+            bookingService.lstBooking.Clear();
+        }
 
-    private async Task OpenDialogCreateBooking()
-    {
-        string nameDialog = "Đặt lịch tại quầy";
-        DialogOptions options = new DialogOptions()
+        private async Task OpenDialogCreateBooking()
+        {
+            isLoading = true;
+            StateHasChanged();
+            string nameDialog = "Đặt lịch tại quầy";
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -559,31 +564,40 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer1>(nameDialog, options);
-        var result = await createUpdateDialog.Result;
-        ClearBookingRequests();
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
+            var createUpdateDialog = await _dialogservice.ShowAsync<CreateBookingCustomer1>(nameDialog, options);
+            var result = await createUpdateDialog.Result;
+            ClearBookingRequests();
+            isLoading = false;
+            StateHasChanged();
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
         }
-    }
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
-    private async Task<bool> Confirm(string text)
-    {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
-                    yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
-        StateHasChanged();
-        if (!confirm.HasValue) return false;
-        return confirm.Value;
-    }
+        private void Message(string message, Severity severity)
+        {
+            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+            Snackbar.Add(message, severity);
+        }
 
-}
+        private async Task<bool> Confirm(string text)
+        {
+            var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+            StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
+        }
 
+        }
+
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

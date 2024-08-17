@@ -1,8 +1,16 @@
-﻿<div style="text-align:center">
-    @*   <img src="@linkqr" height="540px" width="440px"> *@
-    <img src="@linkqr" height="200" width="200">
-</div>
-@code {
-    [Parameter]
-    public string linkqr { get; set; }
-}
+﻿<AuthorizeView>
+    <Authorized>
+        <div style="text-align:center">
+            @*   <img src="@linkqr" height="540px" width="440px"> *@
+            <img src="@linkqr" height="200" width="200">
+        </div>
+        @code {
+        [Parameter]
+        public string linkqr { get; set; }
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

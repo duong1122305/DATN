@@ -1,247 +1,254 @@
-﻿@page "/CreateUpdateServicesDetails"
-@using DATN.ADMIN.IServices
-@using DATN.Data.Entities
-@using DATN.ViewModels.DTOs.ServiceDetail
-@using Microsoft.JSInterop
-@using System.Globalization
-@inject ISnackbar Snackbar
-@inject IDialogService _diagService
-<EditForm Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
-    <MudItem xs="12" sm="12">
-        <MudCard>
-            <MudCardContent>
-                @if (id == null || id == 0)
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @page "/CreateUpdateServicesDetails"
+        @using DATN.ADMIN.IServices
+        @using DATN.Data.Entities
+        @using DATN.ViewModels.DTOs.ServiceDetail
+        @using Microsoft.JSInterop
+        @using System.Globalization
+        @inject ISnackbar Snackbar
+        @inject IDialogService _diagService
+        <EditForm Context="data" Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
+            <MudItem xs="12" sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        @if (id == null || id == 0)
+                        {
+                            <div class="mud-select">
+                                <label class="mud-input-label">Chọn dịch vụ</label>
+                                <select @bind="createServiceDetailVM.ServiceId" required>
+                                    @foreach (var i in lstService)
+                                    {
+                                        <option value="@i.Id">@i.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <MudTextField T="double" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
+                            <MudTextField T="float" Label="Cân nặng tối thiểu(KG)" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
+                            <MudTextField T="float" Label="Cân nặng tối đa(KG)" @bind-Value="@createServiceDetailVM.MaxWeight" For="@(() => createServiceDetailVM.MaxWeight)" />
+                            <MudNumericField T="float" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
+                            <div hidden>
+                                <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
+                            </div>
+                            <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
+                        }
+                        else
+                        {
+                            <MudTextField T="double" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
+                            <MudTextField T="float" Label="Cân nặng tối thiểu" @bind-Value="@updateServiceDetailVM.MinWeight" For="@(() => updateServiceDetailVM.MinWeight)" />
+                            <MudTextField T="float" Label="Cân nặng tối đa" @bind-Value="@updateServiceDetailVM.MaxWeight" For="@(() => updateServiceDetailVM.MaxWeight)" />
+                            <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => updateServiceDetailVM.Price)" />
+                            <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
+                            <MudTextField T="string" Label="Mô tả" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
+                        }
+                        <hr class="hr" />
+                        <div class="mt-5" style="text-align: end;">
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </EditForm>
+        <style>
+
+        </style>
+        <script>
+            window.formatCurrencyVN = (number) => {
+                const formattedPrice = number.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                document.getElementById('formattedPriceInput').value = formattedPrice;
+            };
+        </script>
+
+        @code {
+        [Parameter]
+        public int id { get; set; }
+
+        [Parameter]
+        public CreateServiceDetailVM createServiceDetailVM { get; set; } = new CreateServiceDetailVM();
+
+        [Parameter]
+        public UpdateServiceDetailVM updateServiceDetailVM { get; set; } = new UpdateServiceDetailVM();
+
+        private List<Service> lstService = new List<Service>();
+
+        [Inject]
+        public IServiceManagermentService _serviceManagermentService { get; set; }
+
+        [Inject]
+        public IServiceDetailServices _serviceDetailService { get; set; }
+
+        [Inject]
+        public IJSRuntime JSRuntime { get; set; }
+
+        private string formattedPrice = string.Empty;
+        private float tempPrice;
+        CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
+
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+
+        string _nameButton = "";
+
+        protected override async Task OnInitializedAsync()
+        {
+            var result = await _serviceManagermentService.GetAll();
+            if (result.IsSuccess)
+            {
+                lstService = result.Data;
+            }
+
+            if (id != null && id != 0)
+            {
+                _nameButton = "Cập nhật";
+                var findServiceDetailById = await _serviceDetailService.GetById(id);
+                var data = findServiceDetailById.Data;
+
+                updateServiceDetailVM.Price = data.Price;
+                updateServiceDetailVM.Duration = data.Duration;
+                updateServiceDetailVM.Description = data.Description;
+                await OnPriceChanged(updateServiceDetailVM.Price);
+            }
+            else
+            {
+                _nameButton = "Thêm mới";
+                await OnPriceChanged(createServiceDetailVM.Price);
+            }
+        }
+
+        private async Task OnPriceChanged(float value)
+        {
+            tempPrice = value; // Cập nhật biến trung gian
+            if (id != null && id != 0)
+            {
+                updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
+            }
+            else
+            {
+                createServiceDetailVM.Price = value;
+            }
+            await FormatPrice(); // Định dạng giá
+        }
+
+        private async Task FormatPrice()
+        {
+            double price = id != null && id != 0 ? (double)updateServiceDetailVM.Price : (double)createServiceDetailVM.Price;
+            await JSRuntime.InvokeVoidAsync("formatCurrencyVN", price);
+        }
+
+        private async Task Submit()
+        {
+            if (id == null || id == 0)
+            {
+                await Create();
+            }
+            else
+            {
+                await Update();
+            }
+        }
+
+        public async Task Update()
+        {
+            if (await Confirm("cập nhật") == true)
+            {
+                var result = await _serviceDetailService.Update(id, updateServiceDetailVM);
+                if (result.IsSuccess)
                 {
-                    <div class="mud-select">
-                        <label class="mud-input-label">Chọn dịch vụ</label>
-                        <select @bind="createServiceDetailVM.ServiceId" required>
-                            @foreach (var i in lstService)
-                            {
-                                <option value="@i.Id">@i.Name</option>
-                            }
-                        </select>
-                    </div>
-                        <MudTextField T="double" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
-                    <MudTextField T="float" Label="Cân nặng tối thiểu(KG)" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
-                    <MudTextField T="float" Label="Cân nặng tối đa(KG)" @bind-Value="@createServiceDetailVM.MaxWeight" For="@(() => createServiceDetailVM.MaxWeight)" />
-                    <MudNumericField T="float" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
-                    <div hidden>
-                    <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                    </div>
-                        <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
+                    Message(result.Data, Severity.Success);
+                    _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
                 {
-                    <MudTextField T="double" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
-                    <MudTextField T="float" Label="Cân nặng tối thiểu" @bind-Value="@updateServiceDetailVM.MinWeight" For="@(() => updateServiceDetailVM.MinWeight)" />
-                    <MudTextField T="float" Label="Cân nặng tối đa" @bind-Value="@updateServiceDetailVM.MaxWeight" For="@(() => updateServiceDetailVM.MaxWeight)" />
-                    <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => updateServiceDetailVM.Price)" />
-                    <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                    <MudTextField T="string" Label="Mô tả" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
+                    Message(result.Error, Severity.Error);
                 }
-                <hr class="hr" />
-                <div class="mt-5" style="text-align: end;">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</EditForm>
-<style>
-
-</style>
-<script>
-    window.formatCurrencyVN = (number) => {
-        const formattedPrice = number.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-        document.getElementById('formattedPriceInput').value = formattedPrice;
-    };
-</script>
-
-@code {
-    [Parameter]
-    public int id { get; set; }
-
-    [Parameter]
-    public CreateServiceDetailVM createServiceDetailVM { get; set; } = new CreateServiceDetailVM();
-
-    [Parameter]
-    public UpdateServiceDetailVM updateServiceDetailVM { get; set; } = new UpdateServiceDetailVM();
-
-    private List<Service> lstService = new List<Service>();
-
-    [Inject]
-    public IServiceManagermentService _serviceManagermentService { get; set; }
-
-    [Inject]
-    public IServiceDetailServices _serviceDetailService { get; set; }
-
-    [Inject]
-    public IJSRuntime JSRuntime { get; set; }
-
-    private string formattedPrice = string.Empty;
-    private float tempPrice;
-    CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
-
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-
-    string _nameButton = "";
-
-    protected override async Task OnInitializedAsync()
-    {
-        var result = await _serviceManagermentService.GetAll();
-        if (result.IsSuccess)
-        {
-            lstService = result.Data;
+            }
+            else
+            {
+                Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+            }
         }
 
-        if (id != null && id != 0)
+        private async Task<bool> Confirm(string text)
         {
-            _nameButton = "Cập nhật";
-            var findServiceDetailById = await _serviceDetailService.GetById(id);
-            var data = findServiceDetailById.Data;
+            var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ chi tiết ?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+            StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
+        }
 
-            updateServiceDetailVM.Price = data.Price;
-            updateServiceDetailVM.Duration = data.Duration;
-            updateServiceDetailVM.Description = data.Description;
-            await OnPriceChanged(updateServiceDetailVM.Price);
-        }
-        else
+        protected async Task Create()
         {
-            _nameButton = "Thêm mới";
-            await OnPriceChanged(createServiceDetailVM.Price);
-        }
-    }
-
-    private async Task OnPriceChanged(float value)
-    {
-        tempPrice = value; // Cập nhật biến trung gian
-        if (id != null && id != 0)
-        {
-            updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
-        }
-        else
-        {
-            createServiceDetailVM.Price = value;
-        }
-        await FormatPrice(); // Định dạng giá
-    }
-
-    private async Task FormatPrice()
-    {
-        double price = id != null && id != 0 ? (double)updateServiceDetailVM.Price : (double)createServiceDetailVM.Price;
-        await JSRuntime.InvokeVoidAsync("formatCurrencyVN", price);
-    }
-
-    private async Task Submit()
-    {
-        if (id == null || id == 0)
-        {
-            await Create();
-        }
-        else
-        {
-            await Update();
-        }
-    }
-
-    public async Task Update()
-    {
-        if (await Confirm("cập nhật") == true)
-        {
-            var result = await _serviceDetailService.Update(id, updateServiceDetailVM);
+            var confirm = await Confirm("thêm mới");
+            if (!confirm)
+            {
+                return;
+            }
+            var result = await _serviceDetailService.Create(createServiceDetailVM);
             if (result.IsSuccess)
             {
-                Message(result.Data, Severity.Success);
+                Message("Thành công", Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
                 Message(result.Error, Severity.Error);
             }
+
         }
-        else
+
+        //thông báo
+        private void Message(string message, Severity severity)
         {
-            Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+            Snackbar.Clear();
+            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+            Snackbar.Add(message, severity);
         }
-    }
-
-    private async Task<bool> Confirm(string text)
-    {
-        var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ chi tiết ?",
-                    yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
-        StateHasChanged();
-        if (!confirm.HasValue) return false;
-        return confirm.Value;
-    }
-
-    protected async Task Create()
-    {
-        var confirm = await Confirm("thêm mới");
-        if (!confirm)
-        {
-            return;
         }
-        var result = await _serviceDetailService.Create(createServiceDetailVM);
-        if (result.IsSuccess)
-        {
-            Message("Thành công", Severity.Success);
-            _dialogBox.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            Message(result.Error, Severity.Error);
-        }
+        <style>
+            .mud-select {
+                display: inline-block;
+                position: relative;
+                margin-bottom: 1rem;
+                width: 100%;
+            }
 
-    }
+            .mud-input-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #495057; /* màu chữ */
+            }
 
-    //thông báo
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Clear();
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-        Snackbar.Add(message, severity);
-    }
-}
-<style>
-    .mud-select {
-        display: inline-block;
-        position: relative;
-        margin-bottom: 1rem;
-        width: 100%;
-    }
+            .mud-select select {
+                display: block;
+                width: 100%;
+                padding: 0.75rem 1.25rem;
+                font-size: 1rem;
+                line-height: 1.5;
+                color: #495057;
+                background-color: #fff;
+                background-clip: padding-box;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
 
-    .mud-input-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #495057; /* màu chữ */
-    }
+                /* hiệu ứng khi hover */
+                .mud-select select:hover {
+                    border-color: #b3b3b3;
+                }
 
-    .mud-select select {
-        display: block;
-        width: 100%;
-        padding: 0.75rem 1.25rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #495057;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-        /* hiệu ứng khi hover */
-        .mud-select select:hover {
-            border-color: #b3b3b3;
-        }
-
-        .mud-select select:focus {
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-</style>
+                .mud-select select:focus {
+                    border-color: #80bdff;
+                    outline: 0;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                }
+        </style>
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>

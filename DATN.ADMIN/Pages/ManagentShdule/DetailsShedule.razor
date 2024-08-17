@@ -1,97 +1,99 @@
-﻿@inject ISnackbar Snackbar
-@inject IDialogService _diagService;
-@inject HttpClient httpClient
-@using DATN.ADMIN.IServices
-@using DATN.ViewModels.Common
-@using DATN.ViewModels.DTOs.Authenticate
-@inject IDialogService _dialogservice;
-@if (lsstvi.Count > 0)
-{
-    <MudTable Items="@lsstvi" Dense="true">
-        <HeaderContent>
-            <MudTh>Mã nhân viên</MudTh>
-            <MudTh>Ca làm</MudTh>
-            <MudTh>Họ và tên</MudTh>
-            <MudTh>Ngày làm</MudTh>
-            <MudTh Style="text-align:center;">Hành động</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Name">@context.UserName</MudTd>
-            <MudTd DataLabel="ShiftName">@context.ShiftName</MudTd>
-            <MudTd DataLabel="FullName">@context.FullName</MudTd>
-            <MudTd DataLabel="WorkDate">@context.Date.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd Style="text-align:center;">
-                <MudButtonGroup Variant="Variant.Filled">
-                    @if (dateNow.Month == context.Date.Month && dateNow.Day == context.Date.Day && dateNow.Year == context.Date.Year)
-                    {
-                        @if (dateNow.Hour < from)
-                        {
-                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
-                        }
-                        else if (dateNow.Hour > from && dateNow.Hour < to)
-                        {
-                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))" Disabled></MudIconButton>
-                        }
-                        else if (dateNow.Hour > to)
-                        {
-                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))" Disabled></MudIconButton>
-                        }
-                    }
-                    else
-                    {
-                        if (context.Date.CompareTo(dateNow) > 0)
-                        {
-                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))"></MudIconButton>
-                        }
-                        else
-                        {
-                            <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(context.shiftId,context.UserName,context.Date,context.FullName))" Disabled></MudIconButton>
-                        }
-                    }
-                </MudButtonGroup>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-}
-
-@code {
-    [Parameter]
-    public int id { get; set; }
-    [Parameter]
-    public DateTime workDate { get; set; }
-    [Parameter]
-    public int from { get; set; }
-    [Parameter]
-    public int to { get; set; }
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-    [Inject]
-    IEmployeeScheduleSer _client { get; set; }
-    [Inject]
-    IUserClientSev _userClient { get; set; }
-    [Parameter]
-    public List<NumberOfScheduleView> lsstvi { get; set; } = new List<NumberOfScheduleView>();
-    //lấy các nhân viên làm việc trong ca ngày hôm ấy
-
-    public DateTime dateNow { get; set; } = DateTime.Now;
-    protected async Task LoadData()
-    {
-        var respone = await _client.ListStaffOfDay(id, workDate);
-        lsstvi = respone.Data;
-    }
-    protected async override Task OnInitializedAsync()
-    {
-        if (id != null || id > 0)
+﻿<AuthorizeView Roles="Admin">
+    <Authorized>
+        @inject ISnackbar Snackbar
+        @inject IDialogService _diagService;
+        @inject HttpClient httpClient
+        @using DATN.ADMIN.IServices
+        @using DATN.ViewModels.Common
+        @using DATN.ViewModels.DTOs.Authenticate
+        @inject IDialogService _dialogservice;
+        @if (lsstvi.Count > 0)
         {
-            await LoadData();
+            <MudTable Items="@lsstvi" Dense="true">
+                <HeaderContent>
+                    <MudTh>Mã nhân viên</MudTh>
+                    <MudTh>Ca làm</MudTh>
+                    <MudTh>Họ và tên</MudTh>
+                    <MudTh>Ngày làm</MudTh>
+                    <MudTh Style="text-align:center;">Hành động</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="data">
+                    <MudTd DataLabel="Name">@data.UserName</MudTd>
+                    <MudTd DataLabel="ShiftName">@data.ShiftName</MudTd>
+                    <MudTd DataLabel="FullName">@data.FullName</MudTd>
+                    <MudTd DataLabel="WorkDate">@data.Date.ToString("dd/MM/yyyy")</MudTd>
+                    <MudTd Style="text-align:center;">
+                        <MudButtonGroup Variant="Variant.Filled">
+                            @if (dateNow.Month == data.Date.Month && dateNow.Day == data.Date.Day && dateNow.Year == data.Date.Year)
+                            {
+                                @if (dateNow.Hour < from)
+                                {
+                                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(data.shiftId,data.UserName,data.Date,data.FullName))"></MudIconButton>
+                                }
+                                else if (dateNow.Hour > from && dateNow.Hour < to)
+                                {
+                                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(data.shiftId,data.UserName,data.Date,data.FullName))" Disabled></MudIconButton>
+                                }
+                                else if (dateNow.Hour > to)
+                                {
+                                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(data.shiftId,data.UserName,data.Date,data.FullName))" Disabled></MudIconButton>
+                                }
+                            }
+                            else
+                            {
+                                if (data.Date.CompareTo(dateNow) > 0)
+                                {
+                                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(data.shiftId,data.UserName,data.Date,data.FullName))"></MudIconButton>
+                                }
+                                else
+                                {
+                                    <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Title="Chuyển ca nè" OnClick="@(async()=>await OpenDialog(data.shiftId,data.UserName,data.Date,data.FullName))" Disabled></MudIconButton>
+                                }
+                            }
+                        </MudButtonGroup>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
         }
-    }
 
-    private async Task OpenDialog(int idShift, string idNhanVien, DateTime workDate, string fulName)
-    {
-        var idRespone = await _userClient.GetById(idNhanVien);
-        var parameters = new DialogParameters();
-        string nameDialog = "Danh sách nhân viên trống ca";
-        DialogOptions options = new DialogOptions()
+        @code {
+        [Parameter]
+        public int id { get; set; }
+        [Parameter]
+        public DateTime workDate { get; set; }
+        [Parameter]
+        public int from { get; set; }
+        [Parameter]
+        public int to { get; set; }
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+        [Inject]
+        IEmployeeScheduleSer _client { get; set; }
+        [Inject]
+        IUserClientSev _userClient { get; set; }
+        [Parameter]
+        public List<NumberOfScheduleView> lsstvi { get; set; } = new List<NumberOfScheduleView>();
+        //lấy các nhân viên làm việc trong ca ngày hôm ấy
+
+        public DateTime dateNow { get; set; } = DateTime.Now;
+        protected async Task LoadData()
+        {
+            var respone = await _client.ListStaffOfDay(id, workDate);
+            lsstvi = respone.Data;
+        }
+        protected async override Task OnInitializedAsync()
+        {
+            if (id != null || id > 0)
+            {
+                await LoadData();
+            }
+        }
+
+        private async Task OpenDialog(int idShift, string idNhanVien, DateTime workDate, string fulName)
+        {
+            var idRespone = await _userClient.GetById(idNhanVien);
+            var parameters = new DialogParameters();
+            string nameDialog = "Danh sách nhân viên trống ca";
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -100,17 +102,22 @@
                 FullWidth = true,
                 DisableBackdropClick = true
             };
-        parameters.Add("idShift", idShift);
-        parameters.Add("idNhanVien", idRespone.Data);
-        parameters.Add("workDate", workDate);
-        parameters.Add("fulName", fulName);
-        var createUpdateDialog = await _dialogservice.ShowAsync<UpdateStaffSchedule>(nameDialog, parameters, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
+            parameters.Add("idShift", idShift);
+            parameters.Add("idNhanVien", idRespone.Data);
+            parameters.Add("workDate", workDate);
+            parameters.Add("fulName", fulName);
+            var createUpdateDialog = await _dialogservice.ShowAsync<UpdateStaffSchedule>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
         }
-    }
 
-}
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>
