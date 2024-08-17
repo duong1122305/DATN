@@ -278,12 +278,13 @@ else
             };
         var createUpdateDialog = await _diagService.ShowAsync<CreateUpdateProductDetails>(nameDialog, parameters, options);
         var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
+        if (result.Canceled)
         {
             createUpdateDialog.Close();
             await LoadData();
             StateHasChanged();
         }
+   
     }
     //messenge
     private void Message(string message, Severity severity)

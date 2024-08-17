@@ -25,12 +25,12 @@
 			<HeaderContent>
 				<MudTh>STT</MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameCustomer)">Tên khách hàng</MudTableSortLabel></MudTh>
+				<MudTh>Tên dịch vụ </MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.DateRate)">Ngày đánh giá</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Rate)">Số sao</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Comment)">Nội dung đánh giá</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameStaff)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.BillID)">Mã hóa đơn</MudTableSortLabel></MudTh>
-				<MudTh>Thao tác</MudTh>
 			</HeaderContent>
 			<RowTemplate>
 				@{
@@ -38,6 +38,7 @@
 				}
 				<MudTd >@(lstReport.IndexOf(context) + 1)</MudTd>
 				<MudTd >@context.NameCustomer</MudTd>
+				<MudTd >@context.ServiceName</MudTd>
 				<MudTd >@context.DateRate</MudTd>
 				<MudTd >
 					<MudRating ReadOnly=true SelectedValue="@context.Rate"></MudRating>
@@ -46,12 +47,7 @@
 				<MudTd >@context.NameStaff</MudTd>
 				<MudTd>@context.BillID</MudTd>
 				
-				<MudTd>
-					<MudButtonGroup Variant="Variant.Filled">
-						<MudIconButton OnClick="()=>DeleteReport(context.ID)" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Title="Xóa đánh giá"></MudIconButton>
-
-					</MudButtonGroup>
-				</MudTd>
+			
 			</RowTemplate>
 			<PagerContent>
 				<MudTablePager />

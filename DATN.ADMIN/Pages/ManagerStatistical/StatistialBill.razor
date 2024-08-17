@@ -10,8 +10,8 @@
 @using DATN.ViewModels.DTOs.Guest
 @using System.Timers
 @using DATN.ViewModels.DTOs.Report
-
 @inject ISnackbar Snackbar
+<DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 <MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách hóa đơn</MudText>
 
 <div style="display:flex">
@@ -40,7 +40,7 @@
 				</MudStack>
 			</div>
 			<div style="margin-top:20px">
-				<MudButton OnClick="()=>LoadData(5)">Tìm kiếm</MudButton>
+				<MudButton OnClick="()=>LoadData(4)">Tìm kiếm</MudButton>
 			</div>
 		</div>
 	}
@@ -63,23 +63,26 @@
 				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng giá trị</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Status)">Trạng thái đơn hàng</MudTableSortLabel></MudTh>
 				<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.StaffName)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
-				
+
 				<MudTh>Chi tiết</MudTh>
 			</HeaderContent>
-			<RowTemplate>
+			<RowTemplate Context="data">
 				@{
 					var stt = 1;
 				}
-				<MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
-				<MudTd>@context.TimeComplete</MudTd>
-				<MudTd>@context.CusName</MudTd>
-				<MudTd>@context.Amount</MudTd>
-				<MudTd>@context.Status</MudTd>
-				<MudTd>@context.StaffName</MudTd>
+				<MudTd>@(lstBill.IndexOf(data) + 1)</MudTd>
+				<MudTd>
+					@((MarkupString)@data.TimeComplete.Replace("Ngày", "<br>Ngày"))
+				</MudTd>
+
+				<MudTd>@data.CusName</MudTd>
+				<MudTd>@data.Amount</MudTd>
+				<MudTd>@data.Status</MudTd>
+				<MudTd>@data.StaffName</MudTd>
 
 				<MudTd>
 					<MudButtonGroup Variant="Variant.Filled">
-						<MudIconButton OnClick="()=>ViewDetail(context.ID)" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Title="Xóa đánh giá"></MudIconButton>
+						<MudIconButton OnClick="()=>ViewDetail(data)" Color="Color.Error" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem chi tiết"></MudIconButton>
 
 					</MudButtonGroup>
 				</MudTd>
@@ -103,58 +106,92 @@ else
 </style>
 @code {
 	int type = 1;
+	private bool isLoading;
 	private MudDateRangePicker _picker;
 	private DateRange _dateRange;
 	private bool isDisplayDate = false;
 	string searchString = "";
 	private List<StatiscalBill> lstBill = new List<StatiscalBill>();
 	[Inject]
-	private IReportClient _ser { get; set; }
+	private IStatiscalClient _ser { get; set; }
 	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 	[Inject]
 	private IDialogService _dialogService { get; set; }
 	protected override async Task OnInitializedAsync()
 	{
+		type = 3;
 		await LoadData();
 	}
 
 	// load lai du lieu
-	protected async Task LoadData(int type=3 )
+	protected async Task LoadData(int type = 3)
 	{
-		var response = await _ser.GetAllReports();
+		ResponseData<List<StatiscalBill>> response;
+		if (type == 4)
+		{
+			var startDate = _dateRange.Start;
+			var endDate = _dateRange.End;
+			response = await _ser.StatisticalBill(startDate.Value.ToString("MM/dd/yyy"), endDate.Value.ToString("MM/dd/yyy"), 4);
+		}
+		else
+		{
+			response = await _ser.StatisticalBill(null, null, type);
+		}
 		if (response.IsSuccess)
 		{
-			//lstReport = response.Data;
+			lstBill = response.Data;
 			StateHasChanged();
 		}
 		else
 		{
-
+			lstBill = new List<StatiscalBill>();
+			Snackbar.Add(response.Error, Severity.Warning);
 		}
 
 	}
 
-	private async Task ChangeType(int value=3)
+	private async Task ChangeType(int value = 3)
 	{
-		
-	}
-
-	private async Task ViewDetail(int id)
-	{
-		
-		StateHasChanged();
-
-	
-
-
-		var response = await _ser.DeleteReport(id);
-		if (response.IsSuccess)
+		type=value;
+		if (type!=4)
 		{
-			Snackbar.Add(response.Data!, Severity.Success);
-
+			isDisplayDate = false;
+			await LoadData(type);
 		}
 		else
-			Snackbar.Add(response.Error!, Severity.Error);
+		{
+			isDisplayDate = true;
+		}
+	}
+
+	private async Task ViewDetail(StatiscalBill bookingData)
+	{
+		isLoading = true;
+		await Task.Delay(10);
+		var parameters = new DialogParameters();
+		string nameDialog = " ";
+		
+		parameters.Add("bookingData", bookingData);
+		DialogOptions options = new DialogOptions()
+			{
+				CloseOnEscapeKey = true,
+				Position = DialogPosition.Center,
+				MaxWidth = MaxWidth.Large,
+				CloseButton = true,
+				FullWidth = true,
+				DisableBackdropClick = true
+			};
+		var createUpdateDialog = await _dialogService.ShowAsync<BillDetails>(nameDialog, parameters, options);
+		var result = await createUpdateDialog.Result;
+		
+		isLoading = false;
+		if (!result.Canceled)
+		{
+			createUpdateDialog.Close();
+			await LoadData();
+			StateHasChanged();
+		}
+		StateHasChanged();
 		await LoadData();
 		StateHasChanged();
 

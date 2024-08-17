@@ -44,9 +44,10 @@
 
     [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-    
+
     [Parameter]
     public ProductDetaiView product { get; set; } = new ProductDetaiView();
+    public ProductDetaiView oldData { get; set; } = new ProductDetaiView();
     string _nameButton = "";
     [Inject]
     private IProductServices _client { get; set; }
@@ -64,12 +65,12 @@
             if (product==null|| product.Id ==null )
             {
                 _nameButton = "Thêm mới";
-                
+
             }
             else
             {
                 _nameButton = "Cập nhật";
-
+                 oldData = product;
             }
         }
 
@@ -112,6 +113,7 @@
 
         if (product != null)
         {
+           
             var result = await _client.UpdateProductDetails(new CreateProductDetaiView()
                 {
                     Id=product.Id,
@@ -129,6 +131,7 @@
             else
             {
                 Message(result.Error, Severity.Error);
+                product =  oldData ;
             }
         }
         else

@@ -279,8 +279,8 @@ else
 		if (!result.Canceled)
 		{
 			createUpdateDialog.Close();
-			await LoadData();
 		}
+			await LoadData();
 			StateHasChanged();
 	}
 	private async Task OpenDetails(int? id)
