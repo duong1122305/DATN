@@ -1,5 +1,6 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.DTOs.ServiceManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace DATN.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "Admin")]
     public class ServicesController : ControllerBase
     {
         private readonly IServiceManagementService _serviceManager;

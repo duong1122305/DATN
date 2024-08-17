@@ -3,6 +3,7 @@ using DATN.Data.Entities;
 using DATN.Utilites;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Attendace;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,7 @@ namespace DATN.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-
+    [Authorize(Roles = "Admin,Receptionist")]
     public class AttendaceController : ControllerBase
     {
         private readonly IAttendanteMangarService _attendante;

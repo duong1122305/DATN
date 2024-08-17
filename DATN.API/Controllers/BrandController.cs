@@ -1,6 +1,7 @@
 ﻿using DATN.Aplication.Services.IServices;
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Brand;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace DATN.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "Admin")]
     public class BrandController : Controller
     {
         IBrandManagementService _brandManagementService;

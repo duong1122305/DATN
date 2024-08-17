@@ -2,6 +2,7 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Product;
 using DATN.ViewModels.DTOs.ProductDetail;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace DATN.API.Controllers
     [ApiController]
     // cấp quyền đê không bị chặn cors khi chạy local
     [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         IProductManagementService _productManagementServicel;

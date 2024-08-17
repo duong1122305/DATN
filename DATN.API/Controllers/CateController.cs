@@ -2,6 +2,7 @@
 using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Category;
 using DATN.ViewModels.DTOs.CategoryProduct;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,7 @@ namespace DATN.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "Admin")]
     public class CateController : Controller
     {
         ICategoryManagementService _categoryManagement;
