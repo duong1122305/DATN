@@ -48,33 +48,34 @@
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
 
-        [Parameter]
-        public ProductDetaiView product { get; set; } = new ProductDetaiView();
-        string _nameButton = "";
-        [Inject]
-        private IProductServices _client { get; set; }
-        [Inject]
-        private IPetManagerServices petServices { get; set; }
-        private List<PetType> lstpetType = new List<PetType>();
-        private CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
+    [Parameter]
+    public ProductDetaiView product { get; set; } = new ProductDetaiView();
+    public ProductDetaiView oldData { get; set; } = new ProductDetaiView();
+    string _nameButton = "";
+    [Inject]
+    private IProductServices _client { get; set; }
+    [Inject]
+    private IPetManagerServices petServices { get; set; }
+    private List<PetType> lstpetType = new List<PetType>();
+    private CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
 
-        protected async override Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
+    {
+        var brand = await petServices.GetAllTypes();
+        if (brand.IsSuccess)
         {
-            var brand = await petServices.GetAllTypes();
-            if (brand.IsSuccess)
+            lstpetType = brand.Data;
+            if (product==null|| product.Id ==null )
             {
-                lstpetType = brand.Data;
-                if (product == null || product.Id == null)
-                {
-                    _nameButton = "Thêm mới";
+                _nameButton = "Thêm mới";
 
-                }
-                else
-                {
-                    _nameButton = "Cập nhật";
-
-                }
             }
+            else
+            {
+                _nameButton = "Cập nhật";
+                 oldData = product;
+            }
+        }
 
         }
         public async Task Create()
@@ -127,17 +128,18 @@
                 {
                     Message(result.Data, Severity.Success);
 
-                    _dialogBox.Close(DialogResult.Ok(true));
-                }
-                else
-                {
-                    Message(result.Error, Severity.Error);
-                }
+                _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+                Message(result.Error, Severity.Error);
+                product =  oldData ;
             }
+        }
+        else
+        {
+            Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+        }
 
         }
 

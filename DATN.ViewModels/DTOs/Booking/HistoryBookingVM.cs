@@ -12,5 +12,7 @@ namespace DATN.ViewModels.DTOs.Booking
 		public string TimeAction { get; set; }
 		public string ActionName { get; set; }
 		public string ActionBy { get; set; }
+		public string Description { get; set; }
+
 	}
 }

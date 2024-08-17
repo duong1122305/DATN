@@ -13,8 +13,8 @@
         @inject ISnackbar Snackbar
         @inject IDialogService _dialogservice;
         @inject IAddressService _addressServive;
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
         <PageTitle>Danh sách Khách hàng</PageTitle>
-
         <MudText Typo="Typo.h4" Style="text-align:center;margin-bottom:5px">Danh sách khách hàng</MudText>
         @if (lstGuest != null && lstGuest.Count > 0)
         {
@@ -84,8 +84,6 @@
                         <MudTd>
                             <MudButtonGroup Variant="Variant.Filled">
                                 <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.Edit" Disabled=@isOpenDialog OnClick="@(async()=>await OpenDialog(data.Id))" Title="Sửa thông tin cá nhân"></MudIconButton>
-                                <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.ManageSearch" Title="Xem thông tin đơn hàng"></MudIconButton>
-
                             </MudButtonGroup>
                         </MudTd>
                     </RowTemplate>
@@ -119,6 +117,7 @@
         [Inject]
         private IGuestManagerClient _guestService { get; set; }
         string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+        private bool isLoading;
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
@@ -154,7 +153,7 @@
                 PasswordInputIcon = Icons.Material.Filled.Visibility;
                 PasswordInput = InputType.Text;
             }
-        }
+            }
 
 
         private async Task OnchangeStatus(bool value, Guid id)
@@ -199,13 +198,12 @@
                 ChangDetailPopup();
 
             }
-            else
-            {
-            }
         }
         // them sửa khách
         public async Task OpenDialog(Guid id)
         {
+            isLoading = true;
+            await Task.Delay(1);
             isOpenDialog = true;
             var parameters = new DialogParameters();
             string nameDialog = "Thêm mới khách hàng";
@@ -233,6 +231,7 @@
                 await LoadData();
                 StateHasChanged();
             }
+            isLoading = false;
             isOpenDialog = false;
         }// them sửa khách
         public async Task OpeListPetDialog(Guid id)
