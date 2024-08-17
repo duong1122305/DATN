@@ -274,7 +274,6 @@
                     if (repos.IsSuccess)
                     {
                         Message(repos.Data, Severity.Success);
-                        isLoading = false;
                         StateHasChanged();
                         _dialogBox.Close();
                     }
@@ -282,6 +281,7 @@
                     {
                         Message(repos.Error, Severity.Error);
                     }
+                    isLoading = false;
                 }
             }
             catch (Exception)

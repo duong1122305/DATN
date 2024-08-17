@@ -342,8 +342,8 @@ namespace DATN.Aplication.Services
 							 {
 								 ServiceName = s.Name,
 								 Amount = b.Price.ToString("M0"),
-								 EndTime = b.EndDateTime.ToString("dd/MM/yyy HH:mm"),
-								 StartTime = b.StartDateTime.ToString("dd/MM/yyy HH:mm"),
+								 EndTime = b.EndDateTime.ToString("dd/MM/yyyy HH:mm"),
+								 StartTime = b.StartDateTime.ToString("dd/MM/yyyy HH:mm"),
 								 StaffName = u.FullName,
 								 Status = StatusBookingDetailToString(b.Status),
 								 ID = b.Id,
@@ -361,8 +361,8 @@ namespace DATN.Aplication.Services
 								 ProductName = p.Name + "- " + pd.Name,
 								 Amount = (od.Price * od.Quantity).ToString("N0")
 							 };
-
-				result.BookingDetailData = dataBD == null ? new List<StatiscalBookingDetail>() : dataBD.ToList();
+				var x= dataBD == null ? new List<StatiscalBookingDetail>() : dataBD.ToList();
+                result.BookingDetailData = dataBD == null ? new List<StatiscalBookingDetail>() : dataBD.ToList();
 				result.OderData = dataOD == null ? new List<OderStatiscal>() : dataOD.ToList();
 				return new ResponseData<BookingDataStatiscal>(result);
 			}
