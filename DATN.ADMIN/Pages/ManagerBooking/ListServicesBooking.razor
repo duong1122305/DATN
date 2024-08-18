@@ -119,6 +119,10 @@
                 <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
                     <CellTemplate Context="data">
                         <MudButtonGroup Variant="Variant.Filled">
+                            @if (data.Item.IdGuest.Value == Contant.GuestsID)
+                            {
+                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment))" hidden></MudIconButton>
+                            }
                             <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment))"></MudIconButton>
                             @if (data.Item.Status == BookingStatus.PendingConfirmation)
                             {
