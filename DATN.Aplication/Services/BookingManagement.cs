@@ -560,7 +560,7 @@ namespace DATN.Aplication.Services
                                 ActionByID = Guid.Parse(idUserAction.Data)
                             };
                             await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
-                            await _unitOfWork.HistoryActionRepository.UpdateAsync(historyAction);
+                            await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
                             await _unitOfWork.SaveChangeAsync();
                             return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
                         }
@@ -578,55 +578,43 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView)
         {
-            var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+            var query = (from bookingDetail in await _unitOfWork.BookingRepository.GetAllAsync()
                          where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
             if (query != null)
             {
-                int count = 0;
-                foreach (var item in (await _unitOfWork.BookingDetailRepository.GetAllAsync()).Where(c => c.BookingId == query.BookingId && c.Status != BookingDetailStatus.Cancelled))
+                if (query.Status == BookingStatus.PendingConfirmation)
                 {
-                    count++;
+                    try
+                    {
+                        query.Status = BookingStatus.CustomerCancelled;
+                        HistoryAction historyAction = new HistoryAction()
+                        {
+                            BookingID = query.Id,
+                            ActionTime = DateTime.Now,
+                            Description = actionView.Reason + $"(Trạng thái khách hủy dịch vụ con {actionView.IdBokingOrDetail})",
+                            ActionID = 14,
+                            ByGuest = true
+                        };
+                        await _unitOfWork.BookingRepository.UpdateAsync(query);
+                        await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
+                        await _unitOfWork.SaveChangeAsync();
+                        return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                    }
+                    catch (Exception)
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
+                    }
                 }
-                if (count > 1)
+                else
                 {
-
-                    if (query.Status == BookingDetailStatus.Processing || query.Status == BookingDetailStatus.Completed)
-                    {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Trạng thái của dịch vụ hiện tại không cho phép hủy!" };
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var queryBoking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                                               where booking.Id == query.BookingId
-                                               select booking).FirstOrDefault();
-                            query.Status = BookingDetailStatus.Cancelled;
-                            HistoryAction historyAction = new HistoryAction()
-                            {
-                                BookingID = queryBoking.Id,
-                                ActionTime = DateTime.Now,
-                                Description = actionView.Reason + $"(Trạng thái khách hủy dịch vụ con {actionView.IdBokingOrDetail})",
-                                ActionID = 14,
-                                ByGuest = true
-                            };
-                            await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
-                            await _unitOfWork.HistoryActionRepository.UpdateAsync(historyAction);
-                            await _unitOfWork.SaveChangeAsync();
-                            return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
-                        }
-                        catch (Exception)
-                        {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Thất bại" };
-                        }
-                    }
-
+                    return new ResponseData<string> { IsSuccess = false, Error = "Trạng thái của dịch vụ hiện tại không cho phép hủy!" };
                 }
-                return new ResponseData<string> { IsSuccess = false, Error = "Chỉ có 1 dịch vụ, vui lòng huỷ ngoài màn danh sách!" };
             }
+
             else
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
+
         }
         public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
@@ -1103,17 +1091,19 @@ namespace DATN.Aplication.Services
                         where booking.Id == idBooking.Value
                         select guest).FirstOrDefault();
                 var checkQuan = (from order in await _unitOfWork.OrderDetailRepository.GetAllAsync()
-                                 join product in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                                 on order.IdProductDetail equals product.Id
+                                 join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                                 on order.IdProductDetail equals productDetail.Id
+                                 join product in await _unitOfWork.ProductRepository.GetAllAsync()
+                                 on productDetail.IdProduct equals product.Id
                                  where order.IdBooking == idBooking.Value
                                  select new ProductDetailView
                                  {
                                      IdBooking = order.IdBooking,
                                      IdProductDetail = order.IdProductDetail,
-                                     Name = product.Name,
+                                     Name = product.Name + "-" + product.Name,
                                      Price = order.Price,
                                      Quantity = order.Quantity,
-                                     Status = product.Status,
+                                     Status = productDetail.Status,
                                      SelectQuantityProduct = order.Quantity,
                                  }).ToList();
                 if (checkQuan.Count > 0)
@@ -1930,6 +1920,75 @@ namespace DATN.Aplication.Services
             else
             {
                 return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
+            }
+        }
+        public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuestNoAccount(string userOrPhoneNumber)
+        {
+            try
+            {
+                var user = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                            where guest.PhoneNumber == userOrPhoneNumber ||
+                            guest.Email == userOrPhoneNumber
+                            select guest).FirstOrDefault();
+                if (user.Id == Guid.Empty || user == null) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Không xác định được danh tính của bạn"
+                };
+                var query = from bd in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                            join sd in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                            on bd.ServiceDetailId equals sd.Id
+                            join p in await _unitOfWork.PetRepository.GetAllAsync()
+                            on bd.PetId equals p.Id
+                            select new BookingDetailForGuest
+                            {
+                                EndDate = new DateOnly(bd.StartDateTime.Year, bd.StartDateTime.Month, bd.StartDateTime.Day).ToString("dd/MM/yyyy"),
+                                StartDate = new DateOnly(bd.StartDateTime.Year, bd.StartDateTime.Month, bd.StartDateTime.Day).ToString("dd/MM/yyyy"),
+                                PetName = p.Name,
+                                ServiceId = sd.Id,
+                                ServiceName = sd.NameDetail,
+                                StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
+                                Status = bd.Status,
+                                TotalPrice = bd.Price,
+                                IdBooking = bd.BookingId,
+
+                            };
+                var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
+                            where b.GuestId == user.Id
+                            group new { b.Id, b.BookingTime }
+                            by new { b.Id, b.BookingTime, b.Status }
+                            into view
+                            select new GetBookingByGuestVM
+                            {
+                                BookingTime = new DateOnly(view.Key.BookingTime.Year, view.Key.BookingTime.Month, view.Key.BookingTime.Day).ToString("dd/MM/yyyy"),
+                                IdBooking = view.Key.Id,
+                                LstBookingDetail = (from lstBd in query
+                                                    where lstBd.IdBooking == view.Key.Id
+                                                    select lstBd).ToList(),
+                            }).OrderByDescending(c => c.BookingTime).AsQueryable();
+                if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Có lỗi trong quá trình tìm kiếm"
+                };
+
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = true,
+                    Data = join.ToList(),
+                    Error = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = ex.Message
+                };
             }
         }
     }

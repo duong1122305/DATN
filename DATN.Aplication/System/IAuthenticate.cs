@@ -1,4 +1,5 @@
-﻿using DATN.ViewModels.Common;
+﻿using DATN.Data.Entities;
+using DATN.ViewModels.Common;
 using DATN.ViewModels.DTOs.Authenticate;
 
 namespace DATN.Aplication.System
