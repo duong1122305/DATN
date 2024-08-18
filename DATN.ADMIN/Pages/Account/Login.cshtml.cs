@@ -36,9 +36,13 @@ namespace DATN.ADMIN.Pages.Account
                 {
                     _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
                 }
-                else
+                else if (claim == "Receptionist")
                 {
                     _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/ListServicesBooking"));
+                }
+                else
+                {
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/attendancePersonal"));
                 }
             }
             else
@@ -66,11 +70,14 @@ namespace DATN.ADMIN.Pages.Account
                             {
                                 _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
                             }
-                            else
+                            else if (claim == "Receptionist")
                             {
                                 _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/ListServicesBooking"));
                             }
-
+                            else
+                            {
+                                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/attendancePersonal"));
+                            }
                         }
                         else if (!checkLogin.IsSuccess)
                         {

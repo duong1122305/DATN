@@ -53,7 +53,6 @@ namespace DATN.API.Controllers
         }
 
         //change password
-        [Authorize(Roles = "Admin")]
         [HttpPatch("changePassword")]
         public async Task<ResponseData<string>> ChangePassword(UserChangePasswordView changePasswordView)
         {
@@ -226,7 +225,7 @@ namespace DATN.API.Controllers
         {
             return await _userrepo.ActiveAccount(id);
         }
-        [Authorize(Roles = "Admin,Receptionist")]
+        [Authorize(Roles = "Admin,Receptionist,ServiceStaff")]
         [HttpGet("Get-user-inf-by-token/{id}")]
         public async Task<ResponseData<UserInfView>> GetInfByToken(string id)
         {
@@ -250,7 +249,7 @@ namespace DATN.API.Controllers
         {
             return await _vouchermanagement.GetAllVoucher();
         }
-        [Authorize(Roles = "Admin")]
+
         [HttpPost("Reset-Pass")]
         public async Task<ResponseData<string>> ResetPass(UserResetPassView user)
         {
