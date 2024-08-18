@@ -112,7 +112,7 @@ namespace DATN.Aplication.Services
                                                  select new ProductDetailView
                                                  {
                                                      IdProductDetail = tetsa.Id,
-                                                     Name = view.Key.product.Name + "-" + tetsa.Name,
+                                                     Name = tetsa.Name,
                                                      Price = tetsa.Price,
                                                      Quantity = tetsa.Amount,
                                                      Status = tetsa.Status,
