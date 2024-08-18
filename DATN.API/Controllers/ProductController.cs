@@ -12,7 +12,6 @@ namespace DATN.API.Controllers
     [ApiController]
     // cấp quyền đê không bị chặn cors khi chạy local
     [EnableCors("AllowSpecificOrigin")]
-    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         IProductManagementService _productManagementServicel;
@@ -22,22 +21,30 @@ namespace DATN.API.Controllers
             _productManagementServicel = productManagementService;
             _productDetaiManagementServicel = productDetaiManagementService;
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpPost("Create-Product")]
         public async Task<ResponseData<string>> CreateProduct(CreateProductView productView)
         {
             return await _productManagementServicel.CreateProduct(productView);
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpPatch("Update-Product")]
         public async Task<ResponseData<string>> UpdateProduct(CreateProductView productView)
         {
             return await _productManagementServicel.UpdateProduct(productView);
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpGet("Remove-Product")]
         public async Task<ResponseData<string>> RemoveProduct(int id)
         {
             return await _productManagementServicel.RemoveProduct(id);
 
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpGet("Active-Product")]
         public async Task<ResponseData<string>> ActiveProduct(int id)
         {
@@ -49,6 +56,7 @@ namespace DATN.API.Controllers
         {
             return await _productManagementServicel.ListProduct();
         }
+        [Authorize(Roles = "Admin")]
 
         //product details
         [HttpPost("Create-Product-Details")]
@@ -56,17 +64,23 @@ namespace DATN.API.Controllers
         {
             return await _productDetaiManagementServicel.CreateProductDetail(productView);
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpPatch("Update-Product-Details")]
         public async Task<ResponseData<string>> UpdateProductDetails(CreateProductDetaiView productView)
         {
             return await _productDetaiManagementServicel.UpdateProductDetail(productView);
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpGet("Remove-Product-Details")]
         public async Task<ResponseData<string>> RemoveProductDetails(int id)
         {
             return await _productDetaiManagementServicel.RemoveProductDetail(id);
 
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpGet("Active-Product-Details")]
         public async Task<ResponseData<string>> ActiveProductDetails(int id)
         {
