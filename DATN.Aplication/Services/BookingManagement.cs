@@ -1924,9 +1924,11 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var user = await _user.CheckUser(userOrPhoneNumber);
-
-                if (user != null) return new ResponseData<List<GetBookingByGuestVM>>
+                var user = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                            where guest.PhoneNumber == userOrPhoneNumber ||
+                            guest.Email == userOrPhoneNumber
+                            select guest).FirstOrDefault();
+                if (user.Id == Guid.Empty || user == null) return new ResponseData<List<GetBookingByGuestVM>>
                 {
                     IsSuccess = false,
                     Data = new List<GetBookingByGuestVM>(),
