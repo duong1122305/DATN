@@ -824,7 +824,7 @@ namespace DATN.Aplication.Services
                                     HistoryAction historyAction = new HistoryAction()
                                     {
                                         ActionByID = Guid.Parse(idUserAction.Data),
-                                        ActionID = 15,
+                                        ActionID = 17,
                                         ActionTime = DateTime.Now,
                                         BookingID = item.BookingId,
                                         Description = $"Bắt đầu thực hiện dịch vụ đầu tiên"
