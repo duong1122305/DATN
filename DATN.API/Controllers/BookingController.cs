@@ -217,5 +217,11 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.CancelBookingDetailByGuest(actionView);
         }
+
+        [HttpGet("Cancel-BookingDetail-ByGuest")]
+        public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuestNoAccount(string userOrPhoneNumber)
+        {
+            return await _bookingManagement.GetBookingByGuestNoAccount(userOrPhoneNumber);
+        }
     }
 }

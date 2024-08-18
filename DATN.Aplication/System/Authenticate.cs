@@ -287,7 +287,7 @@ namespace DATN.Aplication.System
             }
             return new ResponseData<string> { IsSuccess = false, Error = "Tài khoản hoặc mật khẩu chưa đúng!" };
         }
-        private async Task<User> CheckUser(string username)
+        public async Task<User> CheckUser(string username)
         {
 
             var userName = _userManager.Users.AsEnumerable()

@@ -33,6 +33,6 @@ namespace DATN.Aplication.Services.IServices
         public Task CheckStatusPayment(int id, MomoResultRequest momoResult);
         public Task<ResponseData<string>> CreateBookingForGuestNoAcount(BookingForGuestNoAccount booking);
         public Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView);
-
+        public Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuestNoAccount(string userOrPhoneNumber);
     }
 }

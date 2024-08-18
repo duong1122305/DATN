@@ -1920,6 +1920,73 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Chưa chọn dịch vụ không thể đặt lịch!" };
             }
         }
+        public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuestNoAccount(string userOrPhoneNumber)
+        {
+            try
+            {
+                var user = await _user.CheckUser(userOrPhoneNumber);
+
+                if (user != null) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Không xác định được danh tính của bạn"
+                };
+                var query = from bd in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                            join sd in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                            on bd.ServiceDetailId equals sd.Id
+                            join p in await _unitOfWork.PetRepository.GetAllAsync()
+                            on bd.PetId equals p.Id
+                            select new BookingDetailForGuest
+                            {
+                                EndDate = new DateOnly(bd.StartDateTime.Year, bd.StartDateTime.Month, bd.StartDateTime.Day).ToString("dd/MM/yyyy"),
+                                StartDate = new DateOnly(bd.StartDateTime.Year, bd.StartDateTime.Month, bd.StartDateTime.Day).ToString("dd/MM/yyyy"),
+                                PetName = p.Name,
+                                ServiceId = sd.Id,
+                                ServiceName = sd.NameDetail,
+                                StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
+                                Status = bd.Status,
+                                TotalPrice = bd.Price,
+                                IdBooking = bd.BookingId,
+
+                            };
+                var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
+                            where b.GuestId == user.Id
+                            group new { b.Id, b.BookingTime }
+                            by new { b.Id, b.BookingTime, b.Status }
+                            into view
+                            select new GetBookingByGuestVM
+                            {
+                                BookingTime = new DateOnly(view.Key.BookingTime.Year, view.Key.BookingTime.Month, view.Key.BookingTime.Day).ToString("dd/MM/yyyy"),
+                                IdBooking = view.Key.Id,
+                                LstBookingDetail = (from lstBd in query
+                                                    where lstBd.IdBooking == view.Key.Id
+                                                    select lstBd).ToList(),
+                            }).OrderByDescending(c => c.BookingTime).AsQueryable();
+                if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = "Có lỗi trong quá trình tìm kiếm"
+                };
+
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = true,
+                    Data = join.ToList(),
+                    Error = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetBookingByGuestVM>>
+                {
+                    IsSuccess = false,
+                    Data = new List<GetBookingByGuestVM>(),
+                    Error = ex.Message
+                };
+            }
+        }
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
     {
