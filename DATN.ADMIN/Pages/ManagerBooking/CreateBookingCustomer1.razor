@@ -31,7 +31,7 @@
                         </MudIconButton>
                     }
                     <div style="display: flex; align-items: center;padding-left:200px">
-                        <MudButton OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
+                        <MudButton Disabled=@isOpenDialog OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
                         <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Chọn ngày làm dịch vụ</MudButton>
                         @if (bookingService.lstBooking.Count > 0 && value1 != null)
                         {
@@ -94,7 +94,7 @@
 
         [Inject]
         HttpContextAccessor _httpContextAccessor { get; set; }
-
+        private bool isOpenDialog = false;
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
@@ -199,12 +199,9 @@
 
         public async Task OpenDialog()
         {
-            if (isEditing)
-            {
-                return; // Exit if already editing
-            }
-            isEditing = true; // Set flag to true to indicate editing in progress
-
+            isLoading = true;
+            await Task.Delay(1);
+            isOpenDialog = true;
             string nameDialog = "Thêm mới khách hàng";
             DialogOptions options = new DialogOptions()
             {
@@ -223,6 +220,9 @@
                 await LoadData();
                 StateHasChanged();
             }
+            isLoading = false;
+            isOpenDialog = false;
+
         }
         public async Task OpenDialogServices()
         {
