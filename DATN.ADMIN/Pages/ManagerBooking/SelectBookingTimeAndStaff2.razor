@@ -17,8 +17,8 @@
             <MudButton @onclick="@(async()=>await OpeListPetDialog())">Thêm thú cưng</MudButton>
         </div>
         <div style="display:flex;width:500px;margin-left:10px">
-            <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
-            <MudDatePicker @bind-Date="bookingDate" Label="Ngày hẹn" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" />
+             <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" /> 
+             <MudDatePicker @bind-Date="bookingDate" Label="Ngày hẹn" Editable="true" DateFormat="dd/MM/yyyy" Mask="@(new DateMask("dd/MM/yyyy"))" /> 
             <MudButton OnClick="@(async()=>await Create())">Tìm Kiếm</MudButton>
         </div>
         @code {
