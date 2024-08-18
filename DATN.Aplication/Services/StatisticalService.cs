@@ -306,13 +306,17 @@ namespace DATN.Aplication.Services
                            orderby h.ActionTime descending
                            select new StatiscalBill()
                            {
-                               Amount = b.TotalPrice.ToString("N0"),
+
+                               Amount = b.ReducedAmount != null? (b.TotalPrice-b.ReducedAmount.Value).ToString("N0") : b.TotalPrice.ToString("N0"),
                                CusName = g.Name,
                                ID = b.Id,
                                StaffName = u.FullName,
                                Status = StatusBookingToString(b.Status),
-                               TimeComplete = h.ActionTime.ToString("dddd 'Ngày' dd/MM/yyyy", viCulture)
-                           };
+                               TimeComplete = h.ActionTime.ToString("dddd, HH:mm, 'Ngày' dd/MM/yyyy", viCulture),
+                               AmountReduced = b.ReducedAmount != 0 ? b.ReducedAmount.Value.ToString("N0") : "Không có voucher",
+                               AmountReal = b.TotalPrice.ToString("N0")
+
+						   };
 
                 return new ResponseData<List<StatiscalBill>>(data.ToList());
             }
@@ -378,8 +382,19 @@ namespace DATN.Aplication.Services
             {
                 var lstHistoryById = await _ufw.HistoryActionRepository.FindAsync(p => p.BookingID == bookingID);
                 var lstAction = await _ufw.ActionBookingRepository.GetAllAsync();
+                var bookingData = await _ufw.BookingRepository.GetAsync(bookingID);
                 var lstUser = _userManager.Users.ToList();
-                var result = from h in lstHistoryById
+				List <HistoryBookingVM > historyAction= new List<HistoryBookingVM>();
+                var startHis = new HistoryBookingVM()
+                {
+                    ActionName = "Tạo hóa đơn",
+                    TimeAction = bookingData.BookingTime.ToString("dd/MM/yyyy HH:mm"),
+                    Description= "Đơn hàng được tạo mới",
+                    
+
+				};
+				historyAction.Add(startHis);
+				var result = from h in lstHistoryById
                              join a in lstAction on h.ActionID equals a.ID
                              join u in lstUser on h.ActionByID equals u.Id into uGroup
                              from u in uGroup.DefaultIfEmpty()
@@ -392,7 +407,8 @@ namespace DATN.Aplication.Services
                                  Description = h.Description
                              };
 
-                return new ResponseData<List<HistoryBookingVM>>(result.ToList());
+                historyAction.AddRange(result.ToList());
+                return new ResponseData<List<HistoryBookingVM>>(historyAction);
             }
             catch (Exception ex)
             {

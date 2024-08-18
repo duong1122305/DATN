@@ -64,7 +64,9 @@
 						<MudTh>STT</MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.TimeComplete)">Thời gian</MudTableSortLabel></MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.CusName)">Tên khách hàng</MudTableSortLabel></MudTh>
-						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng giá trị</MudTableSortLabel></MudTh>
+						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.AmountReal)">Tổng giá trị</MudTableSortLabel></MudTh>
+						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.AmountReduced)">Tổng giảm voucher</MudTableSortLabel></MudTh>
+						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng khách trả</MudTableSortLabel></MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Status)">Trạng thái đơn hàng</MudTableSortLabel></MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.StaffName)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
 
@@ -77,6 +79,8 @@
 						<MudTd>@(lstBill.IndexOf(data) + 1)</MudTd>
 						<MudTd>@data.TimeComplete</MudTd>
 						<MudTd>@data.CusName</MudTd>
+						<MudTd>@data.AmountReal</MudTd>
+						<MudTd>@data.AmountReduced</MudTd>
 						<MudTd>@data.Amount</MudTd>
 						<MudTd>@data.Status</MudTd>
 						<MudTd>@data.StaffName</MudTd>
@@ -120,7 +124,8 @@
 		private IDialogService _dialogService { get; set; }
 		protected override async Task OnInitializedAsync()
 		{
-			await LoadData();
+			type = 1;
+			await LoadData(1);
 		}
 
 		// load lai du lieu

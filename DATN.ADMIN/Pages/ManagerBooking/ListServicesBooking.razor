@@ -524,7 +524,12 @@
 
         private async Task CheckInArrive(int id)
         {
-            var respone = await _client.CheckInArrive(id);
+            ActionView actionView = new ActionView()
+            {
+                IdBokingOrDetail = id,
+                Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+            };
+            var respone = await _client.CheckInArrive(actionView);
             if (respone.IsSuccess)
             {
                 Message(respone.Data, Severity.Success);
