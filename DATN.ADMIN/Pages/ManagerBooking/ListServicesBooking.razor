@@ -186,6 +186,7 @@
 
         private string searchString = "";
         private bool isLoading;
+        private bool isEditing = false;
 
         MudDataGrid<BookingView> dataGrid;
         [Inject] private BookingService bookingService { get; set; }
@@ -267,6 +268,8 @@
 
         private async Task CheckIn(int idBooking)
         {
+            isLoading = true;
+            await Task.Delay(1000);
             var response = await _client.QrCodeCheckIn(idBooking);
             var parameters = new DialogParameters();
             string nameDialog = "Khách check In";
@@ -288,9 +291,13 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            isLoading = false;
+            StateHasChanged();
         }
         private async Task CheckOut(int idBooking)
         {
+            isLoading = true;
+            await Task.Delay(1000);
             var response = await _client.QrCodeCheckIn(idBooking);
             var parameters = new DialogParameters();
             string nameDialog = "Khách check Out";
@@ -311,6 +318,8 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            isLoading = false;
+            StateHasChanged();
         }
         private Func<BookingView, bool> _quickFilter => x =>
         {
@@ -353,7 +362,8 @@
         private async Task OpenDialog(int id, Guid idGuest, bool payment)
         {
             isLoading = true;
-            StateHasChanged();
+            await Task.Delay(1000);
+
             var parameters = new DialogParameters();
             string nameDialog = "Chi tiết khách đặt lịch";
             DialogOptions options = new DialogOptions()
@@ -388,12 +398,14 @@
                 StateHasChanged();
                 Message("Không có dữ liệu", Severity.Warning);
             }
+            isLoading = false;
+            StateHasChanged();
         }
         //bill
         private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking)
         {
             isLoading = true;
-            StateHasChanged();
+            await Task.Delay(1000);
             var parameters = new DialogParameters();
             string nameDialog = "";
 
@@ -418,6 +430,8 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            isLoading = false;
+            StateHasChanged();
         }
 
         private async Task OpenDialogBillInStore(Guid? id, DateTime date)
@@ -553,7 +567,7 @@
         private async Task OpenDialogCreateBooking()
         {
             isLoading = true;
-            StateHasChanged();
+            await Task.Delay(1000);
             string nameDialog = "Đặt lịch tại quầy";
             DialogOptions options = new DialogOptions()
             {
@@ -574,6 +588,8 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            isLoading= false;
+            StateHasChanged();
         }
         private void Message(string message, Severity severity)
         {
