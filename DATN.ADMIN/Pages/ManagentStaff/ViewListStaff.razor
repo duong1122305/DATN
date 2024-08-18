@@ -283,12 +283,6 @@
         {
             isLoading = true;
             await Task.Delay(500);
-            if (isEditing)
-            {
-                return; // Exit if already editing
-            }
-
-            isEditing = true; // Set flag to true to indicate editing in progress
             var parameters = new DialogParameters();
             string nameDialog = "Thêm mới nhân viên";
             if (username != null)
@@ -317,14 +311,13 @@
             };
             var createUpdateDialog = await _dialogservice.ShowAsync<CreateUpdate>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
-            isEditing = false;
-            isLoading = false;
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
                 await LoadData();
                 StateHasChanged();
             }
+            isLoading = false;
         }
 
         private void HandleShiftChange(ChangeEventArgs e)
@@ -354,9 +347,7 @@
                     if (selectedShiftId > 0)
                     {
                         var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-                        var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
                         var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
-                        dialog.Close();
                         if (repo.IsSuccess)
                         {
                             Message(repo.Data, Severity.Success);
@@ -378,12 +369,6 @@
                     Message("Thêm không thành công", Severity.Error);
                 }
             }
-            else
-            {
-                Message("Lỗi không xác định!!", Severity.Warning);
-
-            }
-
         }
         //thêm vào ca khẩn cấp
         private async Task StaffSuddenly()
@@ -412,7 +397,6 @@
                 parameters.Add("idShift", selectedShiftId);
                 var createUpdateDialog = await _dialogservice.ShowAsync<AddStaffSuddenly>(nameDialog, parameters, options);
                 var result = await createUpdateDialog.Result;
-                isEditing = false;
                 if (!result.Canceled)
                 {
                     createUpdateDialog.Close();
@@ -436,7 +420,6 @@
             if (await Confirm2() == true)
             {
                 var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-                var dialog = await _dialogservice.ShowAsync<LoadingIndicator>("", options);
                 if (selectedUser1s.Count > 0 && selectedUser1s != null)
                 {
                     foreach (var user2 in selectedUser1s)
@@ -447,7 +430,6 @@
                     if (selectedShiftId > 0)
                     {
                         var repo = await _client2.InsertEmployeeCurrentMonth(listIdUser, selectedShiftId);
-                        dialog.Close();
                         if (repo.IsSuccess)
                         {
                             Message(repo.Data, Severity.Success);
@@ -467,11 +449,6 @@
                 {
                     Message("Thêm không thành công", Severity.Error);
                 }
-            }
-            else
-            {
-                Message("Lỗi không xác định!!", Severity.Warning);
-
             }
 
         }
