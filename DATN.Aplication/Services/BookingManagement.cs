@@ -1091,17 +1091,19 @@ namespace DATN.Aplication.Services
                         where booking.Id == idBooking.Value
                         select guest).FirstOrDefault();
                 var checkQuan = (from order in await _unitOfWork.OrderDetailRepository.GetAllAsync()
-                                 join product in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                                 on order.IdProductDetail equals product.Id
+                                 join productDetail in await _unitOfWork.ProductDetailRepository.GetAllAsync()
+                                 on order.IdProductDetail equals productDetail.Id
+                                 join product in await _unitOfWork.ProductRepository.GetAllAsync()
+                                 on productDetail.IdProduct equals product.Id
                                  where order.IdBooking == idBooking.Value
                                  select new ProductDetailView
                                  {
                                      IdBooking = order.IdBooking,
                                      IdProductDetail = order.IdProductDetail,
-                                     Name = product.Name,
+                                     Name = product.Name + "-" + product.Name,
                                      Price = order.Price,
                                      Quantity = order.Quantity,
-                                     Status = product.Status,
+                                     Status = productDetail.Status,
                                      SelectQuantityProduct = order.Quantity,
                                  }).ToList();
                 if (checkQuan.Count > 0)
