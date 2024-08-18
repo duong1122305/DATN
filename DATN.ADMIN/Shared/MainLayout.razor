@@ -81,17 +81,11 @@
         }
         protected async override Task OnInitializedAsync()
         {
-            var session = httpContextAccessor.HttpContext!.Session.GetString("Key");
+            var session = httpContextAccessor.HttpContext.Session.GetString("Key");
 
-            var url = httpContextAccessor.HttpContext!.Request.Path;
-            if (url == "/_blazor")
-            {
-                url = "/";
-            }
             if (string.IsNullOrEmpty(session))
             {
                 navigationManager.NavigateTo($"/dangnhap", true);
-
             }
             else
             {
@@ -106,9 +100,9 @@
 
                 var user = await _ser.GetInfoUser(idUser);
                 urlImg = user.Data.ImgUrl;
+                await InitializeSignalR();
             }
             // Initialize SignalR connection
-            await InitializeSignalR();
         }
 
         private async Task InitializeSignalR()

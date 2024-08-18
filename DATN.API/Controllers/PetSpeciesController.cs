@@ -10,7 +10,6 @@ namespace DATN.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    [Authorize(Roles = "Admin")]
     public class PetSpeciesController : ControllerBase
     {
         private readonly IPetSpeciesManagerService _service;
@@ -25,6 +24,7 @@ namespace DATN.API.Controllers
         {
             return await _service.GetAll();
         }
+        [Authorize(Roles = "Admin")]
 
         [HttpPost("create-species")]
         public async Task<ResponseData<string>> Create(PetSpeciesCreateUpdate resquest)
@@ -32,17 +32,19 @@ namespace DATN.API.Controllers
             return await _service.Create(resquest);
 
         }
+        [Authorize(Roles = "Admin")]
+
         [HttpPost("update-species")]
         public async Task<ResponseData<string>> Update(PetSpeciesCreateUpdate resquest)
         {
             return await _service.Update(resquest);
         }
-
         [HttpGet("get-by-id-species")]
         public async Task<ResponseData<PetSpeciesVM>> GetById(int id)
         {
             return await _service.FindPetSpeciesByID(id);
         }
+        [Authorize(Roles = "Admin")]
 
         [HttpPost("delete-species")]
         public async Task<ResponseData<string>> Delete(DeleteRequest<int> resquest)

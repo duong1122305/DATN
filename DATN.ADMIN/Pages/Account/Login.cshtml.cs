@@ -26,10 +26,20 @@ namespace DATN.ADMIN.Pages.Account
         }
         public async Task HandleLogin()
         {
-
-            if (_contextAccessor.HttpContext.Session.GetString("Key") != null)
+            var key = _contextAccessor.HttpContext.Session.GetString("Key");
+            if (key != null)
             {
-                _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                var jwt = new JwtSecurityTokenHandler();
+                var tok = jwt.ReadJwtToken(key);
+                var claim = tok.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault()?.Value;
+                if (claim == "Admin")
+                {
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/trangchu"));
+                }
+                else
+                {
+                    _contextAccessor.HttpContext.Response.Redirect(Url.Content("~/ListServicesBooking"));
+                }
             }
             else
             {

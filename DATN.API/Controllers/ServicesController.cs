@@ -9,7 +9,6 @@ namespace DATN.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    [Authorize(Roles = "Admin")]
     public class ServicesController : ControllerBase
     {
         private readonly IServiceManagementService _serviceManager;
@@ -40,6 +39,7 @@ namespace DATN.API.Controllers
 
             return Ok(result);
         }
+        [Authorize(Roles = "Admin")]
 
         [HttpPost("createService")]
         public async Task<IActionResult> CreateService(CreateServiceVM service)
@@ -52,6 +52,7 @@ namespace DATN.API.Controllers
 
             return Ok(result);
         }
+        [Authorize(Roles = "Admin")]
 
         [HttpPatch("updateService/{id}")]
         public async Task<IActionResult> UpdateService(int id, UpdateServiceVM service)
@@ -64,6 +65,7 @@ namespace DATN.API.Controllers
 
             return Ok(result);
         }
+        [Authorize(Roles = "Admin")]
 
         [HttpPatch("removeService/{id}")]
         public async Task<IActionResult> RemoveService(int id)
