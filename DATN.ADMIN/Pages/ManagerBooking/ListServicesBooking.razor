@@ -468,6 +468,7 @@
             ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
+                Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
             };
             var respone = await _client.StartBooking(actionView);
             if (respone.IsSuccess)
@@ -593,7 +594,7 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
-            isLoading= false;
+            isLoading = false;
             StateHasChanged();
         }
         private void Message(string message, Severity severity)
