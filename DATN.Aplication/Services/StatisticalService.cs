@@ -341,7 +341,7 @@ namespace DATN.Aplication.Services
                              select new StatiscalBookingDetail()
                              {
                                  ServiceName = s.Name,
-                                 Amount = b.Price.ToString("M0"),
+                                 Amount = b.Price.ToString("N0"),
                                  EndTime = b.EndDateTime.ToString("dd/MM/yyyy HH:mm"),
                                  StartTime = b.StartDateTime.ToString("dd/MM/yyyy HH:mm"),
                                  StaffName = u.FullName,
