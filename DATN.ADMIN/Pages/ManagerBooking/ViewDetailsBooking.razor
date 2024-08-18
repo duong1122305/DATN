@@ -30,6 +30,11 @@
                     <MudSpacer />
                 </ToolBarContent>
                 <Columns>
+                    <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+                        <CellTemplate Context="data">
+                            <span>@(lstBooking.IndexOf(data.Item) + 1)</span>
+                        </CellTemplate>
+                    </TemplateColumn>
                     <PropertyColumn Property="x => x.NameStaffService" Title="Nhân viên làm" Filterable="false" Groupable="false" />
                     <PropertyColumn Property="x => x.ServiceDetaiName" Title="Dịch vụ làm" Filterable="false" Groupable="false" />
                     <TemplateColumn Title="Giờ bắt đầu" Sortable="false" Filterable="false">
