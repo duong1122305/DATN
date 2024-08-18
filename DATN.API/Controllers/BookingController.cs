@@ -179,10 +179,10 @@ namespace DATN.API.Controllers
             return await _voucherManagementService.GetAllVoucherCanApply(totalPrice);
         }
 
-        [HttpGet("CheckIn-Booking")]
-        public async Task<ResponseData<string>> CheckInArrive(int idBooking)
+        [HttpPatch("CheckIn-Booking")]
+        public async Task<ResponseData<string>> CheckInArrive(ActionView actionView)
         {
-            return await _bookingManagement.CheckInArrive(idBooking);
+            return await _bookingManagement.CheckInArrive(actionView);
         }
 
         [HttpGet("GetBookingByGuest")]

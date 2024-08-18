@@ -29,7 +29,7 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
         public Task<ResponseData<ResponseMomo>> PaymentQr(Payment payment, int? id);
         public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
-        public Task<ResponseData<string>> CheckInArrive(int idBooking);
+        public Task<ResponseData<string>> CheckInArrive(ActionView actionView);
         public Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest);
     }
 }

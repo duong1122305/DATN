@@ -155,9 +155,12 @@ namespace DATN.ADMIN.Services
         {
             return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/Payment-Qr-VnPay?totalPrice={totalPrice}");
         }
-        public async Task<ResponseData<string>> CheckInArrive(int idBooking)
+        public async Task<ResponseData<string>> CheckInArrive(ActionView actionView)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"api/Booking/CheckIn-Booking?idBooking={idBooking}");
+            var response = await _httpClient.PatchAsJsonAsync<ActionView>($"api/Booking/CheckIn-Booking", actionView);
+            var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
+
+            return result;
         }
         public async Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest)
         {

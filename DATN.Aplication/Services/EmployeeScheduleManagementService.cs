@@ -653,6 +653,8 @@ namespace DATN.Aplication.Services
                                                       join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                                       on workshift.ShiftId equals shift.Id
                                                       where bookingDetail.StaffId == item.IdStaff
+                                                      && bookingDetail.Status != BookingDetailStatus.Cancelled &&
+                                                      bookingDetail.Status != BookingDetailStatus.Completed
                                                       select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                                 if (queryCheckUser.Count() == 0)
                                 {
@@ -714,7 +716,8 @@ namespace DATN.Aplication.Services
                                                   join shift in await _unitOfWork.ShiftRepository.GetAllAsync()
                                                   on workshift.ShiftId equals shift.Id
                                                   where bookingDetail.StaffId == item.IdStaff
-                                                  && bookingDetail.Status != BookingDetailStatus.Cancelled
+                                                  && bookingDetail.Status != BookingDetailStatus.Cancelled &&
+                                                      bookingDetail.Status != BookingDetailStatus.Completed
                                                   select bookingDetail).Where(c => c.EndDateTime.Date.CompareTo(dateTime.Date) == 0);
                             if (queryCheckUser.Count() == 0)
                             {
@@ -765,7 +768,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<List<NumberOfScheduleView>> { IsSuccess = false, Error = e.Message };
             }
         }
-        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate,string role)
+        public async Task<ResponseData<List<UserInfView>>> ListStaffNotWorkingInDay(int shiftId, DateTime workDate, string role)
         {
             var query = from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
                         join workShift in await _unitOfWork.WorkShiftRepository.GetAllAsync()
