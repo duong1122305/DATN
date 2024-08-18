@@ -28,7 +28,7 @@
                 <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
                 <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
                     <CellTemplate Context="data">
-                        <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e,data.Item.Name)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
                             @foreach (var item2 in data.Item.ListProductDetail)
                             {
                                 if (item2.Quantity > 0)
@@ -73,8 +73,9 @@
                 lstProductDetaiView = new List<ProductSelect>();
             }
         }
-        private async Task ChooseProduct(ProductDetailView productDV)
+        private async Task ChooseProduct(ProductDetailView productDV, string name)
         {
+            productDV.Name = name + "-" + productDV.Name;
             @if (IdBooking != 0 && IdBooking != null)
             {
                 productDV.IdBooking = IdBooking.Value;
