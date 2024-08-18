@@ -64,12 +64,11 @@
 						<MudTh>STT</MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.TimeComplete)">Thời gian</MudTableSortLabel></MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.CusName)">Tên khách hàng</MudTableSortLabel></MudTh>
-						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.AmountReal)">Tổng giá trị</MudTableSortLabel></MudTh>
-						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.AmountReduced)">Tổng giảm voucher</MudTableSortLabel></MudTh>
-						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng khách trả</MudTableSortLabel></MudTh>
+						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.AmountReal)">Tổng giá trị(VND)</MudTableSortLabel></MudTh>
+						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.AmountReduced)">Tổng giảm voucher(VND)</MudTableSortLabel></MudTh>
+						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Amount)">Tổng khách trả(VND)</MudTableSortLabel></MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.Status)">Trạng thái đơn hàng</MudTableSortLabel></MudTh>
 						<MudTh><MudTableSortLabel SortBy="new Func<StatiscalBill, object>(x=>x.StaffName)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
-
 						<MudTh>Chi tiết</MudTh>
 					</HeaderContent>
 					<RowTemplate Context="data">

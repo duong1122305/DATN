@@ -213,46 +213,46 @@
         private async Task LoadData()
         {
             var respone = await _client.GetAll();
-            lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
+            lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).ToList();
             if (selectedStatus == Status.All)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).ToList();
             }
             else if (selectedStatus == Status.PendingConfirmation)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.PendingConfirmation).ToList();
             }
             else if (selectedStatus == Status.Confirmed)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Confirmed).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.Confirmed).ToList();
             }
             else if (selectedStatus == Status.Arrived)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Arrived).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.Arrived).ToList();
             }
             else if (selectedStatus == Status.InProgress)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.InProgress).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.InProgress).ToList();
             }
             else if (selectedStatus == Status.Completed)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.Completed).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.Completed).ToList();
             }
             else if (selectedStatus == Status.NoShow)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.NoShow).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.NoShow).ToList();
             }
             else if (selectedStatus == Status.CustomerCancelled)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.CustomerCancelled).ToList();
             }
             else if (selectedStatus == Status.StaffCancelled)
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.StaffCancelled).ToList();
             }
             else
             {
-                lstBookingServices = respone.Data.OrderByDescending(x => x.BookingTime.Date).Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
+                lstBookingServices = respone.Data.OrderBy(x => x.BookingTime).Where(x => x.Status == BookingStatus.AdminCancelled).ToList();
             }
             StateHasChanged();
         }
