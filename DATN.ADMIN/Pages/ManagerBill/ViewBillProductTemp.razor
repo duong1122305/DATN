@@ -71,6 +71,8 @@
         }
         private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking, int? idterm)
         {
+            isLoading = true;
+            await Task.Delay(30);
             var parameters = new DialogParameters();
             string nameDialog = "";
 
@@ -94,6 +96,8 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            isLoading = false;
+
         }
         public async Task RemoveBill(int id)
         {
@@ -115,8 +119,6 @@
             };
             var createUpdateDialog = await _dialogservice.ShowAsync<ViewBillCustomer>(nameDialog, options);
             var result = await createUpdateDialog.Result;
-            isLoading = false;
-            StateHasChanged();
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
