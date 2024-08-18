@@ -186,6 +186,7 @@
 
         private string searchString = "";
         private bool isLoading;
+        private bool isEditing = false;
 
         MudDataGrid<BookingView> dataGrid;
         [Inject] private BookingService bookingService { get; set; }
@@ -354,6 +355,12 @@
         {
             isLoading = true;
             StateHasChanged();
+                        if (isEditing)
+            {
+                return; // Exit if already editing
+            }
+            isEditing = true; // Set flag to true to indicate editing in progress
+
             var parameters = new DialogParameters();
             string nameDialog = "Chi tiết khách đặt lịch";
             DialogOptions options = new DialogOptions()
