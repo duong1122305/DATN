@@ -13,5 +13,6 @@ namespace DATN.Aplication.Services.IServices
         Task<ResponseData<string>> SoftDelete(DeleteRequest<int> request);
         Task<ResponseData<List<PetVM>>> GetAll();
         Task<ResponseData<List<PetType>>> GetAllTypes();
+        Task<ResponseData<Pet>> GetPetById(int id);
     }
 }
