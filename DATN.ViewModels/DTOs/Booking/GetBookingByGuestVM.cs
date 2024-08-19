@@ -12,7 +12,6 @@ namespace DATN.ViewModels.DTOs.Booking
     {
         public int IdBooking { get; set; }
         public string BookingTime { get; set; }
-        public BookingStatus Status { get; set; }
         public List<BookingDetailForGuest> LstBookingDetail { get; set; }
     }
 }

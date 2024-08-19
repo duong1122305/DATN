@@ -18,5 +18,6 @@ namespace DATN.ViewModels.DTOs.Booking
         public string EndDate { get; set; }
         public string StartTime { get; set; }
         public double TotalPrice { get; set; }
+        public BookingDetailStatus Status { get; set; }
     }
 }

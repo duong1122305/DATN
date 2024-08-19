@@ -1762,13 +1762,13 @@ namespace DATN.Aplication.Services
                                 StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
                                 TotalPrice = bd.Price,
                                 IdBooking = bd.BookingId,
-                                IdBookingDetail = bd.Id
-
+                                IdBookingDetail = bd.Id,
+                                Status = bd.Status,
                             };
                 var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
                             where b.GuestId == idGuest
                             group new { b.Id, b.BookingTime }
-                            by new { b.Id, b.BookingTime, b.Status }
+                            by new { b.Id, b.BookingTime }
                             into view
                             select new GetBookingByGuestVM
                             {
@@ -1777,7 +1777,6 @@ namespace DATN.Aplication.Services
                                 LstBookingDetail = (from lstBd in query
                                                     where lstBd.IdBooking == view.Key.Id
                                                     select lstBd).ToList(),
-                                Status = view.Key.Status
                             }).OrderByDescending(c => c.BookingTime).AsQueryable();
                 if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
                 {
@@ -1987,7 +1986,8 @@ namespace DATN.Aplication.Services
                                 StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
                                 TotalPrice = bd.Price,
                                 IdBooking = bd.BookingId,
-                                IdBookingDetail = bd.Id
+                                IdBookingDetail = bd.Id,
+                                Status = bd.Status,
                             };
                 var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
                             where b.GuestId == user.Id
@@ -2001,7 +2001,6 @@ namespace DATN.Aplication.Services
                                 LstBookingDetail = (from lstBd in query
                                                     where lstBd.IdBooking == view.Key.Id
                                                     select lstBd).ToList(),
-                                Status = view.Key.Status
                             }).OrderByDescending(c => c.BookingTime).AsQueryable();
                 if (join == null) return new ResponseData<List<GetBookingByGuestVM>>
                 {
