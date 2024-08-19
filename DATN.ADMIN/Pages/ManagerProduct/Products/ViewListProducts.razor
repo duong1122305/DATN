@@ -49,8 +49,8 @@
                     <PropertyColumn Property="x => x.CategoryProduct" Title="Tên danh mục" Sortable="false" Filterable="false" />
                     @* 		<PropertyColumn Property="x => x.Description" Title="Mô tả" style="width:400px" Sortable="false" Filterable="false" /> *@
 
-                    <TemplateColumn Title="Mô tả" Sortable="false" Filterable="false">
-                        <CellTemplate Context="data">
+                    <TemplateColumn Class="w-300" Resizable=true Title="Mô tả" Sortable="false" Filterable="false">
+                        <CellTemplate  Context="data">
                             @{
                                 var des = data.Item.Description;
                                 if (des!.Length > 100)
@@ -58,6 +58,14 @@
                                     des = data.Item.Description!.Substring(0, 100) + "...";
                                 }
                             }
+                            <br />
+                            @for (int i = 0; i < des.Length; i++)
+                        {
+                            if (i==20)
+                            {
+                                
+                            }
+                        }
                             <span title="@data.Item.Description" class="rounded-lg">@des</span>
                         </CellTemplate>
                     </TemplateColumn>
@@ -281,8 +289,8 @@
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
-                await LoadData();
             }
+                await LoadData();
             StateHasChanged();
         }
         private async Task OpenDetails(int? id)

@@ -9,6 +9,7 @@
         @using DATN.ViewModels.DTOs.Authenticate
         @using DATN.ViewModels.DTOs.Guest
         @using System.Timers
+@using Newtonsoft.Json
 
         @inject ISnackbar Snackbar
         @inject IDialogService _dialogservice;
@@ -21,12 +22,12 @@
 
             <MudDrawerContainer Class="mud-height-full" Style=" width:100%">
 
-                <MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" Filter="new Func<GuestViewModel,bool>(FilterFunc)">
+                <MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" >
                     <ToolBarContent>
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
 
                         <MudSpacer />
-                        <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField T="string"  Value="searchString"  ValueChanged="(e)=>Search(e)" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>STT</MudTh>
@@ -44,7 +45,7 @@
                             var stt = 1;
                         }
                         <MudTd DataLabel="STT">@(lstGuest.IndexOf(data) + 1)</MudTd>
-                        <MudTd DataLabel="Tên">@data.Name</MudTd>
+                        <MudTd DataLabel="Tên">@(data.Name??"Data lỗi")</MudTd>
                         <MudTd DataLabel="Số điện thoại">@data.PhoneNumber</MudTd>
                         @{
                             string gender = "Không xác định";
@@ -57,11 +58,11 @@
                         <MudTd DataLabel="Địa chỉ">@(_addressServive.GetAddress(data.Address!) ?? "Không có địa chỉ")</MudTd>
                         <MudTd @onclick="@(async()=>await OpeListPetDialog(data.Id))" DataLabel="Thú cưng">
                             <div style="display: flex; align-items: center;">
-                                <span>@data.CountPet</span>
+                                <span>@(data.CountPet??0)</span>
                                 <MudIcon Color="Color.Primary" Icon="@Icons.Material.Filled.AddBox" style="margin-left: 8px;" />
                             </div>
                         </MudTd>
-                        @if (data.IsConfirm ?? false)
+                        @if (data.IsConfirm.HasValue && data.IsConfirm.Value)
                         {
                             <MudTd DataLabel="" Style="text-align:center;">
 
@@ -79,7 +80,7 @@
                         }
 
                         <MudTd>
-                            <MudSwitch T="bool" Value="@(data.IsDelete!.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, data.Id))" Color="Color.Primary"></MudSwitch>
+                            <MudSwitch T="bool" Value="@(data.IsDelete.HasValue && data.IsDelete.Value ? false : true)" ValueChanged="@(newValue => OnchangeStatus(newValue, data.Id))" Color="Color.Primary"></MudSwitch>
                         </MudTd>
                         <MudTd>
                             <MudButtonGroup Variant="Variant.Filled">
@@ -106,7 +107,7 @@
         </style>
         @code {
 
-        //button trạng thái
+            //button trạng thái
         private bool isOpenDialog = false;
         private string searchString = "";
         private bool cusDetailOpen = false;
@@ -114,6 +115,7 @@
         public bool Rtl { get; set; }
         private GuestViewModel selectedGuest = new GuestViewModel();
         private List<GuestViewModel> lstGuest = new List<GuestViewModel>();
+        private List<GuestViewModel> lstGuestResponse = new List<GuestViewModel>();
         [Inject]
         private IGuestManagerClient _guestService { get; set; }
         string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -129,7 +131,7 @@
             //var response = await _client.GetGuest();
             var response = await _guestService.GetGuest();
             lstGuest = response.Data!;
-
+            lstGuestResponse = lstGuest;
             StateHasChanged();
         }
         // mở details
@@ -178,17 +180,20 @@
                 StateHasChanged();
             }
         }
-
-        private bool FilterFunc(GuestViewModel element)// lọc data
+        private void Search(string value)
         {
-            if (string.IsNullOrWhiteSpace(searchString.Trim()))
-                return true;
-            if (element.Name.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                return true;
-            if (element.PhoneNumber.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                return true;
-            return false;
+            if (value!=null|| !string.IsNullOrEmpty(value))
+            {
+                searchString = value;
+                value = value.ToUpper();
+                var csde = JsonConvert.SerializeObject(lstGuest);
+                lstGuest = lstGuestResponse.Where(p => p.Name.ToUpper().Contains(value)
+                || (p.PhoneNumber!=null&& p.PhoneNumber.ToUpper().Contains(value))
+                || (p.Email != null && p.Email.ToUpper().Contains(value))
+                ).ToList();
+            }
         }
+       
         public void OpenGuestDetails(Guid id)
         {
             bool result = id == selectedGuest.Id;
