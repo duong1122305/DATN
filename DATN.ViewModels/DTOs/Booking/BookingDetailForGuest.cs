@@ -10,6 +10,7 @@ namespace DATN.ViewModels.DTOs.Booking
     public class BookingDetailForGuest
     {
         public int? IdBooking { get; set; }
+        public int? IdBookingDetail { get; set; }
         public string PetName { get; set; }
         public string ServiceName { get; set; }
         public int ServiceId { get; set; }

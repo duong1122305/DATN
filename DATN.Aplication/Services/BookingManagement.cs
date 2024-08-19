@@ -1768,6 +1768,7 @@ namespace DATN.Aplication.Services
                                 StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
                                 TotalPrice = bd.Price,
                                 IdBooking = bd.BookingId,
+                                IdBookingDetail = bd.Id
 
                             };
                 var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
@@ -1992,7 +1993,7 @@ namespace DATN.Aplication.Services
                                 StartTime = new TimeOnly(bd.StartDateTime.Hour, bd.StartDateTime.Minute).ToString("HH:mm"),
                                 TotalPrice = bd.Price,
                                 IdBooking = bd.BookingId,
-
+                                IdBookingDetail = bd.Id
                             };
                 var join = (from b in await _unitOfWork.BookingRepository.GetAllAsync()
                             where b.GuestId == user.Id
