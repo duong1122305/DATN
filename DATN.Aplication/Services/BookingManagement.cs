@@ -589,22 +589,17 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView)
         {
-            var query = (from bookingDetail in await _unitOfWork.BookingRepository.GetAllAsync()
+            var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                          where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
             if (query != null)
             {
-                if (query.Status == BookingStatus.PendingConfirmation)
+                if (query.Status == BookingDetailStatus.Unfulfilled)
                 {
                     List<BookingDetail> lstUpdate = new List<BookingDetail>();
-                    foreach (var item in (await _unitOfWork.BookingDetailRepository.GetAllAsync()).Where(c => c.BookingId == query.Id))
-                    {
-                        item.Status = BookingDetailStatus.Cancelled;
-                        lstUpdate.Add(item);
-                    }
                     try
                     {
-                        query.Status = BookingStatus.CustomerCancelled;
+                        query.Status = BookingDetailStatus.Cancelled;
                         HistoryAction historyAction = new HistoryAction()
                         {
                             BookingID = query.Id,
@@ -613,8 +608,7 @@ namespace DATN.Aplication.Services
                             ActionID = 14,
                             ByGuest = true
                         };
-                        await _unitOfWork.BookingRepository.UpdateAsync(query);
-                        await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(lstUpdate);
+                        await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
                         await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
