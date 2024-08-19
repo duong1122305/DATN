@@ -16,6 +16,7 @@
         @using DATN.ADMIN.Pages.ManagerProduct.Category
         @using MudBlazor
         @using System.Globalization
+@using System.Text.RegularExpressions
         @inject ISnackbar Snackbar
         @inject IDialogService _dialogService
         <EditForm Context="data"
@@ -103,10 +104,14 @@
                                     <MudTextField @bind-Value="productd.Name" For="@(() => productd.Name)" Required RequiredError="Phải bắt buộc nhập trường này" />
                                 </MudTd>
                                 <MudTd DataLabel="Position">
-                                    <MudTextField T="double" Immediate="true" For="@(() => productd.Price)" Culture="@nrDisplay" @bind-Value="productd.Price" Required Error=true ErrorText="Định dạng số sai" />
+                                    <MudTextField T="double" Immediate="true" For="@(() => productd.Price)" Culture="@nrDisplay"
+                                                  @bind-Value="productd.Price" Required Error=true ErrorText="Định dạng số sai"
+                                                  Format="#,##0.##" />
                                 </MudTd>
                                 <MudTd DataLabel="Molar mass">
-                                    <MudTextField T="int" Immediate="true" For="@(() => productd.Amount)" Culture="@nrDisplay" @bind-Value="productd.Amount" Required Error=true ErrorText="Định dạng số sai" />
+                                    <MudTextField T="int" Immediate="true" For="@(() => productd.Amount)" Culture="@nrDisplay"
+                                                  @bind-Value="productd.Amount" Required Error=true ErrorText="Định dạng số sai"
+                                                  Format="N0" />
                                 </MudTd>
                             </RowEditingTemplate>
                             <PagerContent>
@@ -383,7 +388,6 @@
                 if (result.IsSuccess)
                 {
                     Message(result.Data, Severity.Success);
-
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
@@ -527,9 +531,9 @@
                         Snackbar.Add($"Biến thể {i + 1}: Tên không được để trống", Severity.Warning);
                         result = false;
                     }
-                    if (lstPD[i].Name.Length > 15)
+                    if (lstPD[i].Name.Length > 30)
                     {
-                        Snackbar.Add($"Biến thể {i + 1}: Tên biến thể không được quá 15 ký tự", Severity.Warning);
+                        Snackbar.Add($"Biến thể {i + 1}: Tên biến thể không được quá 30 ký tự", Severity.Warning);
                         result = false;
                     }
                     if (lstPD[i].Price < 1000 || lstPD[i].Price > 100000000)
@@ -537,9 +541,15 @@
                         Snackbar.Add($"Biến thể {i + 1}: Giá phải từ 1.000đ-100.000.000đ ", Severity.Warning);
                         result = false;
                     }
-                    if (lstPD[i].Amount < 1 || lstPD[i].Amount > 100000)
+                    if (lstPD[i].Amount < 1 || lstPD[i].Amount > 10000)
                     {
                         Snackbar.Add($"Biến thể {i + 1}: Số lượng phải từ 1-10.000 ", Severity.Warning);
+                        result = false;
+                    }
+                    string regexName = @"^[a-zA-Z0-9À-ỹ\s]+$";
+                    if (!Regex.IsMatch(lstPD[i].Name, regexName))
+                    {
+                        Snackbar.Add($"Biến thể {i + 1}: Tên không được chứa ký tự đặc biệt ", Severity.Warning);
                         result = false;
                     }
                 }
@@ -547,6 +557,7 @@
 
             return result;
         }
+
         }
         <style>
             .mud-select {
