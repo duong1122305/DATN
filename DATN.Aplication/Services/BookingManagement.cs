@@ -602,7 +602,7 @@ namespace DATN.Aplication.Services
                         query.Status = BookingDetailStatus.Cancelled;
                         HistoryAction historyAction = new HistoryAction()
                         {
-                            BookingID = query.Id,
+                            BookingID = query.BookingId,
                             ActionTime = DateTime.Now,
                             Description = actionView.Reason + $"(Trạng thái khách hủy dịch vụ con {actionView.IdBokingOrDetail})",
                             ActionID = 14,
