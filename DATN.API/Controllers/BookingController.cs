@@ -170,7 +170,7 @@ namespace DATN.API.Controllers
         [HttpGet("Payment-Qr-VnPay")]
         public async Task<ResponseData<string>> PaymentQrVnPay(long totalPrice)
         {
-            return await _bookingManagement.PaymentQrVnPay(totalPrice);
+            return null;//await _bookingManagement.PaymentQrVnPay(totalPrice);
         }
 
         [HttpGet("List-Voucher-Can-Apply")]

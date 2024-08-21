@@ -9,6 +9,7 @@ namespace DATN.ViewModels.DTOs.Booking
         public string NameGuest { get; set; }
         public string PhoneNumber { get; set; }
         public string? Email { get; set; }
+        public int CountBookingDetail { get; set; }
         public string Address { get; set; }
         public BookingStatus Status { get; set; }
         public DateTime BookingTime { get; set; }
