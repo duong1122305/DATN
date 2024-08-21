@@ -34,7 +34,7 @@
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Comment)">Nội dung đánh giá</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameStaff)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.BillID)">Mã hóa đơn</MudTableSortLabel></MudTh>
-                        <MudTh>Thao tác</MudTh>
+                       
                     </HeaderContent>
                     <RowTemplate Context="data">
                         @{
@@ -50,12 +50,7 @@
                         <MudTd>@data.NameStaff</MudTd>
                         <MudTd>@data.BillID</MudTd>
 
-                        <MudTd>
-                            <MudButtonGroup Variant="Variant.Filled">
-                                <MudIconButton OnClick="()=>DeleteReport(data.ID)" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Title="Xóa đánh giá"></MudIconButton>
-
-                            </MudButtonGroup>
-                        </MudTd>
+                       
                     </RowTemplate>
                     <PagerContent>
                         <MudTablePager />

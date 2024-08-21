@@ -36,6 +36,7 @@ namespace DATN.ADMIN.Pages
         public double[] dataPie = { 0, 0 };
         public string[] labelsPie = { "Dịch vụ", "Sản phẩm" };
         string width = "99%";
+        string height = "350px";
         // bộ lọc
         private MudDateRangePicker _picker;
         private DateRange _dateRange;
@@ -87,18 +88,24 @@ namespace DATN.ADMIN.Pages
             if (response.IsSuccess)
             {
                 revenuePieDatas = response.Data.DataPiceRevenue;
+                customerData= new LstDataChart();
+                revenueDatas = new LstDataChart();
+                StateHasChanged();
                 customerData = response.Data.CustomerStatistical;
                 revenueDatas = response.Data.RevenueStatistical;
                 lstProductDataRaw = response.Data.LstProductOutStock;
                 top3ProductQuantity = response.Data.ProductQuantityStatistical;
                 top3ServiceQuantity = response.Data.ServiceQuantityStatistical;
+                height = "351px";
                 width = "99%";
             }
             else
             {
                 Snackbar.Add("Chưa có dữ liệu!");
             }
+            
             width = "100%";
+            height = "350px";
 
         }
         async void ChangStatus(int value)
