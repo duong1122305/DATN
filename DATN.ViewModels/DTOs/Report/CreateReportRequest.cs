@@ -13,7 +13,7 @@ namespace DATN.ViewModels.DTOs.Report
         public int IdBooking { get; set; }
         [Required(ErrorMessage ="Nội dung đánh giá ko được bỏ trống")]
         [MaxLength(500,ErrorMessage ="Nội dung đánh giá phải dưới 500 ký tự")]
-        public string Commment { get; set; }
+        public string Comment { get; set; }
 		[Range(1, 5, ErrorMessage = "Số sao chỉ từ 1 - 5")]
 		public int Rate { get; set; }
 	}
