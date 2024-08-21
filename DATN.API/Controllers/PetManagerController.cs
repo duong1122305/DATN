@@ -55,5 +55,11 @@ namespace DATN.API.Controllers
         {
             return await _petManagerService.GetAllTypes();
         }
+
+        [HttpGet("GetById")]
+        public async Task<ResponseData<Pet>> GetById(int id)
+        {
+            return await _petManagerService.GetPetById(id);
+        }
     }
 }

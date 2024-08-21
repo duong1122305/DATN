@@ -27,7 +27,7 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> QrCodeCheckIn(int idBooking);
         public Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail);
         public Task<ResponseData<ResponseMomo>> PaymentQrMomo(int? id, Payment payment);
-        public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
+        //public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
         public Task<ResponseData<string>> CheckInArrive(ActionView actionView);
         public Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuest(Guid idGuest);
         public Task CheckStatusPayment(int id, MomoResultRequest momoResult);

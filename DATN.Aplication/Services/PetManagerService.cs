@@ -192,5 +192,32 @@ namespace DATN.Aplication.Services
             }
         }
 
+        public async Task<ResponseData<Pet>> GetPetById(int id)
+        {
+            try
+            {
+                var pet = await _unitOfWork.PetRepository.FindAsync(c => c.Id == id);
+                if (pet == null) return new ResponseData<Pet>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Error = "Có lỗi trong quá trình tìm kiếm"
+                };
+
+                return new ResponseData<Pet>
+                {
+                    IsSuccess = true,
+                    Data = pet.First(),
+                    Error = null
+                };
+            }catch (Exception ex)
+            {
+                return new ResponseData<Pet>
+                {
+                    IsSuccess = false,
+                    Error = ex.Message
+                };
+            }
+        }
     }
 }

@@ -16,8 +16,8 @@ namespace DATN.Data.Validator
                 .WithMessage("Chưa biết nhân viên nào làm dịch vụ này");
 
             RuleFor(c => c)
-                .Must(c => c.ComboId != 0 && c.ServiceDetailId != 0)
-                .WithMessage("Chưa chọn dịch vụ hoặc chọn combo");
+                .Must(c => c.ServiceDetailId != 0)
+                .WithMessage("Chưa chọn dịch vụ");
         }
     }
 }

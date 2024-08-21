@@ -124,7 +124,6 @@ namespace DATN.ADMIN.Services
         }
         public async Task<ResponseData<string>> ResetPass(UserResetPassView userResetPassView)
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _httpContextAccessor.HttpContext.Session.GetString("Key"));
 
             var response = _client.PostAsJsonAsync("api/UserLogin/Reset-Pass", userResetPassView).GetAwaiter().GetResult();
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
