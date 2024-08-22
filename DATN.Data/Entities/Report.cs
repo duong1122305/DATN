@@ -19,6 +19,6 @@ namespace DATN.Data.Entities
         public DateTime CreateAt { get; set; } // Thời gian tạo
 
         // Quan hệ một-nhiều: Mỗi báo cáo liên quan đến một chi tiết dịch vụ
-        public virtual BookingDetail BookingDetail { get; set; }
+        public virtual Booking Booking { get; set; }
     }
 }

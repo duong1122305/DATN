@@ -35,6 +35,7 @@ namespace DATN.Data.Entities
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }
         public virtual ICollection<HistoryAction> HistoryActions { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
 
 
         public virtual Guest Guest { get; set; }

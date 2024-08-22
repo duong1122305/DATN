@@ -29,7 +29,6 @@ namespace DATN.Data.Entities
         public virtual Booking Booking { get; set; } // Đặt lịch
         public virtual Pet Pet { get; set; }
         public virtual User Staff { get; set; } // Đặt lịch
-        public virtual ICollection<Report> Reports { get; set; }
 
         public virtual ServiceDetail ServiceDetail { get; set; } // Chi tiết dịch vụ
     }

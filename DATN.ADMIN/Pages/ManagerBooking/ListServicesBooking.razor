@@ -298,7 +298,7 @@
         {
             isLoading = true;
             await Task.Delay(1000);
-            var response = await _client.QrCodeCheckIn(idBooking);
+            var response = await _client.QrCodeCheckOut(idBooking);
             var parameters = new DialogParameters();
             string nameDialog = "Khách check Out";
             DialogOptions options = new DialogOptions()
