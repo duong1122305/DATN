@@ -93,7 +93,7 @@ namespace DATN.Aplication.Services
 				var newRP = new Report()
 				{
 					BookingId = report.IdBooking,
-					Comment = report.Commment,
+					Comment = report.Comment,
 					CreateAt = DateTime.Now,
 				};
 				await _uow.ReportRepository.AddAsync(newRP);

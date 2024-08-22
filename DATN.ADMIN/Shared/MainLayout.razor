@@ -95,10 +95,10 @@
                 string idUser = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
                 string fullName = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.UserData).FirstOrDefault()?.Value!;
                 httpContextAccessor.HttpContext.Session.SetString("id", idUser);
-                httpContextAccessor.HttpContext.Session.SetString("fullName", fullName);
 
 
                 var user = await _ser.GetInfoUser(idUser);
+                httpContextAccessor.HttpContext.Session.SetString("fullName", fullName);
                 urlImg = user.Data.ImgUrl;
                 await InitializeSignalR();
             }
@@ -107,15 +107,15 @@
 
         private async Task InitializeSignalR()
         {
-            var connection = new HubConnectionBuilder()
-            .WithUrl("https://api.datlich.id.vn/bookingHub")
-            .Build();
+            // var connection = new HubConnectionBuilder()
+            // .WithUrl("https://api.datlich.id.vn/bookingHub")
+            // .Build();
 
-            connection.On<string>("ReceiveBookingNotification", async message =>
-            {
-                _snackBar.Add(message, Severity.Success);
-            });
-            await connection.StartAsync();
+            // connection.On<string>("ReceiveBookingNotification", async message =>
+            // {
+            //     _snackBar.Add(message, Severity.Success);
+            // });
+            // await connection.StartAsync();
         }
 
         private async Task<bool?> Confirm()
