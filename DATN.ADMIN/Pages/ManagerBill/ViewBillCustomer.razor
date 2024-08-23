@@ -74,14 +74,12 @@
                                 <MudTh>Tên sản phẩm</MudTh>
                                 <MudTh>Số lượng</MudTh>
                                 <MudTh>Đơn giá</MudTh>
-                                <MudTh>Hành động</MudTh>
                             </HeaderContent>
                             <RowTemplate Context="bill2">
                                 <MudTd>@bill2.Name</MudTd>
                                 <MudTd>
                                     <div class="quantity-input">
                                         <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
-
                                     </div>
                                 </MudTd>
                                 <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
