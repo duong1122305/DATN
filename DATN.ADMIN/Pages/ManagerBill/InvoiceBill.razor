@@ -49,13 +49,13 @@
                     }
                 </tbody>
             </table>
-            <p><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)BillInvoice.ReducePrice)</p>
+            <p><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.ReducePrice)</p>
             <p><b>Thanh toán:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.TotalPayment)</p>
             <p><b>Tiền khách trả:</b> @CurrencyHelper.FormatCurrency((float)@BillInvoice.TotalPayment)</p>
         </div>
         @code {
         [Parameter]
-        public Bill BillInvoice { get; set; } = new Bill();
+        public Bill BillInvoice { get; set; }
         }
         <style>
             .div-content {
@@ -114,11 +114,11 @@
 
         </style>
         @code {
-        protected override async Task OnInitializedAsync()
-        {
-            await Task.Delay(500);
-            await jsRuntime.InvokeVoidAsync("window.print");
-        }
+        // protected override async Task OnInitializedAsync()
+        // {
+        //     await Task.Delay(500);
+        //     await jsRuntime.InvokeVoidAsync("window.print");
+        // }
         }
 
     </Authorized>
