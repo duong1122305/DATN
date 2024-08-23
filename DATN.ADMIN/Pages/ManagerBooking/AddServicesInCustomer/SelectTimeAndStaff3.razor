@@ -30,34 +30,18 @@
                         @(lstServiceName.IndexOf(data.Item) + 1)
                     </CellTemplate>
                 </TemplateColumn>
-                <PropertyColumn Property="x=>x.ServiceName" Title="Tên chi dịch vụ" Sortable="false" Filterable="false" />
+                <PropertyColumn Property="x=>x.Description" Title="Tên dịch vụ" Sortable="false" Filterable="false" />
                 <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
                     <CellTemplate Context="data">
                         @(CurrencyHelper.FormatCurrency(data.Item.Price))
                     </CellTemplate>
                 </TemplateColumn>
-                <TemplateColumn Title="Thời gian làm" Sortable="false" Filterable="false">
+                <TemplateColumn Title="Thời gian làm dự kiến" Sortable="false" Filterable="false">
                     <CellTemplate Context="data">
                         @data.Item.Duration <span>Phút</span>
                     </CellTemplate>
                 </TemplateColumn>
-                <PropertyColumn Property="x=>x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
-                <TemplateColumn Sortable="false" Filterable="false" Title="Trạng thái">
-                    <CellTemplate Context="data">
-                        @if (!data.Item.IsDeleted)
-                        {
-                            <span>
-                                <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
-                            </span>
-                        }
-                        else
-                        {
-                            <span>
-                                <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
-                            </span>
-                        }
-                    </CellTemplate>
-                </TemplateColumn>
+                <PropertyColumn Property="x=>x.ServiceName" Title="Loại dịch vụ" Sortable="false" Filterable="false" />
             </Columns>
             <PagerContent>
                 <MudDataGridPager T="GetServiceNameVM" />
@@ -118,29 +102,6 @@
             return false;
         };
 
-        public async Task OpeListPetDialog()
-        {
-            var parameters = new DialogParameters();
-            parameters.Add("Id", idCustomer);
-            string nameDialog = "Danh sách thú cưng";
-            DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
-                CloseButton = true,
-                FullWidth = true,
-                DisableBackdropClick = true,
-            };
-            var createUpdateDialog = await _diagService.ShowAsync<ViewPetOfGuest>(nameDialog, parameters, options);
-            var result = await createUpdateDialog.Result;
-            if (result.Canceled)
-            {
-                createUpdateDialog.Close();
-                StateHasChanged();
-            }
-        }
-
 
         private async Task CreateBooking()
         {
@@ -174,15 +135,12 @@
                         BookingId = idBooking,
                         Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
                     };
-                    var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
-                    var dialog = await _diagService.ShowAsync<LoadingIndicator>("", options);
                     StateHasChanged();
                     var respone = await _iBooking.AddService(bookingDetail);
                     if (respone.IsSuccess)
                     {
                         Message(respone.Data, Severity.Success);
                         StateHasChanged();
-                        dialog.Close();
                         _dialogBox.Close();
                     }
                     else
