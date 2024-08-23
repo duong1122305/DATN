@@ -119,7 +119,7 @@
                 <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
                     <CellTemplate Context="data">
                         <MudButtonGroup Variant="Variant.Filled">
-                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment))"></MudIconButton>
+                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment,data.Item.BookingTime))"></MudIconButton>
                             @if (data.Item.Status == BookingStatus.PendingConfirmation)
                             {
                                 <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(data.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -359,7 +359,7 @@
         {
             dataGrid?.ExpandAllGroups();
         }
-        private async Task OpenDialog(int id, Guid idGuest, bool payment)
+        private async Task OpenDialog(int id, Guid idGuest, bool payment,DateTime bookingDate)
         {
             isLoading = true;
             await Task.Delay(1000);
@@ -378,6 +378,7 @@
             parameters.Add("id", id);
             parameters.Add("idGuest", idGuest);
             parameters.Add("payment", payment);
+            parameters.Add("bookingDate", bookingDate);
             // check có danh sách ko
             var respone2 = await _client.ListBookingDetailInDay(id);
             if (respone2.IsSuccess)
