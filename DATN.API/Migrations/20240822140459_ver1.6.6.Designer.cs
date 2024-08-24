@@ -4,6 +4,7 @@ using DATN.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.API.Migrations
 {
     [DbContext(typeof(DATNDbContext))]
-    partial class DATNDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240822140459_ver1.6.6")]
+    partial class ver166
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1249,13 +1252,13 @@ namespace DATN.API.Migrations
 
             modelBuilder.Entity("DATN.Data.Entities.Report", b =>
                 {
-                    b.HasOne("DATN.Data.Entities.Booking", "Booking")
+                    b.HasOne("DATN.Data.Entities.BookingDetail", "BookingDetail")
                         .WithMany("Reports")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Booking");
+                    b.Navigation("BookingDetail");
                 });
 
             modelBuilder.Entity("DATN.Data.Entities.ServiceDetail", b =>
@@ -1347,7 +1350,10 @@ namespace DATN.API.Migrations
                     b.Navigation("HistoryActions");
 
                     b.Navigation("OrderDetails");
+                });
 
+            modelBuilder.Entity("DATN.Data.Entities.BookingDetail", b =>
+                {
                     b.Navigation("Reports");
                 });
 

@@ -5,11 +5,13 @@
         @inject HttpClient httpClient
         @using DATN.ADMIN.IServices
         @using DATN.ADMIN.Pages.ManagerBooking.AddServicesInCustomer
+        @using DATN.ADMIN.Pages.ManagerGuest
         @using DATN.Utilites
         @using DATN.ViewModels.Common
         @using DATN.ViewModels.DTOs.ActionBooking
         @using DATN.ViewModels.DTOs.Authenticate
         @using DATN.ViewModels.DTOs.Booking
+        @using DATN.ViewModels.DTOs.Pet
         @using DATN.ViewModels.Enum
         @inject IDialogService _dialogservice;
 
@@ -21,10 +23,24 @@
                     @if (!payment)
                     {
                         <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+                        <div style="width:200px;margin-left:10px">
+                            <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
+                        </div>
+
+                        <div style="display:flex;width:450px;margin-left:10px">
+                            <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
+                        </div>
+                        <MudButton @onclick="@(async()=>await OpeListPetDialog())" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
                     }
                     else
                     {
                         <MudButton Disabled OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
+                        <MudTimePicker Disabled Label="Chọn thời gian" @bind-Time="timeStart" />
+
+                        <div style="display:flex;width:500px;margin-left:10px" Disabled>
+                            <MudAutocomplete Disabled T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
+                            <MudButton Disabled @onclick="@(async()=>await OpeListPetDialog())">Thêm thú cưng</MudButton>
+                        </div>
 
                     }
                     <MudSpacer />
@@ -97,20 +113,24 @@
             </div>
         }
         @code {
-        [Parameter]
+            [Parameter]
         public int id { get; set; }
         [Parameter]
-        public DateTime dateBooking { get; set; }
-        [Parameter]
         public bool payment { get; set; }
+        [Parameter]
+        public DateTime bookingDate { get; set; }
 
         [Parameter]
         public Guid idGuest { get; set; }
         [Inject]
         IBookingViewServices _client { get; set; }
+        TimeSpan? timeStart;
+        public List<PetVM> lstPet = new List<PetVM>();
+        private PetVM value2;
 
         public List<ListBokingDetailInDay> lstBooking { get; set; } = new List<ListBokingDetailInDay>();
-
+        [Inject]
+        public IPetServiceClient petService { get; set; }
         [Inject]
         private IHttpContextAccessor _httpContextAccessor { get; set; }
 
@@ -127,7 +147,7 @@
             var respone = await _client.ListBookingDetailInDay(id);
             if (respone.IsSuccess)
             {
-                lstBooking = respone.Data.OrderByDescending(x => x.StartDate).ToList();
+                lstBooking = respone.Data.OrderBy(x => x.StartDate).ToList();
             }
             else
             {
@@ -225,28 +245,91 @@
         }
         public async Task OpenDialogServices()
         {
-            string nameDialog = "Chọn thời gian";
+            if (timeStart == null)
+            {
+                Message("Vui lòng chọn giờ!", Severity.Warning);
+                return;
+            }
+            if (value2 == null)
+            {
+                Message("Vui lòng chọn thú cưng!", Severity.Warning);
+                return;
+            }
+            string nameDialog = "Chọn dịch vụ";
             var parameters = new DialogParameters();
-            parameters.Add("idCus", idGuest);
+            // parameters.Add("idCus", idGuest);
             parameters.Add("idBooking", id);
+
+            parameters.Add("bookingDate", bookingDate);
+            parameters.Add("timeStart", timeStart);
+            //id pet
+            parameters.Add("idPet", value2.Id);
             DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Small,
+                MaxWidth = MaxWidth.Medium,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true,
             };
-            var createUpdateDialog = await _dialogservice.ShowAsync<SelectServicesInCustomer2>(nameDialog, parameters, options);
+            var createUpdateDialog = await _dialogservice.ShowAsync<SelectTimeAndStaff3>(nameDialog, parameters, options);
             var result = await createUpdateDialog.Result;
             if (!result.Cancelled)
             {
                 createUpdateDialog.Close();
                 StateHasChanged();
+                timeStart = null;
+                value2 = null;
                 await LoadData();
             }
 
+        }
+        private async Task<IEnumerable<PetVM>> Search2(string value)
+        {
+            var responsePet = await petService.GetAll();
+            if (responsePet.Data.Count > 0)
+            {
+                lstPet = responsePet.Data.Where(x => x.OwnerId == idGuest).ToList();
+            }
+            else
+            {
+                lstPet = new List<PetVM>();
+            }
+            if (lstPet.Count() < 0)
+            {
+                return lstPet = new List<PetVM>();
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return lstPet;
+                }
+                return lstPet.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            }
+        }
+        public async Task OpeListPetDialog()
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Id", idGuest);
+            string nameDialog = "Danh sách thú cưng";
+            DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true,
+            };
+            var createUpdateDialog = await _diagService.ShowAsync<ViewPetOfGuest>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (result.Canceled)
+            {
+                createUpdateDialog.Close();
+                StateHasChanged();
+            }
         }
 
         }

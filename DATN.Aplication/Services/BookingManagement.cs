@@ -118,35 +118,35 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<List<ListBokingDetailInDay>>> GetListBookingDetailInDay(int id)
         {
-            var query = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                        join bookingdetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                        on booking.Id equals bookingdetail.BookingId
-                        join guest in await _unitOfWork.GuestRepository.GetAllAsync()
-                        on booking.GuestId equals guest.Id
-                        join user in await _userManager.Users.ToListAsync()
-                        on bookingdetail.StaffId equals user.Id
-                        join servicedetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
-                        on bookingdetail.ServiceDetailId equals servicedetail.Id
-                        join service in await _unitOfWork.ServiceRepository.GetAllAsync()
-                        on servicedetail.ServiceId equals service.Id
-                        join pet in await _unitOfWork.PetRepository.GetAllAsync()
-                        on bookingdetail.PetId equals pet.Id
-                        where booking.Id == id
-                        group new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
-                        by new { user.FullName, servicedetail.Price, pet.Name, servicedetail.NameDetail, bookingdetail.Status, bookingdetail.StartDateTime, bookingdetail.EndDateTime, booking.BookingTime, bookingdetail.Id }
+            var query = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                         join bookingdetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                         on booking.Id equals bookingdetail.BookingId
+                         join guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                         on booking.GuestId equals guest.Id
+                         join user in await _userManager.Users.ToListAsync()
+                         on bookingdetail.StaffId equals user.Id
+                         join servicedetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
+                         on bookingdetail.ServiceDetailId equals servicedetail.Id
+                         join service in await _unitOfWork.ServiceRepository.GetAllAsync()
+                         on servicedetail.ServiceId equals service.Id
+                         join pet in await _unitOfWork.PetRepository.GetAllAsync()
+                         on bookingdetail.PetId equals pet.Id
+                         where booking.Id == id
+                         group new { guest.Id, guest.Name, guest.Email, guest.Address, guest.PhoneNumber, booking.BookingTime }
+                         by new { user.FullName, servicedetail.Price, pet.Name, servicedetail.NameDetail, bookingdetail.Status, bookingdetail.StartDateTime, bookingdetail.EndDateTime, booking.BookingTime, bookingdetail.Id }
                         into view
-                        select new ListBokingDetailInDay
-                        {
-                            IdBookingDetail = view.Key.Id,
-                            NameStaffService = view.Key.FullName,
-                            ServiceDetaiName = view.Key.NameDetail,
-                            PetName = view.Key.Name,
-                            BookingTime = view.Key.BookingTime,
-                            Price = view.Key.Price,
-                            Status = view.Key.Status,
-                            EndDate = view.Key.EndDateTime,
-                            StartDate = view.Key.StartDateTime,
-                        };
+                         select new ListBokingDetailInDay
+                         {
+                             IdBookingDetail = view.Key.Id,
+                             NameStaffService = view.Key.FullName,
+                             ServiceDetaiName = view.Key.NameDetail,
+                             PetName = view.Key.Name,
+                             BookingTime = view.Key.BookingTime,
+                             Price = view.Key.Price,
+                             Status = view.Key.Status,
+                             EndDate = view.Key.EndDateTime,
+                             StartDate = view.Key.StartDateTime,
+                         }).OrderBy(c => c.StartDate);
             if (query.Count() > 0)
             {
                 return new ResponseData<List<ListBokingDetailInDay>>() { IsSuccess = true, Data = query.ToList() };
@@ -162,6 +162,7 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+                    createBookingRequest.ListIdServiceDetail = createBookingRequest.ListIdServiceDetail.OrderBy(c => c.StartDateTime).ToList();
                     var query = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                 select serviceDetail;
                     for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
@@ -289,6 +290,7 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+                    createBookingRequest.ListIdServiceDetail = createBookingRequest.ListIdServiceDetail.OrderBy(c => c.StartDateTime).ToList();
                     var query = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                 select serviceDetail;
                     for (global::System.Int32 i = 0; i < createBookingRequest.ListIdServiceDetail.Count; i++)
@@ -1319,7 +1321,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write($"https://sd33.datlich.id.vn/public/{idBooking}"))
+                    using (var bitmap = barcodeWriter.Write($"https://datn-sd33.datlich.id.vn/public/{idBooking}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);
@@ -1362,7 +1364,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write($"https://mewshop.datlich.id.vn/report/{idBookingDetail}"))
+                    using (var bitmap = barcodeWriter.Write($"https://mewshop.datlich.id.vn/report/id={idBookingDetail}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);
@@ -1518,6 +1520,14 @@ namespace DATN.Aplication.Services
                 booking.IsPayment = true;
                 booking.PaymentTypeId = 2;
                 booking.IsAddToSchedule = true;
+                HistoryAction action = new HistoryAction()
+                {
+                    ActionID=16,
+                    ActionTime = DateTime.Now,
+                    ByGuest=true,
+                    Description="Khách thanh toán qua momo thành công",
+                    BookingID=booking.Id,
+                };
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await _unitOfWork.BookingRepository.SaveChangesAsync();
             }
@@ -1838,6 +1848,7 @@ namespace DATN.Aplication.Services
             {
                 try
                 {
+                    booking.LstBookingDetail = booking.LstBookingDetail.OrderBy(c => c.StartDateTime).ToList();
                     var query = from serviceDetail in await _unitOfWork.ServiceDetailRepository.GetAllAsync()
                                 select serviceDetail;
                     for (global::System.Int32 i = 0; i < booking.LstBookingDetail.Count; i++)

@@ -11,7 +11,7 @@ namespace DATN.Data.Config
             //
             builder.HasKey(x => x.Id);
             //
-            builder.HasOne(c => c.BookingDetail)
+            builder.HasOne(c => c.Booking)
                 .WithMany(c => c.Reports)
                 .HasForeignKey(c => c.BookingId);
 

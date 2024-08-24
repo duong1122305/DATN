@@ -156,7 +156,7 @@ namespace DATN.Aplication.System
                 userIdentity.CodeConfirm = newcode;
                 var updateUser = await _userManager.UpdateAsync(userIdentity);
                 if (updateUser.Succeeded)
-                    return await _mail.SendMailCodeForgot(userIdentity.Email, newcode);
+                    return await _mail.SendCodeForgotOfUser(userIdentity.Email, newcode);
                 else
                 {
                     return new ResponseMail { IsSuccess = false, Notifications = "CodeConfirm chưa được đưa vào database!!" };

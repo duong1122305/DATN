@@ -156,6 +156,43 @@ namespace DATN.Aplication.Extentions
             }
         }
 
+        public async Task<ResponseMail> SendCodeForgotOfUser(string userMail, string code)
+        {
+            try
+            {
+                MailAddress mailFrom = new MailAddress("shoppet79@gmail.com", "MewShop");
+                MailAddress mailTo = new MailAddress(userMail);
+                MailMessage message = new MailMessage(mailFrom, mailTo);
+                message.Subject = "Yêu cầu đặt lại mật khẩu";
+                message.Body = $@"
+                        <body style=""font-family: Arial, sans-serif;"">
+                            <h2>Yêu cầu đặt lại mật khẩu</h2>
+                            <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại MewShop.<br>
+                               Nếu bạn đã yêu cầu đặt lại mật khẩu, đây là mã xác minh của bạn <p style=""color: #007BFF; text-decoration: none;"">{code}</p></p>
+                            <p>Nếu bạn không phải là người yêu cầu, hãy bỏ qua email này và mật khẩu của bạn sẽ không thay đổi.</p>
+                            <p>Nếu bạn có bất kỳ thắc mắc nào, hãy liên hệ qua: <b>shoppet79@gmail.com</b>,<br>
+                               hoặc liên hệ qua sđt của chúng tôi 0975825324</p>
+                            <p>Trân trọng,<br> MewShop</p>
+                        </body>";
+
+                message.IsBodyHtml = true;
+                message.Priority = MailPriority.High;
+                SmtpClient client = new SmtpClient();
+                client.Host = "smtp.gmail.com";
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential("shoppet79@gmail.com", "tznx twfq hclm ysok");
+                await client.SendMailAsync(message);
+                return new ResponseMail { IsSuccess = true, Notifications = "Mã xác nhận đã được gửi tới mail của bạn!!" };
+            }
+            catch (Exception e)
+            {
+
+                return new ResponseMail { IsSuccess = true, Notifications = "Mã xác nhận chưa được gửi đi!!", Error = e.Message };
+            }
+        }
         public async Task<string> SendMailVerificationGuestAsync(string userMail, string verifyCode)
         {
             try
