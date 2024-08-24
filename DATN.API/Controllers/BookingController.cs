@@ -198,7 +198,6 @@ namespace DATN.API.Controllers
             return await _bookingManagement.AddService(createBookingDetailRequest);
         }
 
-        [Authorize(Roles = "Admin,Receptionist")]
         [HttpPost("Check-Status/{id}")]
         public async Task<IActionResult> Check([FromBody] MomoResultRequest momoResultRequest, int id)
         {
