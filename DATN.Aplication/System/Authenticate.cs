@@ -19,15 +19,13 @@ namespace DATN.Aplication.System
         private readonly RoleManager<Role> _roleManager;
         private readonly IConfiguration _config;
         private readonly MailExtention _mail;
-        private readonly RandomCodeExtention _random;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private User _user;
-        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RandomCodeExtention randomCodeExtention, RoleManager<Role> roleManager, IHttpContextAccessor httpContextAccessor)
+        public Authenticate(UserManager<User> userManager, IConfiguration configuration, MailExtention mailExtention, RoleManager<Role> roleManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _config = configuration;
             _mail = mailExtention;
-            _random = randomCodeExtention;
             _httpContextAccessor = httpContextAccessor;
             _roleManager = roleManager;
         }
@@ -153,7 +151,7 @@ namespace DATN.Aplication.System
             if (userIdentity == null) return new ResponseMail { IsSuccess = false, Notifications = "Tài khoản bạn nhập chưa được đăng ký!" };
             else
             {
-                string newcode = _random.RandomCode();
+                string newcode = RandomCodeExtention.RandomCode();
 
                 userIdentity.CodeConfirm = newcode;
                 var updateUser = await _userManager.UpdateAsync(userIdentity);

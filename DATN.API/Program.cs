@@ -78,7 +78,6 @@ builder.Services.AddServerSideBlazor()
             options.DetailedErrors = true;
         });
 builder.Services.AddScoped<MailExtention>();
-builder.Services.AddScoped<RandomCodeExtention>();
 builder.Services.AddScoped<IAuthenticate, Authenticate>();
 builder.Services.AddScoped<IAuthenticateGuest, AuthenticateGuest>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
