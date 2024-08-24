@@ -25,34 +25,18 @@
                         @(lstServiceName.IndexOf(data.Item) + 1)
                     </CellTemplate>
                 </TemplateColumn>
-                <PropertyColumn Property="x=>x.ServiceName" Title="Tên chi dịch vụ" Sortable="false" Filterable="false" />
+                <PropertyColumn Property="x=>x.Description" Title="Tên dịch vụ" Sortable="false" Filterable="false" />
                 <TemplateColumn Title="Giá" Sortable="false" Filterable="false">
                     <CellTemplate Context="data">
                         @(CurrencyHelper.FormatCurrency(data.Item.Price))
                     </CellTemplate>
                 </TemplateColumn>
-                <TemplateColumn Title="Thời gian làm" Sortable="false" Filterable="false">
+                <TemplateColumn Title="Thời gian làm dự kiến" Sortable="false" Filterable="false">
                     <CellTemplate Context="data">
                         @data.Item.Duration <span>Phút</span>
                     </CellTemplate>
                 </TemplateColumn>
-                <PropertyColumn Property="x=>x.Description" Title="Mô tả" Sortable="false" Filterable="false" />
-                <TemplateColumn Sortable="false" Filterable="false" Title="Trạng thái">
-                    <CellTemplate Context="data">
-                        @if (!data.Item.IsDeleted)
-                        {
-                            <span>
-                                <MudChip Color="Color.Success" title="Hoạt động">Phục vụ</MudChip>
-                            </span>
-                        }
-                        else
-                        {
-                            <span>
-                                <MudChip Color="Color.Error" title="Hoạt động">Ngưng phục vụ</MudChip>
-                            </span>
-                        }
-                    </CellTemplate>
-                </TemplateColumn>
+                <PropertyColumn Property="x=>x.ServiceName" Title="Loại dịch vụ" Sortable="false" Filterable="false" />
             </Columns>
             <PagerContent>
                 <MudDataGridPager T="GetServiceNameVM" />
@@ -105,33 +89,6 @@
             return false;
         };
 
-        private async Task OpenDialog(double time, int idDetailsServices, float price, string servicedetailname)
-        {
-            string nameDialog = "Chọn thời gian";
-            var parameters = new DialogParameters();
-            parameters.Add("duration", time);
-            parameters.Add("idCus", idCustomer);
-            parameters.Add("idDetailsServices", idDetailsServices);
-            parameters.Add("priceServicesDetails", price);
-            parameters.Add("servicedetailname", servicedetailname);
-            DialogOptions options = new DialogOptions()
-            {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Medium,
-                CloseButton = true,
-                FullWidth = true,
-                DisableBackdropClick = true,
-            };
-            _dialogBox.Close();
-            var createUpdateDialog = await _dialogservice.ShowAsync<SelectBookingTimeAndStaff2>(nameDialog, parameters, options);
-            var result = await createUpdateDialog.Result;
-            if (!result.Cancelled)
-            {
-                createUpdateDialog.Close();
-                StateHasChanged();
-            }
-        }
         protected async Task CreateBooking()
         {
             var selectServiceIndex = selectedServices.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
@@ -155,16 +112,6 @@
             // Đóng dialog sau khi thêm xong
             _dialogBox.Close(DialogResult.Ok(true));
             StateHasChanged();
-        }
-        //hỏi trước khi thêm
-        private async Task<bool?> Confirm2()
-        {
-            var confirm = await _dialogservice.ShowMessageBox("Thông báo",
-            "Xác nhận chọn các dịch vụ?",
-            yesText: "Xác nhận",
-            cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
-            StateHasChanged();
-            return confirm;
         }
         }
     </Authorized>

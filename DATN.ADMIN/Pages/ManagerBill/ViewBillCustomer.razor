@@ -74,14 +74,12 @@
                                 <MudTh>Tên sản phẩm</MudTh>
                                 <MudTh>Số lượng</MudTh>
                                 <MudTh>Đơn giá</MudTh>
-                                <MudTh>Hành động</MudTh>
                             </HeaderContent>
                             <RowTemplate Context="bill2">
                                 <MudTd>@bill2.Name</MudTd>
                                 <MudTd>
                                     <div class="quantity-input">
                                         <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
-
                                     </div>
                                 </MudTd>
                                 <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
@@ -198,8 +196,8 @@
     </MudPaper>
 </MudContainer>
 
-@code {
-    [Parameter]
+        @code {
+            [Parameter]
     public Guid? guid { get; set; }
     [Parameter]
     public DateTime date { get; set; }
@@ -224,32 +222,32 @@
 
     private async Task LoadData()
     {
-        await OpenDialogReload();
-        StateHasChanged();
+            await OpenDialogReload();
+            StateHasChanged();
     }
     protected override async Task OnInitializedAsync()
     {
-        if (guid != null)
-        {
-            await LoadData();
-        }
-        if (idBooking == null)
-        {
-            termId = 1;
-            var lst = bookingService.ListProductDetail;
-            foreach (var item in lst)
+            if (guid != null)
             {
-                if (item.Term == termId)
+                await LoadData();
+            }
+            if (idBooking == null)
+            {
+                termId = 1;
+                var lst = bookingService.ListProductDetail;
+                foreach (var item in lst)
                 {
-                    termId++;
+                    if (item.Term == termId)
+                    {
+                        termId++;
+                    }
                 }
             }
-        }
 
     }
     protected async Task Payment()
     {
-        APIRequest request = new APIRequest()
+            APIRequest request = new APIRequest()
             {
                 accountName = "Meo Shop",
                 accountNo = 37110001031335,
@@ -259,16 +257,16 @@
                 format = "text",
                 template = "compact2"
             };
-        HttpClient client = new HttpClient();
-        client.DefaultRequestHeaders.Add("x-client-id", "c43d080b-f369-4700-bd96-f96d79bcd172");
-        client.DefaultRequestHeaders.Add("x-api-key", "26b18710-94ae-4c9c-8d22-a6880a530924");
-        var response = await client.PostAsJsonAsync<APIRequest>("https://api.vietqr.io/v2/generate", request);
-        var result = JsonConvert.DeserializeObject<APIResponse>(await response.Content.ReadAsStringAsync());
-        if (result.code == "00")
-        {
-            string nameDialog = "Thanh toán";
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("x-client-id", "c43d080b-f369-4700-bd96-f96d79bcd172");
+            client.DefaultRequestHeaders.Add("x-api-key", "26b18710-94ae-4c9c-8d22-a6880a530924");
+            var response = await client.PostAsJsonAsync<APIRequest>("https://api.vietqr.io/v2/generate", request);
+            var result = JsonConvert.DeserializeObject<APIResponse>(await response.Content.ReadAsStringAsync());
+            if (result.code == "00")
+            {
+                string nameDialog = "Thanh toán";
 
-            DialogOptions options = new DialogOptions()
+                DialogOptions options = new DialogOptions()
                 {
                     CloseOnEscapeKey = true,
                     Position = DialogPosition.Center,
@@ -277,28 +275,28 @@
                     FullWidth = true,
                     DisableBackdropClick = true
                 };
-            DialogParameters parameter = new DialogParameters();
-            parameter.Add("linkqr", result.data.qrDataURL);
-            parameter.Add("idBooking", idBooking != null ? idBooking.Value : null);
-            parameter.Add("idGuest", guid != null ? guid.Value : null);
-            parameter.Add("TotalPrice", bill.TotalPrice);
-            parameter.Add("dateBooking", date);
-            parameter.Add("bookingService", bookingService);
-            var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
-            var result1 = await createUpdateDialog.Result;
-            if (!result1.Canceled)
-            {
-                createUpdateDialog.Close();
-                await LoadData();
+                DialogParameters parameter = new DialogParameters();
+                parameter.Add("linkqr", result.data.qrDataURL);
+                parameter.Add("idBooking", idBooking != null ? idBooking.Value : null);
+                parameter.Add("idGuest", guid != null ? guid.Value : null);
+                parameter.Add("TotalPrice", bill.TotalPrice);
+                parameter.Add("dateBooking", date);
+                parameter.Add("bookingService", bookingService);
+                var createUpdateDialog = await _dialogservice.ShowAsync<ComponentPayment>(nameDialog, parameter, options);
+                var result1 = await createUpdateDialog.Result;
+                if (!result1.Canceled)
+                {
+                    createUpdateDialog.Close();
+                    await LoadData();
+                }
+                _dialogBox.Close();
             }
-            _dialogBox.Close();
-        }
     }
     public async Task PayMentQr()
     {
-        try
-        {
-            var payment = new Payment()
+            try
+            {
+                var payment = new Payment()
                 {
                     DateBooking = DateTime.Now,
                     LstProducts = bill.ListProductDetail,
@@ -310,41 +308,41 @@
                     IdBooking = 0,
                     IdGuest = guid,
                 };
-            var response = await _client.PaymentQr(payment, idBooking);
-            if (response.IsSuccess)
-            {
-                if (response.Data.resultCode == 0)
+                var response = await _client.PaymentQr(payment, idBooking);
+                if (response.IsSuccess)
                 {
-                    navigationManager.NavigateTo(response.Data.payUrl);
+                    if (response.Data.resultCode == 0)
+                    {
+                        navigationManager.NavigateTo(response.Data.payUrl);
+                    }
+                    else
+                    {
+                        Message(response.Data.message, Severity.Warning);
+                    }
                 }
                 else
                 {
-                    Message(response.Data.message, Severity.Warning);
+                    Message(response.Error, Severity.Warning);
                 }
             }
-            else
+            catch (Exception e)
             {
-                Message(response.Error, Severity.Warning);
+                Message(e.Message, Severity.Warning);
             }
-        }
-        catch (Exception e)
-        {
-            Message(e.Message, Severity.Warning);
-        }
     }
 
     public async Task PayMentInStore()
     {
 
-        var confirm = await Confirm("thanh toán");
-        if (!confirm)
-        {
-            return;
-        }
-        DATN.ViewModels.DTOs.Booking.Payment payment;
-        if (idBooking != 0 && idBooking != null)
-        {
-            payment = new Payment()
+            var confirm = await Confirm("thanh toán");
+            if (!confirm)
+            {
+                return;
+            }
+            DATN.ViewModels.DTOs.Booking.Payment payment;
+            if (idBooking != 0 && idBooking != null)
+            {
+                payment = new Payment()
                 {
                     IdBooking = idBooking.Value,
                     IdGuest = guid.Value,
@@ -356,10 +354,10 @@
                     Reduce = bill.ReducePrice,
                     VoucherId = bill.IdVoucher
                 };
-        }
-        else
-        {
-            payment = new Payment()
+            }
+            else
+            {
+                payment = new Payment()
                 {
                     TotalPrice = bill.TotalPrice,
                     TypePaymenId = selectedPaymentMethod,
@@ -369,53 +367,53 @@
                     Reduce = bill.ReducePrice,
                     VoucherId = bill.IdVoucher
                 };
-        }
-        var respone = await _client.PaymentInStore(payment);
-        if (respone.IsSuccess)
-        {
-            var listRemove = new List<ProductDetailView>();
-            Message(respone.Data, Severity.Success);
-            if (idBooking != 0 && idBooking != null)
+            }
+            var respone = await _client.PaymentInStore(payment);
+            if (respone.IsSuccess)
             {
-                foreach (var item in bookingService.ListProductDetail)
+                var listRemove = new List<ProductDetailView>();
+                Message(respone.Data, Severity.Success);
+                if (idBooking != 0 && idBooking != null)
                 {
-                    if (item.IdBooking == idBooking.Value)
+                    foreach (var item in bookingService.ListProductDetail)
                     {
-                        listRemove.Add(item);
+                        if (item.IdBooking == idBooking.Value)
+                        {
+                            listRemove.Add(item);
+                        }
                     }
                 }
+                else
+                {
+                    foreach (var item in bookingService.ListProductDetail)
+                    {
+                        if (item.Term == termId.Value)
+                        {
+                            listRemove.Add(item);
+                        }
+                    }
+                }
+                if (listRemove.Count > 0)
+                {
+                    bookingService.RemoveBillTerm(listRemove);
+                }
+                _dialogBox.Close();
             }
             else
             {
-                foreach (var item in bookingService.ListProductDetail)
-                {
-                    if (item.Term == termId.Value)
-                    {
-                        listRemove.Add(item);
-                    }
-                }
+                Message(respone.Error, Severity.Error);
             }
-            if (listRemove.Count > 0)
-            {
-                bookingService.RemoveBillTerm(listRemove);
-            }
-            _dialogBox.Close();
-        }
-        else
-        {
-            Message(respone.Error, Severity.Error);
-        }
     }
 
     public async Task OpenDialog()
     {
 
-        string nameDialog = "Chọn sản phẩm";
-        DialogParameters parameter = new DialogParameters();
-        parameter.Add("guid", guid);
-        parameter.Add("IdBooking", idBooking);
-        parameter.Add("termId", termId);
-        DialogOptions options = new DialogOptions()
+            string nameDialog = "Chọn sản phẩm";
+            DialogParameters parameter = new DialogParameters();
+            parameter.Add("guid", guid);
+            parameter.Add("IdBooking", idBooking);
+            parameter.Add("termId", termId);
+            DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
@@ -424,40 +422,45 @@
                 FullWidth = false,
                 DisableBackdropClick = true,
             };
-        var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog, parameter, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
-            await LoadData();
-            StateHasChanged();
-        }
+            var createUpdateDialog = await _dialogservice.ShowAsync<SelectProductView>(nameDialog, parameter, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+                StateHasChanged();
+            }
     }
     public async Task OpenDialogReload()
     {
-        if (idBooking != 0 && idBooking != null)
-        {
-            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
-            if (respone2.IsSuccess)
+            if (idBooking != 0 && idBooking != null)
             {
-                bill = respone2.Data;
-                StateHasChanged();
+                var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
+                if (respone2.IsSuccess)
+                {
+                    bill = respone2.Data;
+                    StateHasChanged();
+                }
             }
-        }
-        else
-        {
-            var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == termId).ToList());
-            if (respone2.IsSuccess)
+            else
             {
-                bill = respone2.Data;
-                StateHasChanged();
+                var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.Term == termId).ToList());
+                if (respone2.IsSuccess)
+                {
+                    bill = respone2.Data;
+                    StateHasChanged();
+                }
             }
-        }
 
     }
     public async Task PrintBill()
     {
-        DialogParameters parameter = new DialogParameters();
+            if (!bill.IsPayment)
+            {
+                Message("Hoá đơn chưa thanh toán", Severity.Warning);
+                return;
+            }
+            DialogParameters parameter = new DialogParameters();
         DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
