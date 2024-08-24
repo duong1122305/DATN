@@ -2,27 +2,29 @@
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.DTOs.ActionBooking
 @layout LayoutNoAuth
+@inject ISnackbar snackbar
 @code {
-	[Inject]
-	public IBookingViewServices _booking { get; set; }
-	[Inject]
-	NavigationManager navigationManager { get; set; }
-	[Parameter]
-	public string idBooking { get; set; }
-	protected override async Task OnInitializedAsync()
-	{
-		var action = new ActionView()
-			{
-				IdBokingOrDetail = Convert.ToInt32(idBooking),
-			};
-		var response = await _booking.CheckInArrive(action);
-		if (response.IsSuccess)
-		{
-			navigationManager.NavigateTo("https://mewshop.datlich.id.vn/");
-		}
-		else
-		{
-			//thông báo
-		}
-	}
+    [Inject]
+    public IBookingViewServices _booking { get; set; }
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+    [Parameter]
+    public string idBooking { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var action = new ActionView()
+            {
+                IdBokingOrDetail = Convert.ToInt32(idBooking),
+            };
+        var response = await _booking.CheckInArrive(action);
+        if (response.IsSuccess)
+        {
+            navigationManager.NavigateTo("https://mewshop.datlich.id.vn/");
+        }
+        else
+        {
+            snackbar.Add(response.Error, Severity.Error);
+            //thông báo
+        }
+    }
 }

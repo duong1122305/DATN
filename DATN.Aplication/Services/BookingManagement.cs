@@ -1319,7 +1319,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write($"https://sd33.datlich.id.vn/public/{idBooking}"))
+                    using (var bitmap = barcodeWriter.Write($"https://datn-sd33.datlich.id.vn/public/{idBooking}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);
