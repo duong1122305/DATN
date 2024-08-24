@@ -580,7 +580,7 @@ namespace DATN.Aplication.Services
                 var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
                 if (guest != null)
                 {
-                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now||  !string.IsNullOrEmpty(guest.VerifyCode))// kiểm tra thời gian phù hợp vs max
                     {
                         return new ResponseData<string>
                         {
@@ -588,6 +588,7 @@ namespace DATN.Aplication.Services
                             Error = "Thông tin xác minh của bạn đã quá hạn"
                         };
                     }
+                    guest.VerifyCode = "";
                     guest.PasswordHash = _passwordExtensitons.HashPassword(newPass);
                     var result = await _unitOfWork.SaveChangeAsync();
 
