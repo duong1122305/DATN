@@ -248,8 +248,7 @@
             }
             ActionView actionView = new ActionView()
             {
-                IdBokingOrDetail = id,
-
+                IdBokingOrDetail = id
             };
             var respone = await _client.StartBookingDetail(actionView);
             if (respone.IsSuccess)
