@@ -32,7 +32,6 @@
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.DateRate)">Ngày đánh giá</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Rate)">Số sao</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.Comment)">Nội dung đánh giá</MudTableSortLabel></MudTh>
-                        <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.NameStaff)">Nhân viên thực hiện</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<ReportVM, object>(x=>x.BillID)">Mã hóa đơn</MudTableSortLabel></MudTh>
                        
                     </HeaderContent>
@@ -47,9 +46,7 @@
                             <MudRating ReadOnly=true SelectedValue="@data.Rate"></MudRating>
                         </MudTd>
                         <MudTd>@data.Comment</MudTd>
-                        <MudTd>@data.NameStaff</MudTd>
                         <MudTd>@data.BillID</MudTd>
-
                        
                     </RowTemplate>
                     <PagerContent>
@@ -131,8 +128,6 @@
             if (string.IsNullOrWhiteSpace(searchString.Trim()))
                 return true;
             if (element.NameCustomer.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
-                return true;
-            if (element.NameStaff.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
                 return true;
             return false;
         }

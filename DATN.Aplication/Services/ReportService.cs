@@ -34,12 +34,8 @@ namespace DATN.Aplication.Services
 			try
 			{
 				var query = from rp in await _uow.ReportRepository.GetAllAsync()
-							join bd in await _uow.BookingDetailRepository.GetAllAsync() on rp.BookingId equals bd.Id
-							join b in await _uow.BookingRepository.GetAllAsync() on bd.BookingId equals b.Id
+							join b in await _uow.BookingRepository.GetAllAsync() on rp.BookingId equals b.Id
 							join g in await _uow.GuestRepository.GetAllAsync() on b.GuestId equals g.Id
-							join u in await _userManager.Users.ToListAsync() on bd.StaffId equals u.Id
-							join sd in await _uow.ServiceDetailRepository.GetAllAsync() on bd.ServiceDetailId equals sd.Id
-							join s in await _uow.ServiceRepository.GetAllAsync() on sd.ServiceId equals s.Id
 							orderby rp.CreateAt descending
 							select new ReportVM
 							{
@@ -48,10 +44,7 @@ namespace DATN.Aplication.Services
 								Comment = rp.Comment,
 								DateRate = rp.CreateAt.ToString("dd/MM/yyyy"),
 								Rate= rp.Rate,
-								NameCustomer = g.Name,
-								NameStaff = u.FullName,
-								ServiceName = s.Name,
-								StaffID = u.Id,
+								NameCustomer = g.Name
 							};
 				return new ResponseData<List<ReportVM>>(query.ToList());
 			}
@@ -90,6 +83,11 @@ namespace DATN.Aplication.Services
 		{
 			try
 			{
+				var bookingDetail = _uow.ReportRepository.FindAsync(p => p.BookingId == report.IdBooking);
+				if (bookingDetail != null)
+				{
+                    return new ResponseData<string>(false, "Một booking chỉ được đánh giá 1 lần ");
+                }
 				var newRP = new Report()
 				{
 					BookingId = report.IdBooking,
@@ -127,9 +125,6 @@ namespace DATN.Aplication.Services
 								DateRate = rp.CreateAt.ToString("dd/MM/yyyy"),
 								NameCustomer = g.Name,
 								Rate = rp.Rate,
-								NameStaff = u.FullName,
-								ServiceName = g.Name,
-								StaffID = u.Id,
 							};
 				return new ResponseData<List<ReportVM>>(query.ToList());
 			}
