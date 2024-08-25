@@ -14,6 +14,7 @@ namespace DATN.Aplication.Services
         Task<ResponseData<string>> SoftDelete(DeleteRequest<Guid> request);
         Task<ResponseData<string>> SendForgotMail(string mail);
         Task<ResponseData<string>> ChangPassWithVerifyCode(string verifyCode, string newPass);
+        Task<ResponseData<string>> CheckConfirmCode(string confirmCode, string email);
         Task<ResponseData<string>> RegisterNoUser(GuestRegisterByGuestRequest request);
 		 Task<ResponseData<List<GuestViewModel>>> GetAllGuest();
 

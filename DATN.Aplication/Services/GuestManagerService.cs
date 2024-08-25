@@ -160,7 +160,7 @@ namespace DATN.Aplication.Services
                 {
                     return new ResponseData<string>(false, "Email đã xem được sử dụng");
                 }
-                var verifyCode = _mailExtension.GennarateVerifyCode(Guid.NewGuid().ToString());//tạo mã xác mình
+                var verifyCode = RandomCodeExtention.GennarateVerifyCode(Guid.NewGuid().ToString());//tạo mã xác mình
                 await _mailExtension.SendMailVerificationGuestAsync(email, verifyCode);
                 return new ResponseData<string>(verifyCode);
             }
@@ -301,7 +301,7 @@ namespace DATN.Aplication.Services
 
                 if (hasEmail)
                 {
-                    var verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
+                    var verifyCode = RandomCodeExtention.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
                     guest.VerifyCode = verifyCode;
                     await _mailExtension.SendMailVerificationGuestAsync(request.Email, verifyCode);
                 }
@@ -366,7 +366,7 @@ namespace DATN.Aplication.Services
 
                 if (hasEmail)
                 {
-                    var verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
+                    var verifyCode = RandomCodeExtention.GennarateVerifyCode(guest.Id.ToString());//tạo mã xác mình
                     guest.VerifyCode = verifyCode;
                     await _mailExtension.SendMailVerificationAsync(guest.Email, guest.UserName, randomPass, verifyCode);
                 }
@@ -483,8 +483,8 @@ namespace DATN.Aplication.Services
                 if (guest != null)
                 {
 
-                    string verifyCode = _mailExtension.GennarateVerifyCode(guest.Id.ToString());
-                    guest.VerifyCode = verifyCode;
+                    string verifyCode = RandomCodeExtention.RandomCodeOnlyNumber();
+                    guest.VerifyCode = verifyCode+"|"+ DateTime.Now.AddMinutes(5).ToString();
                     await _unitOfWork.GuestRepository.UpdateAsync(guest);
                     var result = await _unitOfWork.SaveChangeAsync();
                     if (result == 0)
@@ -495,13 +495,13 @@ namespace DATN.Aplication.Services
                             Error = "Có gì đó sai sai"
                         };
                     }
-                    await _mailExtension.SendMailCodeForgot(guest.Email, guest.VerifyCode);
+                    await _mailExtension.SendMailGuestForgot(guest.Email!, guest.VerifyCode.Split("|").First());
 
                 }
                 return new ResponseData<string>
                 {
                     IsSuccess = true,
-                    Error = "Tin nhắn đã gửi vào mail của quý khách"
+                    Data = "Tin nhắn đã gửi vào mail của quý khách"
                 };
 
 
@@ -580,7 +580,7 @@ namespace DATN.Aplication.Services
                 var guest = await _unitOfWork.GuestRepository.GetAsync(Guid.Parse(dataVerify[0]));
                 if (guest != null)
                 {
-                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now)// kiểm tra thời gian phù hợp vs max
+                    if (DateTime.Parse(dataVerify[1]) < DateTime.Now||  !string.IsNullOrEmpty(guest.VerifyCode))// kiểm tra thời gian phù hợp vs max
                     {
                         return new ResponseData<string>
                         {
@@ -588,6 +588,7 @@ namespace DATN.Aplication.Services
                             Error = "Thông tin xác minh của bạn đã quá hạn"
                         };
                     }
+                    guest.VerifyCode = "";
                     guest.PasswordHash = _passwordExtensitons.HashPassword(newPass);
                     var result = await _unitOfWork.SaveChangeAsync();
 
@@ -617,6 +618,39 @@ namespace DATN.Aplication.Services
             }
         }
 
+        public async Task<ResponseData<string>> CheckConfirmCode(string confirmCode, string email)
+        {
+            try
+            {
+                var guests = await _unitOfWork.GuestRepository.FindAsync(p=>p.Email == email&& (!p.IsDeleted.HasValue || !p.IsDeleted.Value)&& p.IsComfirm.Value);
+                if (guests != null && guests.Count() >0)
+                {
+                    var guest= guests.First();
+                    var confirmAndTime = guest.VerifyCode;
+                    string[] arrData = confirmAndTime.Split("|");
+                    if (arrData[0] != confirmCode)
+                    {
+                        return new ResponseData<string>(false, "Thông tin xác minh của bạn không chính xác");
+                    }
+                    else if (DateTime.Parse(arrData[1])<DateTime.Now){
+                        return new ResponseData<string>(false, "Thông tin xác minh của bạn đã quá hạn");
+                    }
+                    guest.VerifyCode= RandomCodeExtention.GennarateVerifyCode(guest.Id.ToString());
+                    await _unitOfWork.GuestRepository.UpdateAsync(guest);
+                    var result=  await _unitOfWork.SaveChangeAsync();
+                    if (result>0)
+                    {
+                        return new ResponseData<string>(guest.VerifyCode);
+                    }
 
+                }
+                return new ResponseData<string> ( false, "Thông tin xác minh của bạn không chính xác" );
+            }
+            catch (Exception)
+            {
+
+                return new ResponseData<string>(false, "Có lỗi xảy ra trong quá trình xác minh");
+            }
+        }
     }
 }

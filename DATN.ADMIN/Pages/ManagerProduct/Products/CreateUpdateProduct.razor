@@ -188,11 +188,12 @@
         async Task LoadData()
         {
             var brand = await _brandClient.ListBrand();
+       
             var cate = await _cateClient.ListCategoryProduct();
             if (brand.IsSuccess && cate.IsSuccess)
             {
-                lstBrand = brand.Data;
-                lstCate = cate.Data;
+                lstBrand = brand.Data.Where(prop => prop.Status.HasValue && prop.Status.Value).ToList();
+                lstCate = cate.Data.Where(prop => !prop.IsDeleted ).ToList();
             }
         }
         void AddItem()

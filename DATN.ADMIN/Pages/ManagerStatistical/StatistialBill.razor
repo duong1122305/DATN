@@ -143,6 +143,10 @@
 			if (response.IsSuccess)
 			{
 				lstBill = response.Data;
+				if (lstBill.Count()==0)
+				{
+					Snackbar.Add("Chưa có data");
+				}
 				StateHasChanged();
 			}
 			else

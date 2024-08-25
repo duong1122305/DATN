@@ -1,4 +1,4 @@
-﻿using DATN.ADMIN.Components;
+﻿
 using DATN.ADMIN.IServices;
 using DATN.Aplication.CustomProvider;
 using DATN.ViewModels.DTOs.Statistical;
@@ -98,6 +98,10 @@ namespace DATN.ADMIN.Pages
                 top3ServiceQuantity = response.Data.ServiceQuantityStatistical;
                 height = "351px";
                 width = "99%";
+                if (revenuePieDatas.Data.Sum(p=>p.Value)==0)
+                {
+                    Snackbar.Add("Chưa có data");
+                }
             }
             else
             {
