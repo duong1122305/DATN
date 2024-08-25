@@ -38,10 +38,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
                 }
 
-                if (CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
-                }
+                
 
                 if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
                 {
@@ -133,6 +130,7 @@ namespace DATN.Aplication.Services
                 findServiceDetailById.Duration = serviceDetail.Duration;
                 findServiceDetailById.NameDetail = serviceDetail.Description;
                 findServiceDetailById.UpdateAt = DateTime.Now;
+                findServiceDetailById.ServiceId = serviceDetail.ServiceId;
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
@@ -144,11 +142,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
                 }
 
-                if (CheckIsNumber.Check(serviceDetail.MinWeight.ToString()) == false || CheckIsNumber.Check(serviceDetail.MaxWeight.ToString()) == false)
-                {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Cân nặng chỉ được nhập số" };
-                }
-
+                 
                 if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Thời gian chỉ chứa ký tự là số" };

@@ -116,6 +116,46 @@ namespace DATN.Aplication.Extentions
                 return new ResponseMail { IsSuccess = true, Notifications = "Mã xác nhận chưa được gửi đi!!", Error = e.Message };
             }
         }
+        public async Task<bool> SendMailGuestForgot(string userMail, string code)
+        {
+            try
+            {
+                MailAddress mailFrom = new MailAddress("shoppet79@gmail.com", "MewShop");
+                MailAddress mailTo = new MailAddress(userMail);
+                MailMessage message = new MailMessage(mailFrom, mailTo);
+                string verificationLink = @$"{_hosting}?verifyCode={code}";
+                message.Subject = "Yêu cầu đặt lại mật khẩu";
+                message.Body = $@"
+                        <body style=""font-family: Arial, sans-serif;"">
+                            <h2>Yêu cầu đặt lại mật khẩu</h2>
+                            <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại MewShop.<br>
+                                Nếu bạn đã yêu cầu đặt lại mật khẩu, vui lòng sử dụng mã sau để thay đổi mật khẩu của bạn:</p>
+                            <h3 style=""font-size: 24px; color: #007BFF;"">{code}</h3>
+                            <p>Nếu bạn không phải là người yêu cầu, hãy bỏ qua email này và mật khẩu của bạn sẽ không thay đổi.</p>
+                            <p>Nếu bạn có bất kỳ thắc mắc nào, hãy liên hệ qua: <b>shoppet79@gmail.com</b>,<br>
+                                hoặc liên hệ qua sđt của chúng tôi 0975825324</p>
+                            <p>Trân trọng,<br> MewShop</p>
+                        </body>";
+
+                message.IsBodyHtml = true;
+                message.Priority = MailPriority.High;
+                SmtpClient client = new SmtpClient();
+                client.Host = "smtp.gmail.com";
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential("shoppet79@gmail.com", "tznx twfq hclm ysok");
+                await client.SendMailAsync(message);
+                return true;
+            }
+            catch (Exception e)
+            {
+
+                return false;
+            }
+        }
+
         public async Task<ResponseMail> SendCodeForgotOfUser(string userMail, string code)
         {
             try
@@ -231,14 +271,6 @@ namespace DATN.Aplication.Extentions
                 return e.Message;
             }
         }
-        public string GennarateVerifyCode(string ID)
-        {
-            Guid randomGuid = Guid.NewGuid();
-
-            string verifyString = ID + "|" + DateTime.Now.AddMinutes(3).ToString();
-            PasswordExtensitons hasCode = new PasswordExtensitons();
-            string verifyCode = hasCode.HashCode(verifyString);
-            return verifyCode;
-        }
+       
     }
 }

@@ -74,7 +74,7 @@ namespace DATN.API.Controllers
         {
             return await _attendante.CheckLate(shiftID, isCheckin);
         }
-        [Authorize(Roles = "ServiceStaff,Receptionist")]
+        [Authorize(Roles = "ServiceStaff,Receptionist,Admin")]
         [HttpGet("get-attendance-month-by-user")]
         public async Task<ResponseData<ListPerAttenMonth>> GetAttandanceMonth(Guid idUser, int month = 0, int year = 0, int typeAttendance = Contant.AllAttendance)
         {

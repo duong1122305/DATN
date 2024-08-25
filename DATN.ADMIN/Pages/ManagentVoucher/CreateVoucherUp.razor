@@ -95,12 +95,12 @@
 
             if (result.IsSuccess)
             {
-                Message(result.Data, Severity.Success);
+                Snackbar.Add(result.Data, Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message(result.Error, Severity.Error);
+                Snackbar.Add(result.Error, Severity.Error);
             }
         }
         //thông báo xác nhận
@@ -130,12 +130,12 @@
             var result = await _client.UpdateVoucher(Voucher);
             if (result.IsSuccess)
             {
-                Message(result.Data, Severity.Success);
+                Snackbar.Add(result.Data, Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message(result.Error, Severity.Error);
+                Snackbar.Add(result.Error, Severity.Error);
             }
 
         }
@@ -151,14 +151,6 @@
                 await Update();
             }
             StateHasChanged();
-        }
-
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
 
         }

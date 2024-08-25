@@ -14,8 +14,8 @@
             <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
-                        <MudTextField @bind-Value="@guest.Name" Required="true" Label="Họ và tên" For="@(() => guest.Name)" />
-                        <MudTextField @bind-Value="@guest.PhoneNumber" Required="true" Label="Số điện thoại" For="@(() => guest.PhoneNumber)" style="margin-top:15px;margin-bottom:15px" />
+                        <MudTextField @bind-Value="@guest.Name" Required="true" Label="Họ và tên" MaxLength="50" For="@(() => guest.Name)" />
+                        <MudTextField @bind-Value="@guest.PhoneNumber" MaxLength="11" Required="true" Label="Số điện thoại" For="@(() => guest.PhoneNumber)" style="margin-top:15px;margin-bottom:15px" />
                         <MudField Label="Giới tính" Variant="Variant.Text" InnerPadding="false">
                             <MudRadioGroup @bind-Value="Gender" Name="Giới tính" style="justify-content:space-between">
                                 <MudRadio Value="@(1)" Color="Color.Primary">Nam</MudRadio>

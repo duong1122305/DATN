@@ -20,30 +20,59 @@
             <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
                          Hideable="true" Groupable="true" GroupExpanded="false">
                 <ToolBarContent>
-                    @if (!payment)
-                    {
-                        <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
-                        <div style="width:200px;margin-left:10px">
-                            <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
-                        </div>
-
-                        <div style="display:flex;width:450px;margin-left:10px">
-                            <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
-                        </div>
-                        <MudButton @onclick="@(async()=>await OpeListPetDialog())" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
-                    }
-                    else
-                    {
-                        <MudButton Disabled OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm dịch vụ cho khách</MudButton>
-                        <MudTimePicker Disabled Label="Chọn thời gian" @bind-Time="timeStart" />
-
-                        <div style="display:flex;width:500px;margin-left:10px" Disabled>
-                            <MudAutocomplete Disabled T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
-                            <MudButton Disabled @onclick="@(async()=>await OpeListPetDialog())">Thêm thú cưng</MudButton>
-                        </div>
-
-                    }
+                            <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
+                    <MudButton @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
                     <MudSpacer />
+
+                 <div style="display: flex">
+
+                        <!-- Time Picker Section -->
+                        <div style="display: flex; flex-direction: column; margin-bottom: 10px;margin-right:10px">
+                            @if (!payment)
+                            {
+                                <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
+                                @if (timeStart != null)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                                                   Color="Color.Error"
+                                                   Size="MudBlazor.Size.Small"
+                                                   Disabled="@isEditing"
+                                                   OnClick="ClearTimeStart"
+                                                   Style="margin-left: 8px;"
+                                                   ToolTip="Xoá thời gian">
+                                    </MudIconButton>
+                                }
+                            }
+                            else
+                            {
+                                <MudTimePicker Disabled Label="Chọn thời gian" @bind-Time="timeStart" />
+                            }
+                        </div>
+
+                        <!-- Pet Selection Section -->
+                        <div style="display: flex; flex-direction: column;">
+                            @if (!payment)
+                            {
+                                <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e => e == null ? null : $"{e.Name}")" />
+                                @if (value2 != null)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                                                   Color="Color.Error"
+                                                   Size="MudBlazor.Size.Small"
+                                                   Disabled="@isEditing2"
+                                                   OnClick="ClearPetSelection"
+                                                   Style="margin-left: 8px;"
+                                                   ToolTip="Xoá lựa chọn thú cưng">
+                                    </MudIconButton>
+                                }
+                            }
+                            else
+                            {
+                                <MudAutocomplete Disabled T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e => e == null ? null : $"{e.Name}")" />
+                                <MudButton Disabled @onclick="@(async() => await OpeListPetDialog())">Thêm thú cưng</MudButton>
+                            }
+                        </div>
+                        </div>
                 </ToolBarContent>
                 <Columns>
                     <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -52,6 +81,7 @@
                         </CellTemplate>
                     </TemplateColumn>
                     <PropertyColumn Property="x => x.NameStaffService" Title="Nhân viên làm" Filterable="false" Groupable="false" />
+                    <PropertyColumn Property="x => x.PetName" Title="Thú cưng" Filterable="false" Groupable="false" />
                     <PropertyColumn Property="x => x.ServiceDetaiName" Title="Dịch vụ làm" Filterable="false" Groupable="false" />
                     <TemplateColumn Title="Giờ bắt đầu" Sortable="false" Filterable="false">
                         <CellTemplate Context="data">
@@ -96,8 +126,8 @@
                     <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                         <CellTemplate Context="data">
                             <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" OnClick="@(async()=>await SuccessServices(data.Item.IdBookingDetail.Value))">Hoàn thành</MudButton>
-                            <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(data.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
                             <MudButton StartIcon="@Icons.Material.Filled.Start" Color="Color.Success" OnClick="@(async()=>await StartServices(data.Item.IdBookingDetail.Value))">Thực hiện</MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(data.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
                         </CellTemplate>
                     </TemplateColumn>
                 </Columns>
@@ -119,7 +149,8 @@
         public bool payment { get; set; }
         [Parameter]
         public DateTime bookingDate { get; set; }
-
+        private bool isEditing = false;
+        private bool isEditing2;
         [Parameter]
         public Guid idGuest { get; set; }
         [Inject]
@@ -136,6 +167,8 @@
 
         [Inject] private BookingService bookingService { get; set; }
 
+        private bool CanSelectPet => value2 == null && lstBooking.Count == 0;
+        private bool CanSelectTime => timeStart == null && lstBooking.Count == 0;
 
         protected async override Task OnInitializedAsync()
         {
@@ -154,6 +187,19 @@
                 lstBooking = new List<ListBokingDetailInDay>();
             }
         }
+        private void ClearTimeStart()
+        {
+            timeStart = null;
+            // Cập nhật lại trạng thái giao diện
+            StateHasChanged();
+        }
+
+        private void ClearPetSelection()
+        {
+            value2 = null;
+            // Cập nhật lại trạng thái giao diện
+            StateHasChanged();
+        }
         private async Task SuccessServices(int idS)
         {
             var confirm = await Confirm("hoàn thành");
@@ -170,13 +216,13 @@
             var respone = await _client.CompleteBookingDetail(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
                 StateHasChanged();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
 
@@ -195,13 +241,13 @@
             var respone = await _client.StartBookingDetail(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
                 StateHasChanged();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
         private async Task CancelServices(int id)
@@ -212,7 +258,7 @@
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
@@ -237,22 +283,16 @@
             if (!confirm.HasValue) return false;
             return confirm.Value;
         }
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
         public async Task OpenDialogServices()
         {
             if (timeStart == null)
             {
-                Message("Vui lòng chọn giờ!", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn giờ!", Severity.Warning);
                 return;
             }
             if (value2 == null)
             {
-                Message("Vui lòng chọn thú cưng!", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn thú cưng!", Severity.Warning);
                 return;
             }
             string nameDialog = "Chọn dịch vụ";

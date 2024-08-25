@@ -100,14 +100,6 @@
             return false;
         }
 
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
-
-
         private async Task OpenDialog(int? id)
         {
             var parameters = new DialogParameters();

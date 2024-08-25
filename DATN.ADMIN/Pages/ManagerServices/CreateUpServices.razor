@@ -15,12 +15,12 @@
                         @if (id == 0 || id == null)
                         {
                             <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Name" For="@(() => service.Name)" />
-                            <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@service.Description" For="@(() => service.Description)" />
+                            <MudTextField T="string" Label="Mô tả dịch vụ" @bind-Value="@service.Description" For="@(() => service.Description)" />
                         }
                         else
                         {
                             <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Name" For="@(() => serviceUpdate.Name)" />
-                            <MudTextField T="string" Label="Tên dịch vụ" @bind-Value="@serviceUpdate.Description" For="@(() => serviceUpdate.Description)" />
+                            <MudTextField T="string" Label="Mô tả dịch vụ" @bind-Value="@serviceUpdate.Description" For="@(() => serviceUpdate.Description)" />
                         }
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">

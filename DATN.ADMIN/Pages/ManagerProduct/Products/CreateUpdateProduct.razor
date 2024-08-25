@@ -188,11 +188,12 @@
         async Task LoadData()
         {
             var brand = await _brandClient.ListBrand();
+       
             var cate = await _cateClient.ListCategoryProduct();
             if (brand.IsSuccess && cate.IsSuccess)
             {
-                lstBrand = brand.Data;
-                lstCate = cate.Data;
+                lstBrand = brand.Data.Where(prop => prop.Status.HasValue && prop.Status.Value).ToList();
+                lstCate = cate.Data.Where(prop => !prop.IsDeleted ).ToList();
             }
         }
         void AddItem()
@@ -266,18 +267,18 @@
                 if (selectedBrand == null || selectedBrand.Id == null)
                 {
 
-                    Message("Vui lòng chọn thương hiệu", Severity.Warning);
+                    Snackbar.Add("Vui lòng chọn thương hiệu", Severity.Warning);
                     return;
                 }
                 if (selectedCate == null || selectedCate.Id == null)
                 {
 
-                    Message("Vui lòng chọn danh mục", Severity.Warning);
+                    Snackbar.Add("Vui lòng chọn danh mục", Severity.Warning);
                     return;
                 }
                 if (url == Contant.ImgDefault)
                 {
-                    Message("Hãy chọn ảnh cho sản phầm", Severity.Warning);
+                    Snackbar.Add("Hãy chọn ảnh cho sản phầm", Severity.Warning);
                     return;
                 }
                 if (!Validate())
@@ -292,7 +293,7 @@
                 }
                 else
                 {
-                    Message(fileRes.Error!, Severity.Warning);
+                    Snackbar.Add(fileRes.Error!, Severity.Warning);
                     return;
                 }
 
@@ -307,11 +308,11 @@
                     if (result.IsSuccess)
                     {
 
-                        Message(result.Data, Severity.Success);
+                        Snackbar.Add(result.Data, Severity.Success);
                         _dialogBox.Close(DialogResult.Ok(true));
                     }
                     else
-                        Message(result.Error, Severity.Error);
+                        Snackbar.Add(result.Error, Severity.Error);
                 }
             }
             else
@@ -334,13 +335,13 @@
             if (selectedBrand == null || selectedBrand.Id == null)
             {
 
-                Message("Vui lòng chọn thương hiệu", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn thương hiệu", Severity.Warning);
                 return;
             }
             if (selectedCate == null || selectedCate.Id == null)
             {
 
-                Message("Vui lòng chọn danh mục", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn danh mục", Severity.Warning);
                 return;
             }
             if (url != Contant.ImgDefault)
@@ -387,17 +388,17 @@
                 });
                 if (result.IsSuccess)
                 {
-                    Message(result.Data, Severity.Success);
+                    Snackbar.Add(result.Data, Severity.Success);
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
                 {
-                    Message(result.Error, Severity.Error);
+                    Snackbar.Add(result.Error, Severity.Error);
                 }
             }
             else
             {
-                Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+                Snackbar.Add("Có lỗi trong quá trình cập nhật", Severity.Error);
             }
 
         }
@@ -426,15 +427,6 @@
 
         }
 
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Clear();
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-            Snackbar.Add(message, severity);
-        }
         private async Task ChooseFile(IBrowserFile file)
         {
             var maxSize = Contant.MaxIMGSize;

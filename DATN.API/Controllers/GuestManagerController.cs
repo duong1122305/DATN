@@ -55,12 +55,17 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.SoftDelete(request);
         }
-        [HttpPost("update-pass-by-verifyCode")]
+        [HttpPost("update-pass")]/// cập nhật vs code và pass mới
         public async Task<ResponseData<string>> UpdatePassByCode(string verifyCode, string newPass)
         {
             return await _guestManagerService.ChangPassWithVerifyCode(verifyCode, newPass);
+        }  
+        [HttpPost("check-verify-code")]/// xác minh code gưi về, trả lại verify gắn vào đổi lại pass.
+        public async Task<ResponseData<string>> CheckVerifyCode(string confirmCode, string email)
+        {
+            return await _guestManagerService.CheckConfirmCode(confirmCode, email);
         }
-        [HttpPost("forgot-pass")]
+        [HttpPost("forgot-pass")]/// quên pass và gửi code về đaada
         public async Task<ResponseData<string>> SendForgotMail(string email)
         {
             return await _guestManagerService.SendForgotMail(email);

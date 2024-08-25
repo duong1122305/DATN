@@ -23,7 +23,7 @@
 
         <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt lịch dịch vụ</MudText>
         <div style="display: flex; justify-content: flex-end;">
-            <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+            <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;margin-right:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
             <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
         </div>
 
@@ -45,9 +45,13 @@
                     </MudSelect>
                 </div>
                 <MudSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
-                <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
+                <div>
+                    <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+                </div>
+                <div>
+                    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 
+                </div>
             </ToolBarContent>
             <Columns>
                 <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
@@ -160,12 +164,11 @@
                                 @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
                             }@if (data.Item.Status == BookingStatus.StaffCancelled)
                             {
-                                @* <MudChip Color="Color.Error">Nhân viên huỷ</MudChip> *@
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
 
                             }@if (data.Item.Status == BookingStatus.AdminCancelled)
                             {
-                                @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
-
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
                             }
 
                         </MudButtonGroup>
@@ -269,7 +272,7 @@
         private async Task CheckIn(int idBooking)
         {
             isLoading = true;
-            await Task.Delay(1000);
+            await Task.Delay(500);
             var response = await _client.QrCodeCheckIn(idBooking);
             var parameters = new DialogParameters();
             string nameDialog = "Khách check In";
@@ -278,7 +281,7 @@
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
@@ -359,7 +362,7 @@
         {
             dataGrid?.ExpandAllGroups();
         }
-        private async Task OpenDialog(int id, Guid idGuest, bool payment,DateTime bookingDate)
+        private async Task OpenDialog(int id, Guid idGuest, bool payment, DateTime bookingDate)
         {
             isLoading = true;
             await Task.Delay(1000);
@@ -397,7 +400,7 @@
             {
                 isLoading = false;
                 StateHasChanged();
-                Message("Không có dữ liệu", Severity.Warning);
+                Snackbar.Add("Không có dữ liệu", Severity.Warning);
             }
             isLoading = false;
             StateHasChanged();
@@ -474,12 +477,12 @@
             var respone = await _client.StartBooking(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
         private async Task CompleteBooking(int id)
@@ -497,12 +500,12 @@
             var respone = await _client.CompleteBooking(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
         private async Task ConfimBooking(int id)
@@ -515,12 +518,12 @@
             var respone = await _client.ConfirmBooking(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
 
@@ -534,12 +537,12 @@
             var respone = await _client.CheckInArrive(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
 
@@ -551,7 +554,7 @@
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
@@ -598,13 +601,6 @@
             isLoading = false;
             StateHasChanged();
         }
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
-
         private async Task<bool> Confirm(string text)
         {
             var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",

@@ -3,21 +3,24 @@
         @using DATN.ADMIN.IServices
         @using DATN.ViewModels.DTOs.ActionBooking
         @inject ISnackbar Snackbar
-
-        <MudDialog>
-            <DialogContent>
-                <MudTextField @bind-Value="CancellationReason" Label="Lý do huỷ" MaxLength="255" Required />
-            </DialogContent>
-            <DialogActions>
-                <MudButton Color="Color.Default" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
-                <MudButton Color="Color.Error" OnClick="@(async()=>await ConfirmCancel())">Xác nhận</MudButton>
-            </DialogActions>
-        </MudDialog>
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
+        <EditForm Model="@actionView" OnValidSubmit="ConfirmCancel" Context="editFormContext">
+            <DataAnnotationsValidator />
+            <MudItem xs="12" sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField @bind-Value="actionView.Reason" Label="Lý do huỷ" MaxLength="255" />
+                        <ValidationMessage style="color:red" For="@(()=> actionView.Reason)" />
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="@(async()=>await Canel())">Huỷ</MudButton>
+                        <MudButton Color="Color.Error" Variant="Variant.Filled" Class="mt-4" ButtonType="ButtonType.Submit">Xác nhận</MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </EditForm>
         @code {
         [Parameter]
         public int id { get; set; }
-
-        private string CancellationReason { get; set; }
+        private ActionView actionView = new ActionView();
 
         [Inject]
         private IHttpContextAccessor _httpContextAccessor { get; set; }
@@ -26,31 +29,31 @@
         [Inject]
         IBookingViewServices _client { get; set; }
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-
+        private bool isLoading;
         public async Task ConfirmCancel()
         {
-            if (CancellationReason.Trim() != null)
+            if (actionView.Reason != null)
             {
-                ActionView actionView = new ActionView()
-                {
-                    IdBokingOrDetail = id,
-                    Token = _httpContextAccessor.HttpContext.Session.GetString("Key"),
-                    Reason = CancellationReason
-                };
+                isLoading = true;
+                await Task.Delay(500);
+                actionView.IdBokingOrDetail = id;
+                actionView.Token = _httpContextAccessor.HttpContext.Session.GetString("Key");
                 var respone = await _client.CancelBooking(actionView);
                 if (respone.IsSuccess)
                 {
-                    Message(respone.Data, Severity.Success);
+                    Snackbar.Add(respone.Data, Severity.Success);
+                    isLoading = false;
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
                 {
-                    Message(respone.Error, Severity.Error);
+                    Snackbar.Add(respone.Error, Severity.Error);
                 }
+                isLoading = false;
             }
             else
             {
-                Message("Vui lòng nhập lý do huỷ", Severity.Warning);
+                Snackbar.Add("Vui lòng nhập lý do huỷ", Severity.Warning);
             }
         }
         public async Task Canel()
@@ -58,15 +61,7 @@
             _dialogBox.Close(DialogResult.Ok(true));
         }
 
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
-
-        }
-
 
     </Authorized>
     <NotAuthorized>
