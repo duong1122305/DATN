@@ -50,8 +50,6 @@
                 </div>
                 <div>
                     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
-                    @* <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Khách lẻ đặt</MudButton> *@
-
                 </div>
             </ToolBarContent>
             <Columns>
@@ -602,7 +600,7 @@
         private async Task OpenDialogCreateBooking()
         {
             isLoading = true;
-            await Task.Delay(1000);
+            await Task.Delay(50);
             string nameDialog = "Đặt lịch tại quầy";
             DialogOptions options = new DialogOptions()
             {
@@ -636,10 +634,7 @@
             if (!confirm.HasValue) return false;
             return confirm.Value;
         }
-
         }
-
-
     </Authorized>
     <NotAuthorized>
         <p>Không có quyền truy cập</p>
