@@ -9,6 +9,7 @@
         @inject ISnackbar Snackbar
         @inject IDialogService _diagService
         <EditForm Context="data" Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
+            <DataAnnotationsValidator/>
             <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
