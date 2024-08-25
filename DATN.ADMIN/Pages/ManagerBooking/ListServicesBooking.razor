@@ -23,7 +23,7 @@
 
         <MudText Typo="Typo.h4" Style="text-align:center">Danh sách đặt lịch dịch vụ</MudText>
         <div style="display: flex; justify-content: flex-end;">
-            <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
+            <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;margin-right:10px" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" OnClick="@ExpandAllGroups">Mở hết danh sách</MudButton>
             <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogBillInStore(Guid.Empty,DateTime.Now))">Tạo hóa đơn</MudButton>
         </div>
 
@@ -45,9 +45,13 @@
                     </MudSelect>
                 </div>
                 <MudSpacer />
+                <div>
                 <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
-                <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
+                </div>
+                <div>
+                    <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
 
+                </div>
             </ToolBarContent>
             <Columns>
                 <TemplateColumn Title="Ngày" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">

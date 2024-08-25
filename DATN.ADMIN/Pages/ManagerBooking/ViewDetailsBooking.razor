@@ -97,8 +97,8 @@
                     <TemplateColumn Title="Hành động" Sortable="false" Filterable="false">
                         <CellTemplate Context="data">
                             <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" OnClick="@(async()=>await SuccessServices(data.Item.IdBookingDetail.Value))">Hoàn thành</MudButton>
-                            <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(data.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
                             <MudButton StartIcon="@Icons.Material.Filled.Start" Color="Color.Success" OnClick="@(async()=>await StartServices(data.Item.IdBookingDetail.Value))">Thực hiện</MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="@(async()=>await CancelServices(data.Item.IdBookingDetail.Value))">Huỷ dịch vụ</MudButton>
                         </CellTemplate>
                     </TemplateColumn>
                 </Columns>

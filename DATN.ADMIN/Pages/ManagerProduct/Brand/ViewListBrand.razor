@@ -134,7 +134,7 @@ else
                 if (lstBrand.Count == null || lstBrand.Count ==0)
                 {
                     lstBrand = brand.Data.OrderByDescending(x => x.Id).ToList();
-                    Message("Danh sách lọc bị trống", Severity.Warning);
+                    Snackbar.Add("Danh sách lọc bị trống", Severity.Warning);
                 }
                 else
                 {
