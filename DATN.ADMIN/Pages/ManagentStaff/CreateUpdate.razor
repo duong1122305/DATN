@@ -9,7 +9,7 @@
         @using DATN.ViewModels.DTOs.Authenticate
         <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-        <EditForm Context="data" Model="@user">
+        <EditForm Context="data" Model="@user" OnValidSubmit="@(async()=>await OnValidSubmit())">
             <DataAnnotationsValidator />
             <MudItem xs="12" sm="12">
                 <MudCard>
@@ -45,7 +45,7 @@
                         <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async()=>await OnValidSubmit())">@_nameButton</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                         </div>
                     </MudCardContent>
                 </MudCard>
@@ -120,8 +120,10 @@
             }
             else
             {
+                isLoading = false;
                 Snackbar.Add(result.Error, Severity.Warning);
             }
+            isLoading = false;
         }
         //thông báo xác nhận
         private async Task<bool> Confirm(string text)
@@ -162,9 +164,10 @@
             }
             else
             {
+                isLoading = false;
                 Snackbar.Add(result.Error, Severity.Warning);
             }
-
+            isLoading = false;
         }
         private async Task OnValidSubmit()
         {
