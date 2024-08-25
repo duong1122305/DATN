@@ -256,7 +256,7 @@
                 else
                 {
                     lstVoucher = null;
-                    Message("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
+                    Snackbar.Add("Không có dữ liệu trong khoảng ngày bạn tìm kiếm!", Severity.Warning);
                     await LoadData();
                 }
             }
@@ -333,23 +333,15 @@
 
                 if (result.IsSuccess)
                 {
-                    Message(result.Data, Severity.Success);
+                    Snackbar.Add(result.Data, Severity.Success);
                     await LoadData();
                 }
                 else
                 {
-                    Message(result.Error, Severity.Error);
+                    Snackbar.Add(result.Error, Severity.Error);
                 }
             }
         }
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
-
         private async Task<bool?>
         Confirm()
         {

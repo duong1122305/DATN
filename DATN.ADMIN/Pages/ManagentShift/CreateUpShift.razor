@@ -50,12 +50,12 @@
             var val = JsonConvert.DeserializeObject<ResponseData<string>>(await result.Content.ReadAsStringAsync());
             if (val.IsSuccess)
             {
-                Message(val.Data, Severity.Success);
+                Snackbar.Add(val.Data, Severity.Success);
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
             {
-                Message(val.Error, Severity.Error);
+                Snackbar.Add(val.Error, Severity.Error);
             }
         }
         //thông báo xác nhận
@@ -78,12 +78,12 @@
 
                 if (val.IsSuccess)
                 {
-                    Message(val.Data, Severity.Success);
+                    Snackbar.Add(val.Data, Severity.Success);
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
                 {
-                    Message(val.Error, Severity.Error);
+                    Snackbar.Add(val.Error, Severity.Error);
                 }
             }
         }
@@ -100,13 +100,7 @@
 
             StateHasChanged();
         }
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
+
         }
 
     </Authorized>

@@ -128,7 +128,7 @@
                     if (lstCate.Count == null || lstCate.Count == 0)
                     {
                         lstCate = respone.Data.OrderByDescending(x => x.Id).ToList();
-                        Message("Trạng thái đang hoạt động bị trống", Severity.Warning);
+                        Snackbar.Add("Trạng thái đang hoạt động bị trống", Severity.Warning);
                     }
                     else
                     {
@@ -141,7 +141,7 @@
                     if (lstCate.Count == null || lstCate.Count == 0)
                     {
                         lstCate = respone.Data.OrderByDescending(x => x.Id).ToList();
-                        Message("Trạng thái ngưng hoạt động bị trống", Severity.Warning);
+                        Snackbar.Add("Trạng thái ngưng hoạt động bị trống", Severity.Warning);
                     }
                     else
                     {
@@ -209,12 +209,12 @@
                 var response2 = await _client.RemoveCategory(Convert.ToInt32(id));
                 if (response2.IsSuccess)
                 {
-                    Message(response2.Data, Severity.Success);
+                    Snackbar.Add(response2.Data, Severity.Success);
                     await LoadData();
                 }
                 else
                 {
-                    Message(response2.Error, Severity.Error);
+                    Snackbar.Add(response2.Error, Severity.Error);
                 }
             }
         }
@@ -224,12 +224,12 @@
             var repon = await _client.ActiveCategory(Convert.ToInt32(id));
             if (repon.IsSuccess)
             {
-                Message(repon.Data, Severity.Success);
+                Snackbar.Add(repon.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(repon.Error, Severity.Success);
+                Snackbar.Add(repon.Error, Severity.Success);
             }
         }
 
@@ -289,14 +289,6 @@
                 await LoadData();
                 StateHasChanged();
             }
-        }
-
-        //messenge
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
         }
     </Authorized>

@@ -114,13 +114,13 @@
                     UserId = idUserAffterAdd.Data
                 };
                 var position = await _client.AddRoleForUser(addRole);
-                Message(result.Data, Severity.Success);
+                Snackbar.Add(result.Data, Severity.Success);
                 isLoading = false;
                 _dialogBox.Close();
             }
             else
             {
-                Message(result.Error, Severity.Warning);
+                Snackbar.Add(result.Error, Severity.Warning);
             }
         }
         //thông báo xác nhận
@@ -155,14 +155,14 @@
             var result = await _client.UpdateUser(view, userName);
             if (result.IsSuccess)
             {
-                Message(result.Data, Severity.Success);
+                Snackbar.Add(result.Data, Severity.Success);
                 _dialogBox.Close();
                 isLoading = false;
                 StateHasChanged();
             }
             else
             {
-                Message(result.Error, Severity.Warning);
+                Snackbar.Add(result.Error, Severity.Warning);
             }
 
         }
@@ -178,14 +178,6 @@
 
             }
             StateHasChanged();
-        }
-
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
 
         private void HandleAddressChanged(string address)

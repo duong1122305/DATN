@@ -67,23 +67,23 @@
                     dialog.Close();
                     if (repo.IsSuccess)
                     {
-                        Message(repo.Data, Severity.Success);
+                        Snackbar.Add(repo.Data, Severity.Success);
                         _dialogBox.Close();
                         StateHasChanged();
                     }
                     else
                     {
-                        Message(repo.Error, Severity.Error);
+                        Snackbar.Add(repo.Error, Severity.Error);
                     }
                 }
                 else
                 {
-                    Message("Chưa chọn ca làm", Severity.Error);
+                    Snackbar.Add("Chưa chọn ca làm", Severity.Error);
                 }
             }
             else
             {
-                Message("Thêm hông thành công", Severity.Error);
+                Snackbar.Add("Thêm hông thành công", Severity.Error);
             }
         }
         //thông báo xác nhận
@@ -108,13 +108,6 @@
             }
         }
 
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
         }
     </Authorized>
     <NotAuthorized>

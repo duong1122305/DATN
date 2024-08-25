@@ -206,12 +206,12 @@ else
             var response2 = await _client.RemoveBrand(id);
             if (response2.IsSuccess)
             {
-                Message(response2.Data, Severity.Success);
+                Snackbar.Add(response2.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(response2.Error, Severity.Error);
+                    Snackbar.Add(response2.Error, Severity.Error);
             }
         }
     }
@@ -221,12 +221,12 @@ else
         var repon = await _client.Active(id);
         if (repon.IsSuccess)
         {
-            Message(repon.Data, Severity.Success);
+                Snackbar.Add(repon.Data, Severity.Success);
             await LoadData();
         }
         else
         {
-            Message(repon.Error, Severity.Success);
+                Snackbar.Add(repon.Error, Severity.Success);
         }
     }
 
@@ -271,14 +271,6 @@ else
         return confirm;
     }
 
-
-    //messenge
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
 }
     </Authorized>
     <NotAuthorized>
