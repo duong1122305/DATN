@@ -164,7 +164,7 @@
                                 @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
                             }@if (data.Item.Status == BookingStatus.StaffCancelled)
                             {
-                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async=>await SeeHistory(data.Item.IdBooking))" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
 
                             }@if (data.Item.Status == BookingStatus.AdminCancelled)
                             {
@@ -207,6 +207,11 @@
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
+        }
+
+        private async Task SeeHistory(int id)
+        {
+
         }
 
         private async Task LoadData()
