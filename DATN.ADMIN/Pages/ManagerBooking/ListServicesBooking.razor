@@ -269,7 +269,7 @@
         private async Task CheckIn(int idBooking)
         {
             isLoading = true;
-            await Task.Delay(1000);
+            await Task.Delay(500);
             var response = await _client.QrCodeCheckIn(idBooking);
             var parameters = new DialogParameters();
             string nameDialog = "Khách check In";
@@ -397,7 +397,7 @@
             {
                 isLoading = false;
                 StateHasChanged();
-                Message("Không có dữ liệu", Severity.Warning);
+                Snackbar.Add("Không có dữ liệu", Severity.Warning);
             }
             isLoading = false;
             StateHasChanged();
@@ -474,12 +474,12 @@
             var respone = await _client.StartBooking(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
         private async Task CompleteBooking(int id)
@@ -497,12 +497,12 @@
             var respone = await _client.CompleteBooking(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
         private async Task ConfimBooking(int id)
@@ -515,12 +515,12 @@
             var respone = await _client.ConfirmBooking(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
 
@@ -534,12 +534,12 @@
             var respone = await _client.CheckInArrive(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
 
@@ -598,13 +598,6 @@
             isLoading = false;
             StateHasChanged();
         }
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
-
         private async Task<bool> Confirm(string text)
         {
             var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",

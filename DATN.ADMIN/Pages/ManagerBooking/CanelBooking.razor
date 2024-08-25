@@ -3,9 +3,10 @@
         @using DATN.ADMIN.IServices
         @using DATN.ViewModels.DTOs.ActionBooking
         @inject ISnackbar Snackbar
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
         <EditForm Model="@actionView" OnValidSubmit="ConfirmCancel" Context="editFormContext">
             <DataAnnotationsValidator />
-             <MudItem xs="12" sm="12">
+            <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
                         <MudTextField @bind-Value="actionView.Reason" Label="Lý do huỷ" MaxLength="255" />
@@ -14,13 +15,11 @@
                         <MudButton Color="Color.Error" Variant="Variant.Filled" Class="mt-4" ButtonType="ButtonType.Submit">Xác nhận</MudButton>
                     </MudCardContent>
                 </MudCard>
-             </MudItem >
+            </MudItem>
         </EditForm>
         @code {
-            [Parameter]
+        [Parameter]
         public int id { get; set; }
-
-        // private string CancellationReason { get; set; }
         private ActionView actionView = new ActionView();
 
         [Inject]
@@ -30,23 +29,27 @@
         [Inject]
         IBookingViewServices _client { get; set; }
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-
+        private bool isLoading;
         public async Task ConfirmCancel()
         {
             if (actionView.Reason != null)
             {
+                isLoading = true;
+                await Task.Delay(500);
                 actionView.IdBokingOrDetail = id;
                 actionView.Token = _httpContextAccessor.HttpContext.Session.GetString("Key");
                 var respone = await _client.CancelBooking(actionView);
                 if (respone.IsSuccess)
                 {
                     Snackbar.Add(respone.Data, Severity.Success);
+                    isLoading = false;
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
                 {
                     Snackbar.Add(respone.Error, Severity.Error);
                 }
+                isLoading = false;
             }
             else
             {

@@ -201,7 +201,7 @@
             if (await Confirm() == true)
             {
                 bookingService.RemoveBooking(booking);
-                Message("Đã xoá thành công.", Severity.Success);
+                Snackbar.Add("Đã xoá thành công.", Severity.Success);
             }
             // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
         }
@@ -215,20 +215,6 @@
             // Gọi dialog hoặc thực hiện hành động cần thiết trước khi đóng component
             ClearBookingRequests(); // Gọi phương thức để xoá danh sách bookingRequest
         }
-
-        // private async Task Change(GuestViewModel value)
-        // {
-        //     value1 = value;
-        //     var responsePet = await petService.GetAll();
-        //     if (responsePet.Data.Count > 0)
-        //     {
-        //         lstPet = responsePet.Data.Where(x => x.OwnerId == value.Id).ToList();
-        //     }
-        //     else
-        //     {
-        //         lstPet = new List<PetVM>();
-        //     }
-        // }
 
         // xoá khách nếu chọn nhầm
         private void ClearGuestSelection()
@@ -332,13 +318,13 @@
                     var repos = await _BookingSer.CreateBookingStore(createBookingRequest, _httpContextAccessor.HttpContext.Session.GetString("Key"));
                     if (repos.IsSuccess)
                     {
-                        Message(repos.Data, Severity.Success);
+                        Snackbar.Add(repos.Data, Severity.Success);
                         StateHasChanged();
                         _dialogBox.Close();
                     }
                     else
                     {
-                        Message(repos.Error, Severity.Error);
+                        Snackbar.Add(repos.Error, Severity.Error);
                     }
                     isLoading = false;
                 }
@@ -351,13 +337,6 @@
                 throw;
                 isLoading = false;
             }
-        }
-
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
         //tìm kiếm pet
         private async Task<IEnumerable<PetVM>> Search2(string value)
@@ -388,22 +367,22 @@
         protected async Task Create()
         {
             if(value1==null){
-                Message("Vui lòng chọn khách hàng.", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn khách hàng.", Severity.Warning);
                 return;
             }
             if (value2 == null)
             {
-                Message("Vui lòng chọn thú cưng trước khi tìm.", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn thú cưng trước khi tìm.", Severity.Warning);
                 return;
             }
             if (timeStart == null)
             {
-                Message("Vui lòng chọn giờ.", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn giờ.", Severity.Warning);
                 return;
             } 
             if (bookingDate == null)
             {
-                Message("Vui lòng chọn ngày.", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn ngày.", Severity.Warning);
                 return;
             }
             var now = DateTime.Now;
@@ -411,7 +390,7 @@
 
             if (selectedDateTime < now)
             {
-                Message("Ngày và giờ đã chọn không hợp lệ. Vui lòng chọn lại ngày và giờ", Severity.Warning);
+                Snackbar.Add("Ngày và giờ đã chọn không hợp lệ. Vui lòng chọn lại ngày và giờ", Severity.Warning);
                 return;
             }
 
@@ -444,7 +423,7 @@
         {
             if (value1 == null)
             {
-                Message("Vui lòng chọn khách hàng!", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn khách hàng!", Severity.Warning);
                 return;
             }
             var parameters = new DialogParameters();
@@ -466,7 +445,6 @@
                 createUpdateDialog.Close();
                 StateHasChanged();
             }
-
         }
         }
     </Authorized>

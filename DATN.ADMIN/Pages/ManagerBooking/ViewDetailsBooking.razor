@@ -171,13 +171,13 @@
             var respone = await _client.CompleteBookingDetail(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
                 StateHasChanged();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
 
@@ -196,13 +196,13 @@
             var respone = await _client.StartBookingDetail(actionView);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 await LoadData();
                 StateHasChanged();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
         }
         private async Task CancelServices(int id)
@@ -213,7 +213,7 @@
             {
                 CloseOnEscapeKey = true,
                 Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
+                MaxWidth = MaxWidth.Small,
                 CloseButton = true,
                 FullWidth = true,
                 DisableBackdropClick = true
@@ -238,22 +238,16 @@
             if (!confirm.HasValue) return false;
             return confirm.Value;
         }
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
-        }
         public async Task OpenDialogServices()
         {
             if (timeStart == null)
             {
-                Message("Vui lòng chọn giờ!", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn giờ!", Severity.Warning);
                 return;
             }
             if (value2 == null)
             {
-                Message("Vui lòng chọn thú cưng!", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn thú cưng!", Severity.Warning);
                 return;
             }
             string nameDialog = "Chọn dịch vụ";
