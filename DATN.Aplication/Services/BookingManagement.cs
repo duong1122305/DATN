@@ -55,7 +55,7 @@ namespace DATN.Aplication.Services
             List<HistoryAction> lstAction = new List<HistoryAction>();
             foreach (var item in querybooking)
             {
-                if (item.Status == BookingStatus.Confirmed || item.Status == BookingStatus.PendingConfirmation)
+                if (item.Status != BookingStatus.Completed && item.Status != BookingStatus.AdminCancelled && item.Status != BookingStatus.StaffCancelled && item.Status != BookingStatus.CustomerCancelled)
                 {
                     var queryBookingDetail = from detail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                                              where detail.BookingId == item.Id
@@ -72,9 +72,13 @@ namespace DATN.Aplication.Services
                                 count++;
                             }
                         }
-                        else
+                        else if (item1.Status == BookingDetailStatus.Cancelled)
                         {
                             count++;
+                        }
+                        else
+                        {
+                            continue;
                         }
                     }
                     if (count == queryBookingDetail.Count())
@@ -85,10 +89,10 @@ namespace DATN.Aplication.Services
                         {
                             ActionID = 14,
                             ActionTime = DateTime.Now,
-                            Description = "Hệ thống hủy lịch đặt do quá hạn mà đơn chưa xác nhận hoặc khách chưa đến sử dụng dịch vụ",
+                            Description = "Hệ thống hủy lịch đặt do quá hạn mà đơn chưa xác nhận hoặc khách không đến sử dụng dịch vụ",
                             BookingID = item.Id,
                         };
-                        lstAction.Add(action);
+
                     }
                 }
             }
@@ -2074,26 +2078,33 @@ namespace DATN.Aplication.Services
                 };
             }
         }
-        public async Task<ResponseData<HistoryBookingVM>> GetReasonCancelBooking(int id)
+        public async Task<ResponseData<List<HistoryBookingVM>>> GetReasonCancelBooking(int id)
         {
-            var query = (from history in await _unitOfWork.HistoryActionRepository.GetAllAsync()
-                         join action in await _unitOfWork.ActionBookingRepository.GetAllAsync()
-                         on history.ActionID equals action.ID
-                         where history.BookingID == id
-                         && history.ActionID == 14
-                         select new HistoryBookingVM
-                         {
-                             ID = id,
-                             ActionBy = history.ActionByID.Value == Guid.Empty ? "Không có" : (_userManager.FindByIdAsync(history.ActionByID.Value.ToString())).GetAwaiter().GetResult().FullName,
-                             ActionName = action.Name,
-                             Description = history.Description,
-                             TimeAction = history.ActionTime.ToString("HH:mm:ss dd-MM-yyyy")
-                         }).FirstOrDefault();
-            if (query != null)
+            try
             {
-                return new ResponseData<HistoryBookingVM> { IsSuccess = true, Data = query };
+                var query = from history in await _unitOfWork.HistoryActionRepository.GetAllAsync()
+                            join action in await _unitOfWork.ActionBookingRepository.GetAllAsync()
+                            on history.ActionID equals action.ID
+                            where history.BookingID == id
+                            && history.ActionID == 14
+                            select new HistoryBookingVM
+                            {
+                                ID = id,
+                                ActionBy = history.ActionByID == null ? "Không có" : "Không biết nhân viên nào",
+                                ActionName = action.Name,
+                                Description = history.Description,
+                                TimeAction = history.ActionTime.ToString("HH:mm:ss dd-MM-yyyy"),
+                            };
+                if (query != null)
+                {
+                    return new ResponseData<List<HistoryBookingVM>> { IsSuccess = true, Data = query.ToList() };
+                }
+                return new ResponseData<List<HistoryBookingVM>> { IsSuccess = false, Error = "Có hủy đâu mà có booking" };
             }
-            return new ResponseData<HistoryBookingVM> { IsSuccess = false, Error = "Có hủy đâu mà có booking" };
+            catch (Exception e)
+            {
+                return new ResponseData<List<HistoryBookingVM>> { IsSuccess = false, Error = e.Message };
+            }
         }
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>

@@ -229,7 +229,7 @@ namespace DATN.API.Controllers
             return await _bookingManagement.GetBookingByGuestNoAccount(userOrPhoneNumber);
         }
         [HttpGet("Get-Reason-Cancel-Booking")]
-        public async Task<ResponseData<HistoryBookingVM>> GetReasonCancelBooking(int id)
+        public async Task<ResponseData<List<HistoryBookingVM>>> GetReasonCancelBooking(int id)
         {
             return await _bookingManagement.GetReasonCancelBooking(id);
         }

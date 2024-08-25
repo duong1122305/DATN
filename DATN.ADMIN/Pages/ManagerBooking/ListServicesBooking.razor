@@ -160,14 +160,14 @@
 
                             }@if (data.Item.Status == BookingStatus.CustomerCancelled)
                             {
-                                @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async ()=> await SeeHistory(data.Item.IdBooking))" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
                             }@if (data.Item.Status == BookingStatus.StaffCancelled)
                             {
                                 <MudIconButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async ()=> await SeeHistory(data.Item.IdBooking))" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
 
                             }@if (data.Item.Status == BookingStatus.AdminCancelled)
                             {
-                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async ()=> await SeeHistory(data.Item.IdBooking))" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
                             }
 
                         </MudButtonGroup>
