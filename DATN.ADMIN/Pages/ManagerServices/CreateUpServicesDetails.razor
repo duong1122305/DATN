@@ -8,12 +8,12 @@
         @using System.Globalization
         @inject ISnackbar Snackbar
         @inject IDialogService _diagService
-        <EditForm Context="data" Model="@createServiceDetailVM" OnValidSubmit="@(async () => await Submit())">
+        <EditForm Context="data" Model="@createServiceDetailVM" >
             <DataAnnotationsValidator/>
             <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
-                        @if (id == null || id == 0)
+                        @if ( id == 0)
                         {
                             <div class="mud-select">
                                 <label class="mud-input-label">Chọn dịch vụ</label>
@@ -24,42 +24,39 @@
                                     }
                                 </select>
                             </div>
+                            <MudTextField T="string" Label="Tên chi tiết" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
                             <MudTextField T="double" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
-                            <MudTextField T="float" Label="Cân nặng tối thiểu(KG)" @bind-Value="@createServiceDetailVM.MinWeight" For="@(() => createServiceDetailVM.MinWeight)" />
-                            <MudTextField T="float" Label="Cân nặng tối đa(KG)" @bind-Value="@createServiceDetailVM.MaxWeight" For="@(() => createServiceDetailVM.MaxWeight)" />
                             <MudNumericField T="float" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
-                            <div hidden>
-                                <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                            </div>
-                            <MudTextField T="string" Label="Mô tả" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
+                           
                         }
                         else
                         {
+                            <div class="mud-select">
+                                <label class="mud-input-label">Chọn dịch vụ</label>
+                                <select @bind="updateServiceDetailVM.ServiceId" required>
+                                    @foreach (var i in lstService)
+                                    {
+                                        <option value="@i.Id">@i.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <MudTextField T="string" Label="Tên chi tiết" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
                             <MudTextField T="double" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
-                            <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => updateServiceDetailVM.Price)" />
-                            <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
-                            <MudTextField T="string" Label="Mô tả" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
+                            <MudNumericField T="float" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
+                          
                         }
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                         </div>
                     </MudCardContent>
                 </MudCard>
             </MudItem>
         </EditForm>
-        <style>
-
-        </style>
-        <script>
-            window.formatCurrencyVN = (number) => {
-                const formattedPrice = number.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-                document.getElementById('formattedPriceInput').value = formattedPrice;
-            };
-        </script>
+        
 
         @code {
-        [Parameter]
+            [Parameter]
         public int id { get; set; }
 
         [Parameter]
@@ -76,8 +73,6 @@
         [Inject]
         public IServiceDetailServices _serviceDetailService { get; set; }
 
-        [Inject]
-        public IJSRuntime JSRuntime { get; set; }
 
         private string formattedPrice = string.Empty;
         private float tempPrice;
@@ -92,7 +87,8 @@
             var result = await _serviceManagermentService.GetAll();
             if (result.IsSuccess)
             {
-                lstService = result.Data;
+                lstService = result.Data.Where(p=>!p.IsDetele).ToList();
+                createServiceDetailVM.ServiceId = lstService.First().Id;
             }
 
             if (id != null && id != 0)
@@ -124,15 +120,9 @@
             {
                 createServiceDetailVM.Price = value;
             }
-            await FormatPrice(); // Định dạng giá
         }
 
-        private async Task FormatPrice()
-        {
-            double price = id != null && id != 0 ? (double)updateServiceDetailVM.Price : (double)createServiceDetailVM.Price;
-            await JSRuntime.InvokeVoidAsync("formatCurrencyVN", price);
-        }
-
+       
         private async Task Submit()
         {
             if (id == null || id == 0)

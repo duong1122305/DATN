@@ -25,11 +25,10 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh Style="text-align:center;">STT</MudTh>
-                <MudTh Style="text-align:center;">Tên dịch vụ</MudTh>
                 <MudTh Style="text-align:center;">Tên chi tiết</MudTh>
+                <MudTh Style="text-align:center;">Tên dịch vụ</MudTh>
                 <MudTh Style="text-align:center;">Giá</MudTh>
                 <MudTh Style="text-align:center;">Thời gian làm</MudTh>
-                <MudTh Style="text-align:center;">Mô tả</MudTh>
                 <MudTh Style="text-align:center;">Ngày tạo</MudTh>
                 <MudTh Style="text-align:center;">Trạng thái</MudTh>
                 <MudTh Style="text-align:center;">Hành động</MudTh>
@@ -38,11 +37,10 @@
                 <MudTd DataLabel="STT" Style="text-align:center;">
                     @(lstServiceName.IndexOf(data) + 1)
                 </MudTd>
-                <MudTd DataLabel="Name" Style="text-align:center;">@data.ServiceName</MudTd>
                 <MudTd DataLabel="Name" Style="text-align:center;">@data.Description</MudTd>
+                <MudTd DataLabel="Name" Style="text-align:center;">@data.ServiceName</MudTd>
                 <MudTd DataLabel="Name" Style="text-align:center;">@CurrencyHelper.FormatCurrency(data.Price)</MudTd>
                 <MudTd DataLabel="Name" Style="text-align:center;">@data.Duration Phút</MudTd>
-                <MudTd DataLabel="Name" Style="text-align:center;">@data.Description</MudTd>
                 <MudTd DataLabel="Name" Style="text-align:center;">@data.CreatedAt</MudTd>
                 @if (!data.IsDeleted)
                 {
@@ -116,7 +114,7 @@
 
             if (result != null)
             {
-                lstServiceName = result;
+                lstServiceName = result.OrderByDescending(p => p.ServiceDetailId).ToList();
             }
         }
 
