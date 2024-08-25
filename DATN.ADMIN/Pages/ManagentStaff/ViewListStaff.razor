@@ -254,12 +254,12 @@
                 var response2 = await _client.GetByIdRemove(userName);
                 if (response2.IsSuccess)
                 {
-                    Message($"Đã cập nhật trạng thái nhân viên {userName}", Severity.Success);
+                    Snackbar.Add($"Đã cập nhật trạng thái nhân viên {userName}", Severity.Success);
                     await LoadData();
                 }
                 else
                 {
-                    Message("Không tìm thấy nhân viên", Severity.Error);
+                    Snackbar.Add("Không tìm thấy nhân viên", Severity.Error);
                 }
             }
         }
@@ -269,12 +269,12 @@
             var repon = await _client.activeUser(username);
             if (repon.IsSuccess)
             {
-                Message(repon.Data, Severity.Success);
+                Snackbar.Add(repon.Data, Severity.Success);
                 await LoadData();
             }
             else
             {
-                Message(repon.Error, Severity.Success);
+                Snackbar.Add(repon.Error, Severity.Success);
             }
         }
 
@@ -356,23 +356,23 @@
                         var repo = await _client.AddShuduleStaffMany(listIdUser, selectedShiftId);
                         if (repo.IsSuccess)
                         {
-                            Message(repo.Data, Severity.Success);
+                            Snackbar.Add(repo.Data, Severity.Success);
                             await LoadData();
                         }
                         else
                         {
-                            Message(repo.Error, Severity.Error);
+                            Snackbar.Add(repo.Error, Severity.Error);
                             await LoadData();
                         }
                     }
                     else
                     {
-                        Message("Chưa chọn ca làm", Severity.Error);
+                        Snackbar.Add("Chưa chọn ca làm", Severity.Error);
                     }
                 }
                 else
                 {
-                    Message("Thêm không thành công", Severity.Error);
+                    Snackbar.Add("Thêm không thành công", Severity.Error);
                 }
             }
         }
@@ -396,7 +396,7 @@
             parameters.Add("lstUser", selectedUser1s);
             if (selectedShiftId == null || selectedShiftId == 0)
             {
-                Message("Vui lòng chọn ca làm", Severity.Warning);
+                Snackbar.Add("Vui lòng chọn ca làm", Severity.Warning);
             }
             else
             {
@@ -438,22 +438,22 @@
                         var repo = await _client2.InsertEmployeeCurrentMonth(listIdUser, selectedShiftId);
                         if (repo.IsSuccess)
                         {
-                            Message(repo.Data, Severity.Success);
+                            Snackbar.Add(repo.Data, Severity.Success);
                             await LoadData();
                         }
                         else
                         {
-                            Message(repo.Error, Severity.Error);
+                            Snackbar.Add(repo.Error, Severity.Error);
                         }
                     }
                     else
                     {
-                        Message("Chưa chọn ca làm", Severity.Error);
+                        Snackbar.Add("Chưa chọn ca làm", Severity.Error);
                     }
                 }
                 else
                 {
-                    Message("Thêm không thành công", Severity.Error);
+                    Snackbar.Add("Thêm không thành công", Severity.Error);
                 }
             }
 
@@ -467,15 +467,6 @@
             cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
             StateHasChanged();
             return confirm;
-        }
-
-
-        //messenge
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
         }
     </Authorized>

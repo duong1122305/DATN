@@ -67,11 +67,11 @@
                 if (result.IsSuccess)
                 {
 
-                    Message(result.Data, Severity.Success);
+                    Snackbar.Add(result.Data, Severity.Success);
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
-                    Message(result.Error, Severity.Error);
+                    Snackbar.Add(result.Error, Severity.Error);
             }
             else
             {
@@ -93,18 +93,18 @@
                 var result = await _client.UpdateCategory(category);
                 if (result.IsSuccess)
                 {
-                    Message(result.Data, Severity.Success);
+                    Snackbar.Add(result.Data, Severity.Success);
 
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
                 {
-                    Message(result.Error, Severity.Error);
+                    Snackbar.Add(result.Error, Severity.Error);
                 }
             }
             else
             {
-                Message("Có lỗi trong quá trình cập nhật", Severity.Error);
+                Snackbar.Add("Có lỗi trong quá trình cập nhật", Severity.Error);
             }
 
         }
@@ -134,15 +134,6 @@
 
         }
 
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Clear();
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-            Snackbar.Add(message, severity);
-        }
         }
 
     </Authorized>

@@ -9,7 +9,7 @@
         @using DATN.ViewModels.DTOs.Authenticate
         <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-        <EditForm Context="data" Model="@user">
+        <EditForm Context="data" Model="@user" OnValidSubmit="@(async()=>await OnValidSubmit())">
             <DataAnnotationsValidator />
             <MudItem xs="12" sm="12">
                 <MudCard>
@@ -45,7 +45,7 @@
                         <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async()=>await OnValidSubmit())">@_nameButton</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                         </div>
                     </MudCardContent>
                 </MudCard>
@@ -114,14 +114,16 @@
                     UserId = idUserAffterAdd.Data
                 };
                 var position = await _client.AddRoleForUser(addRole);
-                Message(result.Data, Severity.Success);
+                Snackbar.Add(result.Data, Severity.Success);
                 isLoading = false;
                 _dialogBox.Close();
             }
             else
             {
-                Message(result.Error, Severity.Warning);
+                isLoading = false;
+                Snackbar.Add(result.Error, Severity.Warning);
             }
+            isLoading = false;
         }
         //thông báo xác nhận
         private async Task<bool> Confirm(string text)
@@ -155,16 +157,17 @@
             var result = await _client.UpdateUser(view, userName);
             if (result.IsSuccess)
             {
-                Message(result.Data, Severity.Success);
+                Snackbar.Add(result.Data, Severity.Success);
                 _dialogBox.Close();
                 isLoading = false;
                 StateHasChanged();
             }
             else
             {
-                Message(result.Error, Severity.Warning);
+                isLoading = false;
+                Snackbar.Add(result.Error, Severity.Warning);
             }
-
+            isLoading = false;
         }
         private async Task OnValidSubmit()
         {
@@ -178,14 +181,6 @@
 
             }
             StateHasChanged();
-        }
-
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
 
         private void HandleAddressChanged(string address)

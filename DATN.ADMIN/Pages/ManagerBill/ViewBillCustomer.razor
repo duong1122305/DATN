@@ -317,17 +317,17 @@
                     }
                     else
                     {
-                        Message(response.Data.message, Severity.Warning);
+                        Snackbar.Add(response.Data.message, Severity.Warning);
                     }
                 }
                 else
                 {
-                    Message(response.Error, Severity.Warning);
+                    Snackbar.Add(response.Error, Severity.Warning);
                 }
             }
             catch (Exception e)
             {
-                Message(e.Message, Severity.Warning);
+                Snackbar.Add(e.Message, Severity.Warning);
             }
     }
 
@@ -372,7 +372,7 @@
             if (respone.IsSuccess)
             {
                 var listRemove = new List<ProductDetailView>();
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 if (idBooking != 0 && idBooking != null)
                 {
                     foreach (var item in bookingService.ListProductDetail)
@@ -401,7 +401,7 @@
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
     }
 
@@ -457,7 +457,7 @@
     {
             if (!bill.IsPayment)
             {
-                Message("Hoá đơn chưa thanh toán", Severity.Warning);
+                Snackbar.Add("Hoá đơn chưa thanh toán", Severity.Warning);
                 return;
             }
             DialogParameters parameter = new DialogParameters();
@@ -491,7 +491,7 @@
         // Gọi phương thức từ BookingService để xóa booking
         bookingService.RemoveProduct(product);
         await LoadData();
-        Message("Đã xoá thành công.", Severity.Success);
+        Snackbar.Add("Đã xoá thành công.", Severity.Success);
         // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
     }
     private async Task<bool> Confirm(string text)
@@ -504,15 +504,6 @@
         if (!confirm.HasValue) return false;
         return confirm.Value;
     }
-
-
-    private void Message(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add(message, severity);
-    }
-
 
     //thêm sản phẩm
     async void IncrementQuantity(ProductDetailView product)

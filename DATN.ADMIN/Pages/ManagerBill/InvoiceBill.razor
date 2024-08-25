@@ -114,11 +114,11 @@
 
         </style>
         @code {
-        // protected override async Task OnInitializedAsync()
-        // {
-        //     await Task.Delay(500);
-        //     await jsRuntime.InvokeVoidAsync("window.print");
-        // }
+        protected override async Task OnInitializedAsync()
+        {
+            await Task.Delay(500);
+            await jsRuntime.InvokeVoidAsync("window.print");
+        }
         }
 
     </Authorized>

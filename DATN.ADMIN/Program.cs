@@ -106,7 +106,6 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.HideTransitionDuration = 100;
     config.SnackbarConfiguration.ShowTransitionDuration = 100;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
-    ;
 });
 builder.Services.AddCors(options =>
 {

@@ -64,12 +64,12 @@
             var respone = await _client.PaymentInStore(payment);
             if (respone.IsSuccess)
             {
-                Message(respone.Data, Severity.Success);
+                Snackbar.Add(respone.Data, Severity.Success);
                 _dialogBox.Close();
             }
             else
             {
-                Message(respone.Error, Severity.Error);
+                Snackbar.Add(respone.Error, Severity.Error);
             }
 
         }
@@ -82,12 +82,6 @@
             StateHasChanged();
             if (!confirm.HasValue) return false;
             return confirm.Value;
-        }
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
         }
 

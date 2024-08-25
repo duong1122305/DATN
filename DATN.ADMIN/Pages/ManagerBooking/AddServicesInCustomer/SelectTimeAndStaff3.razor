@@ -139,18 +139,18 @@
                     var respone = await _iBooking.AddService(bookingDetail);
                     if (respone.IsSuccess)
                     {
-                        Message(respone.Data, Severity.Success);
+                        Snackbar.Add(respone.Data, Severity.Success);
                         StateHasChanged();
                         _dialogBox.Close();
                     }
                     else
                     {
-                        Message(respone.Error, Severity.Error);
+                        Snackbar.Add(respone.Error, Severity.Error);
                     }
                 }
                 else
                 {
-                    Message("Đã có lỗi!", Severity.Error);
+                    Snackbar.Add("Đã có lỗi!", Severity.Error);
                 }
             }
             catch (Exception e)
@@ -168,13 +168,6 @@
             cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
             StateHasChanged();
             return confirm;
-        }
-        //thông báo
-        private void Message(string message, Severity severity)
-        {
-            Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
-            Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-            Snackbar.Add(message, severity);
         }
 
         }
