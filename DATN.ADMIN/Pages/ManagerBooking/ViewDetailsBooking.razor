@@ -20,7 +20,7 @@
             <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
                          Hideable="true" Groupable="true" GroupExpanded="false">
                 <ToolBarContent>
-                    <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
+                            <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
                     <MudButton @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
                     <MudSpacer />
 

@@ -94,22 +94,12 @@
                     <MudTh>Tên dịch vụ</MudTh>
                     <MudTh>Thú cưng</MudTh>
                     <MudTh>Giá</MudTh>
-                    @if (bookingService.lstBooking.Count > 0)
-                    {
-                        <MudTh>@bookingService.lstBooking[0].StartDateTime</MudTh>
-                    }
-                    else
-                    {
-                        <MudTh>Chưa có giờ bắt đầu</MudTh>
-                        <MudTh>Thời gian làm dự kiến</MudTh>
-                    }
                     <MudTh>Hành động</MudTh>
                 </HeaderContent>
                 <RowTemplate Context="data">
                     <MudTd DataLabel="Sign">@data.ServiceDetailName</MudTd>
                     <MudTd DataLabel="Sign">@data.PetId</MudTd>
                     <MudTd DataLabel="Sign">@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
-                    <MudTd DataLabel="Sign">@data.StartDateTime</MudTd>
                     <MudTd>
                         <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveBooking(data))" Color="Color.Error">Xoá</MudButton>
                     </MudTd>
