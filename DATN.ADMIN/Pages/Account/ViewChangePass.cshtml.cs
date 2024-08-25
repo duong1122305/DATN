@@ -1,4 +1,4 @@
-using DATN.ADMIN.IServices;
+﻿using DATN.ADMIN.IServices;
 using DATN.ViewModels.DTOs.Authenticate;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,15 +24,16 @@ namespace DATN.ADMIN.Pages.Account
             {
                 var checkuser = _httpContextAccessor.HttpContext.Session.GetString("username");
                 var checkotp = _httpContextAccessor.HttpContext.Session.GetString("otp");
-                if (checkuser == null)
+                if (string.IsNullOrEmpty(checkuser))
                 {
                     _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/quenMatKhau"));
+                    return;
                 }
-                else if (checkotp == null)
+                else if (string.IsNullOrEmpty(checkotp))
                 {
                     _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/OTP"));
+                    return;
                 }
-
             }
             catch (Exception)
             {
@@ -41,25 +42,38 @@ namespace DATN.ADMIN.Pages.Account
         }
         public async Task<IActionResult> ResetPass()
         {
-            var resetpassview = new UserResetPassView()
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(password_re))
             {
-                UserName = _httpContextAccessor.HttpContext.Session.GetString("username"),
-                NewPassWord = password,
-                ConfirmPassWord = password_re,
-            };
-            var result = await _userClientSev.ResetPass(resetpassview);
-            if (result.IsSuccess)
-            {
-                TempData["e3r"] = null;
-                _httpContextAccessor.HttpContext.Session.Remove("username");
-                _httpContextAccessor.HttpContext.Session.Remove("otp");
-                _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                return Page();
             }
-            else
+
+            try
             {
-                TempData["e3r"] = result.Error;
+                var resetpassview = new UserResetPassView()
+                {
+                    UserName = _httpContextAccessor.HttpContext.Session.GetString("username"),
+                    NewPassWord = password,
+                    ConfirmPassWord = password_re,
+                };
+                var result = await _userClientSev.ResetPass(resetpassview);
+                if (result.IsSuccess)
+                {
+                    TempData["e3r"] = null;
+                    _httpContextAccessor.HttpContext.Session.Remove("username");
+                    _httpContextAccessor.HttpContext.Session.Remove("otp");
+                    _httpContextAccessor.HttpContext.Response.Redirect(Url.Content("~/dangnhap"));
+                }
+                else
+                {
+                    TempData["e3r"] = result.Error;
+                }
+                return Page();
             }
-            return Page();
+            catch (Exception)
+            {
+                TempData["e3r"] = "Đã xảy ra lỗi trong quá trình đặt lại mật khẩu.";
+                return Page();
+            }
 
         }
     }

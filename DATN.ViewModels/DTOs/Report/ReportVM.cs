@@ -13,9 +13,6 @@ namespace DATN.ViewModels.DTOs.Report
         public string NameCustomer { get; set; }
         public string DateRate { get; set; }
         public string Comment { get; set; }
-        public string NameStaff { get; set; }
-        public string ServiceName {  get; set; }
-        public Guid StaffID { get; set; }
         public int BillID { get; set; }
 		public int Rate { get; set; }
 	}
