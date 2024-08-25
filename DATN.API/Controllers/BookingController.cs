@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using ZXing;
 
 namespace DATN.API.Controllers
 {
@@ -208,7 +209,12 @@ namespace DATN.API.Controllers
         [HttpPost("Create-Booking-For-User-NoAccount")]
         public async Task<ResponseData<string>> CreateBookingForUserNoAccount(BookingForGuestNoAccount booking)
         {
-            return await _bookingManagement.CreateBookingForGuestNoAcount(booking);
+            var result = await _bookingManagement.CreateBookingForGuestNoAcount(booking);
+            if (result.IsSuccess)
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification", $"Khách hàng không tài khoản đặt dịch vụ {booking.NameGuest}");
+            }
+            return result;
         }
 
         [HttpPatch("Cancel-BookingDetail-ByGuest")]
@@ -221,6 +227,11 @@ namespace DATN.API.Controllers
         public async Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuestNoAccount(string userOrPhoneNumber)
         {
             return await _bookingManagement.GetBookingByGuestNoAccount(userOrPhoneNumber);
+        }
+        [HttpGet("Get-Reason-Cancel-Booking")]
+        public async Task<ResponseData<HistoryBookingVM>> GetReasonCancelBooking(int id)
+        {
+            return await _bookingManagement.GetReasonCancelBooking(id);
         }
     }
 }

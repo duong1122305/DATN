@@ -6,6 +6,7 @@
         @using DATN.ADMIN.IServices
         @using DATN.ADMIN.Pages.ManagerBooking.AddServicesInCustomer
         @using DATN.ADMIN.Pages.ManagerGuest
+@using DATN.Data.Enum
         @using DATN.Utilites
         @using DATN.ViewModels.Common
         @using DATN.ViewModels.DTOs.ActionBooking
@@ -20,15 +21,24 @@
             <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
                          Hideable="true" Groupable="true" GroupExpanded="false">
                 <ToolBarContent>
-                    <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
-                    <MudButton @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
+                    @if (status == BookingStatus.AdminCancelled || status == BookingStatus.StaffCancelled)
+                {
+                        <MudButton Disabled OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
+                        <MudButton Disabled @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
+
+                    }
+                    else
+                    {
+                        <MudButton OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
+                        <MudButton @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
+
+                    }
                     <MudSpacer />
 
                  <div style="display: flex">
-
                         <!-- Time Picker Section -->
                         <div style="display: flex; flex-direction: column; margin-bottom: 10px;margin-right:10px">
-                            @if (!payment)
+                            @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled)
                             {
                                 <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
                                 @if (timeStart != null)
@@ -51,7 +61,7 @@
 
                         <!-- Pet Selection Section -->
                         <div style="display: flex; flex-direction: column;">
-                            @if (!payment)
+                            @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled)
                             {
                                 <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e => e == null ? null : $"{e.Name}")" />
                                 @if (value2 != null)
@@ -149,6 +159,9 @@
         public bool payment { get; set; }
         [Parameter]
         public DateTime bookingDate { get; set; }
+        [Parameter]
+        public BookingStatus status{ get; set; }
+
         private bool isEditing = false;
         private bool isEditing2;
         [Parameter]
