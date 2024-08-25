@@ -248,7 +248,9 @@
             }
             ActionView actionView = new ActionView()
             {
-                IdBokingOrDetail = id
+                IdBokingOrDetail = id,
+                Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+
             };
             var respone = await _client.StartBookingDetail(actionView);
             if (respone.IsSuccess)

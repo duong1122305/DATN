@@ -1,6 +1,25 @@
-﻿<h3>ReasonBooking</h3>
-
+﻿@using DATN.ADMIN.IServices
+@inject ISnackbar snackbar
+<h3>ReasonBooking</h3>
+<p>@test</p>
 @code {
     [Parameter]
-    public int? id{ get; set; }
+    public int? id { get; set; }
+    [Inject]
+    IBookingViewServices bookingViewServices { get; set; }
+    public string test { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await bookingViewServices.GetReasonCancelBooking(id.Value);
+
+        if (response.IsSuccess)
+        {
+            test = string.Join("-", response.Data);
+            StateHasChanged();
+        }
+        else
+        {
+            snackbar.Add(response.Error, Severity.Warning);
+        }
+    }
 }

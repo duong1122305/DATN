@@ -630,56 +630,64 @@ namespace DATN.Aplication.Services
         }
         public async Task<ResponseData<string>> StartBookingDetail(ActionView actionView)
         {
-            var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
-                         where bookingDetail.Id == actionView?.IdBokingOrDetail
-                         select bookingDetail).FirstOrDefault();
-            if (query.StartDateTime.Date.CompareTo(DateTime.Now.Date) != 0)
+            try
             {
-                return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ này không phải đặt cho hôm nay ko thực hiện được mất rùi !!!!" };
-            }
-            else
-            {
-                var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
-                                    where booking.Id == query.BookingId
-                                    select booking).FirstOrDefault();
-                if (queryBooking.Status == BookingStatus.InProgress)
+                var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                             where bookingDetail.Id == actionView?.IdBokingOrDetail
+                             select bookingDetail).FirstOrDefault();
+                if (query.StartDateTime.Date.CompareTo(DateTime.Now.Date) != 0)
                 {
-                    if (query != null)
-                    {
-                        if (query.Status == BookingDetailStatus.Cancelled)
-                        {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ hủy không bắt đầu được" };
-                        }
-                        else if (query.Status == BookingDetailStatus.Completed)
-                        {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã hoàn thành không bắt đầu được" };
-                        }
-                        else
-                        {
-                            query.Status = BookingDetailStatus.Processing;
-                            var idUserAction = await _user.GetUserByToken(actionView.Token);
-
-                            HistoryAction historyAction = new HistoryAction()
-                            {
-                                ActionByID = Guid.Parse(idUserAction.Data),
-                                ActionID = 17,
-                                ActionTime = DateTime.Now,
-                                BookingID = query.BookingId,
-                                Description = $"Đây là bắt đầu 1 dịch vụ con của dịch vụ ({query.Id})"
-                            };
-                            await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
-                            await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
-                            await _unitOfWork.SaveChangeAsync();
-                            return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
-                        }
-                    }
-                    else
-                        return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ này không phải đặt cho hôm nay ko thực hiện được mất rùi !!!!" };
                 }
                 else
                 {
-                    return new ResponseData<string> { IsSuccess = false, Error = "Bạn chưa bắt đầu làm dịch vụ cho khách không thể bắt đầu dịch vụ con" };
+                    var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                        where booking.Id == query.BookingId
+                                        select booking).FirstOrDefault();
+                    if (queryBooking.Status == BookingStatus.InProgress)
+                    {
+                        if (query != null)
+                        {
+                            if (query.Status == BookingDetailStatus.Cancelled)
+                            {
+                                return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ hủy không bắt đầu được" };
+                            }
+                            else if (query.Status == BookingDetailStatus.Completed)
+                            {
+                                return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã hoàn thành không bắt đầu được" };
+                            }
+                            else
+                            {
+                                query.Status = BookingDetailStatus.Processing;
+                                var idUserAction = await _user.GetUserByToken(actionView.Token);
+
+                                HistoryAction historyAction = new HistoryAction()
+                                {
+                                    ActionByID = Guid.Parse(idUserAction.Data),
+                                    ActionID = 17,
+                                    ActionTime = DateTime.Now,
+                                    BookingID = query.BookingId,
+                                    Description = $"Đây là bắt đầu 1 dịch vụ con của dịch vụ ({query.Id})"
+                                };
+                                await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
+                                await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
+                                await _unitOfWork.SaveChangeAsync();
+                                return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
+                            }
+                        }
+                        else
+                            return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
+                    }
+                    else
+                    {
+                        return new ResponseData<string> { IsSuccess = false, Error = "Bạn chưa bắt đầu làm dịch vụ cho khách không thể bắt đầu dịch vụ con" };
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+
+                return new ResponseData<string> { IsSuccess = false, Error = "Bugg"+ ex.Message };
             }
         }
         public async Task<ResponseData<string>> CheckInArrive(ActionView actionView)
@@ -1522,11 +1530,11 @@ namespace DATN.Aplication.Services
                 booking.IsAddToSchedule = true;
                 HistoryAction action = new HistoryAction()
                 {
-                    ActionID=16,
+                    ActionID = 16,
                     ActionTime = DateTime.Now,
-                    ByGuest=true,
-                    Description="Khách thanh toán qua momo thành công",
-                    BookingID=booking.Id,
+                    ByGuest = true,
+                    Description = "Khách thanh toán qua momo thành công",
+                    BookingID = booking.Id,
                 };
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await _unitOfWork.BookingRepository.SaveChangesAsync();
@@ -2033,6 +2041,27 @@ namespace DATN.Aplication.Services
                     Error = ex.Message
                 };
             }
+        }
+        public async Task<ResponseData<HistoryBookingVM>> GetReasonCancelBooking(int id)
+        {
+            var query = (from history in await _unitOfWork.HistoryActionRepository.GetAllAsync()
+                         join action in await _unitOfWork.ActionBookingRepository.GetAllAsync()
+                         on history.ActionID equals action.ID
+                         where history.BookingID == id
+                         && history.ActionID == 14
+                         select new HistoryBookingVM
+                         {
+                             ID = id,
+                             ActionBy = history.ActionByID.Value == Guid.Empty ? "Không có" : (_userManager.FindByIdAsync(history.ActionByID.Value.ToString())).GetAwaiter().GetResult().FullName,
+                             ActionName = action.Name,
+                             Description = history.Description,
+                             TimeAction = history.ActionTime.ToString("HH:mm:ss dd-MM-yyyy")
+                         }).FirstOrDefault();
+            if (query != null)
+            {
+                return new ResponseData<HistoryBookingVM> { IsSuccess = true, Data = query };
+            }
+            return new ResponseData<HistoryBookingVM> { IsSuccess = false, Error = "Có hủy đâu mà có booking" };
         }
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
