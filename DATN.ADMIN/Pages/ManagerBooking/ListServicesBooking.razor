@@ -46,7 +46,7 @@
                 </div>
                 <MudSpacer />
                 <div>
-                <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+                    <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
                 </div>
                 <div>
                     <MudButton Variant="Variant.Filled" Style="margin-bottom: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialogCreateBooking())">Đặt dịch vụ</MudButton>
@@ -123,7 +123,7 @@
                 <TemplateColumn Title="Hành động" Filterable="false" Sortable="false">
                     <CellTemplate Context="data">
                         <MudButtonGroup Variant="Variant.Filled">
-                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment,data.Item.BookingTime))"></MudIconButton>
+                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary" Title="Xem danh sách chi tiết" OnClick="@(async()=>await OpenDialog(data.Item.IdBooking.Value,data.Item.IdGuest.Value,data.Item.IsPayment,data.Item.BookingTime,data.Item.Status))"></MudIconButton>
                             @if (data.Item.Status == BookingStatus.PendingConfirmation)
                             {
                                 <MudIconButton Variant="Variant.Text" Color="Color.Success" Title="Xác nhận" OnClick="@(async()=>await ConfimBooking(data.Item.IdBooking.Value))">Xác nhận</MudIconButton>
@@ -164,12 +164,11 @@
                                 @*   <MudChip Color="Color.Error">Khách huỷ</MudChip> *@
                             }@if (data.Item.Status == BookingStatus.StaffCancelled)
                             {
-                                @* <MudChip Color="Color.Error">Nhân viên huỷ</MudChip> *@
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async ()=> await SeeHistory(data.Item.IdBooking))" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
 
                             }@if (data.Item.Status == BookingStatus.AdminCancelled)
                             {
-                                @* <MudChip Color="Color.Error">Quản trị viên huỷ</MudChip> *@
-
+                                <MudIconButton Variant="Variant.Text" Color="Color.Primary" Title="Xem lý do huỷ">Xem lý do</MudIconButton>
                             }
 
                         </MudButtonGroup>
@@ -208,6 +207,29 @@
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
+        }
+
+        private async Task SeeHistory(int? id)
+        {
+            var parameters = new DialogParameters();
+            string nameDialog = "Huỷ dịch vụ";
+            DialogOptions options = new DialogOptions()
+            {
+                CloseOnEscapeKey = true,
+                Position = DialogPosition.Center,
+                MaxWidth = MaxWidth.Small,
+                CloseButton = true,
+                FullWidth = true,
+                DisableBackdropClick = true
+            };
+            parameters.Add("id", id);
+            var createUpdateDialog = await _dialogservice.ShowAsync<ReasonBooking>(nameDialog, parameters, options);
+            var result = await createUpdateDialog.Result;
+            if (!result.Canceled)
+            {
+                createUpdateDialog.Close();
+                await LoadData();
+            }
         }
 
         private async Task LoadData()
@@ -363,7 +385,7 @@
         {
             dataGrid?.ExpandAllGroups();
         }
-        private async Task OpenDialog(int id, Guid idGuest, bool payment,DateTime bookingDate)
+        private async Task OpenDialog(int id, Guid idGuest, bool payment, DateTime bookingDate, BookingStatus status)
         {
             isLoading = true;
             await Task.Delay(1000);
@@ -383,6 +405,7 @@
             parameters.Add("idGuest", idGuest);
             parameters.Add("payment", payment);
             parameters.Add("bookingDate", bookingDate);
+            parameters.Add("status", status);
             // check có danh sách ko
             var respone2 = await _client.ListBookingDetailInDay(id);
             if (respone2.IsSuccess)
