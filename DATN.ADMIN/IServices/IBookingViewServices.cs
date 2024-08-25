@@ -31,5 +31,6 @@ namespace DATN.ADMIN.IServices
         public Task<ResponseData<string>> PaymentQrVnPay(long totalPrice);
         public Task<ResponseData<string>> CheckInArrive(ActionView actionView);
         public Task<ResponseData<string>> AddService(AddBookingDetail createBookingDetailRequest);
+        public Task<ResponseData<HistoryBookingVM>> GetReasonCancelBooking(int id);
     }
 }

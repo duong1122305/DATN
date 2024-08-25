@@ -1522,11 +1522,11 @@ namespace DATN.Aplication.Services
                 booking.IsAddToSchedule = true;
                 HistoryAction action = new HistoryAction()
                 {
-                    ActionID=16,
+                    ActionID = 16,
                     ActionTime = DateTime.Now,
-                    ByGuest=true,
-                    Description="Khách thanh toán qua momo thành công",
-                    BookingID=booking.Id,
+                    ByGuest = true,
+                    Description = "Khách thanh toán qua momo thành công",
+                    BookingID = booking.Id,
                 };
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await _unitOfWork.BookingRepository.SaveChangesAsync();
@@ -2033,6 +2033,27 @@ namespace DATN.Aplication.Services
                     Error = ex.Message
                 };
             }
+        }
+        public async Task<ResponseData<HistoryBookingVM>> GetReasonCancelBooking(int id)
+        {
+            var query = (from history in await _unitOfWork.HistoryActionRepository.GetAllAsync()
+                         join action in await _unitOfWork.ActionBookingRepository.GetAllAsync()
+                         on history.ActionID equals action.ID
+                         where history.BookingID == id
+                         && history.ActionID == 14
+                         select new HistoryBookingVM
+                         {
+                             ID = id,
+                             ActionBy = history.ActionByID.Value == Guid.Empty ? "Không có" : (_userManager.FindByIdAsync(history.ActionByID.Value.ToString())).GetAwaiter().GetResult().FullName,
+                             ActionName = action.Name,
+                             Description = history.Description,
+                             TimeAction = history.ActionTime.ToString("HH:mm:ss dd-MM-yyyy")
+                         }).FirstOrDefault();
+            if (query != null)
+            {
+                return new ResponseData<HistoryBookingVM> { IsSuccess = true, Data = query };
+            }
+            return new ResponseData<HistoryBookingVM> { IsSuccess = false, Error = "Có hủy đâu mà có booking" };
         }
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
