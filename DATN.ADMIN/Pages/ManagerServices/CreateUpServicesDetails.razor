@@ -35,8 +35,6 @@
                         else
                         {
                             <MudTextField T="double" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
-                            <MudTextField T="float" Label="Cân nặng tối thiểu" @bind-Value="@updateServiceDetailVM.MinWeight" For="@(() => updateServiceDetailVM.MinWeight)" />
-                            <MudTextField T="float" Label="Cân nặng tối đa" @bind-Value="@updateServiceDetailVM.MaxWeight" For="@(() => updateServiceDetailVM.MaxWeight)" />
                             <MudTextField T="float" Label="Giá" Value="@tempPrice" ValueChanged="async (value) => await OnPriceChanged(value)" Immediate="true" For="@(() => updateServiceDetailVM.Price)" />
                             <MudTextField T="string" id="formattedPriceInput" Variant="Variant.Text" Value="@formattedPrice" ReadOnly="true" />
                             <MudTextField T="string" Label="Mô tả" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />

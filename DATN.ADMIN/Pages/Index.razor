@@ -162,7 +162,7 @@
 
                 <MudPaper Elevation="2" Class="pa-4">
                     <h1>Các sản phẩm cần nhập hàng</h1>
-                    @if (lstProductOutStock != null && lstProductOutStock.Count > 0)
+                    @if (lstProductOutStock != null )
                     {
                         <MudDataGrid Items="@lstProductOutStock" Groupable="false" Hover="true" Filterable="true">
 

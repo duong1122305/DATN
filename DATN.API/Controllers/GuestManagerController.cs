@@ -65,7 +65,7 @@ namespace DATN.API.Controllers
         {
             return await _guestManagerService.CheckConfirmCode(confirmCode, email);
         }
-        [HttpPost("forgot-pass")]/// quên pass và gửi code về
+        [HttpPost("forgot-pass")]/// quên pass và gửi code về đaada
         public async Task<ResponseData<string>> SendForgotMail(string email)
         {
             return await _guestManagerService.SendForgotMail(email);
