@@ -28,7 +28,7 @@
                                 <a href="/"><img src="img/logo_name.png" class="img-fluid h-4 mb-4" style="height: 150px; width: 150px;"></a>
                             </div>
                             <div>
-                                <div class="my-4">Quên mật khẩu? Bạn hãy cố nhớ lại mật khẩu cũ của mình!.</div>
+                                <div class="my-4">Quên mật khẩu? Nhập mã OTP gửi về mail để đặt lại mật khẩu.</div>
                                 <form method="post" >
                                     <input type="hidden">
                                     <!-- Email Address -->
@@ -36,7 +36,7 @@
                                     <div class="mt-2">
                                         <label class="form-label" for="email">Mã OTP</label>
                                         <div class="d-flex">
-                                            <input class="form-control" id="code" type="text" name="code" maxlength="6">
+                                            <input class="form-control" required id="code" type="text" name="code" maxlength="6">
                                         </div>
                                       <div>
                                             @if (TempData["er"] != null)
