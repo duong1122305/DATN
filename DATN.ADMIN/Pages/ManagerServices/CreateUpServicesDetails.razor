@@ -98,31 +98,31 @@
                 _nameButton = "Cập nhật";
                 var findServiceDetailById = await _serviceDetailService.GetById(id);
                 var data = findServiceDetailById.Data;
-
+                updateServiceDetailVM.ServiceId = data.ServiceId;
                 updateServiceDetailVM.Price = data.Price;
                 updateServiceDetailVM.Duration = data.Duration;
                 updateServiceDetailVM.Description = data.NameDetail;
-                // await OnPriceChanged(updateServiceDetailVM.Price);
+                await OnPriceChanged(updateServiceDetailVM.Price);
             }
             else
             {
                 _nameButton = "Thêm mới";
-                // await OnPriceChanged(createServiceDetailVM.Price);
+                await OnPriceChanged(createServiceDetailVM.Price);
             }
         }
 
-        // private async Task OnPriceChanged(float value)
-        // {
-        //     tempPrice = value; // Cập nhật biến trung gian
-        //     if (id != null && id != 0)
-        //     {
-        //         updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
-        //     }
-        //     else
-        //     {
-        //         createServiceDetailVM.Price = value;
-        //     }
-        // }
+        private async Task OnPriceChanged(float value)
+        {
+            tempPrice = value; // Cập nhật biến trung gian
+            if (id != null && id != 0)
+            {
+                updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
+            }
+            else
+            {
+                createServiceDetailVM.Price = value;
+            }
+        }
 
 
         private async Task Submit()
@@ -145,6 +145,8 @@
                 if (result.IsSuccess)
                 {
                     Message(result.Data, Severity.Success);
+                    await LoadData();
+                    StateHasChanged();
                     _dialogBox.Close(DialogResult.Ok(true));
                 }
                 else
@@ -180,6 +182,8 @@
             if (result.IsSuccess)
             {
                 Message("Thành công", Severity.Success);
+                await LoadData();
+                StateHasChanged();
                 _dialogBox.Close(DialogResult.Ok(true));
             }
             else
