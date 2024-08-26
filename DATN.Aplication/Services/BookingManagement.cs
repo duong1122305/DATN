@@ -16,6 +16,7 @@ using DATN.ViewModels.Enum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols;
+using NetTopologySuite.Index.HPRtree;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -824,6 +825,8 @@ namespace DATN.Aplication.Services
                                            && bookingDetail.Status == BookingDetailStatus.Unfulfilled
                                            select bookingDetail;
                         var listBookingInDay = queryBooking.Where(c => c.StartDateTime.Date.CompareTo(DateTime.Now.Date) == 0);
+                        List<HistoryAction> listHis = new List<HistoryAction>();
+                        List<BookingDetail> listBookingDetail = new List<BookingDetail>();
                         if (listBookingInDay.Count() == 0)
                         {
                             return new ResponseData<string> { IsSuccess = false, Error = "Khách đặt dịch vụ không phải hôm nay ko thể bắt đầu" };
@@ -832,6 +835,7 @@ namespace DATN.Aplication.Services
                         {
                             var idUserAction = await _user.GetUserByToken(actionView.Token);
                             int count = 0;
+
                             foreach (var item in listBookingInDay.OrderBy(c => c.StartDateTime))
                             {
                                 if (DateTime.Now.TimeOfDay.CompareTo(item.StartDateTime.TimeOfDay.Add(new TimeSpan(0, -30, 0))) >= 0 && DateTime.Now.TimeOfDay.CompareTo(item.StartDateTime.TimeOfDay.Add(new TimeSpan(0, 10, 0))) <= 0)
@@ -845,15 +849,41 @@ namespace DATN.Aplication.Services
                                         BookingID = item.BookingId,
                                         Description = $"Bắt đầu thực hiện dịch vụ đầu tiên"
                                     };
-                                    await _unitOfWork.BookingDetailRepository.UpdateAsync(item);
-                                    await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
-                                    await _unitOfWork.BookingRepository.UpdateAsync(query);
-                                    await _unitOfWork.SaveChangeAsync();
+                                    listHis.Add(historyAction);
+                                    listBookingDetail.Add(item);
                                     count++;
+                                }
+                            }
+                            for (int i = 0; i < listBookingDetail.Count; i++)
+                            {
+                                for (int j = 0; j < listBookingDetail.Count; j++)
+                                {
+                                    if (i == j)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        if (listBookingDetail[i].PetId == listBookingDetail[j].PetId)
+                                        {
+                                            listBookingDetail = listBookingDetail.OrderBy(c => c.StartDateTime).ToList();
+                                            for (int k = 0; k < listBookingDetail.Count; k++)
+                                            {
+                                                if (k != 0)
+                                                {
+                                                    listBookingDetail[k].Status = BookingDetailStatus.Unfulfilled;
+                                                }
+                                            }
+
+                                        }
+                                    }
                                 }
                             }
                             if (count > 0)
                             {
+                                await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(listBookingDetail);
+                                await _unitOfWork.HistoryActionRepository.AddRangeAsync(listHis);
+                                await _unitOfWork.BookingRepository.UpdateAsync(query);
                                 return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
                             }
                             return new ResponseData<string> { IsSuccess = false, Error = "Chưa đến giờ mà khách đặt dịch vụ hoặc quá giờ bắt đầu dịch vụ" };
