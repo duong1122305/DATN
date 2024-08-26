@@ -116,6 +116,7 @@
                 var position = await _client.AddRoleForUser(addRole);
                 Snackbar.Add(result.Data, Severity.Success);
                 isLoading = false;
+                StateHasChanged();
                 _dialogBox.Close();
             }
             else
@@ -124,6 +125,8 @@
                 Snackbar.Add(result.Error, Severity.Warning);
             }
             isLoading = false;
+            StateHasChanged();
+
         }
         //thông báo xác nhận
         private async Task<bool> Confirm(string text)
@@ -158,9 +161,9 @@
             if (result.IsSuccess)
             {
                 Snackbar.Add(result.Data, Severity.Success);
-                _dialogBox.Close();
                 isLoading = false;
                 StateHasChanged();
+                _dialogBox.Close();
             }
             else
             {
@@ -168,6 +171,7 @@
                 Snackbar.Add(result.Error, Severity.Warning);
             }
             isLoading = false;
+            StateHasChanged();
         }
         private async Task OnValidSubmit()
         {

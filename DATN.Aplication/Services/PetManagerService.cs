@@ -16,6 +16,7 @@ namespace DATN.Aplication.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+
         public async Task<ResponseData<List<PetVM>>> GetPetByGuestId(Guid guestId)
         {
             try
@@ -210,13 +211,54 @@ namespace DATN.Aplication.Services
                     Data = pet.First(),
                     Error = null
                 };
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return new ResponseData<Pet>
                 {
                     IsSuccess = false,
                     Error = ex.Message
                 };
+            }
+        }
+
+        public async Task<ResponseData<List<PetVM>>> GetListPetOfGuest(string id)
+        {
+            var queryGuest = (from guest in await _unitOfWork.GuestRepository.GetAllAsync()
+                              where guest.Email == id || guest.PhoneNumber == id
+                              select guest).FirstOrDefault();
+            if (queryGuest != null)
+            {
+                var queryBooking = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                   where booking.GuestId == queryGuest.Id
+                                   select booking;
+                if (queryBooking.Count() > 0)
+                {
+                    var querypet = from pet in await _unitOfWork.PetRepository.GetAllAsync()
+                                   where pet.OwnerId == queryGuest.Id
+                                   select new PetVM
+                                   {
+                                       OwnerId = pet.OwnerId,
+                                       Gender = pet.Gender,
+                                       Birthday = pet.Birthday,
+                                       Id = pet.Id,
+                                       Name = pet.Name,
+                                       Neutered = pet.Neutered,
+                                       Note = pet.Note,
+                                       Weight = pet.Weight,
+                                       SpeciesId = pet.SpeciesId,
+                                       IsDelete = pet.IsDelete.Value,
+                                   };
+                    return new ResponseData<List<PetVM>> { IsSuccess = true, Data = querypet.ToList() };
+                }
+                else
+                {
+                    return new ResponseData<List<PetVM>> { IsSuccess = false, Data = new List<PetVM> { new PetVM() }, Error = "Chưa có pet nào!!" };
+                }
+            }
+            else
+            {
+                return new ResponseData<List<PetVM>> { IsSuccess = false, Error = "Không có tài khoản trùng với số điện thoại hoặc email đã nhập" };
             }
         }
     }

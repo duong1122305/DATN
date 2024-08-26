@@ -2,6 +2,7 @@
 using DATN.Aplication.Services.IServices;
 using DATN.Data.Entities;
 using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Pet;
 using DATN.ViewModels.DTOs.PetSpecies;
 
 namespace DATN.Aplication.Services
@@ -26,6 +27,7 @@ namespace DATN.Aplication.Services
             return true;
 
         }
+
         public async Task<ResponseData<string>> Create(PetSpeciesCreateUpdate request)
         {
             try

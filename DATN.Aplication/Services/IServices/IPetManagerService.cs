@@ -14,5 +14,6 @@ namespace DATN.Aplication.Services.IServices
         Task<ResponseData<List<PetVM>>> GetAll();
         Task<ResponseData<List<PetType>>> GetAllTypes();
         Task<ResponseData<Pet>> GetPetById(int id);
+        Task<ResponseData<List<PetVM>>> GetListPetOfGuest(string id);
     }
 }
