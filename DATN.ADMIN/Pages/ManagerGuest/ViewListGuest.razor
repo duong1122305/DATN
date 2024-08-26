@@ -217,23 +217,27 @@
                 || (p.Email != null && p.Email.ToUpper().Contains(searchString))
                 ).ToList();
             }
+            else
+            {
+                lstGuest = lstGuestResponse;
+            }
             if (statusActive==1)
             {
-                lstGuest = lstGuestResponse.Where(p => p.IsConfirm.HasValue && p.IsConfirm.Value).ToList();
+                lstGuest = lstGuest.Where(p => p.IsConfirm.HasValue && p.IsConfirm.Value).ToList();
             }
 
             if (statusActive == 0)
             {
-                lstGuest = lstGuestResponse.Where(p => !p.IsConfirm.HasValue || !p.IsConfirm.Value).ToList();
+                lstGuest = lstGuest.Where(p => !p.IsConfirm.HasValue || !p.IsConfirm.Value).ToList();
             }
             if (statusVerify==1)
             {
-                lstGuest = lstGuestResponse.Where(p => p.IsDelete.HasValue && p.IsConfirm.Value).ToList();
+                lstGuest = lstGuest.Where(p => p.IsDelete.HasValue && p.IsConfirm.Value).ToList();
             }
 
             if (statusVerify == 0)
             {
-                lstGuest = lstGuestResponse.Where(p => !p.IsConfirm.HasValue || !p.IsConfirm.Value).ToList();
+                lstGuest = lstGuest.Where(p => !p.IsConfirm.HasValue || !p.IsConfirm.Value).ToList();
             }
         }
 
