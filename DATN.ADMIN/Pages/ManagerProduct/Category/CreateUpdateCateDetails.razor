@@ -14,7 +14,7 @@
             <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
-                        @if (lstCate != null && lstCate.Count() > 0)
+       @*                  @if (lstCate != null && lstCate.Count() > 0)
                         {
                             <MudSelect T="CategoryView" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" @bind-Value="selectedCate">
                                 <MudSelectItem Value="selectedCate">--Chọn danh mục lớn-- </MudSelectItem>
@@ -25,7 +25,7 @@
 
                             </MudSelect>
                         }
-
+ *@
                         <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" MaxLength="255" />
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
