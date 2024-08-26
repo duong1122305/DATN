@@ -233,5 +233,10 @@ namespace DATN.API.Controllers
         {
             return await _bookingManagement.GetReasonCancelBooking(id);
         }
+        [HttpGet("get-bill-print")]
+        public async Task<ResponseData<BillPrintVM>> GetBillPrintByID(int id)
+        {
+            return await _bookingManagement.GetBillPrintByID(id);
+        }
     }
 }
