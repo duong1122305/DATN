@@ -130,7 +130,6 @@ namespace DATN.Aplication.Services
                 findServiceDetailById.Duration = serviceDetail.Duration;
                 findServiceDetailById.NameDetail = serviceDetail.Description;
                 findServiceDetailById.UpdateAt = DateTime.Now;
-                findServiceDetailById.ServiceId = serviceDetail.ServiceId;
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
                 {
