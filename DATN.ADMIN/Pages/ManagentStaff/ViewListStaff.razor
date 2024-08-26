@@ -249,6 +249,8 @@
         //Thông báo hỏi khi xoá
         private async Task deleteStaff(string userName)
         {
+            isLoading = true;
+                        StateHasChanged();
             if (await Confirm() == true)
             {
                 var response2 = await _client.GetByIdRemove(userName);
@@ -261,11 +263,18 @@
                 {
                     Snackbar.Add("Không tìm thấy nhân viên", Severity.Error);
                 }
+                isLoading = false;
+                StateHasChanged();
             }
+            isLoading = false;
+            StateHasChanged();
         }
 
         private async Task activeAc(string username)
         {
+
+            isLoading = true;
+            StateHasChanged();
             var repon = await _client.activeUser(username);
             if (repon.IsSuccess)
             {
@@ -276,6 +285,8 @@
             {
                 Snackbar.Add(repon.Error, Severity.Success);
             }
+            isLoading = false;
+            StateHasChanged();
         }
 
         //thêm sửa !
@@ -334,15 +345,19 @@
         //thêm nhân viên vào ca làm tháng tiếp theo
         private async Task AddToShift()
         {
+
+
             var selectedUserIndexes = selectedUsers.Select((value, index) => (value, index)).Where(pair => pair.value).Select(pair => pair.index).ToList();
             var selectedUser1s = selectedUserIndexes.Select(index => lstUser[index]).ToList();
             var selectedShiftId = this.selectedShiftId;
 
             // Xử lý logic để thêm selectedUsers vào một ca làm
             var listIdUser = new List<string>();
+
             if (await Confirm2() == true)
             {
-
+                isLoading = true;
+                StateHasChanged();
                 if (selectedUser1s.Count > 0 && selectedUser1s != null)
                 {
                     foreach (var user2 in selectedUser1s)
@@ -374,6 +389,8 @@
                 {
                     Snackbar.Add("Thêm không thành công", Severity.Error);
                 }
+                isLoading = false;
+                StateHasChanged();
             }
         }
         //thêm vào ca khẩn cấp
@@ -425,6 +442,8 @@
             var listIdUser = new List<string>();
             if (await Confirm2() == true)
             {
+                isLoading = true;
+                StateHasChanged();
                 var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
                 if (selectedUser1s.Count > 0 && selectedUser1s != null)
                 {
@@ -455,6 +474,8 @@
                 {
                     Snackbar.Add("Thêm không thành công", Severity.Error);
                 }
+                isLoading=false;
+                StateHasChanged();
             }
 
         }

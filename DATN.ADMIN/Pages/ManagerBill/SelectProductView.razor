@@ -123,21 +123,16 @@
                     if (check.SelectQuantityProduct < productDV.Quantity)
                     {
                         _tempLstProductDetail.AddProduct(productDV);
-                        isLoading = false;
-                        StateHasChanged();
                     }
                 }
                 else
                 {
                     _tempLstProductDetail.AddProduct(productDV);
-                    isLoading = false;
-                    StateHasChanged();
-
                 }
-                isLoading = false;
-                StateHasChanged();
-                _dialogBox.Close();
             }
+            isLoading = false;
+            StateHasChanged();
+            _dialogBox.Close();
         }
         protected override async Task OnInitializedAsync()
         {

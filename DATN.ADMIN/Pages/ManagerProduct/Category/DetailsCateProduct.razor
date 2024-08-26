@@ -253,7 +253,6 @@
                 CreateCategoryProductView viewUpdate = lstCateProduct!.Where(p => p.Id == idcateDetail).Select(c => new CreateCategoryProductView
                 {
                     Id = idcateDetail,
-                    IdCategory = id,
                     Name = c.Name,
                     IsDeleted = c.IsDeleted
                 }).FirstOrDefault();
