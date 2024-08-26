@@ -250,7 +250,7 @@
         private async Task deleteStaff(string userName)
         {
             isLoading = true;
-            await Task.Delay(50);
+                        StateHasChanged();
             if (await Confirm() == true)
             {
                 var response2 = await _client.GetByIdRemove(userName);
@@ -274,7 +274,7 @@
         {
 
             isLoading = true;
-            await Task.Delay(50);
+            StateHasChanged();
             var repon = await _client.activeUser(username);
             if (repon.IsSuccess)
             {
@@ -357,7 +357,7 @@
             if (await Confirm2() == true)
             {
                 isLoading = true;
-                await Task.Delay(50);
+                StateHasChanged();
                 if (selectedUser1s.Count > 0 && selectedUser1s != null)
                 {
                     foreach (var user2 in selectedUser1s)
@@ -443,7 +443,7 @@
             if (await Confirm2() == true)
             {
                 isLoading = true;
-                await Task.Delay(50);
+                StateHasChanged();
                 var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, FullScreen = true };
                 if (selectedUser1s.Count > 0 && selectedUser1s != null)
                 {
