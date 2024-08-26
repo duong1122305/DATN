@@ -22,6 +22,11 @@ namespace DATN.API.Controllers
         {
             return await _authenticateGuest.Login(request);
         }
+        [HttpPost("change-pass")]
+        public async Task<ResponseData<string>> Changepas(string userName, string oldPass, string newPass)// userName có thể là id, username, email, sđt
+        {
+            return await _authenticateGuest.ChangePass(userName,oldPass, newPass);
+        }
 
     }
 }
