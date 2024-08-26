@@ -663,7 +663,7 @@ namespace DATN.Aplication.Services
                             }
                             else if (query.Status == BookingDetailStatus.Unfulfilled)
                             {
-                                if (DateTime.Now.TimeOfDay.CompareTo(query.StartDateTime.TimeOfDay.Add(new TimeSpan(0, -5, 0))) >= 0 && DateTime.Now.TimeOfDay.CompareTo(query.StartDateTime.TimeOfDay.Add(new TimeSpan(0, 5, 0))) <= 0)
+                                if (DateTime.Now.TimeOfDay.CompareTo(query.StartDateTime.TimeOfDay.Add(new TimeSpan(-1, 0, 0))) >= 0 && DateTime.Now.TimeOfDay.CompareTo(query.StartDateTime.TimeOfDay.Add(new TimeSpan(1, 0, 0))) <= 0)
                                 {
                                     query.Status = BookingDetailStatus.Processing;
                                     var idUserAction = await _user.GetUserByToken(actionView.Token);
