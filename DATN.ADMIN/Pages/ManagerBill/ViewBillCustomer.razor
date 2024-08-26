@@ -563,7 +563,7 @@
                 Snackbar.Add("Hoá đơn chưa thanh toán", Severity.Warning);
                 return;
             }
-            await jsRuntime.InvokeVoidAsync("PrintBill()");
+            await jsRuntime.InvokeVoidAsync("document.getElementById('contentbill').innerHTML.print()");
         }
 
         private async void RemoveProduct(ProductDetailView product)
@@ -616,18 +616,3 @@
         <p>Không có quyền truy cập</p>
     </NotAuthorized>
 </AuthorizeView>
-<script>
-    function PrintBill() {
-        var bill = document.getElementById("contentbill").innerHTML;
-        var printWindow = window.open('', '', 'height=600,width=800');
-
-        // Thêm nội dung vào cửa sổ mới
-        printWindow.document.write('<html><head><title>Print Content</title>');
-        printWindow.document.write('</head><body>');
-        printWindow.document.write(bill);
-        printWindow.document.write('</body></html>');
-
-        // Đợi đến khi nội dung được tải xong và thực hiện in
-        printWindow.print();
-    }
-</script>
