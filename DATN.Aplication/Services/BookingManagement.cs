@@ -1323,7 +1323,6 @@ namespace DATN.Aplication.Services
                         Data = new Bill()
                         {
                             TotalPrice = totalprice,
-                            DateBooking = DateTime.Now,
                             IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
                             ReducePrice = reduce.Value,
                             TotalPayment = totalprice - reduce.Value,
@@ -1332,7 +1331,9 @@ namespace DATN.Aplication.Services
                             Address = idBooking != null ? info.Address : "Không có",
                             PhoneNumber = idBooking != null ? info.PhoneNumber : "Không có",
                             ListServiceBooked = queryBooking.ToList(),
-                            IsPayment = (await _unitOfWork.BookingRepository.GetAllAsync()).FirstOrDefault(c => c.Id == idBooking.Value).IsPayment
+                            IsPayment = (await _unitOfWork.BookingRepository.GetAllAsync()).FirstOrDefault(c => c.Id == idBooking.Value).IsPayment,
+                            DateBooking = (await _unitOfWork.BookingRepository.GetAllAsync()).FirstOrDefault(c => c.Id == idBooking.Value).IsPayment ? (await _unitOfWork.HistoryActionRepository.GetAllAsync()).FirstOrDefault(c => c.ActionID == 16).ActionTime : DateTime.UtcNow
+
                         }
                     };
                 }
@@ -1344,7 +1345,7 @@ namespace DATN.Aplication.Services
                         Data = new Bill()
                         {
                             TotalPrice = totalprice,
-                            DateBooking = DateTime.Now,
+                            DateBooking = (await _unitOfWork.BookingRepository.GetAllAsync()).FirstOrDefault(c => c.Id == idBooking.Value).IsPayment ? (await _unitOfWork.HistoryActionRepository.GetAllAsync()).FirstOrDefault(c => c.ActionID == 16).ActionTime : DateTime.UtcNow,
                             IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
                             ReducePrice = reduce.Value,
                             TotalPayment = totalprice - reduce.Value,

@@ -6,10 +6,10 @@ namespace DATN.ViewModels.DTOs.ServiceDetail
     {
         [Required(ErrorMessage = "Chưa chọn dịch vụ")]
         public int ServiceId { get; set; } // Khóa ngoại đến ID dịch vụ
-        [Range(1000, 10000000, ErrorMessage = "Giá phải trong khoảng 1.000vnđ đến 10.000.000vnđ")]
+        [Range(1000.0f, 5000000.0f, ErrorMessage = "Giá phải trong khoảng 1.000vnđ đến 5.000.000vnđ")]
         public float Price { get; set; }
 
-        [Range(1, 9999, ErrorMessage = "Thời gian làm trong khoảng 1-90 phút")]
+        [Range(1, 90, ErrorMessage = "Thời gian làm trong khoảng 1-90 phút")]
         public double Duration { get; set; }
 
         [Required(ErrorMessage = "Mô tả không được để trống")]

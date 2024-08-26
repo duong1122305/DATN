@@ -31,7 +31,17 @@
                             </div>
                         </div>
                         <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
-                            <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
+                            @if (!bill.IsPayment)
+                        {
+                                <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+
+                                <br />
+                            }
+                            else
+                            {
+                                <span><b>Thời gian thanh toán: @bill.DateBooking</b></span>
+                                <br />
+                            }
                             <span><b>Khách hàng:</b> @bill.GuestName</span><br />
                             <span><b>Số điện thoại:</b> @bill.PhoneNumber</span><br />
                             <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />

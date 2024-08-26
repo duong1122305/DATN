@@ -41,8 +41,8 @@
                                 </select>
                             </div>
                             <MudTextField T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
-                            <MudTextField T="double" Variant="Variant.Outlined" Label="Thời gian làm" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
-                            <MudNumericField T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
+                            <MudTextField T="double" Variant="Variant.Outlined" Label="Thời gian làm" MaxLength="2" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
+                            <MudNumericField T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@updateServiceDetailVM.Price" Format="N0" MaxLength="7" />
                           
                         }
                         <hr class="hr" />
@@ -76,7 +76,7 @@
 
         private string formattedPrice = string.Empty;
         private float tempPrice;
-        CultureInfo nrDisplay = CultureInfo.GetCultureInfo("en-US");
+        CultureInfo nrDisplay = CultureInfo.GetCultureInfo("vn-VN");
 
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
@@ -87,8 +87,8 @@
             var result = await _serviceManagermentService.GetAll();
             if (result.IsSuccess)
             {
-                lstService = result.Data.Where(p=>!p.IsDetele).ToList();
-                createServiceDetailVM.ServiceId = lstService.First().Id;
+                lstService = result.Data.Where(p => !p.IsDetele).ToList();
+                // updateServiceDetailVM = lstService.Select(c => new CreateServiceDetailVM).First();
             }
 
             if (id != null && id != 0)
@@ -100,27 +100,27 @@
                 updateServiceDetailVM.Price = data.Price;
                 updateServiceDetailVM.Duration = data.Duration;
                 updateServiceDetailVM.Description = data.NameDetail;
-                await OnPriceChanged(updateServiceDetailVM.Price);
+                // await OnPriceChanged(updateServiceDetailVM.Price);
             }
             else
             {
                 _nameButton = "Thêm mới";
-                await OnPriceChanged(createServiceDetailVM.Price);
+                // await OnPriceChanged(createServiceDetailVM.Price);
             }
         }
 
-        private async Task OnPriceChanged(float value)
-        {
-            tempPrice = value; // Cập nhật biến trung gian
-            if (id != null && id != 0)
-            {
-                updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
-            }
-            else
-            {
-                createServiceDetailVM.Price = value;
-            }
-        }
+        // private async Task OnPriceChanged(float value)
+        // {
+        //     tempPrice = value; // Cập nhật biến trung gian
+        //     if (id != null && id != 0)
+        //     {
+        //         updateServiceDetailVM.Price = value; // Cập nhật giá trị thực
+        //     }
+        //     else
+        //     {
+        //         createServiceDetailVM.Price = value;
+        //     }
+        // }
 
        
         private async Task Submit()
