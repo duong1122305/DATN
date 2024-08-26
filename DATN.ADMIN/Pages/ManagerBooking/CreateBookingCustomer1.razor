@@ -98,7 +98,7 @@
                 </HeaderContent>
                 <RowTemplate Context="data">
                     <MudTd DataLabel="Sign">@data.ServiceDetailName</MudTd>
-                    <MudTd DataLabel="Sign">@data.PetId</MudTd>
+                    <MudTd DataLabel="Sign">@lstPet.Where(c => c.Id == data.PetId).FirstOrDefault().Name</MudTd>
                     <MudTd DataLabel="Sign">@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
                     <MudTd>
                         <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveBooking(data))" Color="Color.Error">Xoá</MudButton>
@@ -109,7 +109,7 @@
         </MudForm>
 
         @code {
-            [Inject]
+        [Inject]
         private BookingService bookingService { get; set; }
         [Inject]
         private IGuestManagerClient _guestService { get; set; }
@@ -290,7 +290,8 @@
                     Snackbar.Add("Vui lòng không để giờ trống", Severity.Warning);
                     isLoading = false;
                     return;
-                }if (bookingDate==null)
+                }
+                if (bookingDate == null)
                 {
                     Snackbar.Add("Vui lòng không để ngày trống!", Severity.Warning);
                     isLoading = false;
@@ -356,7 +357,8 @@
         //tìm kiếm dịch vụ
         protected async Task Create()
         {
-            if(value1==null){
+            if (value1 == null)
+            {
                 Snackbar.Add("Vui lòng chọn khách hàng.", Severity.Warning);
                 return;
             }
@@ -369,7 +371,7 @@
             {
                 Snackbar.Add("Vui lòng chọn giờ.", Severity.Warning);
                 return;
-            } 
+            }
             if (bookingDate == null)
             {
                 Snackbar.Add("Vui lòng chọn ngày.", Severity.Warning);

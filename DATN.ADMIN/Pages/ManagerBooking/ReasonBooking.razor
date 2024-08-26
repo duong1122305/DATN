@@ -14,7 +14,7 @@
 
         if (response.IsSuccess)
         {
-            test = string.Join("-", response.Data);
+            test = response.Data.FirstOrDefault().Description;
             StateHasChanged();
         }
         else

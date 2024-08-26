@@ -6,7 +6,7 @@
         @using DATN.ADMIN.IServices
         @using DATN.ADMIN.Pages.ManagerBooking.AddServicesInCustomer
         @using DATN.ADMIN.Pages.ManagerGuest
-@using DATN.Data.Enum
+        @using DATN.Data.Enum
         @using DATN.Utilites
         @using DATN.ViewModels.Common
         @using DATN.ViewModels.DTOs.ActionBooking
@@ -22,7 +22,7 @@
                          Hideable="true" Groupable="true" GroupExpanded="false">
                 <ToolBarContent>
                     @if (status == BookingStatus.AdminCancelled || status == BookingStatus.StaffCancelled)
-                {
+                    {
                         <MudButton Disabled OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
                         <MudButton Disabled @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
 
@@ -35,7 +35,7 @@
                     }
                     <MudSpacer />
 
-                 <div style="display: flex">
+                    <div style="display: flex">
                         <!-- Time Picker Section -->
                         <div style="display: flex; flex-direction: column; margin-bottom: 10px;margin-right:10px">
                             @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled)
@@ -82,7 +82,7 @@
                                 <MudButton Disabled @onclick="@(async() => await OpeListPetDialog())">Thêm thú cưng</MudButton>
                             }
                         </div>
-                        </div>
+                    </div>
                 </ToolBarContent>
                 <Columns>
                     <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -93,12 +93,12 @@
                     <PropertyColumn Property="x => x.NameStaffService" Title="Nhân viên làm" Filterable="false" Groupable="false" />
                     <PropertyColumn Property="x => x.PetName" Title="Thú cưng" Filterable="false" Groupable="false" />
                     <PropertyColumn Property="x => x.ServiceDetaiName" Title="Dịch vụ làm" Filterable="false" Groupable="false" />
-                    <TemplateColumn Title="Giờ bắt đầu" Sortable="false" Filterable="false">
+                    <TemplateColumn Title="Giờ bắt đầu(Dự kiến)" Sortable="false" Filterable="false">
                         <CellTemplate Context="data">
                             <span style="text-align:center;">@data.Item.StartDate</span>
                         </CellTemplate>
                     </TemplateColumn>
-                    <TemplateColumn Title="Giờ kết thúc" Sortable="false" Filterable="false">
+                    <TemplateColumn Title="Giờ kết thúc(Dự kiến)" Sortable="false" Filterable="false">
                         <CellTemplate Context="data">
                             <span style="text-align:center;">@data.Item.EndDate</span>
                         </CellTemplate>
@@ -153,14 +153,14 @@
             </div>
         }
         @code {
-            [Parameter]
+        [Parameter]
         public int id { get; set; }
         [Parameter]
         public bool payment { get; set; }
         [Parameter]
         public DateTime bookingDate { get; set; }
         [Parameter]
-        public BookingStatus status{ get; set; }
+        public BookingStatus status { get; set; }
 
         private bool isEditing = false;
         private bool isEditing2;
@@ -186,6 +186,7 @@
         protected async override Task OnInitializedAsync()
         {
             await LoadData();
+            timeStart = lstBooking.OrderByDescending(c => c.EndDate).ToList().FirstOrDefault().EndDate.Value.TimeOfDay;
         }
 
         protected async Task LoadData()

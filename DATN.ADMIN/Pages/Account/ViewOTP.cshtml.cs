@@ -32,6 +32,10 @@ namespace DATN.ADMIN.Pages.Account
             try
             {
 
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    return Page();
+                }
                 if (code != null)
                 {
                     var username = _httpContextAccessor.HttpContext.Session.GetString("username");
