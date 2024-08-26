@@ -6,10 +6,56 @@
         @inject IJSRuntime jsRuntime;
         @inject IAddressService _addressServive;
 
+        <div class="div-content">
+            <h3>MEW SHOP</h3>
+            <div>
+                <p>Khách hàng: Nguyễn Văn A</p>
+                <p>Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                <p>Nhân viên: Việt Nguyễn</p>
+                <p>Số điện thoại: ádfâfà</p>
+                <p>Địa chỉ: ádâfà</p>
+
+                <div>
+                    mã qr
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Tên dịch vụ</th>
+                        <th scope="col">Giá dịch vụ</th>
+                        <th scope="col">Tên sản phẩm</th>
+                        <th scope="col">Số lượng</th>
+                        <th scope="col">Giá sản phẩm</th>
+                        <th scope="col">Tổng tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>2222e</td>
+                                <td>22222</td>
+                                <td>2222</td>
+                                <td>2222</td>
+                                <td>22222</td>
+                            </tr>
+                      
+                </tbody>
+            </table>
+            <p><b>Giảm giá:</b> 333333</p>
+            <p><b>Thanh toán:</b>333333</p>
+            <p><b>Tiền khách trả:</b> 333333333</p>
+        </div>
         
         @code {
         [Parameter]
         public Bill BillInvoice { get; set; }
+        [CascadingParameter]
+        MudDialogInstance _dialogBox { get; set; }
+
         }
         
         @code {
@@ -17,6 +63,7 @@
         {
             await Task.Delay(500);
             await jsRuntime.InvokeVoidAsync("window.print");
+            _dialogBox.Close();
         }
         }
 
