@@ -1,154 +1,157 @@
 ﻿<AuthorizeView Roles="Admin">
     <Authorized>
-		@page "/CreateUpdateCateDetails"
+        @page "/CreateUpdateCateDetails"
 
-		@using DATN.ADMIN.IServices
-		@using DATN.Data.Entities
-		@using DATN.ViewModels.DTOs.Category
-		@using DATN.ViewModels.DTOs.CategoryProduct
-		@using DATN.ViewModels.DTOs.ServiceManager
-		@using MudBlazor
-		@inject ISnackbar Snackbar
-		@inject IDialogService _diagService
-		<EditForm Context="data" Model="@category" OnValidSubmit="@(async () => await Submit())">
-			<MudItem xs="12" sm="12">
-				<MudCard>
-					<MudCardContent>
-						@if (lstCate != null && lstCate.Count() > 0)
-						{
-							<MudSelect T="CategoryView" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" @bind-Value="selectedCate">
-								<MudSelectItem Value="selectedCate">--Chọn danh mục lớn-- </MudSelectItem>
-								@foreach (var item in lstCate)
-								{
-									<MudSelectItem Value="@item">@item.Name </MudSelectItem>
-								}
+        @using DATN.ADMIN.IServices
+        @using DATN.Data.Entities
+        @using DATN.ViewModels.DTOs.Category
+        @using DATN.ViewModels.DTOs.CategoryProduct
+        @using DATN.ViewModels.DTOs.ServiceManager
+        @using MudBlazor
+        @inject ISnackbar Snackbar
+        @inject IDialogService _diagService
+        <EditForm Context="data" Model="@category" OnValidSubmit="@(async () => await Submit())">
+            <MudItem xs="12" sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        @if (lstCate != null && lstCate.Count() > 0)
+                        {
+                            <MudSelect T="CategoryView" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" @bind-Value="selectedCate">
+                                <MudSelectItem Value="selectedCate">--Chọn danh mục lớn-- </MudSelectItem>
+                                @foreach (var item in lstCate)
+                                {
+                                    <MudSelectItem Value="@item">@item.Name </MudSelectItem>
+                                }
 
-							</MudSelect>
-						}
+                            </MudSelect>
+                        }
 
-						<MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" MaxLength="255" />
-						<hr class="hr" />
-						<div class="mt-5" style="text-align: end;">
-							<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
-								@_nameButton
-							</MudButton>
-						</div>
-					</MudCardContent>
-				</MudCard>
-			</MudItem>
-		</EditForm>
+                        <MudTextField T="string" Label="Tên danh mục" @bind-Value="@category.Name" For="@(() => category.Name)" MaxLength="255" />
+                        <hr class="hr" />
+                        <div class="mt-5" style="text-align: end;">
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                                @_nameButton
+                            </MudButton>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </EditForm>
 
-		@code {
-		[Parameter]
-		public int id { get; set; } = 0;
-		[CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+        @code {
+            [Parameter]
+        public int id { get; set; } = 0;
+        [Parameter]
+        public bool updateCheck { get; set; }
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
-		[Parameter]
-		public CreateCategoryProductView category { get; set; } = new CreateCategoryProductView();
-		string _nameButton = "";
-		[Inject]
-		private ICategoryServices _client { get; set; }
-		private List<CategoryView> lstCate = new List<CategoryView>();
-		private CategoryView selectedCate = new CategoryView();
+        [Parameter]
+        public CreateCategoryProductView category { get; set; } = new CreateCategoryProductView();
+        string _nameButton = "";
+        [Inject]
+        private ICategoryServices _client { get; set; }
+        private List<CategoryView> lstCate = new List<CategoryView>();
+        private CategoryView selectedCate = new CategoryView();
 
-		protected async override Task OnInitializedAsync()
-		{
-			if (id == 0)
-			{
-				var responeCate = await _client.ListCategory();
-				lstCate = responeCate.Data;
-			}
-			if (category.Id != null || category.Id != 0)
-			{
-				_nameButton = "Thêm mới";
-			}
-			else
-			{
-				_nameButton = "Cập nhật";
-			}
-		}
-		public async Task Create()
-		{
-			if (await Confirm("thêm mới") == true)
-			{
-				if (id == 0) category.IdCategory = selectedCate.Id.Value;
-				else
-					category.IdCategory = id;
-				var result = await _client.CreateCategoryProduct(category);
-				if (result.IsSuccess)
-				{
-					Snackbar.Add(result.Data, Severity.Success);
-					_dialogBox.Close(DialogResult.Ok(true));
-				}
-				else
-					Snackbar.Add(result.Error, Severity.Error);
-			}
-			else
-			{
-				return;
-			}
-		}
+        protected async override Task OnInitializedAsync()
+        {
+            if (id == 0)
+            {
+                var responeCate = await _client.ListCategory();
+                lstCate = responeCate.Data;
+            }
+            if (updateCheck)
+            {
+                _nameButton = "Cập nhật";
+            }
+            else
+            {
+                _nameButton = "Thêm mới";
+            }
+        }
+        public async Task Create()
+        {
+            if (await Confirm("Thêm mới") == true)
+            {
+                if (id == 0) category.IdCategory = selectedCate.Id.Value;
+                else
+                    category.IdCategory = id;
+                var result = await _client.CreateCategoryProduct(category);
+                if (result.IsSuccess)
+                {
+                    Snackbar.Add(result.Data, Severity.Success);
+                    _dialogBox.Close(DialogResult.Ok(true));
+                }
+                else
+                    Snackbar.Add(result.Error, Severity.Error);
+            }
+            else
+            {
+                return;
+            }
+        }
 
 
-		public async Task Update()
-		{
-			var confirm = await Confirm("cập nhật");
-			if (!confirm)
-			{
-				return;
-			}
+        public async Task Update()
+        {
+            var confirm = await Confirm("Cập nhật");
+            if (!confirm)
+            {
+                return;
+            }
 
-			if (category != null)
-			{
-				var result = await _client.UpdateCategoryProduct(category);
-				if (result.IsSuccess)
-				{
-					Snackbar.Add(result.Data, Severity.Success);
+            if (category != null)
+            {
+                var result = await _client.UpdateCategoryProduct(category);
+                if (result.IsSuccess)
+                {
+                    Snackbar.Add(result.Data, Severity.Success);
 
-					_dialogBox.Close(DialogResult.Ok(true));
-				}
-				else
-				{
-					Snackbar.Add(result.Error, Severity.Error);
-				}
-			}
-			else
-			{
-				Snackbar.Add("Có lỗi trong quá trình cập nhật", Severity.Error);
-			}
+                    _dialogBox.Close(DialogResult.Ok(true));
+                }
+                else
+                {
+                    Snackbar.Add(result.Error, Severity.Error);
+                }
+            }
+            else
+            {
+                Snackbar.Add("Có lỗi trong quá trình cập nhật", Severity.Error);
+            }
 
-		}
+        }
 
-		public async Task Submit()
-		{
-			if (id == 0 && (selectedCate.Id == 0 || selectedCate.Id == null))
-			{
-				Snackbar.Add("Hãy chọn danh mục lớn", Severity.Warning);
-				return;
-			}
-			if (category.Id != null || category.Id != 0)
-			{
-				await Create();
-			}
-			else
-			{
-				await Update();
-			}
-		}
+        public async Task Submit()
+        {
+            if (id == 0 && (selectedCate.Id == 0 || selectedCate.Id == null))
+            {
+                Snackbar.Add("Hãy chọn danh mục lớn", Severity.Warning);
+                return;
+            }
+            if (!updateCheck)
+            {
+                await Create();
+            }
+            else
+            {
+                category.Id = id;
+                await Update();
+            }
+        }
 
-		private async Task<bool>
-		Confirm(string text)
-		{
-			var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
-			yesText: "Xác nhận",
-			cancelText: "Hủy", noText: null,
-			options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
-			StateHasChanged();
-			if (!confirm.HasValue) return false;
-			return confirm.Value;
+        private async Task<bool>
+        Confirm(string text)
+        {
+            var confirm = await _diagService.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true });
+            StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
 
-		}
-		}
+        }
+        }
 
     </Authorized>
     <NotAuthorized>

@@ -5,6 +5,7 @@
         @using DATN.Utilites
         @using DATN.ViewModels.DTOs.Booking
         @inject IDialogService _dialogservice;
+        @inject ISnackbar SnackBar
         @using DATN.ViewModels.DTOs.Product
         <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
@@ -40,7 +41,7 @@
         </MudDataGrid>
 
         @code {
-        private List<ProductDetailView> lstBookingServices = new List<ProductDetailView>();
+            private List<ProductDetailView> lstBookingServices = new List<ProductDetailView>();
         [Inject] private BookingService bookingService { get; set; }
         private bool isLoading = false;
 
@@ -62,7 +63,7 @@
             }
             else
             {
-                return x.Term.Value.ToString();
+                return x.Term.ToString();
             }
         };
         void ExpandAllGroups()

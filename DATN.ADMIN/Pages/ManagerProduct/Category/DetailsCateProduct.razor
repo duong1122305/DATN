@@ -25,7 +25,7 @@
                     <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                                   AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0" MaxLength="50"></MudTextField>
                     <MudSpacer />
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id,false))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
                 </ToolBarContent>
                 <Columns>
                     <TemplateColumn Title="STT" Sortable="false" Filterable="false">
@@ -62,7 +62,7 @@
                                     <MudIconButton Icon="@Icons.Material.Filled.Done" Color="Color.Surface" title="Kích hoạt" OnClick="@(async()=>await ActiveCateDetails(data.Item.Id))"></MudIconButton>
 
                                 }
-                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(data.Item.Id))" title="Sửa"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning" OnClick="@(async()=>await OpenDialog(data.Item.Id,true))" title="Sửa"></MudIconButton>
                             </MudButtonGroup>
                         </CellTemplate>
                     </TemplateColumn>
@@ -77,7 +77,7 @@
         {
             <div style="text-align:center">
                 <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(id,false))" Style="margin-bottom: 10px" title="Thêm">Thêm</MudButton>
             </div>
         }
         <style>
@@ -86,7 +86,7 @@
             }
         </style>
         @code {
-        [Parameter]
+            [Parameter]
         public int id { get; set; }
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
 
@@ -243,12 +243,25 @@
         }
 
         //thêm sửa !
-        private async Task OpenDialog(int? id)
+        private async Task OpenDialog(int? idcateDetail, bool update)
         {
-
             var parameters = new DialogParameters();
             string nameDialog = "Thêm mới danh mục chi tiết";
-            parameters.Add("id", id);
+            if (update)
+            {
+                nameDialog = "Cập nhật danh mục chi tiết";
+                CreateCategoryProductView viewUpdate = lstCateProduct.Select(c => new CreateCategoryProductView
+                {
+                    Id = idcateDetail,
+                    IdCategory = id,
+                    Name = c.Name,
+                    IsDeleted = c.IsDeleted
+                }).FirstOrDefault();
+                parameters.Add("category", viewUpdate);
+            }
+            parameters.Add("id", idcateDetail);
+            parameters.Add("updateCheck", update);
+
             DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,

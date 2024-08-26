@@ -18,7 +18,7 @@
         <MudForm Style="text-align:center;margin-bottom:20px">
             <MudItem xs="12" sm="6" md="4">
                 <div style="display: flex; justify-content: flex-end; width: 1240px; margin-left: auto;margin-left:10px">
-                    <MudAutocomplete T="GuestViewModel" @bind-Value="value1" Label="Chọn khách hàng *" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" Disabled="@(!CanSelectGuest)" />
+                    <MudAutocomplete T="GuestViewModel" @bind-Value="value1" Label="Chọn khách hàng *" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" Disabled="@(!CanSelectGuest)" AdornmentIcon="@Icons.Material.Filled.Add" AdornmentColor="Color.Primary" OnAdornmentClick="@(async()=>OpenDialog())" />
                     @if (value1 != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -26,25 +26,11 @@
                                        Size="MudBlazor.Size.Small"
                                        Disabled="@isEditing"
                                        OnClick="ClearGuestSelection"
-                                       Style="margin-left: 8px;"
+                                       Style="margin-left: 8px; margin-top:10px"
                                        ToolTip="Xoá lựa chọn khách hàng">
                         </MudIconButton>
                     }
-                    <div style="display: flex; align-items: center;padding-left:200px">
-                        <MudButton Disabled=@isOpenDialog OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
-                        @if (bookingService.lstBooking.Count > 0 && value1 != null)
-                        {
-                            <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm lịch hẹn</MudButton>
-                        }
-                        else
-                        {
-                            <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Disabled> Thêm lịch hẹn</MudButton>
-
-                        }
-                    </div>
-                </div>
-                <div style="display: flex; justify-content: flex-end; width: 700px; margin-left: auto;margin-left:10px">
-                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Disabled="@(!CanSelectPet)" />
+                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Disabled="@(!CanSelectPet)" AdornmentIcon="@Icons.Material.Filled.Add" AdornmentColor="Color.Primary" OnAdornmentClick="@(async()=>OpeListPetDialog())" />
                     @if (value2 != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -56,10 +42,20 @@
                                        ToolTip="Xoá lựa chọn thú cưng">
                         </MudIconButton>
                     }
-                    <MudButton @onclick="@(async()=>await OpeListPetDialog())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Success">Thêm thú cưng</MudButton>
+                    <div style="display: flex; align-items: center;padding-left:200px">
+                        @if (bookingService.lstBooking.Count > 0 && value1 != null)
+                        {
+                            <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm lịch hẹn</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Disabled> Thêm lịch hẹn</MudButton>
+
+                        }
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: flex-end; width: 300px; margin-left: auto;margin-left:10px">
-                    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" Disabled="@(!CanSelectTime)" />
+                <div style="display: flex; justify-content: flex-end; width: 650px; margin-left: auto;margin-left:10px">
+                    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" Disabled="@(!CanSelectTime)" Style="margin-right:10px"/>
                     @if (timeStart != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -67,12 +63,10 @@
                                        Size="MudBlazor.Size.Small"
                                        Disabled="@isEditing"
                                        OnClick="ClearTimeStart"
-                                       Style="margin-left: 8px;"
+                                       Style="margin-left: 8px; margin-top:10px"
                                        ToolTip="Xoá thời gian">
                         </MudIconButton>
                     }
-                </div>
-                <div style="display: flex; justify-content: flex-end; width: 700px; margin-left: auto;margin-left:10px">
                     <MudDatePicker @bind-Date="bookingDate" Label="Ngày hẹn" Editable="true" DateFormat="dd/MM/yyyy" Disabled="@(!CanSelectBookingDate)" Mask="@(new DateMask("dd/MM/yyyy"))" />
                     @if (bookingDate != null)
                     {
@@ -81,13 +75,14 @@
                                        Size="MudBlazor.Size.Small"
                                        Disabled="@isEditing"
                                        OnClick="ClearTimeEnd"
-                                       Style="margin-left: 8px;"
+                                       Style="margin-left: 8px; margin-top:10px"
                                        ToolTip="Xoá ngày">
                         </MudIconButton>
                     }
-                    <MudButton OnClick="@(async()=>await Create())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Success">Chọn dịch vụ</MudButton>
-                </div>
-
+                    <div style="width: 200px">
+                    <MudButton OnClick="@(async()=>await Create())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Primary">Chọn dịch vụ</MudButton>
+                    </div>
+                    </div>
             </MudItem>
             <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
@@ -210,6 +205,7 @@
         private void ClearGuestSelection()
         {
             value1 = null;
+            value2 = null;
             // Cập nhật lại trạng thái giao diện
             StateHasChanged();
         }
@@ -255,7 +251,6 @@
         {
             isLoading = true;
             await Task.Delay(1);
-            isOpenDialog = true;
             string nameDialog = "Thêm mới khách hàng";
             DialogOptions options = new DialogOptions()
             {
@@ -271,12 +266,11 @@
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
+                isLoading = true;
                 await LoadData();
                 StateHasChanged();
             }
             isLoading = false;
-            isOpenDialog = false;
-
         }
 
         public async Task CreateBookingInDb()
