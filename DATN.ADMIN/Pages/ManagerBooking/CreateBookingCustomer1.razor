@@ -26,10 +26,23 @@
                                        Size="MudBlazor.Size.Small"
                                        Disabled="@isEditing"
                                        OnClick="ClearGuestSelection"
-                                       Style="margin-left: 8px;"
+                                       Style="margin-left: 8px; margin-top:10px"
                                        ToolTip="Xoá lựa chọn khách hàng">
                         </MudIconButton>
                     }
+                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Disabled="@(!CanSelectPet)" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"/>
+@*                     @if (value2 != null)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                                       Color="Color.Error"
+                                       Size="MudBlazor.Size.Small"
+                                       Disabled="@isEditing2"
+                                       OnClick="ClearPetSelection"
+                                       Style="margin-left: 8px;"
+                                       ToolTip="Xoá lựa chọn thú cưng">
+                        </MudIconButton>
+                    } *@
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" @onclick="@(async()=>await OpeListPetDialog())" Variant="Variant.Outlined" Color="Color.Primary" Size="MudBlazor.Size.Small" />
                     <div style="display: flex; align-items: center;padding-left:200px">
                         <MudButton Disabled=@isOpenDialog OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
                         @if (bookingService.lstBooking.Count > 0 && value1 != null)
@@ -43,23 +56,8 @@
                         }
                     </div>
                 </div>
-                <div style="display: flex; justify-content: flex-end; width: 700px; margin-left: auto;margin-left:10px">
-                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Disabled="@(!CanSelectPet)" />
-                    @if (value2 != null)
-                    {
-                        <MudIconButton Icon="@Icons.Material.Filled.Clear"
-                                       Color="Color.Error"
-                                       Size="MudBlazor.Size.Small"
-                                       Disabled="@isEditing2"
-                                       OnClick="ClearPetSelection"
-                                       Style="margin-left: 8px;"
-                                       ToolTip="Xoá lựa chọn thú cưng">
-                        </MudIconButton>
-                    }
-                    <MudButton @onclick="@(async()=>await OpeListPetDialog())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Success">Thêm thú cưng</MudButton>
-                </div>
-                <div style="display: flex; justify-content: flex-end; width: 300px; margin-left: auto;margin-left:10px">
-                    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" Disabled="@(!CanSelectTime)" />
+                <div style="display: flex; justify-content: flex-end; width: 650px; margin-left: auto;margin-left:10px">
+                    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" Disabled="@(!CanSelectTime)" Style="margin-right:10px"/>
                     @if (timeStart != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -67,12 +65,10 @@
                                        Size="MudBlazor.Size.Small"
                                        Disabled="@isEditing"
                                        OnClick="ClearTimeStart"
-                                       Style="margin-left: 8px;"
+                                       Style="margin-left: 8px; margin-top:10px"
                                        ToolTip="Xoá thời gian">
                         </MudIconButton>
                     }
-                </div>
-                <div style="display: flex; justify-content: flex-end; width: 700px; margin-left: auto;margin-left:10px">
                     <MudDatePicker @bind-Date="bookingDate" Label="Ngày hẹn" Editable="true" DateFormat="dd/MM/yyyy" Disabled="@(!CanSelectBookingDate)" Mask="@(new DateMask("dd/MM/yyyy"))" />
                     @if (bookingDate != null)
                     {
@@ -81,13 +77,14 @@
                                        Size="MudBlazor.Size.Small"
                                        Disabled="@isEditing"
                                        OnClick="ClearTimeEnd"
-                                       Style="margin-left: 8px;"
+                                       Style="margin-left: 8px; margin-top:10px"
                                        ToolTip="Xoá ngày">
                         </MudIconButton>
                     }
-                    <MudButton OnClick="@(async()=>await Create())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Success">Chọn dịch vụ</MudButton>
-                </div>
-
+                    <div style="width: 200px">
+                    <MudButton OnClick="@(async()=>await Create())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Primary">Chọn dịch vụ</MudButton>
+                    </div>
+                    </div>
             </MudItem>
             <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
@@ -210,6 +207,7 @@
         private void ClearGuestSelection()
         {
             value1 = null;
+            value2 = null;
             // Cập nhật lại trạng thái giao diện
             StateHasChanged();
         }

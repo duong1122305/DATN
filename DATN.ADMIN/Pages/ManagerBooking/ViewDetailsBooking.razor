@@ -21,7 +21,7 @@
             <MudDataGrid MultiSelection="true" Items="@lstBooking" Filterable="true"
                          Hideable="true" Groupable="true" GroupExpanded="false">
                 <ToolBarContent>
-                    @if (status == BookingStatus.AdminCancelled || status == BookingStatus.StaffCancelled)
+                    @if (status == BookingStatus.AdminCancelled || status == BookingStatus.StaffCancelled ||status == BookingStatus.Completed)
                     {
                         <MudButton Disabled OnClick="@(async () => await OpenDialogServices())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm</MudButton>
                         <MudButton Disabled @onclick="@(async() => await OpeListPetDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm thú cưng</MudButton>
@@ -38,7 +38,7 @@
                     <div style="display: flex">
                         <!-- Time Picker Section -->
                         <div style="display: flex; flex-direction: column; margin-bottom: 10px;margin-right:10px">
-                            @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled)
+                            @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled || status != BookingStatus.Completed)
                             {
                                 <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" />
                                 @if (timeStart != null)
@@ -61,7 +61,7 @@
 
                         <!-- Pet Selection Section -->
                         <div style="display: flex; flex-direction: column;">
-                            @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled)
+                            @if (!payment && status != BookingStatus.AdminCancelled || status != BookingStatus.StaffCancelled || status == BookingStatus.Completed)
                             {
                                 <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e => e == null ? null : $"{e.Name}")" />
                                 @if (value2 != null)
