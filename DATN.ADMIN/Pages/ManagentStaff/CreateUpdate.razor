@@ -9,7 +9,7 @@
         @using DATN.ViewModels.DTOs.Authenticate
         <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-        <EditForm Context="data" Model="@user" OnValidSubmit="@(async()=>await OnValidSubmit())">
+        <EditForm Context="data" Model="@user">
             <DataAnnotationsValidator />
             <MudItem xs="12" sm="12">
                 <MudCard>
@@ -45,7 +45,7 @@
                         <DATN.ADMIN.Components.AddressComponent OnAddressChanged="HandleAddressChanged" AddressCode="@AddressCode"></DATN.ADMIN.Components.AddressComponent>
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" OnClick="OnValidSubmit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@_nameButton</MudButton>
                         </div>
                     </MudCardContent>
                 </MudCard>
