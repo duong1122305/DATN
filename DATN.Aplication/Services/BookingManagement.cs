@@ -732,10 +732,9 @@ namespace DATN.Aplication.Services
                         }
                         else
                         {
-                            var idUserAction = await _user.GetUserByToken(actionView.Token);
                             HistoryAction historyAction = new HistoryAction()
                             {
-                                ActionByID = Guid.Parse(idUserAction.Data),
+                                ActionByID = Guid.Parse(actionView.Token),
                                 ActionID = 11,
                                 ActionTime = DateTime.Now,
                                 BookingID = query.Id,
@@ -1331,7 +1330,7 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<Bill> { IsSuccess = true, Data = new Bill() };
         }
-        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking, string token)
         {
             if (idBooking != 0)
             {
@@ -1353,7 +1352,7 @@ namespace DATN.Aplication.Services
                     // Sử dụng renderer để tạo ảnh màu
                     barcodeWriter.Renderer = new MyBitmapRenderer();
 
-                    using (var bitmap = barcodeWriter.Write($"https://datn-sd33.datlich.id.vn/public/{idBooking}"))
+                    using (var bitmap = barcodeWriter.Write($"https://datn-sd33.datlich.id.vn/public/{idBooking}/{token}"))
                     using (MemoryStream ms = new MemoryStream())
                     {
                         bitmap.Save(ms, ImageFormat.Png);

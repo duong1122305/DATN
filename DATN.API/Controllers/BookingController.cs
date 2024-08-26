@@ -155,9 +155,9 @@ namespace DATN.API.Controllers
 
         [Authorize(Roles = "Admin,Receptionist")]
         [HttpGet("QrCode-CheckIn")]
-        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking, string token)
         {
-            return await _bookingManagement.QrCodeCheckIn(idBooking);
+            return await _bookingManagement.QrCodeCheckIn(idBooking, token);
         }
 
         [Authorize(Roles = "Admin,Receptionist")]

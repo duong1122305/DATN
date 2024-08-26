@@ -138,9 +138,9 @@ namespace DATN.ADMIN.Services
             return result;
         }
 
-        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking)
+        public async Task<ResponseData<string>> QrCodeCheckIn(int idBooking, string token)
         {
-            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/QrCode-CheckIn?idBooking={idBooking}");
+            return await _httpClient.GetFromJsonAsync<ResponseData<string>>($"/api/Booking/QrCode-CheckIn?idBooking={idBooking}&token={token}");
         }
 
         public async Task<ResponseData<string>> QrCodeCheckOut(int idBookingDetail)
