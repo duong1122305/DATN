@@ -593,7 +593,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
         }
         public async Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView)
-        {
+         {
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                          where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();

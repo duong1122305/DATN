@@ -196,7 +196,7 @@
 		}
 		async Task LoadData()
 		{
-			var brand = await _brandClient.ListBrand();
+			var brand = (await _brandClient.ListBrand());
 
 			var cate = await _cateClient.ListCategoryProduct();
 			if (brand.IsSuccess && cate.IsSuccess)
@@ -205,12 +205,12 @@
 				{
 
 					lstCate = cate.Data.Where(prop => !prop.IsDeleted).ToList();
-					lstBrand = brand.Data.Where(prop => prop.Status.HasValue && prop.Status.Value).ToList();
+					lstBrand = brand.Data.Where(prop => prop.Status.HasValue && prop.Status.Value&& prop.Status.Value==true).ToList();
 				}
 				else
 				{
-					lstCate = cate.Data.ToList();
-					lstBrand = brand.Data.ToList();
+					lstCate = cate.Data.Where(prop => !prop.IsDeleted).ToList();
+					lstBrand = brand.Data.Where(prop => prop.Status.HasValue && prop.Status.Value && prop.Status.Value == true).ToList();
 				}
 			}
 		}
