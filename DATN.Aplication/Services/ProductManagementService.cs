@@ -251,11 +251,11 @@ namespace DATN.Aplication.Services
 								Id = product.Id,
 								BrandDescription = brand.Description,
 								BrandName = brand.Name,
-								CateDatailsName = cd.Name,
+								CateDetailName = cd.Name,
 								ImgUrl = img.UrlImage,
 								NameProduct = product.Name,
-								ProductDescrition = product.Description,
-								ListProductDetail = lstPD.Where(p => p.Id == id && p.Status != ProductDetailStatus.Deleted).Select(p => new ProductDetailCilent() { Name = p.Name, ID = p.Id, Price = p.Price.ToString("N0") }).ToList(),
+								ProductDescription = product.Description,
+								ListProductDetail = lstPD.Where(p => p.Id == id && p.Status != ProductDetailStatus.Deleted).Select(p => new ProductDetailClient() { Name = p.Name, ID = p.Id, Price = p.Price.ToString("N0") }).ToList(),
 							};
 				if (!query.Any())
 				{

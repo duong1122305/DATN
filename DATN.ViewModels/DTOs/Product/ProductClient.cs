@@ -12,9 +12,9 @@ namespace DATN.ViewModels.DTOs.Product
         public string NameProduct { get; set; }
         public string BrandName { get; set; }
         public string BrandDescription { get; set; }
-        public string CateDatailsName { get; set; }
-        public string ProductDescrition { get; set; }
+        public string CateDetailName { get; set; }
+        public string ProductDescription { get; set; }
         public string ImgUrl { get; set; }
-        public List<ProductDetailCilent> ListProductDetail { get; set; }
+        public List<ProductDetailClient> ListProductDetail { get; set; }
     }
 }
