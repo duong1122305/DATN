@@ -1,0 +1,151 @@
+﻿<AuthorizeView>
+    <Authorized>
+        @using System.Security.Policy
+        @using DATN.ADMIN.IServices
+        @using DATN.Aplication.CustomProvider
+        @using System.IdentityModel.Tokens.Jwt
+        @using System.Security.Claims
+        @using Microsoft.AspNetCore.SignalR.Client
+        @using DATN.Utilites
+        @inject IDialogService _dialogservice
+        @inject AuthenticationStateProvider AuthenticationStateProvider
+        @inherits LayoutComponentBase
+        @inject ISnackbar _snackBar
+
+        <MudThemeProvider />
+        <MudDialogProvider />
+        <MudSnackbarProvider />
+        <MudLayout>
+            <MudAppBar Elevation="5">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
+                <MudSpacer />
+                <MudAvatar>
+                    <MudImage Src="@urlImg"></MudImage>
+                </MudAvatar>
+                <MudMenu Label="@name" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Class="mr-3">
+                    <MudMenuItem Href="/profileUser">Hồ sơ</MudMenuItem>
+                    <MudMenuItem OnClick="logOut">Đăng xuất</MudMenuItem>
+                </MudMenu>
+            </MudAppBar>
+            <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+                <img src="./img/logo_name.png" alt="Website Logo" style="padding-left:45px;width: 200px; height: 120px;" />
+                <NavMenu />
+            </MudDrawer>
+            <MudMainContent>
+                <MudContainer Class="mt-5 px-8 " MaxWidth="MaxWidth.False">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </MudLayout>
+
+
+
+        @code {
+        [Inject]
+        protected NavigationManager navigationManager { get; set; }
+        [Inject]
+        protected IHttpContextAccessor httpContextAccessor { get; set; }
+        [Inject]
+        protected IUserClientSev _ser { get; set; }
+        private bool isPopoverOpen = false;
+
+        bool _drawerOpen = true;
+        private string name = "";
+        private string mess = "";
+        private string urlImg = Contant.ImgUser;
+
+
+        private int notificationCount => notifications.Count;
+        private List<Notification> notifications = new List<Notification>();
+
+        void DrawerToggle()
+        {
+            _drawerOpen = !_drawerOpen;
+        }
+
+        private async Task logOut()
+        {
+            var confirm = await Confirm();
+            if (confirm == true)
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+                if (user.Identity.IsAuthenticated)
+                {
+                    // Xoá session (nếu có)
+                    httpContextAccessor.HttpContext.Session.Remove("Key");
+                    httpContextAccessor.HttpContext.Session.Clear();
+                    await OnInitializedAsync();
+                }
+            }
+        }
+        protected async override Task OnInitializedAsync()
+        {
+            var session = httpContextAccessor.HttpContext.Session.GetString("Key");
+
+            if (string.IsNullOrEmpty(session))
+            {
+                navigationManager.NavigateTo($"/dangnhap", true);
+            }
+            else
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = tokenHandler.ReadJwtToken(session);
+                name = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value!;
+                string idUser = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value!;
+                string fullName = jwtSecurityToken.Claims.Where(c => c.Type == ClaimTypes.UserData).FirstOrDefault()?.Value!;
+                httpContextAccessor.HttpContext.Session.SetString("id", idUser);
+
+
+                var user = await _ser.GetInfoUser(idUser);
+                httpContextAccessor.HttpContext.Session.SetString("fullName", fullName);
+                urlImg = user.Data.ImgUrl;
+                await InitializeSignalR();
+            }
+            // Initialize SignalR connection
+        }
+
+        private async Task InitializeSignalR()
+        {
+            try
+            {
+                // var connection = new HubConnectionBuilder()
+                // .WithUrl("https://api.datlich.id.vn/bookingHub")
+                // .Build();
+
+                // connection.On<string>("ReceiveBookingNotification", async message =>
+                // {
+                //     _snackBar.Add(message, Severity.Success);
+                // });
+                // await connection.StartAsync();
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+          
+        }
+
+        private async Task<bool?> Confirm()
+        {
+            var confirm = await _dialogservice.ShowMessageBox("Thông báo",
+            "Bạn có muốn đăng xuất không?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null, options: new DialogOptions { Position = DialogPosition.TopCenter, MaxWidth = MaxWidth.Small, FullWidth = true });
+            StateHasChanged();
+            return confirm;
+        }
+        public class Notification
+        {
+            public string Message { get; set; }
+        }
+        }
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+
+
+    </Authorized>
+    <NotAuthorized>
+        <p>Không có quyền truy cập</p>
+    </NotAuthorized>
+</AuthorizeView>
