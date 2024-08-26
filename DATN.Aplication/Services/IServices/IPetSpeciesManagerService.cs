@@ -1,4 +1,5 @@
 ﻿using DATN.ViewModels.Common;
+using DATN.ViewModels.DTOs.Pet;
 using DATN.ViewModels.DTOs.PetSpecies;
 
 namespace DATN.Aplication.Services.IServices

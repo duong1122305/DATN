@@ -1886,6 +1886,7 @@ namespace DATN.Aplication.Services
         {
             var checkGuest = from guestTable in await _unitOfWork.GuestRepository.GetAllAsync()
                              where guestTable.PhoneNumber == booking.PhoneNumber
+                             && guestTable.Email == booking.Email
                              select guestTable;
             Guest guest;
             if (!checkGuest.Any())
