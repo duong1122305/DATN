@@ -2150,7 +2150,8 @@ namespace DATN.Aplication.Services
                 var user =await _userManager.FindByIdAsync(history.ActionByID!.ToString());
                 var lstBookingDetails= await _unitOfWork.BookingDetailRepository.FindAsync(p=>p.BookingId==id);
                 var lstOrder= await _unitOfWork.OrderDetailRepository.FindAsync(p => p.IdBooking == id);
-                var lstProduct = await _unitOfWork.ProductDetailRepository.GetAllAsync();
+                var lstProductD = await _unitOfWork.ProductDetailRepository.GetAllAsync();
+                var lstProduct = await _unitOfWork.ProductRepository.GetAllAsync();
                 var lstServiceD = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
                 BillPrintVM billPrint = new BillPrintVM() 
                 {
@@ -2164,7 +2165,7 @@ namespace DATN.Aplication.Services
                     TotalReduce= (booking.ReducedAmount??0).ToString("N0")
                 };
                
-                if (lstBookingDetails!=null)
+                if (lstBookingDetails!=null&& lstBookingDetails.Count()>0)
                 {
 					var qrRP = await QrCodeCheckOut(id);
 					billPrint.QrCheckOut = qrRP.Data.ToString();
@@ -2180,15 +2181,17 @@ namespace DATN.Aplication.Services
                                  };
                     billPrint.DataPrintBills.AddRange(dataBD.ToList());
                 }
-                if (lstOrder!=null)
+                if (lstOrder!=null&&lstOrder.Count()>0)
                 {
 					
 					var dataOD = from o in lstOrder
+                                 join pd in lstProductD
+                                 on o.IdProductDetail equals pd.Id 
                                  join p in lstProduct
-                                 on o.IdProductDetail equals p.Id
+                                 on pd.IdProduct equals p.Id
                                  select new DataPrintBill()
                                  {
-                                     Name = p.Name,
+                                     Name = p.Name+" - "+pd.Name,
                                      Price = o.Price.ToString("N0"),
                                      Quantity = o.Quantity.ToString("N0"),
                                      Total = (o.Price * o.Quantity).ToString("N0"),
