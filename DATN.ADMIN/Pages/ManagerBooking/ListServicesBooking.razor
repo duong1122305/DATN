@@ -13,6 +13,8 @@
         @using DATN.ViewModels.DTOs.Booking
         @using DATN.ViewModels.Enum
         @using Microsoft.AspNetCore.SignalR.Client
+        @using System.IdentityModel.Tokens.Jwt
+        @using System.Security.Claims
         @inject HttpClient httpClient
         @inject ISnackbar Snackbar
         @inject IDialogService _dialogservice;
@@ -298,7 +300,10 @@
         {
             isLoading = true;
             await Task.Delay(500);
-            var response = await _client.QrCodeCheckIn(idBooking);
+            var jwt = new JwtSecurityTokenHandler();
+            var tok = jwt.ReadJwtToken(_httpContextAccessor.HttpContext.Session.GetString("Key"));
+            var claim = tok.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+            var response = await _client.QrCodeCheckIn(idBooking, claim);
             var parameters = new DialogParameters();
             string nameDialog = "Khách check In";
 

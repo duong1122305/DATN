@@ -57,7 +57,11 @@ builder.Services.AddDbContext<DATNDbContext>(options =>
         builder.Configuration.GetConnectionString("DATN"),
         b => b.MigrationsAssembly("DATN.API"));
 });
-
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestLineSize = 32768; // Tăng kích thước tối đa cho dòng yêu cầu
+    options.Limits.MaxRequestHeadersTotalSize = 32768*2; // Tăng kích thước tổng cho các header
+});
 builder.Services.AddIdentity<User, Role>(options =>
 {
     options.Password.RequiredLength = 6;
@@ -124,7 +128,7 @@ builder.Services.AddServerSideBlazor()
         {
             options.DetailedErrors = true;
         });
-var app = builder.Build(); 
+var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
