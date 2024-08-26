@@ -10,5 +10,7 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> RemoveProduct(int id);
         public Task<ResponseData<string>> ActiveProduct(int id);
         public Task<ResponseData<List<ProductView>>> ListProduct();
-    }
+        Task<ResponseData<ProductClient>> GetProductByID(int id);
+
+	}
 }

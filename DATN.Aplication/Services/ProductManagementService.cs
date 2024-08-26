@@ -228,6 +228,41 @@ namespace DATN.Aplication.Services
             else
                 return new ResponseData<List<ProductView>> { IsSuccess = false, Error = "Chưa có dữ liệu", Data = new List<ProductView>() };
         }
+        public async Task<ResponseData<ProductClient>> GetProductByID(int id)
+        {
+            try
+            {
+				var lstpd = await _unitOfWork.ProductDetailRepository.GetAllAsync();
+
+				var query = from product in await _unitOfWork.ProductRepository.GetAllAsync()
+							join brand in await _unitOfWork.BrandRepository.GetAllAsync()
+							on product.IdBrand equals brand.Id
+							join img in await _unitOfWork.ImageProductRepository.GetAllAsync()
+							 on product.Id equals img.ProductID
+							join cd in await _unitOfWork.CategoryDetailRepository.GetAllAsync()
+							on product.IdCategoryDeatail equals cd.Id
+							where product.Id == id && !product.Status
+							select new ProductClient()
+							{
+								Id = product.Id,
+								BrandDescription = brand.Description,
+								BrandName = brand.Name,
+								CateDatailsName = cd.Name,
+								ImgUrl = img.UrlImage,
+								NameProduct = product.Name,
+								ProductDescrition = product.Description,
+								ListProductDetail = lstpd.Where(p => p.Id == id&& p.Status!=ProductDetailStatus.Deleted).Select(p => new ProductDetailCilent() { Name = p.Name, ID = p.Id, Price = p.Price.ToString("N0") }).ToList(),
+							};
+                return new ResponseData<ProductClient>(query.ToList().First());
+
+			}
+			catch (Exception ex)
+            {
+
+				return new ResponseData<ProductClient>(false, "Lỗi trong quá trinh xử lý: "+ex);
+			}
+        }
+
     }
 }
 
