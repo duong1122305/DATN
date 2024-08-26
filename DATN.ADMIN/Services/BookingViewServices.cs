@@ -172,5 +172,10 @@ namespace DATN.ADMIN.Services
             var result = JsonConvert.DeserializeObject<ResponseData<string>>(await response.Content.ReadAsStringAsync());
             return result;
         }
+
+        public async Task<ResponseData<BillPrintVM>> GetBillPrintByID(int id)
+        {
+            return _httpClient.GetFromJsonAsync<ResponseData<BillPrintVM>>($"/api/Booking/get-bill-print?id={id}").GetAwaiter().GetResult();
+        }
     }
 }

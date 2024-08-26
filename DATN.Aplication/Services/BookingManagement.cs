@@ -2105,6 +2105,71 @@ namespace DATN.Aplication.Services
                 return new ResponseData<List<HistoryBookingVM>> { IsSuccess = false, Error = e.Message };
             }
         }
+
+        public async Task<ResponseData<BillPrintVM>> GetBillPrintByID(int id)
+        {
+            try
+            {
+                var booking=await _unitOfWork.BookingRepository.GetAsync(id);
+                var guest= await _unitOfWork.GuestRepository.GetAsync(booking.GuestId);
+                var historys= await _unitOfWork.HistoryActionRepository.FindAsync(p=>p.ActionID==16&& p.BookingID==id);
+                var history = historys.First();
+                var user =await _userManager.FindByIdAsync(history.ActionByID!.ToString());
+                var lstBookingDetails= await _unitOfWork.BookingDetailRepository.FindAsync(p=>p.BookingId==id);
+                var lstOrder= await _unitOfWork.OrderDetailRepository.FindAsync(p => p.IdBooking == id);
+                var lstProduct = await _unitOfWork.ProductDetailRepository.GetAllAsync();
+                var lstServiceD = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
+                BillPrintVM billPrint = new BillPrintVM() 
+                {
+                    Address =guest.Address,
+                    AmountPayment= (booking.TotalPrice-booking.ReducedAmount??0).ToString("N0"),
+                    CusName=guest.Name,
+                    PhoneNumber= guest.PhoneNumber,
+                    TimePayment=history.ActionTime.ToString("HH:mm dd/MM/yyyy"),
+                    StaffName= user.FullName,
+                    TotalAmount= booking.TotalPrice.ToString("N0"),
+                    TotalReduce= (booking.ReducedAmount??0).ToString("N0")
+                };
+               
+                if (lstBookingDetails!=null)
+                {
+					var qrRP = await QrCodeCheckOut(id);
+					billPrint.QrCheckOut = qrRP.Data.ToString();
+					var dataBD = from b in lstBookingDetails
+                                 join s in lstServiceD
+                                 on b.ServiceDetailId equals s.Id
+                                 select new DataPrintBill()
+                                 {
+                                     Name = s.NameDetail,
+                                     Price = b.Price.ToString("N0"),
+                                     Quantity = "1",
+                                     Total = b.Price.ToString("N0"),
+                                 };
+                    billPrint.DataPrintBills.AddRange(dataBD.ToList());
+                }
+                if (lstOrder!=null)
+                {
+					
+					var dataOD = from o in lstOrder
+                                 join p in lstProduct
+                                 on o.IdProductDetail equals p.Id
+                                 select new DataPrintBill()
+                                 {
+                                     Name = p.Name,
+                                     Price = o.Price.ToString("N0"),
+                                     Quantity = o.Quantity.ToString("N0"),
+                                     Total = (o.Price * o.Quantity).ToString("N0"),
+                                 };
+                    billPrint.DataPrintBills.AddRange(dataOD.ToList());
+                }
+                return new ResponseData<BillPrintVM>(billPrint);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<BillPrintVM>(false,"Có lỗi xảy ra"+ex);
+            }
+        }
+        //public async Task<ResponseData<>>
     }
     public class MyBitmapRenderer : IBarcodeRenderer<Bitmap>
     {

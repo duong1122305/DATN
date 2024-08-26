@@ -11,6 +11,7 @@
         @inject IDialogService _dialogservice;
         @inject ISnackbar Snackbar
         @inject IJSRuntime jsRuntime;
+        @inject NavigationManager NavigationManager;
         <style>
             .mud-dialog-width-lg {
                 height: 680px;
@@ -460,7 +461,14 @@
                 Snackbar.Add("Hoá đơn chưa thanh toán", Severity.Warning);
                 return;
             }
-            await jsRuntime.InvokeVoidAsync("document.getElementById('contentbill').innerHTML.print()");
+
+         
+
+            // Tạo URL với chuỗi JSON đã mã hóa
+            string url = NavigationManager.ToAbsoluteUri($"/printBill/{idBooking}").ToString();
+
+            await jsRuntime.InvokeVoidAsync("open", url, "_blank");
+            
         }
 
         private async void RemoveProduct(ProductDetailView product)
