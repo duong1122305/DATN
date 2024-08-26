@@ -460,7 +460,7 @@
                 Snackbar.Add("Hoá đơn chưa thanh toán", Severity.Warning);
                 return;
             }
-            await jsRuntime.InvokeVoidAsync("PrintBill");
+            await jsRuntime.InvokeVoidAsync("document.getElementById('contentbill').innerHTML.print()");
         }
 
         private async void RemoveProduct(ProductDetailView product)
@@ -507,6 +507,7 @@
             }
         }
         }
+
     </Authorized>
     <NotAuthorized>
         <p>Không có quyền truy cập</p>

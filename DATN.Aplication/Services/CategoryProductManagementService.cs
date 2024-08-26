@@ -55,7 +55,6 @@ namespace DATN.Aplication.Services
                     if (category.Id == checkdup.FirstOrDefault().Id)
                     {
                         category.Name = categoryView.Name;
-                        category.IdCategory = categoryView.IdCategory;
                         await _unitOfWork.CategoryDetailRepository.UpdateAsync(category);
                         await _unitOfWork.SaveChangeAsync();
                         return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
@@ -66,7 +65,6 @@ namespace DATN.Aplication.Services
                 else
                 {
                     category.Name = categoryView.Name;
-                    category.IdCategory = categoryView.IdCategory;
                     await _unitOfWork.CategoryDetailRepository.UpdateAsync(category);
                     await _unitOfWork.SaveChangeAsync();
                     return new ResponseData<string> { IsSuccess = true, Data = "Sửa thành công " };
