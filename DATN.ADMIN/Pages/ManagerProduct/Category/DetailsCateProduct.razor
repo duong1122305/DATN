@@ -250,7 +250,7 @@
             if (update)
             {
                 nameDialog = "Cập nhật danh mục chi tiết";
-                CreateCategoryProductView viewUpdate = lstCateProduct.Select(c => new CreateCategoryProductView
+                CreateCategoryProductView viewUpdate = lstCateProduct!.Where(p => p.Id == idcateDetail).Select(c => new CreateCategoryProductView
                 {
                     Id = idcateDetail,
                     Name = c.Name,
