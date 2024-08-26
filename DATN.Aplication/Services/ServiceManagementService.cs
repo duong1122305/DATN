@@ -95,13 +95,6 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                foreach (var i in await _unitOfWork.ServiceRepository.GetAllAsync())
-                {
-                    if (i.Name == service.Name.TrimStart().TrimEnd())
-                    {
-                        return new ResponseData<string> { IsSuccess = false, Error = "Dịch vụ đã tồn tại!" };
-                    }
-                }
                 var findId = await _unitOfWork.ServiceRepository.GetAsync(id);
                 findId.Name = service.Name.TrimStart().TrimEnd();
                 findId.Desciption = service.Description.TrimStart().TrimEnd();
