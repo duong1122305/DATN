@@ -109,15 +109,15 @@
         {
             try
             {
-                // var connection = new HubConnectionBuilder()
-                // .WithUrl("https://api.datlich.id.vn/bookingHub")
-                // .Build();
+                var connection = new HubConnectionBuilder()
+                .WithUrl("https://api.datlich.id.vn/bookingHub")
+                .Build();
 
-                // connection.On<string>("ReceiveBookingNotification", async message =>
-                // {
-                //     _snackBar.Add(message, Severity.Success);
-                // });
-                // await connection.StartAsync();
+                connection.On<string>("ReceiveBookingNotification", async message =>
+                {
+                    _snackBar.Add(message, Severity.Success);
+                });
+                await connection.StartAsync();
             }
             catch (Exception)
             {
