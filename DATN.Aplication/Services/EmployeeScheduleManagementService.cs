@@ -203,7 +203,7 @@ namespace DATN.Aplication.Services
                         }
                         else
                         {
-                            return new ResponseData<string> { IsSuccess = false, Data = $"Không có nhân viên nào được thêm vào ca!!!" };
+                            return new ResponseData<string> { IsSuccess = false, Error = $"Không có nhân viên nào được thêm vào ca!!!" };
                         }
                     }
                     else
@@ -233,81 +233,101 @@ namespace DATN.Aplication.Services
                 bool checkCount = false;
                 List<string> listSuccess = new List<string>();
                 List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
-                foreach (var user in listUser)
+                if (query.Count() > 0)
                 {
-                    foreach (var workShift in query.ToList())
+                    var coutReceptionist = 0;
+                    foreach (var user in listUser)
                     {
-                        var checkNumberStaffWokingInDay = await CheckNumberOfStaffWokingInDay(shift, workShift.WorkDate);
-
-                        if ((checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) < 5)
+                        if (String.Join("", (await _usermanager.GetRolesAsync((await _usermanager.FindByIdAsync(user))))) == "Receptionist")
                         {
-                            var schedule = new EmployeeSchedule()
+                            coutReceptionist++;
+                        }
+                        if (coutReceptionist > 1)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Vui lòng không chọn 2 lễ tân trong 1 ca" };
+                        }
+                    }
+                    foreach (var user in listUser)
+                    {
+                        foreach (var workShift in query.ToList())
+                        {
+                            var checkNumberStaffWokingInDay = await CheckNumberOfStaffWokingInDay(shift, workShift.WorkDate);
+
+                            if ((checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) < 5)
                             {
-                                UserId = Guid.Parse(user),
-                                WorkShiftId = workShift.Id,
-                            };
-                            var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                             where scheduletable.UserId == schedule.UserId &&
-                                             scheduletable.WorkShiftId == schedule.WorkShiftId
-                                             select scheduletable;
-                            if (querycheck.ToList().Count == 0)
-                            {
-                                if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) > 5)
+                                var schedule = new EmployeeSchedule()
                                 {
-                                    checkCount = true;
-                                    continue;
-                                }
-                                else
+                                    UserId = Guid.Parse(user),
+                                    WorkShiftId = workShift.Id,
+                                };
+                                var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                                 where scheduletable.UserId == schedule.UserId &&
+                                                 scheduletable.WorkShiftId == schedule.WorkShiftId
+                                                 select scheduletable;
+                                if (querycheck.ToList().Count == 0)
                                 {
-                                    var checkRole = String.Join("", await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(schedule.UserId.ToString())));
-                                    if (checkRole == "Receptionist")
+                                    if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) > 5)
                                     {
-                                        if (checkNumberStaffWokingInDay.Item2 != 0)
-                                        {
-                                            return new ResponseData<string> { IsSuccess = false, Error = "Ca đã có lễ tân vui lòng bỏ chọn thêm lễ tân vào ca" };
-                                        }
+                                        checkCount = true;
+                                        continue;
                                     }
                                     else
                                     {
-                                        if (checkNumberStaffWokingInDay.Item1 >= 4)
+                                        var checkRole = String.Join("", await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(schedule.UserId.ToString())));
+                                        if (checkRole == "Receptionist")
                                         {
-                                            return new ResponseData<string> { IsSuccess = false, Error = "Số nhân viên dịch vụ trong ca đã đủ" };
-                                        }
-                                    }
-                                    if (listSuccess.Count == 0)
-                                    {
-                                        employeeSchedules.Add(schedule);
-                                        listSuccess.Add(schedule.UserId.ToString());
-                                    }
-                                    else
-                                    {
-                                        var check = false;
-                                        foreach (var item in listSuccess)
-                                        {
-                                            if (item.ToLower() == schedule.UserId.ToString().ToLower())
+                                            if (checkNumberStaffWokingInDay.Item2 != 0)
                                             {
-                                                check = true;
-                                                break;
+                                                return new ResponseData<string> { IsSuccess = false, Error = "Ca đã có lễ tân vui lòng bỏ chọn thêm lễ tân vào ca" };
                                             }
                                         }
-                                        if (!check)
+                                        else
                                         {
-                                            listSuccess.Add(schedule.UserId.ToString());
+                                            if (checkNumberStaffWokingInDay.Item1 >= 4)
+                                            {
+                                                return new ResponseData<string> { IsSuccess = false, Error = "Số nhân viên dịch vụ trong ca đã đủ" };
+                                            }
                                         }
-                                        if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) <= 5)
+                                        if (listSuccess.Count == 0)
                                         {
                                             employeeSchedules.Add(schedule);
+                                            listSuccess.Add(schedule.UserId.ToString());
+                                        }
+                                        else
+                                        {
+                                            var check = false;
+                                            foreach (var item in listSuccess)
+                                            {
+                                                if (item.ToLower() == schedule.UserId.ToString().ToLower())
+                                                {
+                                                    check = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!check)
+                                            {
+                                                listSuccess.Add(schedule.UserId.ToString());
+                                            }
+                                            if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) <= 5)
+                                            {
+                                                employeeSchedules.Add(schedule);
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định" };
+                            else
+                            {
+                                return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định" };
+                            }
                         }
                     }
                 }
+                else
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = $"Chưa có ca làm cho tháng {nextMonth}" };
+                }
+
                 var count = checkCount ? listSuccess.Count - 1 : listSuccess.Count;
                 if (count > 0)
                 {
@@ -316,7 +336,7 @@ namespace DATN.Aplication.Services
                 }
                 else
                 {
-                    return new ResponseData<string> { IsSuccess = false, Data = $"Không có nhân viên nào được thêm vào ca" };
+                    return new ResponseData<string> { IsSuccess = false, Error = $"Không có nhân viên nào được thêm vào ca" };
 
                 }
             }
@@ -340,23 +360,101 @@ namespace DATN.Aplication.Services
                 List<string> listSuccess = new List<string>();
                 var checkCount = false;
                 List<EmployeeSchedule> employeeSchedules = new List<EmployeeSchedule>();
-                foreach (var user in listUser)
+                if (query.Count() > 0)
                 {
-                    foreach (var workShift in query.ToList())
+                    var coutReceptionist = 0;
+                    foreach (var user in listUser)
                     {
-                        var checkNumberStaffWokingInDay = await CheckNumberOfStaffWokingInDay(shift, workShift.WorkDate);
-                        if ((checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) < 5)
+                        if (String.Join("", (await _usermanager.GetRolesAsync((await _usermanager.FindByIdAsync(user))))) == "Receptionist")
                         {
-
-                            if (workShift.WorkDate.Day == currentDay.Day && workShift.WorkDate.Month == currentDay.Month && workShift.WorkDate.Year == currentDay.Year)
+                            coutReceptionist++;
+                        }
+                        if (coutReceptionist > 1)
+                        {
+                            return new ResponseData<string> { IsSuccess = false, Error = "Vui lòng không chọn 2 lễ tân trong 1 ca" };
+                        }
+                    }
+                    foreach (var user in listUser)
+                    {
+                        foreach (var workShift in query.ToList())
+                        {
+                            var checkNumberStaffWokingInDay = await CheckNumberOfStaffWokingInDay(shift, workShift.WorkDate);
+                            if ((checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) < 5)
                             {
-                                var queryShift = (from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
-                                                  where shifttable.Id == shift
-                                                  select shifttable).FirstOrDefault();
 
-                                if (currentDay.Hour >= queryShift.To.Hours || currentDay.Hour >= queryShift.From.Hours && currentDay.Hour <= queryShift.To.Hours)
+                                if (workShift.WorkDate.Day == currentDay.Day && workShift.WorkDate.Month == currentDay.Month && workShift.WorkDate.Year == currentDay.Year)
                                 {
-                                    continue;
+                                    var queryShift = (from shifttable in await _unitOfWork.ShiftRepository.GetAllAsync()
+                                                      where shifttable.Id == shift
+                                                      select shifttable).FirstOrDefault();
+
+                                    if (currentDay.Hour >= queryShift.To.Hours || currentDay.Hour >= queryShift.From.Hours && currentDay.Hour <= queryShift.To.Hours)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        var schedule = new EmployeeSchedule()
+                                        {
+                                            UserId = Guid.Parse(user),
+                                            WorkShiftId = workShift.Id
+                                        };
+                                        var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
+                                                         where scheduletable.UserId == schedule.UserId &&
+                                                         scheduletable.WorkShiftId == schedule.WorkShiftId
+                                                         select scheduletable;
+                                        if (querycheck.ToList().Count == 0)
+                                        {
+                                            var checkRole = String.Join("", await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(schedule.UserId.ToString())));
+                                            if (checkRole == "Receptionist")
+                                            {
+                                                if (checkNumberStaffWokingInDay.Item2 != 0)
+                                                {
+                                                    return new ResponseData<string> { IsSuccess = false, Error = "Ca đã có lễ tân vui lòng bỏ chọn thêm lễ tân vào ca" };
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (checkNumberStaffWokingInDay.Item1 >= 4)
+                                                {
+                                                    return new ResponseData<string> { IsSuccess = false, Error = "Số nhân viên dịch vụ trong ca đã đủ" };
+                                                }
+                                            }
+                                            if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) > 5)
+                                            {
+                                                checkCount = true;
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                if (listSuccess.Count == 0)
+                                                {
+                                                    employeeSchedules.Add(schedule);
+                                                    listSuccess.Add(schedule.UserId.ToString());
+                                                }
+                                                else
+                                                {
+                                                    var check = false;
+                                                    foreach (var item in listSuccess)
+                                                    {
+                                                        if (item.ToLower() == schedule.UserId.ToString().ToLower())
+                                                        {
+                                                            check = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (!check)
+                                                    {
+                                                        listSuccess.Add(schedule.UserId.ToString());
+                                                    }
+                                                    if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) <= 5)
+                                                    {
+                                                        employeeSchedules.Add(schedule);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -371,21 +469,6 @@ namespace DATN.Aplication.Services
                                                      select scheduletable;
                                     if (querycheck.ToList().Count == 0)
                                     {
-                                        var checkRole = String.Join("", await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(schedule.UserId.ToString())));
-                                        if (checkRole == "Receptionist")
-                                        {
-                                            if (checkNumberStaffWokingInDay.Item2 != 0)
-                                            {
-                                                return new ResponseData<string> { IsSuccess = false, Error = "Ca đã có lễ tân vui lòng bỏ chọn thêm lễ tân vào ca" };
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (checkNumberStaffWokingInDay.Item1 >= 4)
-                                            {
-                                                return new ResponseData<string> { IsSuccess = false, Error = "Số nhân viên dịch vụ trong ca đã đủ" };
-                                            }
-                                        }
                                         if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) > 5)
                                         {
                                             checkCount = true;
@@ -393,6 +476,14 @@ namespace DATN.Aplication.Services
                                         }
                                         else
                                         {
+                                            var checkRole = String.Join("", await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(schedule.UserId.ToString())));
+                                            if (checkRole == "Receptionist")
+                                            {
+                                                if (checkNumberStaffWokingInDay.Item2 != 0)
+                                                {
+                                                    return new ResponseData<string> { IsSuccess = false, Error = "Ca đã có lễ tân vui lòng bỏ chọn thêm lễ tân vào ca" };
+                                                }
+                                            }
                                             if (listSuccess.Count == 0)
                                             {
                                                 employeeSchedules.Add(schedule);
@@ -424,66 +515,14 @@ namespace DATN.Aplication.Services
                             }
                             else
                             {
-                                var schedule = new EmployeeSchedule()
-                                {
-                                    UserId = Guid.Parse(user),
-                                    WorkShiftId = workShift.Id
-                                };
-                                var querycheck = from scheduletable in await _unitOfWork.EmployeeScheduleRepository.GetAllAsync()
-                                                 where scheduletable.UserId == schedule.UserId &&
-                                                 scheduletable.WorkShiftId == schedule.WorkShiftId
-                                                 select scheduletable;
-                                if (querycheck.ToList().Count == 0)
-                                {
-                                    if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) > 5)
-                                    {
-                                        checkCount = true;
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        var checkRole = String.Join("", await _usermanager.GetRolesAsync(await _usermanager.FindByIdAsync(schedule.UserId.ToString())));
-                                        if (checkRole == "Receptionist")
-                                        {
-                                            if (checkNumberStaffWokingInDay.Item2 != 0)
-                                            {
-                                                return new ResponseData<string> { IsSuccess = false, Error = "Ca đã có lễ tân vui lòng bỏ chọn thêm lễ tân vào ca" };
-                                            }
-                                        }
-                                        if (listSuccess.Count == 0)
-                                        {
-                                            employeeSchedules.Add(schedule);
-                                            listSuccess.Add(schedule.UserId.ToString());
-                                        }
-                                        else
-                                        {
-                                            var check = false;
-                                            foreach (var item in listSuccess)
-                                            {
-                                                if (item.ToLower() == schedule.UserId.ToString().ToLower())
-                                                {
-                                                    check = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!check)
-                                            {
-                                                listSuccess.Add(schedule.UserId.ToString());
-                                            }
-                                            if (listSuccess.Count + (checkNumberStaffWokingInDay.Item1 + checkNumberStaffWokingInDay.Item2) <= 5)
-                                            {
-                                                employeeSchedules.Add(schedule);
-                                            }
-                                        }
-                                    }
-                                }
+                                return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định!!" };
                             }
                         }
-                        else
-                        {
-                            return new ResponseData<string> { IsSuccess = false, Error = "Số người làm việc trong 1 ca vượt quá số người quy định!!" };
-                        }
                     }
+                }
+                else
+                {
+                    return new ResponseData<string> { IsSuccess = false, Error = $"Chưa có ca làm cho tháng {nextMonth}" };
                 }
                 var count = checkCount ? listSuccess.Count - 1 : listSuccess.Count;
                 if (count > 0)
@@ -493,7 +532,7 @@ namespace DATN.Aplication.Services
                 }
                 else
                 {
-                    return new ResponseData<string> { IsSuccess = false, Data = $"Không có nhân viên nào được thêm vào ca" };
+                    return new ResponseData<string> { IsSuccess = false, Error = $"Không có nhân viên nào được thêm vào ca" };
 
                 }
             }
