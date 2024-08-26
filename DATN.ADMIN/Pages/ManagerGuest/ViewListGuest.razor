@@ -24,8 +24,26 @@
 
                 <MudTable Items="@lstGuest" Hover="true" Style="width:100%" SortLabel="Sort By" >
                     <ToolBarContent>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
-
+                       
+                        <div style="display:flex">
+                            <div style="margin:5px">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled=@isOpenDialog Style="margin-bottom: 10px" title="Thêm" OnClick="@(async()=>await OpenDialog(Guid.Empty))">Thêm</MudButton>
+                            </div>
+                            <div style="margin-right:5px">
+                                <MudSelect T="int" Label="Trạng thái xác minh" Value="statusVerify" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="ChangeVerify" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                                    <MudSelectItem Value="1">Đã xác minh</MudSelectItem>
+                                    <MudSelectItem Value="0">Chưa xác minh</MudSelectItem>
+                                </MudSelect>
+                            </div>
+                            <div>
+                                <MudSelect T="int" Label="Trạng thái hoạt động" Value="statusActive" Variant="Variant.Outlined" style="width: 200px; margin-bottom: 10px;" ValueChanged="ChangeActive" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                                    <MudSelectItem Value="1">Đang hoạt động</MudSelectItem>
+                                    <MudSelectItem Value="0">Ngừng hoạt động</MudSelectItem>
+                                </MudSelect>
+                            </div>
+                        </div>
                         <MudSpacer />
                         <MudTextField T="string"  Value="searchString"  ValueChanged="(e)=>Search(e)" Placeholder="Tìm kiếm" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent>
@@ -120,6 +138,9 @@
         private IGuestManagerClient _guestService { get; set; }
         string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
         private bool isLoading;
+        int statusVerify = -1;
+        int statusActive = -1;
+      
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
@@ -182,18 +203,40 @@
         }
         private void Search(string value)
         {
-            if (value!=null|| !string.IsNullOrEmpty(value))
+            searchString= value;
+            FilterData();
+        }
+        private void FilterData()
+        {
+            if (searchString != null || !string.IsNullOrEmpty(searchString))
             {
-                searchString = value;
-                value = value.ToUpper();
+                searchString = searchString.ToUpper();
                 var csde = JsonConvert.SerializeObject(lstGuest);
-                lstGuest = lstGuestResponse.Where(p => p.Name.ToUpper().Contains(value)
-                || (p.PhoneNumber!=null&& p.PhoneNumber.ToUpper().Contains(value))
-                || (p.Email != null && p.Email.ToUpper().Contains(value))
+                lstGuest = lstGuestResponse.Where(p => p.Name.ToUpper().Contains(searchString)
+                || (p.PhoneNumber != null && p.PhoneNumber.ToUpper().Contains(searchString))
+                || (p.Email != null && p.Email.ToUpper().Contains(searchString))
                 ).ToList();
             }
+            if (statusActive==1)
+            {
+                lstGuest = lstGuestResponse.Where(p => p.IsConfirm.HasValue && p.IsConfirm.Value).ToList();
+            }
+
+            if (statusActive == 0)
+            {
+                lstGuest = lstGuestResponse.Where(p => !p.IsConfirm.HasValue || !p.IsConfirm.Value).ToList();
+            }
+            if (statusVerify==1)
+            {
+                lstGuest = lstGuestResponse.Where(p => p.IsDelete.HasValue && p.IsConfirm.Value).ToList();
+            }
+
+            if (statusVerify == 0)
+            {
+                lstGuest = lstGuestResponse.Where(p => !p.IsConfirm.HasValue || !p.IsConfirm.Value).ToList();
+            }
         }
-       
+
         public void OpenGuestDetails(Guid id)
         {
             bool result = id == selectedGuest.Id;
@@ -241,9 +284,12 @@
         }// them sửa khách
         public async Task OpeListPetDialog(Guid id)
         {
+            isLoading = true;
+            await Task.Delay(1);
             var parameters = new DialogParameters();
             parameters.Add("Id", id);
             string nameDialog = "Danh sách thú cưng";
+
             DialogOptions options = new DialogOptions()
             {
                 CloseOnEscapeKey = true,
@@ -259,10 +305,22 @@
             if (result.Canceled)
             {
                 createUpdateDialog.Close();
+            }
+            isLoading = false;
                 await LoadData();
                 StateHasChanged();
-            }
         }
+        private async void ChangeActive(int value)
+        {
+            statusActive= value;
+             FilterData();
+        }
+        private async void ChangeVerify(int value)
+        {
+            statusVerify = value;
+             FilterData();
+        }
+       
 
         }
     </Authorized>

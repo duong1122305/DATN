@@ -1,4 +1,4 @@
-﻿@page "/public/{idBooking}"
+﻿@page "/public/{idBooking}/{token}"
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.DTOs.ActionBooking
 @layout LayoutNoAuth
@@ -10,11 +10,14 @@
     NavigationManager navigationManager { get; set; }
     [Parameter]
     public string idBooking { get; set; }
+    [Parameter]
+    public string token { get; set; }
     protected override async Task OnInitializedAsync()
     {
         var action = new ActionView()
             {
                 IdBokingOrDetail = Convert.ToInt32(idBooking),
+                Token = token
             };
         var response = await _booking.CheckInArrive(action);
         if (response.IsSuccess)

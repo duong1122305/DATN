@@ -97,5 +97,10 @@ namespace DATN.API.Controllers
         {
             return await _productDetaiManagementServicel.ListProductDetailForProduct(id);
         }
+        [HttpGet("get-product-by-id")]
+        public async Task<ResponseData<ProductClient>> GetProductByID(int id)
+		{
+            return await _productManagementServicel.GetProductByID(id);
+        }
     }
 }
