@@ -56,7 +56,7 @@
 
 
         @code {
-        [Parameter]
+            [Parameter]
         public int id { get; set; }
         [Parameter]
         public int idService { get; set; }
@@ -86,13 +86,7 @@
         protected override async Task OnInitializedAsync()
         {
             updateServiceDetailVM.ServiceId = idService;
-            var result = await _serviceManagermentService.GetAll();
-            if (result.IsSuccess)
-            {
-                lstService = result.Data.Where(p => !p.IsDetele).ToList();
-                // updateServiceDetailVM = lstService.Select(c => new CreateServiceDetailVM).First();
-            }
-
+            await LoadData();
             if (id != null && id != 0)
             {
                 _nameButton = "Cập nhật";
@@ -109,6 +103,16 @@
                 _nameButton = "Thêm mới";
                 await OnPriceChanged(createServiceDetailVM.Price);
             }
+        }
+        private async Task LoadData()
+        {
+            var result = await _serviceManagermentService.GetAll();
+            if (result.IsSuccess)
+            {
+                lstService = result.Data.Where(p => !p.IsDetele).ToList();
+                // updateServiceDetailVM = lstService.Select(c => new CreateServiceDetailVM).First();
+            }
+
         }
 
         private async Task OnPriceChanged(float value)
