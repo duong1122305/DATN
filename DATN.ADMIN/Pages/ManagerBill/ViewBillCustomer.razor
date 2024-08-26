@@ -71,7 +71,7 @@
                             {
                                 <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
                                     <HeaderContent>
-                                        <MudTh>Tên sản phẩm</MudTh>
+                                        <MudTh>Tên biến thể</MudTh>
                                         <MudTh>Số lượng</MudTh>
                                         <MudTh>Đơn giá</MudTh>
                                     </HeaderContent>
@@ -92,7 +92,7 @@
                             {
                                 <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
                                     <HeaderContent>
-                                        <MudTh>Tên sản phẩm</MudTh>
+                                        <MudTh>Tên biến thể</MudTh>
                                         <MudTh>Số lượng</MudTh>
                                         <MudTh>Đơn giá</MudTh>
                                         <MudTh>Hành động</MudTh>
@@ -119,7 +119,7 @@
                         {
                             <MudTable Items="@bookingService.ListProductDetail.Where(c=>c.Term==termId)" Class="invoice-table">
                                 <HeaderContent>
-                                    <MudTh>Tên sản phẩm</MudTh>
+                                    <MudTh>Tên biến thể</MudTh>
                                     <MudTh>Số lượng</MudTh>
                                     <MudTh>Đơn giá</MudTh>
                                     <MudTh>Hành động</MudTh>
