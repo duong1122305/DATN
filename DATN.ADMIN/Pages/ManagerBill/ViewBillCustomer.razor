@@ -193,109 +193,6 @@
                         </div>
                     }
                 </div>
-                <div class="div-content" id="contentbill" hidden>
-                    <h3>MEW SHOP</h3>
-                    <div>
-                        <p>Khách hàng: @bill.GuestName</p>
-                        <p>Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
-                        <p>Nhân viên: Việt Nguyễn</p>
-                        <p>Số điện thoại: @bill.PhoneNumber</p>
-                        <p>Địa chỉ: @_addressServive.GetAddress(bill.Address)</p>
-
-                        <div>
-                            mã qr
-                        </div>
-                    </div>
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Tên dịch vụ</th>
-                                <th scope="col">Giá dịch vụ</th>
-                                <th scope="col">Tên sản phẩm</th>
-                                <th scope="col">Số lượng</th>
-                                <th scope="col">Giá sản phẩm</th>
-                                <th scope="col">Tổng tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in bill.ListServiceBooked)
-                            {
-                                @foreach (var item2 in bill.ListProductDetail)
-                                {
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>@item.ServiceDetailName</td>
-                                        <td>@CurrencyHelper.FormatCurrency((float)item.Price)</td>
-                                        <td>@item2.Name</td>
-                                        <td>@item2.SelectQuantityProduct</td>
-                                        <td>@CurrencyHelper.FormatCurrency((float)item2.Price)</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                    <p><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)bill.ReducePrice)</p>
-                    <p><b>Thanh toán:</b> @CurrencyHelper.FormatCurrency((float)bill.TotalPayment)</p>
-                    <p><b>Tiền khách trả:</b> @CurrencyHelper.FormatCurrency((float)bill.TotalPayment)</p>
-                </div>
-                <style>
-                    .div-content {
-                        font-family: Arial, sans-serif;
-                        padding: 20px;
-                        border: 1px solid #ddd;
-                        border-radius: 8px;
-                        width: 90%;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                    }
-
-                    h3 {
-                        color: #333;
-                        text-align: center;
-                    }
-
-                    p {
-                        margin: 0;
-                        padding: 5px 0;
-                        margin-left: 5px;
-                    }
-
-                    .table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 20px;
-                    }
-
-                        .table th, .table td {
-                            border: 1px solid #ddd;
-                            padding: 8px;
-                            text-align: left;
-                        }
-
-                        .table th {
-                            background-color: #f4f4f4;
-                        }
-
-                        .table td {
-                            background-color: #fafafa;
-                        }
-
-                        .table thead {
-                            background-color: #f9f9f9;
-                        }
-
-                        .table tr:nth-child(even) {
-                            background-color: #f2f2f2;
-                        }
-
-                        .table tr:hover {
-                            background-color: #eaeaea;
-                        }
-
-                </style>
             </MudPaper>
         </MudContainer>
 
@@ -610,21 +507,6 @@
             }
         }
         }
-        <script>
-            function async PrintBill() {
-                var bill = document.getElementById("contentbill").innerHTML;
-                var printWindow = window.open('', '', 'height=600,width=800');
-
-                // Thêm nội dung vào cửa sổ mới
-                printWindow.document.write('<html><head><title>Print Content</title>');
-                printWindow.document.write('</head><body>');
-                printWindow.document.write(bill);
-                printWindow.document.write('</body></html>');
-
-                // Đợi đến khi nội dung được tải xong và thực hiện in
-                printWindow.print();
-            }
-        </script>
     </Authorized>
     <NotAuthorized>
         <p>Không có quyền truy cập</p>

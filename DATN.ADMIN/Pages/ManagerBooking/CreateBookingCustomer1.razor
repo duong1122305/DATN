@@ -18,7 +18,7 @@
         <MudForm Style="text-align:center;margin-bottom:20px">
             <MudItem xs="12" sm="6" md="4">
                 <div style="display: flex; justify-content: flex-end; width: 1240px; margin-left: auto;margin-left:10px">
-                    <MudAutocomplete T="GuestViewModel" @bind-Value="value1" Label="Chọn khách hàng *" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" Disabled="@(!CanSelectGuest)" />
+                    <MudAutocomplete T="GuestViewModel" @bind-Value="value1" Label="Chọn khách hàng *" SearchFunc="@Search" ToStringFunc="@(e => e == null ? null : $"{e.Name} ({e.PhoneNumber})")" style="flex: 1; margin-right: 10px;" Disabled="@(!CanSelectGuest)" AdornmentIcon="@Icons.Material.Filled.Add" AdornmentColor="Color.Primary" OnAdornmentClick="@(async()=>OpenDialog())" />
                     @if (value1 != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -30,8 +30,8 @@
                                        ToolTip="Xoá lựa chọn khách hàng">
                         </MudIconButton>
                     }
-                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Disabled="@(!CanSelectPet)" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"/>
-@*                     @if (value2 != null)
+                    <MudAutocomplete T="PetVM" Label="Chọn thú cưng" @bind-Value="value2" SearchFunc="@Search2" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" Disabled="@(!CanSelectPet)" AdornmentIcon="@Icons.Material.Filled.Add" AdornmentColor="Color.Primary" OnAdornmentClick="@(async()=>OpeListPetDialog())" />
+                    @if (value2 != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
                                        Color="Color.Error"
@@ -41,10 +41,8 @@
                                        Style="margin-left: 8px;"
                                        ToolTip="Xoá lựa chọn thú cưng">
                         </MudIconButton>
-                    } *@
-                    <MudIconButton Icon="@Icons.Material.Filled.Add" @onclick="@(async()=>await OpeListPetDialog())" Variant="Variant.Outlined" Color="Color.Primary" Size="MudBlazor.Size.Small" />
+                    }
                     <div style="display: flex; align-items: center;padding-left:200px">
-                        <MudButton Disabled=@isOpenDialog OnClick="@(async () => await OpenDialog())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success">Thêm khách hàng</MudButton>
                         @if (bookingService.lstBooking.Count > 0 && value1 != null)
                         {
                             <MudButton OnClick="@(async () => await CreateBookingInDb())" Style="margin-top: 10px; margin-left: 10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Thêm lịch hẹn</MudButton>
@@ -253,7 +251,6 @@
         {
             isLoading = true;
             await Task.Delay(1);
-            isOpenDialog = true;
             string nameDialog = "Thêm mới khách hàng";
             DialogOptions options = new DialogOptions()
             {
@@ -269,12 +266,11 @@
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
+                isLoading = true;
                 await LoadData();
                 StateHasChanged();
             }
             isLoading = false;
-            isOpenDialog = false;
-
         }
 
         public async Task CreateBookingInDb()
