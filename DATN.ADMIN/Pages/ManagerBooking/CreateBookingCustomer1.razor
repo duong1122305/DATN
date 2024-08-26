@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; width: 650px; margin-left: auto;margin-left:10px">
-                    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" Disabled="@(!CanSelectTime)" Style="margin-right:10px"/>
+                    <MudTimePicker Label="Chọn thời gian" @bind-Time="timeStart" Disabled="@(!CanSelectTime)" Style="margin-right:10px" />
                     @if (timeStart != null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -80,9 +80,9 @@
                         </MudIconButton>
                     }
                     <div style="width: 200px">
-                    <MudButton OnClick="@(async()=>await Create())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Primary">Chọn dịch vụ</MudButton>
+                        <MudButton OnClick="@(async()=>await Create())" StartIcon="@Icons.Material.Filled.Add" Style="margin-top: 10px; margin-left: 10px;" Variant="Variant.Filled" Color="Color.Primary">Chọn dịch vụ</MudButton>
                     </div>
-                    </div>
+                </div>
             </MudItem>
             <MudTable Items="@bookingService.lstBooking" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
@@ -266,11 +266,12 @@
             if (!result.Canceled)
             {
                 createUpdateDialog.Close();
-                isLoading = true;
                 await LoadData();
+                isLoading = false;
                 StateHasChanged();
             }
             isLoading = false;
+            StateHasChanged();
         }
 
         public async Task CreateBookingInDb()

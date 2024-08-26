@@ -4,6 +4,7 @@
         @using DATN.ADMIN.IServices
         @using DATN.ViewModels.DTOs.Attendace
         @inject IDialogService _dialogservice;
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
         <PageTitle>Thông tin chấm công</PageTitle>
         <MudDrawerContainer Class="mud-height-full" Style=" width:100%">
             <MudText Typo="Typo.h6">Thông tin chấm công tháng @month</MudText>
@@ -88,6 +89,7 @@
     private string searchString = "";
     private int month = DateTime.Now.Month;
     private int year = DateTime.Now.Year;
+    private bool isLoading;
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -108,7 +110,8 @@
     }
     private async Task OpenDialog(Guid id)
     {
-
+        isLoading = true;
+        await Task.Delay(10);
         var parameters = new DialogParameters();
         string nameDialog = "Xem chi tiết";
 
@@ -131,6 +134,7 @@
         {
             createUpdateDialog.Close();
         }
+       isLoading= false;
     }
     private bool FilterFunc(AttendanceMonth element)// lọc data
     {

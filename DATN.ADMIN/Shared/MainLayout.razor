@@ -107,15 +107,24 @@
 
         private async Task InitializeSignalR()
         {
-            var connection = new HubConnectionBuilder()
-            .WithUrl("https://api.datlich.id.vn/bookingHub")
-            .Build();
-
-            connection.On<string>("ReceiveBookingNotification", async message =>
+            try
             {
-                _snackBar.Add(message, Severity.Success);
-            });
-            await connection.StartAsync();
+                var connection = new HubConnectionBuilder()
+                .WithUrl("https://api.datlich.id.vn/bookingHub")
+                .Build();
+
+                connection.On<string>("ReceiveBookingNotification", async message =>
+                {
+                    _snackBar.Add(message, Severity.Success);
+                });
+                await connection.StartAsync();
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+          
         }
 
         private async Task<bool?> Confirm()

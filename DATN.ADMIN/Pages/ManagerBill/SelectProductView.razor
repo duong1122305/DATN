@@ -6,44 +6,52 @@
         @using DATN.ViewModels.DTOs.Booking
         @using DATN.ViewModels.DTOs.Product
         @using DATN.ViewModels.DTOs.ProductDetail
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
-        <MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="width:1200px;min-width:1200px">
-            <ToolBarContent>
-                <MudSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
-            </ToolBarContent>
-            <Columns>
-                <TemplateColumn Title="STT" Sortable="false" Filterable="false">
-                    <CellTemplate Context="data">
-                        @(lstProductDetaiView.IndexOf(data.Item) + 1)
-                    </CellTemplate>
-                </TemplateColumn>
-                <TemplateColumn Title="Ảnh" Sortable="false" Filterable="false">
-                    <CellTemplate Context="data">
-                        <MudImage Src="@data.Item.LinkImg" Height="150" />
-                    </CellTemplate>
-                </TemplateColumn>
-                <PropertyColumn Property="x=>x.Name" Title="Tên SP" Sortable="false" Filterable="false" Style="width:200px" />
-                <PropertyColumn Property="x=>x.CateName" Title="Danh mục" Sortable="false" Filterable="false" />
-                <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
-                <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
-                    <CellTemplate Context="data">
-                        <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var item2 in data.Item.ListProductDetail)
-                            {
-                                if (item2.Quantity > 0)
+       @if (lstProductDetaiView.Count != 0 || lstProductDetaiView.Count !=null)
+        {
+            <MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="width:1200px;min-width:1200px">
+                <ToolBarContent>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="searchString" Placeholder="Tìm kiếm, tên" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Small" Class="mt-0" Immediate="true"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <TemplateColumn Title="STT" Sortable="false" Filterable="false">
+                        <CellTemplate Context="data">
+                            @(lstProductDetaiView.IndexOf(data.Item) + 1)
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Ảnh" Sortable="false" Filterable="false">
+                        <CellTemplate Context="data">
+                            <MudImage Src="@data.Item.LinkImg" Height="150" />
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="x=>x.Name" Title="Tên SP" Sortable="false" Filterable="false" Style="width:200px" />
+                    <PropertyColumn Property="x=>x.CateName" Title="Danh mục" Sortable="false" Filterable="false" />
+                    <PropertyColumn Property="x=>x.BrandName" Title="Thương hiệu" Sortable="false" Filterable="false" />
+                    <TemplateColumn Title="Chọn" Sortable="false" Filterable="false">
+                        <CellTemplate Context="data">
+                            <MudSelect T="ProductDetailView" Label="Chọn" ValueChanged="(e)=>ChooseProduct(e)" Variant="Variant.Outlined" Style="width:300px" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var item2 in data.Item.ListProductDetail)
                                 {
-                                    <MudSelectItem Value="item2">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price) - @item2.Quantity Sản phẩm</MudSelectItem>
+                                    if (item2.Quantity > 0)
+                                    {
+                                        <MudSelectItem Value="item2">@item2.Name - @CurrencyHelper.FormatCurrency((float)item2.Price) - @item2.Quantity Sản phẩm</MudSelectItem>
+                                    }
                                 }
-                            }
-                        </MudSelect>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-            <PagerContent>
-                <MudDataGridPager T="ProductSelect" />
-            </PagerContent>
-        </MudDataGrid>
+                            </MudSelect>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="ProductSelect" />
+                </PagerContent>
+            </MudDataGrid>
+        }
+        else
+        {
+            <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+        }
 
         @code {
         [Parameter]
@@ -58,11 +66,13 @@
         private BookingService _tempLstProductDetail { get; set; }
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
         private List<ProductSelect> lstProductDetaiView = new List<ProductSelect>();
+        private bool isLoading;
 
         private string searchString = "";
 
         private async Task LoadData()
         {
+          
             var respone = await _ClientProduct.ListProductViewSale();
             if (respone.IsSuccess)
             {
@@ -72,11 +82,15 @@
             {
                 lstProductDetaiView = new List<ProductSelect>();
             }
+           
         }
         private async Task ChooseProduct(ProductDetailView productDV)
         {
+           
             @if (IdBooking != 0 && IdBooking != null)
             {
+                isLoading = true;
+                await Task.Delay(50);
                 productDV.IdBooking = IdBooking.Value;
                 var check = _tempLstProductDetail.ListProductDetail.FirstOrDefault(c => c.IdProductDetail == productDV.IdProductDetail && c.IdBooking == productDV.IdBooking);
                 if (check != null)
@@ -84,16 +98,24 @@
                     if (check.SelectQuantityProduct < productDV.Quantity)
                     {
                         _tempLstProductDetail.AddProduct(productDV);
+                        isLoading = false;
+                        StateHasChanged();
                     }
                 }
                 else
                 {
                     _tempLstProductDetail.AddProduct(productDV);
+                    isLoading = false;
+                    StateHasChanged();
                 }
+                isLoading = false ;
+                StateHasChanged();
                 _dialogBox.Close();
             }
             else
             {
+                isLoading = true;
+                await Task.Delay(50);
                 productDV.Term = termId;
                 var check = _tempLstProductDetail.ListProductDetail.FirstOrDefault(c => c.IdProductDetail == productDV.IdProductDetail && c.Term == productDV.Term);
                 if (check != null)
@@ -107,12 +129,13 @@
                 {
                     _tempLstProductDetail.AddProduct(productDV);
                 }
-                _dialogBox.Close();
             }
+            isLoading = false;
+            StateHasChanged();
+            _dialogBox.Close();
         }
         protected override async Task OnInitializedAsync()
         {
-
             await LoadData();
         }
         private Func<ProductSelect, bool> _quickFilter => x =>

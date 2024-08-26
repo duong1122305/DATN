@@ -17,7 +17,7 @@
 
         </div>
 
-        <MudDataGrid Items="@bookingService.ListProductDetail" Hover="true" Filterable="true" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
+        <MudDataGrid Items="@lstBookingServices" Hover="true" Filterable="true" @ref="dataGrid" Groupable="true" GroupExpanded="false" MultiSelection="true">
             <Columns>
                 <TemplateColumn Title="STT" Grouping GroupBy="@_groupBy" Sortable="false" Filterable="false">
                     <GroupTemplate Context="data">
@@ -47,13 +47,16 @@
 
         static bool _customizeGroupBy;
         MudDataGrid<ProductDetailView> dataGrid;
-
+        [Parameter]
+        public Guid guid { get; set; }
         protected override async Task OnInitializedAsync()
         {
-        }
 
+            await LoadData();
+        }
         private async Task LoadData()
         {
+            lstBookingServices = bookingService.ListProductDetail.Where(c => c.Term != null && c.Term != 0).ToList();
         }
         private Func<ProductDetailView, string> _groupBy = x =>
         {
@@ -72,8 +75,6 @@
         }
         private async Task OpenDialogBill(Guid? id, DateTime date, int? idBooking, int? idterm)
         {
-            isLoading = true;
-            await Task.Delay(30);
             var parameters = new DialogParameters();
             string nameDialog = "";
 
@@ -97,7 +98,8 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
-            isLoading = false;
+            await LoadData();
+
 
         }
         public async Task RemoveBill(int id)
@@ -125,6 +127,8 @@
                 createUpdateDialog.Close();
                 await LoadData();
             }
+            await LoadData();
+
         }
         }
 
