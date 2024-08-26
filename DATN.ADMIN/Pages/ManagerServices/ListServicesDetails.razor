@@ -14,7 +14,7 @@
         @inject ISnackbar Snackbar
         @inject IDialogService _dialogservice
         <PageTitle>Danh sách dịch vụ chi tiết</PageTitle>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null))">Thêm</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(async()=>await OpenDialog(null,null))">Thêm</MudButton>
 
         <MudButton Variant="Variant.Filled" Href="/ListServices" Style="margin-block-end" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary">Danh sách dịch vụ</MudButton>
         <MudTable Items="@lstServiceName">
@@ -61,7 +61,7 @@
                                IconColor="@(data.IsDeleted ? Color.Surface : Color.Error)"
                                title="@(data.IsDeleted ? "Kích hoạt" : "Xoá")"></MudButton>
 
-                    <MudButton IconSize="MudBlazor.Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(data.ServiceDetailId))"></MudButton>
+                    <MudButton IconSize="MudBlazor.Size.Large" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Warning" title="Sửa" OnClick="@(async()=>await OpenDialog(data.ServiceDetailId,data.IdService))"></MudButton>
                     <MudButton IconSize="MudBlazor.Size.Large" StartIcon="@Icons.Material.Filled.RemoveRedEye" OnClick="@(async() => OpenViewDetails(data.ServiceDetailId))" IconColor="Color.Info" title="Xem chi tiết"></MudButton>
                 </MudTd>
 
@@ -136,7 +136,7 @@
 
         }
 
-        private async Task OpenDialog(int? id)
+        private async Task OpenDialog(int? id, int? idService)
         {
             var parameters = new DialogParameters();
             string nameDialog = "Thêm mới dịch vụ chi tiết";
@@ -145,6 +145,7 @@
             {
                 nameDialog = "Chỉnh sửa dịch vụ chi tiết";
                 parameters.Add("id", id);
+                parameters.Add("idService", idService);
             }
             DialogOptions options = new DialogOptions()
             {

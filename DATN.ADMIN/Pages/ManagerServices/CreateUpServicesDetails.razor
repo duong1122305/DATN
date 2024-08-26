@@ -8,12 +8,12 @@
         @using System.Globalization
         @inject ISnackbar Snackbar
         @inject IDialogService _diagService
-        <EditForm Context="data" Model="@createServiceDetailVM" >
-            <DataAnnotationsValidator/>
+        <EditForm Context="data" Model="@createServiceDetailVM">
+            <DataAnnotationsValidator />
             <MudItem xs="12" sm="12">
                 <MudCard>
                     <MudCardContent>
-                        @if ( id == 0)
+                        @if (id == 0)
                         {
                             <div class="mud-select">
                                 <label class="mud-input-label">Chọn dịch vụ</label>
@@ -27,7 +27,7 @@
                             <MudTextField T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
                             <MudTextField T="double" Variant="Variant.Outlined" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
                             <MudNumericField T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
-                           
+
                         }
                         else
                         {
@@ -43,7 +43,7 @@
                             <MudTextField T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
                             <MudTextField T="double" Variant="Variant.Outlined" Label="Thời gian làm" MaxLength="2" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
                             <MudNumericField T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@updateServiceDetailVM.Price" Format="N0" MaxLength="7" />
-                          
+
                         }
                         <hr class="hr" />
                         <div class="mt-5" style="text-align: end;">
@@ -53,12 +53,13 @@
                 </MudCard>
             </MudItem>
         </EditForm>
-        
+
 
         @code {
-            [Parameter]
+        [Parameter]
         public int id { get; set; }
-
+        [Parameter]
+        public int idService { get; set; }
         [Parameter]
         public CreateServiceDetailVM createServiceDetailVM { get; set; } = new CreateServiceDetailVM();
 
@@ -84,6 +85,7 @@
 
         protected override async Task OnInitializedAsync()
         {
+            updateServiceDetailVM.ServiceId = idService;
             var result = await _serviceManagermentService.GetAll();
             if (result.IsSuccess)
             {
@@ -122,7 +124,7 @@
         //     }
         // }
 
-       
+
         private async Task Submit()
         {
             if (id == null || id == 0)

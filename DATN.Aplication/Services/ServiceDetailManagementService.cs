@@ -38,7 +38,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
                 }
 
-                
+
 
                 if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
                 {
@@ -129,6 +129,7 @@ namespace DATN.Aplication.Services
                 findServiceDetailById.Price = serviceDetail.Price;
                 findServiceDetailById.Duration = serviceDetail.Duration;
                 findServiceDetailById.NameDetail = serviceDetail.Description;
+                findServiceDetailById.ServiceId = serviceDetail.ServiceId;
                 findServiceDetailById.UpdateAt = DateTime.Now;
 
                 if (CheckServiceDetail.CheckPriceIsFormat(serviceDetail.Price) == false)
@@ -141,7 +142,7 @@ namespace DATN.Aplication.Services
                     return new ResponseData<string> { IsSuccess = false, Error = "Giá chỉ chứa ký tự là số" };
                 }
 
-                 
+
                 if (CheckIsNumber.Check(serviceDetail.Duration.ToString()) == false)
                 {
                     return new ResponseData<string> { IsSuccess = false, Error = "Thời gian chỉ chứa ký tự là số" };
@@ -172,7 +173,9 @@ namespace DATN.Aplication.Services
                              Duration = sd.Duration,
                              Description = sd.NameDetail,
                              CreatedAt = sd.CreateAt,
-                             IsDeleted = sd.IsDeleted
+                             IsDeleted = sd.IsDeleted,
+                             IdService = sd.ServiceId,
+
                          }).AsQueryable();
 
             if (query == null) return new List<GetServiceNameVM>();
