@@ -884,6 +884,7 @@ namespace DATN.Aplication.Services
                                 await _unitOfWork.BookingDetailRepository.UpdateRangeAsync(listBookingDetail);
                                 await _unitOfWork.HistoryActionRepository.AddRangeAsync(listHis);
                                 await _unitOfWork.BookingRepository.UpdateAsync(query);
+                                await _unitOfWork.SaveChangeAsync();
                                 return new ResponseData<string> { IsSuccess = true, Data = "Thành công" };
                             }
                             return new ResponseData<string> { IsSuccess = false, Error = "Chưa đến giờ mà khách đặt dịch vụ hoặc quá giờ bắt đầu dịch vụ" };
@@ -1345,7 +1346,7 @@ namespace DATN.Aplication.Services
                         Data = new Bill()
                         {
                             TotalPrice = totalprice,
-                            DateBooking = (await _unitOfWork.BookingRepository.GetAllAsync()).FirstOrDefault(c => c.Id == idBooking.Value).IsPayment ? (await _unitOfWork.HistoryActionRepository.GetAllAsync()).FirstOrDefault(c => c.ActionID == 16).ActionTime : DateTime.UtcNow,
+                            DateBooking = DateTime.UtcNow,
                             IdVoucher = voucherWillUse != 0 ? voucherWillUse : null,
                             ReducePrice = reduce.Value,
                             TotalPayment = totalprice - reduce.Value,
