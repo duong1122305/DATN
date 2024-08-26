@@ -35,5 +35,6 @@ namespace DATN.Aplication.Services.IServices
         public Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView);
         public Task<ResponseData<List<GetBookingByGuestVM>>> GetBookingByGuestNoAccount(string userOrPhoneNumber);
         public Task<ResponseData<List<HistoryBookingVM>>> GetReasonCancelBooking(int id);
+        public Task<ResponseData<BillPrintVM>> GetBillPrintByID(int id);
     }
 }

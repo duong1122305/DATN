@@ -66,7 +66,7 @@
             }
             else
             {
-                return x.Term.ToString();
+                return x.Term.Value.ToString();
             }
         };
         void ExpandAllGroups()
@@ -104,9 +104,12 @@
         }
         public async Task RemoveBill(int id)
         {
-            var listRemove = bookingService.ListProductDetail.Where(c => c.Term == id).ToList();
-            bookingService.RemoveBillTerm(listRemove);
-            await Task.Delay(1);
+            if (await Confirm()== true)
+            {
+                var listRemove = bookingService.ListProductDetail.Where(c => c.Term == id).ToList();
+                bookingService.RemoveBillTerm(listRemove);
+                await LoadData();
+            }
         }
         private async Task OpenDialogBillInStore(Guid? id, DateTime date)
         {
@@ -129,6 +132,16 @@
             }
             await LoadData();
 
+        }
+        private async Task<bool> Confirm()
+        {
+            var confirm = await _dialogservice.ShowMessageBox("Thông báo", "Xác nhận xoá hoá đơn tạm?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
+            StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
         }
         }
 
