@@ -1,6 +1,8 @@
 ﻿@page "/public/{idBooking}/{token}"
 @using DATN.ADMIN.IServices
 @using DATN.ViewModels.DTOs.ActionBooking
+@using System.IdentityModel.Tokens.Jwt
+@using System.Security.Claims
 @layout LayoutNoAuth
 @inject ISnackbar snackbar
 @code {
@@ -12,8 +14,13 @@
     public string idBooking { get; set; }
     [Parameter]
     public string token { get; set; }
+    [Inject]
+    IHttpContextAccessor _httpContextAccessor { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        var jwt = new JwtSecurityTokenHandler();
+        var tok = jwt.ReadJwtToken(_httpContextAccessor.HttpContext.Session.GetString("Key"));
+        var claim = tok.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
         var action = new ActionView()
             {
                 IdBokingOrDetail = Convert.ToInt32(idBooking),

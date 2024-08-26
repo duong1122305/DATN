@@ -560,10 +560,13 @@
 
         private async Task CheckInArrive(int id)
         {
+            var jwt = new JwtSecurityTokenHandler();
+            var tok = jwt.ReadJwtToken(_httpContextAccessor.HttpContext.Session.GetString("Key"));
+            var claim = tok.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             ActionView actionView = new ActionView()
             {
                 IdBokingOrDetail = id,
-                Token = _httpContextAccessor.HttpContext.Session.GetString("Key")
+                Token = claim
             };
             var respone = await _client.CheckInArrive(actionView);
             if (respone.IsSuccess)
