@@ -16,7 +16,7 @@ namespace DATN.Aplication.Services
         public async Task<ResponseData<string>> CreateProductDetail(CreateProductDetaiView productView)
         {
             var check = (from product in await _unitOfWork.ProductDetailRepository.GetAllAsync()
-                         where product.Name == productView.Name.Trim().TrimStart().TrimEnd()
+                         where product.Name == productView.Name.Trim().TrimStart().TrimEnd() && product.IdProduct == productView.IdProduct
                          select product).FirstOrDefault();
             try
             {
@@ -32,10 +32,10 @@ namespace DATN.Aplication.Services
                     };
                     await _unitOfWork.ProductDetailRepository.AddAsync(product);
                     await _unitOfWork.SaveChangeAsync();
-                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm sản phẩm thành công" };
+                    return new ResponseData<string> { IsSuccess = true, Data = "Thêm biến thể thành công" };
                 }
                 else
-                    return new ResponseData<string> { IsSuccess = false, Error = "Tên sản phẩm bị trùng" };
+                    return new ResponseData<string> { IsSuccess = false, Error = "Tên biến thể bị trùng" };
             }
             catch (Exception)
             {
