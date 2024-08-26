@@ -68,21 +68,25 @@
 		{
 			<div class="div-content" id="receipt">
 				<h3>MEW SHOP</h3>
-				<div style="display: flex">
-					<div>
-						<p>Khách hàng: @bill.CusName</p>
-						<p>Thời gian:  @bill.TimePayment</p>
-						<p>Nhân viên:  @bill.StaffName   </p>
-						<p>Số điện thoại: @bill.PhoneNumber</p>
+				<div style="display:flex; justify-content:space-between">
+					<div style="display: flex; justify-content: flex-start">
+						<div>
+							<p>Khách hàng: @bill.CusName</p>
+							<p>Thời gian:  @bill.TimePayment</p>
+							<p>Nhân viên:  @bill.StaffName   </p>
+							<p>Số điện thoại: @bill.PhoneNumber</p>
 
+						</div>
 					</div>
-			
-					<div style="float:right">
-						@if (!string.IsNullOrEmpty(bill.QrCheckOut))
-						{
-							
-						<img width="150" src="@bill.QrCheckOut" />
-						}
+					<div style="display: flex; justify-content: flex-end">
+
+						<div style="float:right">
+							@if (!string.IsNullOrEmpty(bill.QrCheckOut))
+							{
+
+								<img width="150" src="@bill.QrCheckOut" />
+							}
+						</div>
 					</div>
 				</div>
 
@@ -100,7 +104,7 @@
 						@foreach (var item in bill.DataPrintBills)
 						{
 							<tr>
-								<th scope="row">@bill.DataPrintBills.IndexOf(item)</th>
+								<th scope="row">@(bill.DataPrintBills.IndexOf(item)+1)</th>
 								<td>@item.Name</td>
 								<td>@item.Price</td>
 								<td>@item.Quantity</td>
