@@ -249,8 +249,7 @@
         //Thông báo hỏi khi xoá
         private async Task deleteStaff(string userName)
         {
-            isLoading = true;
-                        StateHasChanged();
+          
             if (await Confirm() == true)
             {
                 var response2 = await _client.GetByIdRemove(userName);
@@ -263,18 +262,14 @@
                 {
                     Snackbar.Add("Không tìm thấy nhân viên", Severity.Error);
                 }
-                isLoading = false;
-                StateHasChanged();
             }
-            isLoading = false;
-            StateHasChanged();
+
         }
 
         private async Task activeAc(string username)
         {
 
-            isLoading = true;
-            StateHasChanged();
+        
             var repon = await _client.activeUser(username);
             if (repon.IsSuccess)
             {
@@ -285,21 +280,14 @@
             {
                 Snackbar.Add(repon.Error, Severity.Success);
             }
-            isLoading = false;
-            StateHasChanged();
+
         }
 
         //thêm sửa !
         private async Task OpenDialog(string username)
         {
             isLoading = true;
-            await Task.Delay(10);
-            if (isEditing)
-            {
-                return; // Exit if already editing
-            }
-
-            isEditing = true; // Set flag to true to indicate editing in progress
+            await Task.Delay(50);
             var parameters = new DialogParameters();
             string nameDialog = "Thêm mới nhân viên";
             if (username != null)
@@ -332,9 +320,12 @@
             {
                 createUpdateDialog.Close();
                 await LoadData();
+                isLoading = false;
                 StateHasChanged();
+          
             }
             isLoading = false;
+                StateHasChanged();
         }
 
         private void HandleShiftChange(ChangeEventArgs e)
