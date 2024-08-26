@@ -1,232 +1,335 @@
 ﻿<AuthorizeView>
     <Authorized>
         @page "/viewbill"
-@using DATN.ADMIN.IServices
-@using DATN.Utilites
-@using DATN.ViewModels.DTOs.Booking
-@using DATN.ViewModels.DTOs.Payment
-@using DATN.ViewModels.DTOs.Product
-@using Newtonsoft.Json
-@inject IAddressService _addressServive;
-@inject IDialogService _dialogservice;
-@inject ISnackbar Snackbar
-@inject IJSRuntime jsRuntime;
-<style>
-    .mud-dialog-width-lg {
-        height: 680px;
-        min-height: 680px;
-    }
-</style>
-<MudContainer Class="invoice-container" Style="margin-top: 20px">
-    <MudPaper Elevation="3" Class="invoice-paper">
-        <div class="invoice-body">
-            @if (bill != null)
-            {
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-center flex-grow-1">
-                        <MudText Typo="Typo.h3" Class="invoice-label" Style="color: hotpink;text-align:center;">THÔNG TIN HOÁ ĐƠN</MudText>
-                    </div>
-                    <div class="text-right">
-                        <MudButton Class="invoice-label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" OnClick="PrintBill" Style="margin:15px">In</MudButton>
-                    </div>
-                </div>
-                <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
-                    <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
-                    <span><b>Khách hàng:</b> @bill.GuestName</span><br />
-                    <span><b>Số điện thoại:</b> @bill.PhoneNumber</span><br />
-                    <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
-                </MudText>
-
-                @if (guid != null)
-                {
-                    <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
-                    <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
-                        <HeaderContent>
-                            <MudTh>Dịch vụ sử dụng</MudTh>
-                            <MudTh>Tên thú cưng</MudTh>
-                            <MudTh>Nhân viên làm dịch vụ</MudTh>
-                            <MudTh>Đơn giá</MudTh>
-                        </HeaderContent>
-                                <RowTemplate Context="data">
-                            <MudTd>@data.ServiceDetailName</MudTd>
-                            <MudTd>@data.PetName</MudTd>
-                            <MudTd>@data.NameStaff</MudTd>
-                            <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                }
-
-                <br />
-                @if (bill.IsPayment)
-                {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px" Disabled>Thêm sản phẩm</MudButton>
-                }
-                else
-                {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
-                }
-                @if (idBooking != null && idBooking != 0)
-                {
-                    if (bill.IsPayment)
+        @using DATN.ADMIN.IServices
+        @using DATN.Utilites
+        @using DATN.ViewModels.DTOs.Booking
+        @using DATN.ViewModels.DTOs.Payment
+        @using DATN.ViewModels.DTOs.Product
+        @using Newtonsoft.Json
+        @inject IAddressService _addressServive;
+        @inject IDialogService _dialogservice;
+        @inject ISnackbar Snackbar
+        @inject IJSRuntime jsRuntime;
+        <style>
+            .mud-dialog-width-lg {
+                height: 680px;
+                min-height: 680px;
+            }
+        </style>
+        <MudContainer Class="invoice-container" Style="margin-top: 20px">
+            <MudPaper Elevation="3" Class="invoice-paper">
+                <div class="invoice-body">
+                    @if (bill != null)
                     {
-                        <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
-                            <HeaderContent>
-                                <MudTh>Tên sản phẩm</MudTh>
-                                <MudTh>Số lượng</MudTh>
-                                <MudTh>Đơn giá</MudTh>
-                            </HeaderContent>
-                            <RowTemplate Context="bill2">
-                                <MudTd>@bill2.Name</MudTd>
-                                <MudTd>
-                                    <div class="quantity-input">
-                                        <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
-                                    </div>
-                                </MudTd>
-                                <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
-                                <MudTd>
-                                </MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    }
-                    else
-                    {
-                        <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
-                            <HeaderContent>
-                                <MudTh>Tên sản phẩm</MudTh>
-                                <MudTh>Số lượng</MudTh>
-                                <MudTh>Đơn giá</MudTh>
-                                <MudTh>Hành động</MudTh>
-                            </HeaderContent>
-                                    <RowTemplate Context="data">
-                                <MudTd>@data.Name</MudTd>
-                                <MudTd>
-                                    <div class="quantity-input">
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(data) )">-</button>
-                                        <input type="number" @bind="data.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@data.Quantity" disabled style="width:60px" />
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(data) )">+</button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-center flex-grow-1">
+                                <MudText Typo="Typo.h3" Class="invoice-label" Style="color: hotpink;text-align:center;">THÔNG TIN HOÁ ĐƠN</MudText>
+                            </div>
+                            <div class="text-right">
+                                <MudButton Class="invoice-label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" OnClick="PrintBill" Style="margin:15px">In</MudButton>
+                            </div>
+                        </div>
+                        <MudText Typo="Typo.body2" Class="invoice-info" Style="margin-left:10px">
+                            <span><b>Ngày tạo:</b> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span><br />
+                            <span><b>Khách hàng:</b> @bill.GuestName</span><br />
+                            <span><b>Số điện thoại:</b> @bill.PhoneNumber</span><br />
+                            <span><b>Địa chỉ:</b> @_addressServive.GetAddress(bill.Address)</span><br />
+                        </MudText>
 
-                                    </div>
-                                </MudTd>
-                                <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
-                                <MudTd>
-                                    <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@data))" Color="Color.Error">Xoá</MudButton>
-                                </MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    }
-                }
-                else
-                {
-                    <MudTable Items="@bookingService.ListProductDetail.Where(c=>c.Term==termId)" Class="invoice-table">
-                        <HeaderContent>
-                            <MudTh>Tên sản phẩm</MudTh>
-                            <MudTh>Số lượng</MudTh>
-                            <MudTh>Đơn giá</MudTh>
-                            <MudTh>Hành động</MudTh>
-                        </HeaderContent>
-                                <RowTemplate Context="data">
-                            <MudTd>@data.Name</MudTd>
-                            <MudTd>
-                                <div class="quantity-input">
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(data) )">-</button>
-                                    <input type="number" @bind="data.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@data.Quantity" disabled style="width:60px" />
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(data) )">+</button>
-
-                                </div>
-                            </MudTd>
-                            <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
-                            <MudTd>
-                                <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@data))" Color="Color.Error">Xoá</MudButton>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
-
-                }
-                <style>
-                    .outer-div {
-                        display: flex;
-                        justify-content: flex-end; /* Đẩy div ngoài về bên phải */
-                        width: 100%;
-                    }
-
-                    .inner-div {
-                        text-align: left; /* Căn trái nội dung trong div */
-                    }
-                </style>
-                <div class="outer-div">
-                    <div class="inner-div">
-                        <br />
-                        <span><b>Tạm tính: </b>@CurrencyHelper.FormatCurrency((float)@bill.TotalPrice)</span><br />
-                        <br />
-                        <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
-                        <br />
-                        <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
-                        @if (!bill.IsPayment)
+                        @if (guid != null)
                         {
-                            <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
-                                <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
-                                <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
-                                <MudRadio Value="3" Color="Color.Secondary" UnCheckedColor="Color.Default">Momo</MudRadio>
-                            </MudRadioGroup>
-                            @if (selectedPaymentMethod == 2)
-                            {
-                                <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
-                            }
-                            else if (selectedPaymentMethod == 1)
-                            {
-                                <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
+                            <MudText Typo="Typo.h6" Class="invoice-label" Style="text-align:center;margin-bottom:5px">Danh sách dịch vụ đã sử dụng</MudText>
+                            <MudTable Items="@bill.ListServiceBooked" Class="invoice-table">
+                                <HeaderContent>
+                                    <MudTh>Dịch vụ sử dụng</MudTh>
+                                    <MudTh>Tên thú cưng</MudTh>
+                                    <MudTh>Nhân viên làm dịch vụ</MudTh>
+                                    <MudTh>Đơn giá</MudTh>
+                                </HeaderContent>
+                                <RowTemplate Context="data">
+                                    <MudTd>@data.ServiceDetailName</MudTd>
+                                    <MudTd>@data.PetName</MudTd>
+                                    <MudTd>@data.NameStaff</MudTd>
+                                    <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
 
+                        <br />
+                        @if (bill.IsPayment)
+                        {
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px" Disabled>Thêm sản phẩm</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDialog())" Color="Color.Primary" Style="margin:15px">Thêm sản phẩm</MudButton>
+                        }
+                        @if (idBooking != null && idBooking != 0)
+                        {
+                            if (bill.IsPayment)
+                            {
+                                <MudTable Items="@bill.ListProductDetail" Class="invoice-table">
+                                    <HeaderContent>
+                                        <MudTh>Tên sản phẩm</MudTh>
+                                        <MudTh>Số lượng</MudTh>
+                                        <MudTh>Đơn giá</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate Context="bill2">
+                                        <MudTd>@bill2.Name</MudTd>
+                                        <MudTd>
+                                            <div class="quantity-input">
+                                                <input type="number" @bind="bill2.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@bill2.Quantity" disabled style="width:60px" />
+                                            </div>
+                                        </MudTd>
+                                        <MudTd>@CurrencyHelper.FormatCurrency((float)bill2.Price)</MudTd>
+                                        <MudTd>
+                                        </MudTd>
+                                    </RowTemplate>
+                                </MudTable>
                             }
                             else
                             {
-                                <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
+                                <MudTable Items="@bookingService.ListProductDetail.Where(x=>x.IdBooking == idBooking)" Class="invoice-table">
+                                    <HeaderContent>
+                                        <MudTh>Tên sản phẩm</MudTh>
+                                        <MudTh>Số lượng</MudTh>
+                                        <MudTh>Đơn giá</MudTh>
+                                        <MudTh>Hành động</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate Context="data">
+                                        <MudTd>@data.Name</MudTd>
+                                        <MudTd>
+                                            <div class="quantity-input">
+                                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(data) )">-</button>
+                                                <input type="number" @bind="data.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@data.Quantity" disabled style="width:60px" />
+                                                <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(data) )">+</button>
+
+                                            </div>
+                                        </MudTd>
+                                        <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
+                                        <MudTd>
+                                            <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@data))" Color="Color.Error">Xoá</MudButton>
+                                        </MudTd>
+                                    </RowTemplate>
+                                </MudTable>
                             }
                         }
+                        else
+                        {
+                            <MudTable Items="@bookingService.ListProductDetail.Where(c=>c.Term==termId)" Class="invoice-table">
+                                <HeaderContent>
+                                    <MudTh>Tên sản phẩm</MudTh>
+                                    <MudTh>Số lượng</MudTh>
+                                    <MudTh>Đơn giá</MudTh>
+                                    <MudTh>Hành động</MudTh>
+                                </HeaderContent>
+                                <RowTemplate Context="data">
+                                    <MudTd>@data.Name</MudTd>
+                                    <MudTd>
+                                        <div class="quantity-input">
+                                            <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => DecrementQuantity(data) )">-</button>
+                                            <input type="number" @bind="data.SelectQuantityProduct" id="number2" class="form-control" min="1" max="@data.Quantity" disabled style="width:60px" />
+                                            <button class="btn btn-sm btn-outline-secondary" @onclick="@( () => IncrementQuantity(data) )">+</button>
 
+                                        </div>
+                                    </MudTd>
+                                    <MudTd>@CurrencyHelper.FormatCurrency((float)data.Price)</MudTd>
+                                    <MudTd>
+                                        <MudButton Variant="Variant.Filled" OnClick="@(() => RemoveProduct(@data))" Color="Color.Error">Xoá</MudButton>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+
+                        }
+                        <style>
+                            .outer-div {
+                                display: flex;
+                                justify-content: flex-end; /* Đẩy div ngoài về bên phải */
+                                width: 100%;
+                            }
+
+                            .inner-div {
+                                text-align: left; /* Căn trái nội dung trong div */
+                            }
+                        </style>
+                        <div class="outer-div">
+                            <div class="inner-div">
+                                <br />
+                                <span><b>Tạm tính: </b>@CurrencyHelper.FormatCurrency((float)@bill.TotalPrice)</span><br />
+                                <br />
+                                <span><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)@bill.ReducePrice)</span><br />
+                                <br />
+                                <span><b>Tổng tiền:</b> @CurrencyHelper.FormatCurrency((float)@bill.TotalPayment)</span><br />
+                                @if (!bill.IsPayment)
+                                {
+                                    <MudRadioGroup T="int" @bind-value="selectedPaymentMethod">
+                                        <MudRadio Value="1" Color="Color.Primary">Tiền mặt</MudRadio>
+                                        <MudRadio Value="2" Color="Color.Secondary" UnCheckedColor="Color.Default">Chuyển khoản</MudRadio>
+                                        <MudRadio Value="3" Color="Color.Secondary" UnCheckedColor="Color.Default">Momo</MudRadio>
+                                    </MudRadioGroup>
+                                    @if (selectedPaymentMethod == 2)
+                                    {
+                                        <MudButton OnClick="Payment" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán QR</MudButton>
+                                    }
+                                    else if (selectedPaymentMethod == 1)
+                                    {
+                                        <MudButton OnClick="@(async () => await PayMentInStore())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán tiền mặt</MudButton>
+
+                                    }
+                                    else
+                                    {
+                                        <MudButton OnClick="@(async () => await PayMentQr())" Variant="Variant.Filled" Color="Color.Success" Style="margin-bottom:5px">Thanh toán momo</MudButton>
+                                    }
+                                }
+
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-invoice">
+                            <MudTypography Typo="Typo.body2">Không có hóa đơn nào được chọn.</MudTypography>
+                        </div>
+                    }
+                </div>
+                <div class="div-content" id="contentbill" hidden>
+                    <h3>MEW SHOP</h3>
+                    <div>
+                        <p>Khách hàng: @bill.GuestName</p>
+                        <p>Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p>Nhân viên: Việt Nguyễn</p>
+                        <p>Số điện thoại: @bill.PhoneNumber</p>
+                        <p>Địa chỉ: @_addressServive.GetAddress(bill.Address)</p>
+
+                        <div>
+                            mã qr
+                        </div>
                     </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Tên dịch vụ</th>
+                                <th scope="col">Giá dịch vụ</th>
+                                <th scope="col">Tên sản phẩm</th>
+                                <th scope="col">Số lượng</th>
+                                <th scope="col">Giá sản phẩm</th>
+                                <th scope="col">Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in bill.ListServiceBooked)
+                            {
+                                @foreach (var item2 in bill.ListProductDetail)
+                                {
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>@item.ServiceDetailName</td>
+                                        <td>@CurrencyHelper.FormatCurrency((float)item.Price)</td>
+                                        <td>@item2.Name</td>
+                                        <td>@item2.SelectQuantityProduct</td>
+                                        <td>@CurrencyHelper.FormatCurrency((float)item2.Price)</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    <p><b>Giảm giá:</b> @CurrencyHelper.FormatCurrency((float)bill.ReducePrice)</p>
+                    <p><b>Thanh toán:</b> @CurrencyHelper.FormatCurrency((float)bill.TotalPayment)</p>
+                    <p><b>Tiền khách trả:</b> @CurrencyHelper.FormatCurrency((float)bill.TotalPayment)</p>
                 </div>
-            }
-            else
-            {
-                <div class="no-invoice">
-                    <MudTypography Typo="Typo.body2">Không có hóa đơn nào được chọn.</MudTypography>
-                </div>
-            }
-        </div>
-    </MudPaper>
-</MudContainer>
+                <style>
+                    .div-content {
+                        font-family: Arial, sans-serif;
+                        padding: 20px;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        width: 90%;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }
+
+                    h3 {
+                        color: #333;
+                        text-align: center;
+                    }
+
+                    p {
+                        margin: 0;
+                        padding: 5px 0;
+                        margin-left: 5px;
+                    }
+
+                    .table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                    }
+
+                        .table th, .table td {
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                            text-align: left;
+                        }
+
+                        .table th {
+                            background-color: #f4f4f4;
+                        }
+
+                        .table td {
+                            background-color: #fafafa;
+                        }
+
+                        .table thead {
+                            background-color: #f9f9f9;
+                        }
+
+                        .table tr:nth-child(even) {
+                            background-color: #f2f2f2;
+                        }
+
+                        .table tr:hover {
+                            background-color: #eaeaea;
+                        }
+
+                </style>
+            </MudPaper>
+        </MudContainer>
 
         @code {
-            [Parameter]
-    public Guid? guid { get; set; }
-    [Parameter]
-    public DateTime date { get; set; }
-    [Parameter]
-    public int? idBooking { get; set; }
-    [Parameter]
-    public int? termId { get; set; }
-    [Parameter]
-    public Bill billInvoice { get; set; }
-    [Inject]
-    private IBookingViewServices _client { get; set; }
-    private Bill bill = new Bill();
+        [Parameter]
+        public Guid? guid { get; set; }
+        [Parameter]
+        public DateTime date { get; set; }
+        [Parameter]
+        public int? idBooking { get; set; }
+        [Parameter]
+        public int? termId { get; set; }
+        [Parameter]
+        public Bill billInvoice { get; set; }
+        [Inject]
+        private IBookingViewServices _client { get; set; }
+        private Bill bill = new Bill();
 
-    [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
-    [Inject]
-    private IHttpContextAccessor httpContextAccessor { get; set; }
-    private int selectedPaymentMethod { get; set; } = 1;
-    [Inject] private BookingService bookingService { get; set; }
+        [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
+        [Inject]
+        private IHttpContextAccessor httpContextAccessor { get; set; }
+        private int selectedPaymentMethod { get; set; } = 1;
+        [Inject] private BookingService bookingService { get; set; }
 
-    [Inject]
-    NavigationManager navigationManager { get; set; }
+        [Inject]
+        NavigationManager navigationManager { get; set; }
 
-    private async Task LoadData()
-    {
+        private async Task LoadData()
+        {
             await OpenDialogReload();
             StateHasChanged();
-    }
-    protected override async Task OnInitializedAsync()
-    {
+        }
+        protected override async Task OnInitializedAsync()
+        {
             if (guid != null)
             {
                 await LoadData();
@@ -244,9 +347,9 @@
                 }
             }
 
-    }
-    protected async Task Payment()
-    {
+        }
+        protected async Task Payment()
+        {
             APIRequest request = new APIRequest()
             {
                 accountName = "Meo Shop",
@@ -291,9 +394,9 @@
                 }
                 _dialogBox.Close();
             }
-    }
-    public async Task PayMentQr()
-    {
+        }
+        public async Task PayMentQr()
+        {
             try
             {
                 var payment = new Payment()
@@ -329,10 +432,10 @@
             {
                 Snackbar.Add(e.Message, Severity.Warning);
             }
-    }
+        }
 
-    public async Task PayMentInStore()
-    {
+        public async Task PayMentInStore()
+        {
 
             var confirm = await Confirm("thanh toán");
             if (!confirm)
@@ -403,10 +506,10 @@
             {
                 Snackbar.Add(respone.Error, Severity.Error);
             }
-    }
+        }
 
-    public async Task OpenDialog()
-    {
+        public async Task OpenDialog()
+        {
 
             string nameDialog = "Chọn sản phẩm";
             DialogParameters parameter = new DialogParameters();
@@ -430,9 +533,9 @@
                 await LoadData();
                 StateHasChanged();
             }
-    }
-    public async Task OpenDialogReload()
-    {
+        }
+        public async Task OpenDialogReload()
+        {
             if (idBooking != 0 && idBooking != null)
             {
                 var respone2 = await _client.CheckBill(idBooking, bookingService.ListProductDetail.Where(x => x.IdBooking == idBooking).ToList());
@@ -452,82 +555,79 @@
                 }
             }
 
-    }
-    public async Task PrintBill()
-    {
+        }
+        public async Task PrintBill()
+        {
             if (!bill.IsPayment)
             {
                 Snackbar.Add("Hoá đơn chưa thanh toán", Severity.Warning);
                 return;
             }
-            DialogParameters parameter = new DialogParameters();
-        DialogOptions options = new DialogOptions()
+            await jsRuntime.InvokeVoidAsync("PrintBill()");
+        }
+
+        private async void RemoveProduct(ProductDetailView product)
+        {
+            var confirm = await Confirm("xoá");
+            if (!confirm)
             {
-                CloseOnEscapeKey = true,
-                Position = DialogPosition.Center,
-                MaxWidth = MaxWidth.Large,
-                CloseButton = true,
-                FullWidth = false,
-                DisableBackdropClick = true,
-            };
-        parameter.Add("BillInvoice", bill);
-        var createUpdateDialog = await _dialogservice.ShowAsync<InvoiceBill>("", parameter, options);
-        var result = await createUpdateDialog.Result;
-        if (!result.Canceled)
-        {
-            createUpdateDialog.Close();
+                return;
+            }
+            // Gọi phương thức từ BookingService để xóa booking
+            bookingService.RemoveProduct(product);
             await LoadData();
+            Snackbar.Add("Đã xoá thành công.", Severity.Success);
+            // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
+        }
+        private async Task<bool> Confirm(string text)
+        {
+            var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
+            yesText: "Xác nhận",
+            cancelText: "Hủy", noText: null,
+            options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
             StateHasChanged();
+            if (!confirm.HasValue) return false;
+            return confirm.Value;
         }
-    }
 
-    private async void RemoveProduct(ProductDetailView product)
-    {
-        var confirm = await Confirm("xoá");
-        if (!confirm)
+        //thêm sản phẩm
+        async void IncrementQuantity(ProductDetailView product)
         {
-            return;
+            if (product.SelectQuantityProduct < product.Quantity)
+            {
+                product.SelectQuantityProduct++;
+                await LoadData();
+            }
         }
-        // Gọi phương thức từ BookingService để xóa booking
-        bookingService.RemoveProduct(product);
-        await LoadData();
-        Snackbar.Add("Đã xoá thành công.", Severity.Success);
-        // Hiển thị thông báo hoặc cập nhật giao diện sau khi xoá thành công
-    }
-    private async Task<bool> Confirm(string text)
-    {
-        var confirm = await _dialogservice.ShowMessageBox("Thông báo", $"Xác nhận {text} dịch vụ?",
-                    yesText: "Xác nhận",
-                    cancelText: "Hủy", noText: null,
-                    options: new DialogOptions { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true });
-        StateHasChanged();
-        if (!confirm.HasValue) return false;
-        return confirm.Value;
-    }
 
-    //thêm sản phẩm
-    async void IncrementQuantity(ProductDetailView product)
-    {
-        if (product.SelectQuantityProduct < product.Quantity)
+        //trừ sản phẩm
+        async void DecrementQuantity(ProductDetailView product)
         {
-            product.SelectQuantityProduct++;
-            await LoadData();
+            if (product.SelectQuantityProduct > 1)
+            {
+                product.SelectQuantityProduct--;
+                await LoadData();
+            }
         }
-    }
-
-    //trừ sản phẩm
-    async void DecrementQuantity(ProductDetailView product)
-    {
-        if (product.SelectQuantityProduct > 1)
-        {
-            product.SelectQuantityProduct--;
-            await LoadData();
         }
-    }
-}
 
     </Authorized>
     <NotAuthorized>
         <p>Không có quyền truy cập</p>
     </NotAuthorized>
 </AuthorizeView>
+<script>
+    function PrintBill() {
+        var bill = document.getElementById("contentbill").innerHTML;
+        var printWindow = window.open('', '', 'height=600,width=800');
+
+        // Thêm nội dung vào cửa sổ mới
+        printWindow.document.write('<html><head><title>Print Content</title>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(bill);
+        printWindow.document.write('</body></html>');
+
+        // Đợi đến khi nội dung được tải xong và thực hiện in
+        printWindow.print();
+    }
+</script>
