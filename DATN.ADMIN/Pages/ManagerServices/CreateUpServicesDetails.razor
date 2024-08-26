@@ -24,9 +24,9 @@
                                     }
                                 </select>
                             </div>
-                            <MudTextField Style="margin-top:5px" T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
-                            <MudTextField Style="margin-top:5px" T="double" Variant="Variant.Outlined" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
-                            <MudNumericField Style="margin-top:5px" T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
+                            <MudTextField T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@createServiceDetailVM.Description" For="@(() => createServiceDetailVM.Description)" />
+                            <MudTextField T="double" Variant="Variant.Outlined" Label="Thời gian làm(Phút)" @bind-Value="@createServiceDetailVM.Duration" For="@(() => createServiceDetailVM.Duration)" />
+                            <MudNumericField T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@createServiceDetailVM.Price" Immediate="true" Format="N0" Culture=@nrDisplay For="@(() => createServiceDetailVM.Price)" />
 
                         }
                         else
@@ -40,9 +40,9 @@
                                     }
                                 </select>
                             </div>
-                            <MudTextField Style="margin-top:5px" T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
-                            <MudTextField Style="margin-top:5px" T="double" Variant="Variant.Outlined" Label="Thời gian làm" MaxLength="2" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
-                            <MudNumericField Style="margin-top:5px" T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@updateServiceDetailVM.Price" Format="N0" MaxLength="7" />
+                            <MudTextField T="string" Variant="Variant.Outlined" Label="Tên chi tiết" @bind-Value="@updateServiceDetailVM.Description" For="@(() => updateServiceDetailVM.Description)" />
+                            <MudTextField T="double" Variant="Variant.Outlined" Label="Thời gian làm" MaxLength="2" @bind-Value="@updateServiceDetailVM.Duration" For="@(() => updateServiceDetailVM.Duration)" />
+                            <MudNumericField T="float" Variant="Variant.Outlined" Label="Giá(VNĐ)" @bind-Value="@updateServiceDetailVM.Price" Format="N0" MaxLength="7" />
 
                         }
                         <hr class="hr" />
@@ -56,9 +56,10 @@
 
 
         @code {
-        [Parameter]
+            [Parameter]
         public int id { get; set; }
-
+        [Parameter]
+        public int idService { get; set; }
         [Parameter]
         public CreateServiceDetailVM createServiceDetailVM { get; set; } = new CreateServiceDetailVM();
 
@@ -84,17 +85,8 @@
 
         protected override async Task OnInitializedAsync()
         {
+            updateServiceDetailVM.ServiceId = idService;
             await LoadData();
-        }
-        private async Task LoadData()
-        {
-            var result = await _serviceManagermentService.GetAll();
-            if (result.IsSuccess)
-            {
-                lstService = result.Data.Where(p => !p.IsDetele).ToList();
-                // updateServiceDetailVM = lstService.Select(c => new CreateServiceDetailVM).First();
-            }
-
             if (id != null && id != 0)
             {
                 _nameButton = "Cập nhật";
@@ -111,6 +103,16 @@
                 _nameButton = "Thêm mới";
                 await OnPriceChanged(createServiceDetailVM.Price);
             }
+        }
+        private async Task LoadData()
+        {
+            var result = await _serviceManagermentService.GetAll();
+            if (result.IsSuccess)
+            {
+                lstService = result.Data.Where(p => !p.IsDetele).ToList();
+                // updateServiceDetailVM = lstService.Select(c => new CreateServiceDetailVM).First();
+            }
+
         }
 
         private async Task OnPriceChanged(float value)
