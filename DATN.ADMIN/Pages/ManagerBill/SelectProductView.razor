@@ -6,6 +6,7 @@
         @using DATN.ViewModels.DTOs.Booking
         @using DATN.ViewModels.DTOs.Product
         @using DATN.ViewModels.DTOs.ProductDetail
+        <DATN.ADMIN.Components.Loadding _isVisible="isLoading" />
 
         <MudDataGrid Items="@lstProductDetaiView" QuickFilter="@_quickFilter" Filterable="true" Style="width:1200px;min-width:1200px">
             <ToolBarContent>
@@ -58,6 +59,7 @@
         private BookingService _tempLstProductDetail { get; set; }
         [CascadingParameter] MudDialogInstance _dialogBox { get; set; }
         private List<ProductSelect> lstProductDetaiView = new List<ProductSelect>();
+        private bool isLoading;
 
         private string searchString = "";
 
@@ -75,6 +77,8 @@
         }
         private async Task ChooseProduct(ProductDetailView productDV)
         {
+            isLoading = true;
+            await Task.Delay(50);
             @if (IdBooking != 0 && IdBooking != null)
             {
                 productDV.IdBooking = IdBooking.Value;
@@ -90,6 +94,8 @@
                 {
                     _tempLstProductDetail.AddProduct(productDV);
                 }
+                isLoading = false ;
+                StateHasChanged();
                 _dialogBox.Close();
             }
             else
@@ -107,6 +113,8 @@
                 {
                     _tempLstProductDetail.AddProduct(productDV);
                 }
+                isLoading = false;
+                StateHasChanged();
                 _dialogBox.Close();
             }
         }
