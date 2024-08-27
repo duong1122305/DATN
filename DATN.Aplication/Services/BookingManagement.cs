@@ -593,7 +593,7 @@ namespace DATN.Aplication.Services
                 return new ResponseData<string> { IsSuccess = false, Error = "Không tìm thấy" };
         }
         public async Task<ResponseData<string>> CancelBookingDetailByGuest(ActionView actionView)
-         {
+        {
             var query = (from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                          where bookingDetail.Id == actionView.IdBokingOrDetail
                          select bookingDetail).FirstOrDefault();
@@ -2127,11 +2127,37 @@ namespace DATN.Aplication.Services
                                 Description = history.Description,
                                 TimeAction = history.ActionTime.ToString("HH:mm:ss dd-MM-yyyy"),
                             };
-                if (query != null)
+                if (query.Count() > 0)
                 {
                     return new ResponseData<List<HistoryBookingVM>> { IsSuccess = true, Data = query.ToList() };
                 }
-                return new ResponseData<List<HistoryBookingVM>> { IsSuccess = false, Error = "Có hủy đâu mà có booking" };
+                else
+                {
+                    var query1 = from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                 where booking.Id == id && booking.Status == BookingStatus.AdminCancelled
+                                 select booking;
+                    if (query1 != null)
+                    {
+                        return new ResponseData<List<HistoryBookingVM>>
+                        {
+                            IsSuccess = true,
+                            Data = new List<HistoryBookingVM>
+                        {
+                                new HistoryBookingVM {
+                                    Description = "Tự động huỷ",
+                                ActionBy="ab",
+                                ActionName="Huỷ",
+                                ID=9999,
+                                TimeAction=""
+                                }
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<List<HistoryBookingVM>> { IsSuccess = false, Error = "Không rõ lý do" };
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -2143,33 +2169,33 @@ namespace DATN.Aplication.Services
         {
             try
             {
-                var booking=await _unitOfWork.BookingRepository.GetAsync(id);
-                var guest= await _unitOfWork.GuestRepository.GetAsync(booking.GuestId);
-                var historys= await _unitOfWork.HistoryActionRepository.FindAsync(p=>p.ActionID==16&& p.BookingID==id);
+                var booking = await _unitOfWork.BookingRepository.GetAsync(id);
+                var guest = await _unitOfWork.GuestRepository.GetAsync(booking.GuestId);
+                var historys = await _unitOfWork.HistoryActionRepository.FindAsync(p => p.ActionID == 16 && p.BookingID == id);
                 var history = historys.First();
-                var user =await _userManager.FindByIdAsync(history.ActionByID!.ToString());
-                var lstBookingDetails= await _unitOfWork.BookingDetailRepository.FindAsync(p=>p.BookingId==id);
-                var lstOrder= await _unitOfWork.OrderDetailRepository.FindAsync(p => p.IdBooking == id);
+                var user = await _userManager.FindByIdAsync(history.ActionByID!.ToString());
+                var lstBookingDetails = await _unitOfWork.BookingDetailRepository.FindAsync(p => p.BookingId == id);
+                var lstOrder = await _unitOfWork.OrderDetailRepository.FindAsync(p => p.IdBooking == id);
                 var lstProductD = await _unitOfWork.ProductDetailRepository.GetAllAsync();
                 var lstProduct = await _unitOfWork.ProductRepository.GetAllAsync();
                 var lstServiceD = await _unitOfWork.ServiceDetailRepository.GetAllAsync();
-                BillPrintVM billPrint = new BillPrintVM() 
+                BillPrintVM billPrint = new BillPrintVM()
                 {
-                    Address =guest.Address,
-                    AmountPayment= (booking.TotalPrice-booking.ReducedAmount??0).ToString("N0"),
-                    CusName=guest.Name,
-                    PhoneNumber= guest.PhoneNumber,
-                    TimePayment=history.ActionTime.ToString("HH:mm dd/MM/yyyy"),
-                    StaffName= user.FullName,
-                    TotalAmount= booking.TotalPrice.ToString("N0"),
-                    TotalReduce= (booking.ReducedAmount??0).ToString("N0")
+                    Address = guest.Address,
+                    AmountPayment = (booking.TotalPrice - booking.ReducedAmount ?? 0).ToString("N0"),
+                    CusName = guest.Name,
+                    PhoneNumber = guest.PhoneNumber,
+                    TimePayment = history.ActionTime.ToString("HH:mm dd/MM/yyyy"),
+                    StaffName = user.FullName,
+                    TotalAmount = booking.TotalPrice.ToString("N0"),
+                    TotalReduce = (booking.ReducedAmount ?? 0).ToString("N0")
                 };
-               
-                if (lstBookingDetails!=null&& lstBookingDetails.Count()>0)
+
+                if (lstBookingDetails != null && lstBookingDetails.Count() > 0)
                 {
-					var qrRP = await QrCodeCheckOut(id);
-					billPrint.QrCheckOut = qrRP.Data.ToString();
-					var dataBD = from b in lstBookingDetails
+                    var qrRP = await QrCodeCheckOut(id);
+                    billPrint.QrCheckOut = qrRP.Data.ToString();
+                    var dataBD = from b in lstBookingDetails
                                  join s in lstServiceD
                                  on b.ServiceDetailId equals s.Id
                                  select new DataPrintBill()
@@ -2181,17 +2207,17 @@ namespace DATN.Aplication.Services
                                  };
                     billPrint.DataPrintBills.AddRange(dataBD.ToList());
                 }
-                if (lstOrder!=null&&lstOrder.Count()>0)
+                if (lstOrder != null && lstOrder.Count() > 0)
                 {
-					
-					var dataOD = from o in lstOrder
+
+                    var dataOD = from o in lstOrder
                                  join pd in lstProductD
-                                 on o.IdProductDetail equals pd.Id 
+                                 on o.IdProductDetail equals pd.Id
                                  join p in lstProduct
                                  on pd.IdProduct equals p.Id
                                  select new DataPrintBill()
                                  {
-                                     Name = p.Name+" - "+pd.Name,
+                                     Name = p.Name + " - " + pd.Name,
                                      Price = o.Price.ToString("N0"),
                                      Quantity = o.Quantity.ToString("N0"),
                                      Total = (o.Price * o.Quantity).ToString("N0"),
@@ -2202,7 +2228,7 @@ namespace DATN.Aplication.Services
             }
             catch (Exception ex)
             {
-                return new ResponseData<BillPrintVM>(false,"Có lỗi xảy ra"+ex);
+                return new ResponseData<BillPrintVM>(false, "Có lỗi xảy ra" + ex);
             }
         }
         //public async Task<ResponseData<>>

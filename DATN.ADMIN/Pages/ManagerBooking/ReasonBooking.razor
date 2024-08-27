@@ -1,21 +1,29 @@
 ﻿@using DATN.ADMIN.IServices
 @inject ISnackbar snackbar
 <div style="margin: 20px">
-    <p><b>Lý do huỷ</b>: @test</p>
+    <p>
+        <b>Lý do huỷ</b>: @foreach (var item in test)
+        {
+        <p>@item</p>
+        }
+    </p>
 </div>
 @code {
     [Parameter]
     public int? id { get; set; }
     [Inject]
     IBookingViewServices bookingViewServices { get; set; }
-    public string test { get; set; }
+    public List<string> test { get; set; } = new List<string>();
     protected override async Task OnInitializedAsync()
     {
         var response = await bookingViewServices.GetReasonCancelBooking(id.Value);
 
         if (response.IsSuccess)
         {
-            test = response.Data.FirstOrDefault().Description;
+            foreach (var item in response.Data)
+            {
+                test.Add(item.Description);
+            }
             StateHasChanged();
         }
         else
