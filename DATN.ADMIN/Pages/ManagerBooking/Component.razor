@@ -5,6 +5,7 @@
 @using System.Security.Claims
 @layout LayoutNoAuth
 @inject ISnackbar snackbar
+<p>@Error</p>
 @code {
     [Inject]
     public IBookingViewServices _booking { get; set; }
@@ -14,6 +15,7 @@
     public string idBooking { get; set; }
     [Parameter]
     public string token { get; set; }
+    public string Error { get; set; }
     [Inject]
     IHttpContextAccessor _httpContextAccessor { get; set; }
     protected override async Task OnInitializedAsync()
@@ -33,8 +35,8 @@
         }
         else
         {
-            snackbar.Add(response.Error, Severity.Error);
-            //thông báo
+            Error = response.Data;
+            StateHasChanged();
         }
     }
 }
