@@ -250,6 +250,14 @@ namespace DATN.Aplication.Services
                         IsSuccess = false,
                         Error = "Email đã được đăng ký ở tài khoản khác"
                     };
+                } 
+                if (await _unitOfWork.GuestRepository.CheckPhoneNumberExist(request.PhoneNumber))
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Error = "Số điện thoại đã được đăng ký ở tài khoản khác"
+                    };
                 }
 
                 var guest = new Guest();
@@ -347,7 +355,14 @@ namespace DATN.Aplication.Services
                         Error = "Email đã được đăng ký ở tài khoản khác"
                     };
                 }
-
+                if (await _unitOfWork.GuestRepository.CheckPhoneNumberExist(request.PhoneNumber))
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Error = "Số điện thoại đã được đăng ký ở tài khoản khác"
+                    };
+                }
                 var guest = new Guest()
                 {
                     Address = request.Address,
