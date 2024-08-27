@@ -601,10 +601,14 @@ namespace DATN.Aplication.Services
             {
                 if (query.Status == BookingDetailStatus.Unfulfilled)
                 {
-                    List<BookingDetail> lstUpdate = new List<BookingDetail>();
+                    var queryBookingDetai = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
+                                            where bookingDetail.BookingId == query.BookingId
+                                            select bookingDetail;
+                    var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
+                                        where booking.Id == query.BookingId
+                                        select booking).FirstOrDefault();
                     try
                     {
-                        query.Status = BookingDetailStatus.Cancelled;
                         HistoryAction historyAction = new HistoryAction()
                         {
                             BookingID = query.BookingId,
@@ -613,6 +617,13 @@ namespace DATN.Aplication.Services
                             ActionID = 14,
                             ByGuest = true
                         };
+                        if (queryBookingDetai.Count() == 1)
+                        {
+                            historyAction.Description = "Khách hàng huỷ dịch vụ";
+                            queryBooking.Status = BookingStatus.CustomerCancelled;
+                            await _unitOfWork.BookingRepository.UpdateAsync(queryBooking);
+                        }
+                        query.Status = BookingDetailStatus.Cancelled;
                         await _unitOfWork.BookingDetailRepository.UpdateAsync(query);
                         await _unitOfWork.HistoryActionRepository.AddAsync(historyAction);
                         await _unitOfWork.SaveChangeAsync();
