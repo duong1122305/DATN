@@ -190,7 +190,9 @@
     }
     protected async Task ChangeShift(Shift value)
     {
-
+        selectedShift = value;
+        await  LoadData();
+        StateHasChanged();
     }
 
 
