@@ -2210,6 +2210,7 @@ namespace DATN.Aplication.Services
                     var dataBD = from b in lstBookingDetails
                                  join s in lstServiceD
                                  on b.ServiceDetailId equals s.Id
+                                 where b.Status==BookingDetailStatus.Completed
                                  select new DataPrintBill()
                                  {
                                      Name = s.NameDetail,
