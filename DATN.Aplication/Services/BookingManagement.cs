@@ -603,6 +603,7 @@ namespace DATN.Aplication.Services
                 {
                     var queryBookingDetai = from bookingDetail in await _unitOfWork.BookingDetailRepository.GetAllAsync()
                                             where bookingDetail.BookingId == query.BookingId
+                                            && bookingDetail.Status == BookingDetailStatus.Unfulfilled
                                             select bookingDetail;
                     var queryBooking = (from booking in await _unitOfWork.BookingRepository.GetAllAsync()
                                         where booking.Id == query.BookingId
